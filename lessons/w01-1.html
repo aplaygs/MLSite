@@ -154,11 +154,22 @@ body{margin:0} [hidden]{display:none!important}
 .tp{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:5px 6px;border-radius:7px;cursor:pointer;font-size:14.5px}
 .tp:hover{background:var(--soft)}
 .tp input{position:absolute;opacity:0;width:1px;height:1px}
-.tp .bx{width:16px;height:16px;margin-top:2px;border:1.5px solid var(--muted);border-radius:4px}
+.tp .bx{width:16px;height:16px;margin-top:2px;border:1.5px solid var(--muted);border-radius:4px;display:grid;place-items:center}
 .tp input:checked+.bx{background:var(--accent);border-color:var(--accent)}
+.tp input:checked+.bx::after{content:"";width:8px;height:4px;border:2px solid var(--surface);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .tp input:checked~span:last-child{color:var(--muted);text-decoration:line-through}
 .tp input:disabled+.bx{opacity:.5}
 .tp input:focus-visible+.bx{outline:2px solid var(--accent);outline-offset:2px}
+.topic-check{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;transition:border-color .2s,background .2s;margin-top:4px}
+.topic-check.is-done{background:var(--soft);border-color:var(--accent)}
+.topic-check.multi{display:grid;gap:10px}
+.topic-check-h{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px}
+.topic-check-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 14px}
+.topic-check .tp{display:inline-flex;align-items:center;gap:10px;padding:5px 8px;border-radius:8px;line-height:1.35;font-size:14.5px}
+.topic-check .tp .bx{margin-top:0;flex-shrink:0}
+.topic-check .tp input:checked~span:last-child{text-decoration:none;color:var(--ink)}
+.topic-check .note{font:500 12px var(--f-mono);color:var(--muted);letter-spacing:.02em}
+.topic-check.is-done .note{color:var(--accent)}
 </style>
 
 <div class="wrap">
@@ -234,6 +245,10 @@ body{margin:0} [hidden]{display:none!important}
     <details class="q"><summary><span class="t self">Проверь себя</span>Предсказать, на сколько минут студент опоздает на пару. И разбить 1500 студентов на группы без меток. Какие это типы?</summary>
       <div class="a"><p>Опоздание в минутах — регрессия, ответ это число. Группы без меток — кластеризация.</p></div></details>
   </div>
+  <div class="topic-check" data-for="ml.base.0">
+    <label class="tp"><input type="checkbox" data-id="ml.base.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Типы задач</b></span></label>
+    <span class="note" data-d="ml.base.0">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ 2 ============ -->
@@ -266,6 +281,10 @@ body{margin:0} [hidden]{display:none!important}
       <div class="a"><p>Разметить вручную, в том числе через асессоров. Достать из логов поведения: клик означает интерес, возврат товара означает недовольство. Получить правилами-эвристиками, это слабая разметка. Размечать только самые неуверенные примеры модели, это активное обучение. Или начать без учителя: кластеры и аномалии.</p></div></details>
     <details class="q"><summary><span class="t self">Проверь себя</span>Модель по прошлым сессиям учится предсказывать, будет ли долг. С учителем или без?</summary>
       <div class="a"><p>С учителем: про прошлые сессии известно, у кого был долг, это и есть y.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="ml.base.1">
+    <label class="tp"><input type="checkbox" data-id="ml.base.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Обучение с учителем и без</b></span></label>
+    <span class="note" data-d="ml.base.1">отметка в дереве</span>
   </div>
 </section>
 
@@ -388,6 +407,10 @@ body{margin:0} [hidden]{display:none!important}
     <details class="q"><summary><span class="t">Собес</span>RMSE или MAE — что выбрать как метрику?</summary>
       <div class="a"><p>RMSE — если большие ошибки непропорционально плохи (ошибиться на 10 хуже, чем десять раз на 1). MAE — если все ошибки одинаково важны или в данных выбросы. Обе в единицах целевой переменной, их легко объяснить бизнесу. RMSE всегда ≥ MAE; чем больше разрыв, тем больше крупных ошибок.</p></div></details>
   </div>
+  <div class="topic-check" data-for="ml.base.2">
+    <label class="tp"><input type="checkbox" data-id="ml.base.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Функция потерь и эмпирический риск</b></span></label>
+    <span class="note" data-d="ml.base.2">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ 4 ============ -->
@@ -487,6 +510,10 @@ cross_val_score(model, X_train, y_train, cv=5)  <span class="cm"># и в CV то
     <details class="q"><summary><span class="t">Собес</span>Как делить данные, если это временной ряд?</summary>
       <div class="a"><p>Только по времени: train — прошлое, val и test — будущее. Для CV — <code>TimeSeriesSplit</code>: окно обучения растёт, валидация всегда после него. Перемешивать нельзя, иначе модель подсматривает в будущее.</p></div></details>
   </div>
+  <div class="topic-check" data-for="ml.base.3">
+    <label class="tp"><input type="checkbox" data-id="ml.base.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Train, validation и test</b></span></label>
+    <span class="note" data-d="ml.base.3">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ 5 ============ -->
@@ -574,6 +601,10 @@ cross_val_score(model, X_train, y_train, cv=5)  <span class="cm"># и в CV то
     <details class="q"><summary><span class="t">Собес</span>Поможет ли добавить данных?</summary>
       <div class="a"><p>Смотря что с моделью. Постройте learning curve. Если переобучение (большой зазор train/val) — да, поможет. Если недообучение (обе ошибки высокие и сошлись) — нет, нужна модель сложнее или лучшие признаки.</p></div></details>
   </div>
+  <div class="topic-check" data-for="ml.base.4">
+    <label class="tp"><input type="checkbox" data-id="ml.base.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Переобучение и недообучение</b></span></label>
+    <span class="note" data-d="ml.base.4">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ 6 ============ -->
@@ -630,6 +661,10 @@ cross_val_score(model, X_train, y_train, cv=5)  <span class="cm"># и в CV то
       <div class="a"><p>Random Forest обучает глубокие деревья (низкий bias, высокая variance) на разных бутстреп-выборках и усредняет их. Усреднение слабо связанных ошибок уменьшает разброс. Бустинг последовательно добавляет неглубокие деревья (высокий bias), каждое учится на ошибках текущего ансамбля. Это шаг за шагом уменьшает систематическую ошибку.</p></div></details>
     <details class="q"><summary><span class="t self">Проверь себя</span>Дерево глубины 1 и дерево глубины 30: у какого высокий bias, у какого высокая variance?</summary>
       <div class="a"><p>Глубина 1 — высокий bias: один вопрос не может описать сложную зависимость. Глубина 30 — высокая variance: дерево подстраивается под каждую точку и меняется от любой новой выборки.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="ml.base.5">
+    <label class="tp"><input type="checkbox" data-id="ml.base.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Bias–variance trade-off</b></span></label>
+    <span class="note" data-d="ml.base.5">отметка в дереве</span>
   </div>
 </section>
 
@@ -718,6 +753,10 @@ def binary_search(a, target):
     <details class="q"><summary><span class="t self">Проверь себя</span>Сортировка, а потом один проход по списку. Итоговая сложность?</summary>
       <div class="a"><p>O(n log n) + O(n) = O(n log n): остаётся самое тяжёлое слагаемое.</p></div></details>
   </div>
+  <div class="topic-check" data-for="algo.cx.0">
+    <label class="tp"><input type="checkbox" data-id="algo.cx.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Big O по времени и памяти</b></span></label>
+    <span class="note" data-d="algo.cx.0">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ 8 + 9 ============ -->
@@ -757,6 +796,10 @@ def binary_search(a, target):
     <details class="q"><summary><span class="t">Собес</span>Почему numpy быстрее списков Python?</summary>
       <div class="a"><p>Numpy хранит числа одного типа подряд в памяти, а операции над массивом выполняются циклом на C без проверки типа каждого элемента (векторизация). List хранит ссылки на отдельные Python-объекты, каждый элемент обрабатывается интерпретатором. Плюс непрерывная память лучше использует кэш процессора.</p></div></details>
   </div>
+  <div class="topic-check" data-for="algo.ds.0">
+    <label class="tp"><input type="checkbox" data-id="algo.ds.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Массив и динамический массив</b></span></label>
+    <span class="note" data-d="algo.ds.0">отметка в дереве</span>
+  </div>
 </section>
 <section class="topic" id="t9" style="padding-top:8px">
   <div class="eyebrow">Тема 9 из 10 · Алгоритмы</div>
@@ -790,6 +833,10 @@ def binary_search(a, target):
       <div class="a"><p>Это амортизированная оценка. Список выделяет память с запасом, пропорциональным текущей длине. Полное копирование происходит редко, и его стоимость раскладывается на все предыдущие дешёвые append. Суммарная работа на n добавлений — O(n), значит в среднем O(1) на операцию. Отдельный append в худшем случае стоит O(n).</p></div></details>
     <details class="q"><summary><span class="t self">Проверь себя</span>Нажми insert(0, x) пять раз подряд. Почему каждая вставка дороже предыдущей?</summary>
       <div class="a"><p>Каждый раз сдвигаются все элементы, а их становится больше. Вставка в начало — O(n). Если нужна очередь с добавлением и удалением с обоих концов, берут <code>collections.deque</code> (урок 2).</p></div></details>
+  </div>
+  <div class="topic-check" data-for="algo.cx.1">
+    <label class="tp"><input type="checkbox" data-id="algo.cx.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Амортизированная сложность</b></span></label>
+    <span class="note" data-d="algo.cx.1">отметка в дереве</span>
   </div>
 </section>
 
@@ -863,6 +910,10 @@ def binary_search(a, target):
   <div class="qs">
     <details class="q"><summary><span class="t">Собес</span>Почему <code>x in list</code> медленнее, чем <code>x in set</code>?</summary>
       <div class="a"><p>list проверяет элементы по очереди, пока не найдёт, это O(n). set считает хеш x и сразу идёт в нужную ячейку хеш-таблицы, это O(1) в среднем. Цена — память: set тратит больше места, и элементы должны быть хешируемыми, то есть неизменяемыми.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="algo.cx.2">
+    <label class="tp"><input type="checkbox" data-id="algo.cx.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Сложность операций list, dict, set</b></span></label>
+    <span class="note" data-d="algo.cx.2">отметка в дереве</span>
   </div>
 </section>
 
@@ -1279,16 +1330,53 @@ function initTopics(){
   if(LOCAL)$("topnav").hidden=false;
   const box=$("topicList"),note=$("topicNote");
   box.innerHTML=TOPICS.map(([id,t])=>`<li><label class="tp"><input type="checkbox" id="tp-${id}" data-id="${id}" ${LOCAL?"":"disabled"}><span class="bx" aria-hidden="true"></span><span>${t}</span></label></li>`).join("");
-  if(!LOCAL){note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";return}
-  const apply=d=>TOPICS.forEach(([id])=>{$("tp-"+id).checked=!!d[id]});
+  document.querySelectorAll(".topic-check input[data-id]").forEach(cb=>{ cb.disabled=!LOCAL; });
+  if(!LOCAL){
+    note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";
+    document.querySelectorAll(".topic-check .note").forEach(el=>{ el.textContent="только на localhost"; });
+    return;
+  }
   const day=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+  const fmt=iso=>{const [y,m,d]=(iso||"").split("-");return d&&m?`${d}.${m}`:""};
+  function apply(d){
+    TOPICS.forEach(([id])=>{
+      const on=!!d[id];
+      document.querySelectorAll(`input[data-id="${id}"]`).forEach(cb=>{ cb.checked=on; });
+      const dt=on?fmt(d[id]):"";
+      document.querySelectorAll(`[data-d="${id}"]`).forEach(el=>{
+        el.textContent=on?(dt?`✓ ${dt} в Obsidian`:"✓ в Obsidian"):"отметка в дереве";
+      });
+    });
+    document.querySelectorAll(".topic-check").forEach(card=>{
+      const ids=(card.dataset.for||"").split(",").map(s=>s.trim()).filter(Boolean);
+      const all=ids.length>0&&ids.every(id=>!!d[id]);
+      const any=ids.some(id=>!!d[id]);
+      card.classList.toggle("is-done",all);
+      const hNote=card.querySelector(".topic-check-h .note");
+      if(hNote){
+        const cnt=ids.filter(id=>!!d[id]).length;
+        hNote.textContent=all?"✓ все темы пройдены":(any?`${cnt} из ${ids.length} пройдено`:"");
+      }
+    });
+  }
   fetch("/api/tree").then(r=>r.json()).then(j=>apply(j.done||{})).catch(()=>{note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
-  box.addEventListener("change",async e=>{
-    const id=e.target.dataset.id;if(!id)return;
-    const body=e.target.checked?{set:{[id]:day()}}:{unset:[id]};
-    try{const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-      if(!r.ok)throw 0;const j=await r.json();apply(j.done||{});note.textContent="Сохранено в файле недели в Obsidian";}
-    catch(err){e.target.checked=!e.target.checked;note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево»."}
+  document.addEventListener("change",async e=>{
+    const cb=e.target;
+    if(!cb||!cb.matches("input[data-id]"))return;
+    const id=cb.dataset.id;if(!id)return;
+    const checked=cb.checked;
+    document.querySelectorAll(`input[data-id="${id}"]`).forEach(c=>{ c.checked=checked; });
+    const body=checked?{set:{[id]:day()}}:{unset:[id]};
+    try{
+      const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      if(!r.ok)throw 0;
+      const j=await r.json();
+      apply(j.done||{});
+      note.textContent="Сохранено в файле недели в Obsidian";
+    }catch(err){
+      document.querySelectorAll(`input[data-id="${id}"]`).forEach(c=>{ c.checked=!checked; });
+      note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево».";
+    }
   });
 }
 initTopics();

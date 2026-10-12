@@ -154,11 +154,22 @@ body{margin:0} [hidden]{display:none!important}
 .tp{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:5px 6px;border-radius:7px;cursor:pointer;font-size:14.5px}
 .tp:hover{background:var(--soft)}
 .tp input{position:absolute;opacity:0;width:1px;height:1px}
-.tp .bx{width:16px;height:16px;margin-top:2px;border:1.5px solid var(--muted);border-radius:4px}
+.tp .bx{width:16px;height:16px;margin-top:2px;border:1.5px solid var(--muted);border-radius:4px;display:grid;place-items:center}
 .tp input:checked+.bx{background:var(--accent);border-color:var(--accent)}
+.tp input:checked+.bx::after{content:"";width:8px;height:4px;border:2px solid var(--surface);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .tp input:checked~span:last-child{color:var(--muted);text-decoration:line-through}
 .tp input:disabled+.bx{opacity:.5}
 .tp input:focus-visible+.bx{outline:2px solid var(--accent);outline-offset:2px}
+.topic-check{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;transition:border-color .2s,background .2s;margin-top:4px}
+.topic-check.is-done{background:var(--soft);border-color:var(--accent)}
+.topic-check.multi{display:grid;gap:10px}
+.topic-check-h{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px}
+.topic-check-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 14px}
+.topic-check .tp{display:inline-flex;align-items:center;gap:10px;padding:5px 8px;border-radius:8px;line-height:1.35;font-size:14.5px}
+.topic-check .tp .bx{margin-top:0;flex-shrink:0}
+.topic-check .tp input:checked~span:last-child{text-decoration:none;color:var(--ink)}
+.topic-check .note{font:500 12px var(--f-mono);color:var(--muted);letter-spacing:.02em}
+.topic-check.is-done .note{color:var(--accent)}
 
 :root{--term-bg:#16211B;--term-fg:#DCE8E0;--term-acc:#7FD3A2}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--term-bg:#070B09;--term-fg:#DCE8E0;--term-acc:#7FD3A2}}
@@ -284,6 +295,10 @@ button:disabled{opacity:.45;cursor:default}
     <details class="q"><summary><span class="t self">Проверь себя</span>Сколько ключей в словаре <code>{1: "a", 1.0: "b", True: "c"}</code> и какое значение?</summary>
       <div class="a"><p>Один ключ <code>1</code> со значением <code>"c"</code>: все три равны по == и имеют одинаковый хеш. Ключ остаётся первым вставленным, значение — последним.</p></div></details>
   </div>
+  <div class="topic-check" data-for="algo.ds.1">
+    <label class="tp"><input type="checkbox" data-id="algo.ds.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Хеш-таблица</b></span></label>
+    <span class="note" data-d="algo.ds.1">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ hashing pattern ============ -->
@@ -350,6 +365,10 @@ def isAnagram(s, t):
     <details class="q"><summary><span class="t">Собес</span>Как решить Two Sum без дополнительной памяти?</summary>
       <div class="a"><p>Если можно менять порядок и нужны значения, а не индексы: отсортировать и идти двумя указателями с концов. Сумма меньше target — левый вправо, больше — правый влево. O(n log n) по времени из-за сортировки, O(1) дополнительной памяти. Если нужны исходные индексы — сортировать пары (значение, индекс), тогда память O(n).</p></div></details>
   </div>
+  <div class="topic-check" data-for="algo.pat.0">
+    <label class="tp"><input type="checkbox" data-id="algo.pat.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Хеширование: Two Sum, Contains Duplicate, Valid Anagram</b></span></label>
+    <span class="note" data-d="algo.pat.0">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ how to leetcode ============ -->
@@ -393,6 +412,10 @@ heapq.nlargest(k, nums)          <span class="cm"># топ-k без полной
 bisect.bisect_left(a, x)         <span class="cm"># бинарный поиск в отсортированном списке</span>
 divmod(17, 5)                    <span class="cm"># (3, 2) — частное и остаток</span>
 ord("a"), chr(97)                <span class="cm"># буква ↔ код: ord(c) - ord("a") — индекс буквы 0..25</span></pre>
+  <div class="topic-check" data-for="algo.int.2">
+    <label class="tp"><input type="checkbox" data-id="algo.int.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>LeetCode 75 или NeetCode 150</b></span></label>
+    <span class="note" data-d="algo.int.2">отметка в дереве</span>
+  </div>
 </section>
 
 <div class="part"><span class="eyebrow">Часть 2 · 9 тем</span><h2>Рабочее место</h2><p>На стажировке в первый же день дают репозиторий и говорят: «склонируй, подними окружение, запусти». Эти темы — чтобы в этот день не потеряться.</p></div>
@@ -472,6 +495,16 @@ tail -f log.txt                    <span class="cm"># смотреть лог о
       <div class="a"><p><code>grep -i "error" train.log</code> — показать, <code>grep -ic "error" train.log</code> — посчитать. Последние ошибки: <code>grep -i error train.log | tail -20</code>. Следить в реальном времени: <code>tail -f train.log | grep -i error</code>.</p></div></details>
     <details class="q"><summary><span class="t self">Проверь себя</span>Чем <code>&gt;</code> отличается от <code>&gt;&gt;</code> и от <code>|</code>?</summary>
       <div class="a"><p><code>&gt;</code> записывает вывод в файл, стирая старое; <code>&gt;&gt;</code> дописывает в конец; <code>|</code> передаёт вывод не в файл, а на вход другой команде.</p></div></details>
+  </div>
+  <div class="topic-check multi" data-for="tools.term.0,tools.term.2">
+    <div class="topic-check-h">
+      <span class="eyebrow">Отметки в дереве · 2 темы терминала</span>
+      <span class="note"></span>
+    </div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="tools.term.0"><span class="bx" aria-hidden="true"></span><span><b>Навигация и файлы</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="tools.term.2"><span class="bx" aria-hidden="true"></span><span><b>Поиск: grep, find</b></span></label>
+    </div>
   </div>
 </section>
 
@@ -561,6 +594,17 @@ test_size = 0.25
     <details class="q"><summary><span class="t self">Проверь себя</span>Чем <code>git fetch</code> отличается от <code>git pull</code>?</summary>
       <div class="a"><p>fetch только скачивает новые коммиты в <code>origin/...</code> и ничего не трогает в рабочей папке. pull делает fetch и сразу сливает изменения в текущую ветку.</p></div></details>
   </div>
+  <div class="topic-check multi" data-for="tools.git.0,tools.git.1,tools.git.4">
+    <div class="topic-check-h">
+      <span class="eyebrow">Отметки в дереве · 3 темы git</span>
+      <span class="note"></span>
+    </div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="tools.git.0"><span class="bx" aria-hidden="true"></span><span><b>init, add, commit, status, log</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="tools.git.1"><span class="bx" aria-hidden="true"></span><span><b>Ветки: branch, switch, merge</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="tools.git.4"><span class="bx" aria-hidden="true"></span><span><b>remote, push, pull, clone</b></span></label>
+    </div>
+  </div>
 </section>
 
 <!-- ============ venv ============ -->
@@ -612,6 +656,16 @@ pip uninstall pandas</pre>
   <div class="qs">
     <details class="q"><summary><span class="t">Собес</span>Зачем нужно виртуальное окружение?</summary>
       <div class="a"><p>Изолировать зависимости проекта: у каждого проекта свои версии библиотек, они не конфликтуют между собой и с системным Python. Вместе с requirements.txt или lock-файлом это даёт воспроизводимость: любой участник и сервер собирают ту же среду, и «у меня работает» перестаёт быть проблемой.</p></div></details>
+  </div>
+  <div class="topic-check multi" data-for="tools.env.0,tools.env.1">
+    <div class="topic-check-h">
+      <span class="eyebrow">Отметки в дереве · 2 темы окружения</span>
+      <span class="note"></span>
+    </div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="tools.env.0"><span class="bx" aria-hidden="true"></span><span><b>venv: зачем изолировать зависимости</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="tools.env.1"><span class="bx" aria-hidden="true"></span><span><b>requirements.txt</b></span></label>
+    </div>
   </div>
 </section>
 
@@ -691,6 +745,10 @@ python -m pdb train.py     <span class="cm"># запустить весь скр
     <details class="q"><summary><span class="t">Собес</span>Модель обучилась, но метрики подозрительно плохие. Как будете искать проблему?</summary>
       <div class="a"><p>Сначала данные: формы X и y, совпадает ли порядок строк, нет ли пропусков, правильно ли закодирован таргет, нет ли перепутанных столбцов. Потом сравнить с бейзлайном (DummyClassifier): если не лучше — баг в данных или в разбиении. Проверить на маленькой выборке, что модель может переобучиться. Посмотреть на конкретные ошибочные примеры глазами. Код проверить отладчиком или assert-ами, а не догадками.</p></div></details>
   </div>
+  <div class="topic-check" data-for="tools.ide.0">
+    <label class="tp"><input type="checkbox" data-id="tools.ide.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Отладчик в VS Code</b></span></label>
+    <span class="note" data-d="tools.ide.0">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ career ============ -->
@@ -722,6 +780,10 @@ python -m pdb train.py     <span class="cm"># запустить весь скр
     <li><b>История проекта на 2 минуты</b> вслух: какую задачу решал, почему такие решения, что не получилось и что бы сделал иначе.</li>
   </ul></div>
   <div class="callout trap"><b class="h">Частые ошибки</b><p>Ждать «пока выучу всё» и пропустить сроки — подаваться можно и нужно, даже чувствуя себя не готовым. Подаваться в одну компанию. Писать в резюме технологии, про которые не ответишь на два вопроса.</p></div>
+  <div class="topic-check" data-for="career.apply.6">
+    <label class="tp"><input type="checkbox" data-id="career.apply.6"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Сроки отборов в календаре</b></span></label>
+    <span class="note" data-d="career.apply.6">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ practice ============ -->
@@ -1051,16 +1113,53 @@ function initTopics(){
   if(LOCAL)$("topnav").hidden=false;
   const box=$("topicList"),note=$("topicNote");
   box.innerHTML=TOPICS.map(([id,t])=>`<li><label class="tp"><input type="checkbox" id="tp-${id}" data-id="${id}" ${LOCAL?"":"disabled"}><span class="bx" aria-hidden="true"></span><span>${t}</span></label></li>`).join("");
-  if(!LOCAL){note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";return}
-  const apply=d=>TOPICS.forEach(([id])=>{$("tp-"+id).checked=!!d[id]});
+  document.querySelectorAll(".topic-check input[data-id]").forEach(cb=>{ cb.disabled=!LOCAL; });
+  if(!LOCAL){
+    note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";
+    document.querySelectorAll(".topic-check .note").forEach(el=>{ el.textContent="только на localhost"; });
+    return;
+  }
   const day=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+  const fmt=iso=>{const [y,m,d]=(iso||"").split("-");return d&&m?`${d}.${m}`:""};
+  function apply(d){
+    TOPICS.forEach(([id])=>{
+      const on=!!d[id];
+      document.querySelectorAll(`input[data-id="${id}"]`).forEach(cb=>{ cb.checked=on; });
+      const dt=on?fmt(d[id]):"";
+      document.querySelectorAll(`[data-d="${id}"]`).forEach(el=>{
+        el.textContent=on?(dt?`✓ ${dt} в Obsidian`:"✓ в Obsidian"):"отметка в дереве";
+      });
+    });
+    document.querySelectorAll(".topic-check").forEach(card=>{
+      const ids=(card.dataset.for||"").split(",").map(s=>s.trim()).filter(Boolean);
+      const all=ids.length>0&&ids.every(id=>!!d[id]);
+      const any=ids.some(id=>!!d[id]);
+      card.classList.toggle("is-done",all);
+      const hNote=card.querySelector(".topic-check-h .note");
+      if(hNote){
+        const cnt=ids.filter(id=>!!d[id]).length;
+        hNote.textContent=all?"✓ все темы пройдены":(any?`${cnt} из ${ids.length} пройдено`:"");
+      }
+    });
+  }
   fetch("/api/tree").then(r=>r.json()).then(j=>apply(j.done||{})).catch(()=>{note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
-  box.addEventListener("change",async e=>{
-    const id=e.target.dataset.id;if(!id)return;
-    const body=e.target.checked?{set:{[id]:day()}}:{unset:[id]};
-    try{const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-      if(!r.ok)throw 0;const j=await r.json();apply(j.done||{});note.textContent="Сохранено в файле недели в Obsidian";}
-    catch(err){e.target.checked=!e.target.checked;note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево»."}
+  document.addEventListener("change",async e=>{
+    const cb=e.target;
+    if(!cb||!cb.matches("input[data-id]"))return;
+    const id=cb.dataset.id;if(!id)return;
+    const checked=cb.checked;
+    document.querySelectorAll(`input[data-id="${id}"]`).forEach(c=>{ c.checked=checked; });
+    const body=checked?{set:{[id]:day()}}:{unset:[id]};
+    try{
+      const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      if(!r.ok)throw 0;
+      const j=await r.json();
+      apply(j.done||{});
+      note.textContent="Сохранено в файле недели в Obsidian";
+    }catch(err){
+      document.querySelectorAll(`input[data-id="${id}"]`).forEach(c=>{ c.checked=!checked; });
+      note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево».";
+    }
   });
 }
 initTopics();

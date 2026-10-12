@@ -154,11 +154,22 @@ body{margin:0} [hidden]{display:none!important}
 .tp{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:5px 6px;border-radius:7px;cursor:pointer;font-size:14.5px}
 .tp:hover{background:var(--soft)}
 .tp input{position:absolute;opacity:0;width:1px;height:1px}
-.tp .bx{width:16px;height:16px;margin-top:2px;border:1.5px solid var(--muted);border-radius:4px}
+.tp .bx{width:16px;height:16px;margin-top:2px;border:1.5px solid var(--muted);border-radius:4px;display:grid;place-items:center}
 .tp input:checked+.bx{background:var(--accent);border-color:var(--accent)}
+.tp input:checked+.bx::after{content:"";width:8px;height:4px;border:2px solid var(--surface);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .tp input:checked~span:last-child{color:var(--muted);text-decoration:line-through}
 .tp input:disabled+.bx{opacity:.5}
 .tp input:focus-visible+.bx{outline:2px solid var(--accent);outline-offset:2px}
+.topic-check{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;transition:border-color .2s,background .2s;margin-top:4px}
+.topic-check.is-done{background:var(--soft);border-color:var(--accent)}
+.topic-check.multi{display:grid;gap:10px}
+.topic-check-h{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px}
+.topic-check-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 14px}
+.topic-check .tp{display:inline-flex;align-items:center;gap:10px;padding:5px 8px;border-radius:8px;line-height:1.35;font-size:14.5px}
+.topic-check .tp .bx{margin-top:0;flex-shrink:0}
+.topic-check .tp input:checked~span:last-child{text-decoration:none;color:var(--ink)}
+.topic-check .note{font:500 12px var(--f-mono);color:var(--muted);letter-spacing:.02em}
+.topic-check.is-done .note{color:var(--accent)}
 
 .legb .lv{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px 10px;display:grid;gap:6px;background:var(--surface);transition:background .2s,border-color .2s}
 .legb>.lv{background:var(--soft)}
@@ -268,6 +279,16 @@ t = (1, 2); t += (3,)             <span class="cm"># tuple: += создаёт н
     <details class="q"><summary><span class="t self">Проверь себя</span>Что выведет <code>print(0.1 + 0.2 == 0.3, -7 // 2, round(2.5))</code>?</summary>
       <div class="a"><p><code>False -4 2</code>. Двоичные дроби неточны, целочисленное деление округляет вниз, round — к чётному.</p></div></details>
   </div>
+  <div class="topic-check multi" data-for="python.base.0,python.base.1">
+    <div class="topic-check-h">
+      <span class="eyebrow">Отметки в дереве · 2 темы</span>
+      <span class="note"></span>
+    </div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="python.base.0"><span class="bx" aria-hidden="true"></span><span><b>Типы данных</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="python.base.1"><span class="bx" aria-hidden="true"></span><span><b>Изменяемые и неизменяемые объекты</b></span></label>
+    </div>
+  </div>
 </section>
 
 <!-- ============ 2 ============ -->
@@ -299,6 +320,10 @@ t = (1, 2); t += (3,)             <span class="cm"># tuple: += создаёт н
       <div class="a"><p><code>==</code> сравнивает значения через <code>__eq__</code>, <code>is</code> проверяет, что это один объект (одинаковый <code>id</code>). <code>is</code> используют для синглтонов: <code>None</code>, <code>True</code>, <code>False</code>. Для чисел и строк — только <code>==</code>: совпадение по <code>is</code> зависит от кеширования интерпретатора.</p></div></details>
     <details class="q"><summary><span class="t self">Проверь себя</span>Что вернёт <code>[] or 0 or "x" or 5</code> и <code>1 and [] and 3</code>?</summary>
       <div class="a"><p><code>"x"</code> — первый истинный операнд. <code>[]</code> — первый ложный.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.base.6">
+    <label class="tp"><input type="checkbox" data-id="python.base.6"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>is и ==, истинность объектов</b></span></label>
+    <span class="note" data-d="python.base.6">отметка в дереве</span>
   </div>
 </section>
 
@@ -343,6 +368,10 @@ nums = [x for x in nums if x != 2]   <span class="cm"># правильно: со
   <div class="qs">
     <details class="q"><summary><span class="t">Собес</span>Когда выполняется <code>else</code> у цикла?</summary>
       <div class="a"><p>Когда цикл завершился сам — перебрал все элементы или условие while стало ложным, и при этом не было <code>break</code>. Типичное применение — поиск: break, если нашли, else — «не нашли».</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.base.2">
+    <label class="tp"><input type="checkbox" data-id="python.base.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Условия и циклы, else у цикла</b></span></label>
+    <span class="note" data-d="python.base.2">отметка в дереве</span>
   </div>
 </section>
 
@@ -395,6 +424,10 @@ model = CatBoostClassifier(<span class="hl">**params</span>)   <span class="cm">
       <div class="a"><p><code>*args</code> собирает лишние позиционные аргументы в кортеж, <code>**kwargs</code> — лишние именованные в словарь. Имена args и kwargs — соглашение, важны звёздочки. При вызове звёздочки распаковывают список и словарь в аргументы. Применение: обёртки и декораторы, которые передают аргументы дальше (<code>def wrapper(*args, **kwargs): return func(*args, **kwargs)</code>), конфиги гиперпараметров.</p></div></details>
     <details class="q"><summary><span class="t self">Проверь себя</span>Можно ли вызвать <code>def f(a, *, b): ...</code> как <code>f(1, 2)</code>?</summary>
       <div class="a"><p>Нет: b только именованный. Нужно <code>f(1, b=2)</code>, иначе TypeError.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.base.3">
+    <label class="tp"><input type="checkbox" data-id="python.base.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Функции: аргументы по умолчанию, *args, **kwargs</b></span></label>
+    <span class="note" data-d="python.base.3">отметка в дереве</span>
   </div>
 </section>
 
@@ -459,6 +492,10 @@ fs = [lambda i=i: i for i in range(3)]   <span class="cm"># [0, 1, 2]: знач�
       <div class="a"><p>LEGB — порядок поиска имени: Local, Enclosing, Global, Built-in. Замыкание — функция, которая сохраняет доступ к переменным объемлющей функции после её завершения. Чтобы изменить такую переменную, нужен <code>nonlocal</code>. На замыканиях основаны декораторы.</p></div></details>
     <details class="q"><summary><span class="t self">Проверь себя</span>Что выведет код ниже?<br><code>def outer():<br>&nbsp;&nbsp;x = 1<br>&nbsp;&nbsp;def inner(): return x * 10<br>&nbsp;&nbsp;x = 2<br>&nbsp;&nbsp;return inner()<br>print(outer())</code></summary>
       <div class="a"><p><code>20</code>. Замыкание читает переменную в момент вызова, а не в момент создания функции. К вызову x уже равен 2.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.base.4">
+    <label class="tp"><input type="checkbox" data-id="python.base.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Область видимости</b></span></label>
+    <span class="note" data-d="python.base.4">отметка в дереве</span>
   </div>
 </section>
 
@@ -531,6 +568,10 @@ r"C:\new\data"      <span class="cm"># raw-строка: обратный слэ
     <details class="q"><summary><span class="t self">Проверь себя</span>Что вернёт <code>"data.csv"[-4:]</code>, <code>"abc"[5:]</code>, <code>"abc"[5]</code>?</summary>
       <div class="a"><p><code>".csv"</code>, пустую строку, IndexError.</p></div></details>
   </div>
+  <div class="topic-check" data-for="python.base.5">
+    <label class="tp"><input type="checkbox" data-id="python.base.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Строки, срезы, f-strings</b></span></label>
+    <span class="note" data-d="python.base.5">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ 7 ============ -->
@@ -579,6 +620,10 @@ frozenset(a)                        <span class="cm"># неизменяемое 
       <div class="a"><p>tuple неизменяем: после создания нельзя добавить, удалить или заменить элемент. Поэтому он хешируемый (если внутри тоже неизменяемые объекты) и может быть ключом словаря или элементом множества. Он чуть легче по памяти и сообщает читателю: «эта запись не меняется». Функции возвращают несколько значений именно кортежем.</p></div></details>
     <details class="q"><summary><span class="t">Собес</span>Почему list не может быть ключом словаря?</summary>
       <div class="a"><p>Словарь кладёт ключ в ячейку по его хешу (урок 3). Если ключ изменится, изменится и хеш, и словарь больше не найдёт значение. Поэтому ключами могут быть только хешируемые, то есть неизменяемые, объекты. Вместо списка берут tuple.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.coll.0">
+    <label class="tp"><input type="checkbox" data-id="python.coll.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>list, tuple, dict, set и сложность операций</b></span></label>
+    <span class="note" data-d="python.coll.0">отметка в дереве</span>
   </div>
 </section>
 
@@ -631,6 +676,10 @@ transposed = [[row[i] for row in matrix] for i in range(2)]  <span class="cm"># 
     <details class="q"><summary><span class="t self">Проверь себя</span>Напиши словарь «слово → длина» только для слов длиннее 3 букв.</summary>
       <div class="a"><p><code>{w: len(w) for w in words if len(w) &gt; 3}</code></p></div></details>
   </div>
+  <div class="topic-check" data-for="python.coll.1">
+    <label class="tp"><input type="checkbox" data-id="python.coll.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Comprehensions</b></span></label>
+    <span class="note" data-d="python.coll.1">отметка в дереве</span>
+  </div>
 </section>
 
 <!-- ============ 9 ============ -->
@@ -672,6 +721,10 @@ list(zip_longest([1, 2, 3], ["a"], fillvalue=None))  <span class="cm"># не т�
   <div class="qs">
     <details class="q"><summary><span class="t">Собес</span>Как пройти по списку с индексом? А по двум спискам одновременно?</summary>
       <div class="a"><p><code>for i, x in enumerate(a)</code> вместо <code>for i in range(len(a))</code>. По двум — <code>for x, y in zip(a, b)</code>; если длины должны совпадать — <code>strict=True</code>, если нет — <code>itertools.zip_longest</code>.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.coll.2">
+    <label class="tp"><input type="checkbox" data-id="python.coll.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Распаковка, zip, enumerate</b></span></label>
+    <span class="note" data-d="python.coll.2">отметка в дереве</span>
   </div>
 </section>
 
@@ -736,6 +789,10 @@ defaultdict(lambda: defaultdict(int))   <span class="cm"># вложенный: d
       <div class="a"><p>defaultdict при обращении к отсутствующему ключу вызывает фабрику и сохраняет результат в словарь. <code>get</code> только возвращает значение по умолчанию и ничего не сохраняет. <code>setdefault</code> сохраняет, но значение по умолчанию создаётся при каждом вызове, даже если ключ уже есть. defaultdict короче и быстрее для подсчётов и группировок.</p></div></details>
     <details class="q"><summary><span class="t self">Проверь себя</span>Как одной строкой найти три самых частых класса в <code>y</code>?</summary>
       <div class="a"><p><code>Counter(y).most_common(3)</code></p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.coll.4">
+    <label class="tp"><input type="checkbox" data-id="python.coll.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>collections</b></span></label>
+    <span class="note" data-d="python.coll.4">отметка в дереве</span>
   </div>
 </section>
 
@@ -985,16 +1042,53 @@ function initTopics(){
   if(LOCAL)$("topnav").hidden=false;
   const box=$("topicList"),note=$("topicNote");
   box.innerHTML=TOPICS.map(([id,t])=>`<li><label class="tp"><input type="checkbox" id="tp-${id}" data-id="${id}" ${LOCAL?"":"disabled"}><span class="bx" aria-hidden="true"></span><span>${t}</span></label></li>`).join("");
-  if(!LOCAL){note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";return}
-  const apply=d=>TOPICS.forEach(([id])=>{$("tp-"+id).checked=!!d[id]});
+  document.querySelectorAll(".topic-check input[data-id]").forEach(cb=>{ cb.disabled=!LOCAL; });
+  if(!LOCAL){
+    note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";
+    document.querySelectorAll(".topic-check .note").forEach(el=>{ el.textContent="только на localhost"; });
+    return;
+  }
   const day=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+  const fmt=iso=>{const [y,m,d]=(iso||"").split("-");return d&&m?`${d}.${m}`:""};
+  function apply(d){
+    TOPICS.forEach(([id])=>{
+      const on=!!d[id];
+      document.querySelectorAll(`input[data-id="${id}"]`).forEach(cb=>{ cb.checked=on; });
+      const dt=on?fmt(d[id]):"";
+      document.querySelectorAll(`[data-d="${id}"]`).forEach(el=>{
+        el.textContent=on?(dt?`✓ ${dt} в Obsidian`:"✓ в Obsidian"):"отметка в дереве";
+      });
+    });
+    document.querySelectorAll(".topic-check").forEach(card=>{
+      const ids=(card.dataset.for||"").split(",").map(s=>s.trim()).filter(Boolean);
+      const all=ids.length>0&&ids.every(id=>!!d[id]);
+      const any=ids.some(id=>!!d[id]);
+      card.classList.toggle("is-done",all);
+      const hNote=card.querySelector(".topic-check-h .note");
+      if(hNote){
+        const cnt=ids.filter(id=>!!d[id]).length;
+        hNote.textContent=all?"✓ все темы пройдены":(any?`${cnt} из ${ids.length} пройдено`:"");
+      }
+    });
+  }
   fetch("/api/tree").then(r=>r.json()).then(j=>apply(j.done||{})).catch(()=>{note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
-  box.addEventListener("change",async e=>{
-    const id=e.target.dataset.id;if(!id)return;
-    const body=e.target.checked?{set:{[id]:day()}}:{unset:[id]};
-    try{const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-      if(!r.ok)throw 0;const j=await r.json();apply(j.done||{});note.textContent="Сохранено в файле недели в Obsidian";}
-    catch(err){e.target.checked=!e.target.checked;note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево»."}
+  document.addEventListener("change",async e=>{
+    const cb=e.target;
+    if(!cb||!cb.matches("input[data-id]"))return;
+    const id=cb.dataset.id;if(!id)return;
+    const checked=cb.checked;
+    document.querySelectorAll(`input[data-id="${id}"]`).forEach(c=>{ c.checked=checked; });
+    const body=checked?{set:{[id]:day()}}:{unset:[id]};
+    try{
+      const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      if(!r.ok)throw 0;
+      const j=await r.json();
+      apply(j.done||{});
+      note.textContent="Сохранено в файле недели в Obsidian";
+    }catch(err){
+      document.querySelectorAll(`input[data-id="${id}"]`).forEach(c=>{ c.checked=!checked; });
+      note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево».";
+    }
   });
 }
 initTopics();
