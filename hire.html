@@ -251,7 +251,7 @@ function renderRest(){
     :`<div class="empty">Разборов пока нет.</div>`;
   $("inboxLink").href=obs("60_Машинное обучение/Отборы/Входящие отборов.md");
 }
-/* Переход к теме по #t-<id>: тема раскрыта, прокрутка — мгновенно при открытии страницы (она ещё невидима), плавно — при клике внутри страницы. */
+/* Переход к теме по #t-<id>: тема сразу раскрыта и плавно прокручивается к началу экрана. */
 function jump(smooth){
   const m=location.hash.match(/^#t-(.+)$/); if(!m)return window.siteReady&&window.siteReady();
   const id=decodeURIComponent(m[1]);
@@ -266,7 +266,7 @@ $("seg").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b
 addEventListener("hashchange",()=>jump(true));
 Promise.all([fetch("/api/hire").then(r=>r.json()),fetch("/api/plan").then(r=>r.json()).catch(()=>null)]).then(([h,p])=>{
   H=h;P=p;renderKpis();renderSeg();renderTopics();renderRest();
-  if(document.fonts)document.fonts.ready.then(()=>jump(false));else jump(false);
+  (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(()=>jump(true),80));
 }).catch(()=>{$("topics").innerHTML=`<div class="empty">Сервер не отвечает: открой сайт через ссылку в Obsidian или запусти «Тренажёр и дерево».</div>`});
 </script>
 </body></html>

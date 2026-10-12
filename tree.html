@@ -779,8 +779,8 @@ function buildPlan(){
   syncAll(); updatePlan();
   const m=location.hash.match(/^#w-(\d+)$/);
   if(m&&!box.dataset.jumped){box.dataset.jumped="1";const n=+m[1];
-    const jump=()=>{goWeek(n,true);window.siteReady&&window.siteReady()}; setTimeout(jump,120); if(document.fonts)document.fonts.ready.then(()=>setTimeout(jump,60))}
-  else window.siteReady&&window.siteReady();
+    /* открыли по ссылке на неделю: страница уже видна, плавно листаем к неделе — один раз, когда шрифты встали */
+    const jump=()=>goWeek(n); (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(jump,80))}
 }
 function goWeek(n,instant){
   if(PAGE==="tree"){location.href="/plan#w-"+n;return}

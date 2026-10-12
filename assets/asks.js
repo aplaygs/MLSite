@@ -6,11 +6,11 @@
    Подключение: <script src="/assets/asks.js" defer></script>. Работает только с сервером. */
 (function () {
   const CSS = `
-.qd{display:none;place-items:center;flex:none;width:15px;height:15px;margin-right:6px;border-radius:50%;vertical-align:-2px;
+.qd{display:none;place-items:center;flex:none;width:15px;height:15px;margin-right:7px;border-radius:50%;vertical-align:middle;position:relative;top:-1px;box-sizing:border-box;line-height:1;
   border:1.6px solid var(--warm,var(--key));color:var(--warm,var(--key));font:700 9.5px/1 var(--f-mono,ui-monospace,monospace);
   font-variant-numeric:tabular-nums;cursor:pointer;transition:transform .15s,background-color .15s}
 .qd.key,.qd.has{display:inline-grid}
-.qd.has{width:19px;height:19px;background:color-mix(in srgb,var(--warm,var(--key)) 16%,transparent);vertical-align:-4px}
+.qd.has{width:19px;height:19px;padding-top:1px;background:color-mix(in srgb,var(--warm,var(--key)) 16%,transparent)}
 .qd:hover{transform:scale(1.15);background:color-mix(in srgb,var(--warm,var(--key)) 28%,transparent)}
 .qd:focus-visible{outline:2px solid var(--warm,var(--key));outline-offset:2px}
 .ask-tip{position:fixed;z-index:50;max-width:300px;padding:10px 12px;border-radius:10px;background:var(--ink);color:var(--bg);
