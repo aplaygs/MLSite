@@ -39,7 +39,11 @@ header.top p{color:var(--muted);max-width:62ch}
 .toc a{font-size:13.5px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
 .toc a:hover{border-color:var(--accent)}
 
-section.topic{padding-block:56px 8px;display:grid;gap:18px;scroll-margin-top:16px}
+section.topic{padding-block:56px 8px;display:grid;grid-template-columns:minmax(0,1fr);gap:18px;scroll-margin-top:16px}
+section.topic>*{min-width:0}
+.lab{grid-template-columns:minmax(0,1fr)}
+.lab>*,.lab-grid>*{min-width:0}
+.prose code,.callout code,.tldr code,details.q code{overflow-wrap:anywhere}
 section.topic>h2{font-size:clamp(22px,3.6vw,30px)}
 .tldr{font-size:18px;line-height:1.5;border-left:3px solid var(--accent);padding-left:14px}
 .prose{display:grid;gap:12px;max-width:68ch}
@@ -106,7 +110,8 @@ pre{margin:0;background:var(--soft);border-radius:10px;padding:12px 14px;overflo
 pre .cm{color:var(--muted)} pre .hl{color:var(--accent);font-weight:500} pre .bad{color:var(--red);text-decoration:line-through}
 
 details.q{background:var(--surface);border:1px solid var(--line);border-radius:12px}
-details.q summary{cursor:pointer;padding:12px 16px;font-weight:500;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.q summary{cursor:pointer;padding:12px 16px;font-weight:500;list-style:none;display:block}
+details.q summary .t{margin-right:10px}
 details.q summary::-webkit-details-marker{display:none}
 details.q summary .t{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--plum);white-space:nowrap}
 details.q summary .t.self{color:var(--teal)}
