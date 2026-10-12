@@ -103,7 +103,7 @@
 
 ### Файлы
 - `tree.html` — дерево и план по неделям, полноценная страница.
-- `lessons/wNN-K.html` — урок K недели NN. **Фрагмент без `<head>`**: первая строка — `<title>`, дальше `<link>` шрифтов, `<style>`, разметка, `<script>`. Начало документа (`<!doctype html><html lang=ru><head><meta charset>…<meta viewport>`) добавляет сервер.
+- `lessons/wNN-K.html` — урок K недели NN. **Фрагмент без `<head>`**: первая строка — `<title>Урок K · Короткое название</title>` (чтобы во вкладках браузера было коротко и сразу виден номер урока), дальше `<link>` иконки `/favicon.png` и шрифтов, `<style>`, разметка, `<script>`. Начало документа (`<!doctype html><html lang=ru><head><meta charset>…<meta viewport>` и фавиконка) добавляет сервер.
 - Список уроков с темами — `ml_lessons.json` в хранилище: `{week, n, file, title, focus, minutes, topics}`. Темы всех уроков недели в сумме = все темы недели без повторов, это проверяет тест.
 
 ### API сервера
