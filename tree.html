@@ -82,6 +82,9 @@ header.top p{max-width:64ch;margin:0;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.btn{transition:none}.btn:active{transform:none}}
 .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
 .diamond{color:var(--key);font-size:10px}
+.ask-dot{color:var(--key);font-weight:700}
+.ask-leg{color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--line)}
+.ask-leg:hover{color:var(--ink);border-bottom-color:var(--key)}
 .tag{font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;padding:1px 5px;border-radius:4px;border:1px solid var(--s4);color:var(--s4);white-space:nowrap;vertical-align:1px}
 
 /* Tiers & modules */
@@ -166,7 +169,7 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 .btn.pri:hover{filter:brightness(1.08)}
 .btn.ls{text-decoration:none;display:inline-flex;align-items:center;gap:7px}
 .btn.ls em{font:normal 500 11px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
-.btn.ls.full{border-color:var(--accent)} .btn.ls.full em{color:var(--accent)}
+.btn.ls.full{border-color:var(--accent)} .btn.ls.soon{border-style:dashed;color:var(--muted);cursor:default} .btn.ls.soon:active{transform:none} .btn.ls.full em{color:var(--accent)}
 .mini{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:3px}
 /* Кнопки недель: шкала в плане (.tl) и мини-шкала в панели (.mini) — один стиль */
 .tl a,.mini a{position:relative;display:grid;place-items:center;overflow:hidden;text-decoration:none;color:var(--muted);background:var(--surface);border:1px solid var(--line);font:500 12px var(--f-mono);font-variant-numeric:tabular-nums;cursor:pointer;
@@ -229,6 +232,9 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 .lsn .lp i{flex:1;height:5px;border-radius:3px;background:var(--soft);overflow:hidden}
 .lsn .lp i::after{content:"";display:block;height:100%;width:var(--p,0%);background:var(--accent);border-radius:3px;transition:width .3s}
 .lsn.full{border-color:var(--accent)}
+.lsn.soon{border-style:dashed;cursor:default;opacity:.72}
+.lsn.soon:hover{border-color:var(--line);transform:none}
+.lsn.soon .ln{color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.lsn{transition:none}}
 .later{opacity:.9}
 @media (max-width:640px){.wk>details>summary{grid-template-columns:auto minmax(0,1fr)}.wk .mprog{grid-column:1/3;justify-items:start}.wfocus{grid-column:1/3}.tl a{height:36px}}
@@ -255,7 +261,7 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
         <span class="eyebrow">Ключевое к стажировке</span>
         <div class="big" id="kKey">0<small> / 0</small></div>
         <div class="bar"><i id="kKeyBar" style="width:0%"></i></div>
-        <span class="note">Темы с ромбом <span class="diamond">◆</span>. Их спрашивают на отборах в первую очередь.</span>
+        <span class="note">Темы с ромбом <span class="diamond">◆</span>. Их спрашивают на отборах в первую очередь. Метка <span class="ask-dot">◎</span> — тему уже спрашивали в разборах собеседований и условиях стажировок: <a href="/hire">открыть «Отборы» →</a></span>
       </div>
       <div class="stages">
         <div class="stages-h"><span class="eyebrow">Всё дерево по ярусам</span><span class="note">Сколько тем пройдено в каждом ярусе — от основ к продакшену и карьере.</span></div>
@@ -274,7 +280,8 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
     <button class="btn" id="bFocus" aria-pressed="false">Только ключевое</button>
     <button class="btn" id="bFold">Свернуть все</button>
     <div class="legend">
-      <span><span class="diamond">◆</span> спрашивают на отборе</span>
+      <span><span class="diamond">◆</span> ключевая к отбору</span>
+      <a class="ask-leg" href="/hire"><span class="ask-dot">◎</span> спрашивали на собеседованиях →</a>
     </div>
   </div>
 
@@ -707,9 +714,10 @@ const weekLessons=n=>(PLAN.lessons||[]).filter(l=>l.week===n);
 function lessonsHTML(w){
   const L=weekLessons(w.n); if(!L.length)return "";
   const hrs=m=>m>=60?`~${String(Math.round(m/30)/2).replace(".",",")} ч`:`~${m} мин`;
-  return `<div class="lessons">${L.map(l=>`<a class="lsn" id="ls-${w.n}-${l.n}" href="/lessons/${encodeURIComponent(l.file)}">
-    <span class="ln">Урок ${l.n} из ${L.length} · ${hrs(l.minutes)}</span><b>${esc(l.title)}</b><span class="lm">${esc(l.focus)}</span>
-    <span class="lp"><i></i><span id="lp-${w.n}-${l.n}">0 / ${l.topics.length}</span></span></a>`).join("")}</div>`;
+  return `<div class="lessons">${L.map(l=>{const tag=l.ready===false?"div":"a",href=l.ready===false?' aria-disabled="true"':` href="/lessons/${encodeURIComponent(l.file)}"`;
+    return `<${tag} class="lsn${l.ready===false?" soon":""}" id="ls-${w.n}-${l.n}"${href}>
+    <span class="ln">Урок ${l.n} из ${L.length} · ${l.ready===false?"скоро":hrs(l.minutes)}</span><b>${esc(l.title)}</b><span class="lm">${esc(l.focus)}</span>
+    <span class="lp"><i></i><span id="lp-${w.n}-${l.n}">0 / ${l.topics.length}</span></span></${tag}>`}).join("")}</div>`;
 }
 function weekHTML(w){
   const ids=weekIds(w.n), [kname,kc]=KIND[w.kind];
@@ -796,7 +804,7 @@ function updatePlan(){
     document.getElementById("kWeek").innerHTML=`${k}<small> / ${ids.length}</small>`;
     document.getElementById("kWeekBar").style.width=(ids.length?k/ids.length*100:0)+"%";
     const L=weekLessons(cur.n);
-    document.getElementById("kWeekNav").innerHTML=`<div class="wact"><a class="btn pri" href="#w-${cur.n}" data-gw="${cur.n}">Открыть неделю ${cur.n} →</a>${L.map(l=>{const k=l.topics.filter(id=>done[id]).length;return `<a class="btn ls${k===l.topics.length?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)}">Урок ${l.n}<em>${k}/${l.topics.length}</em></a>`}).join("")}</div>
+    document.getElementById("kWeekNav").innerHTML=`<div class="wact"><a class="btn pri" href="#w-${cur.n}" data-gw="${cur.n}">Открыть неделю ${cur.n} →</a>${L.map(l=>{const k=l.topics.filter(id=>done[id]).length;return l.ready===false?`<span class="btn ls soon" title="${esc(l.title)} — урок готовится">Урок ${l.n}<em>скоро</em></span>`:`<a class="btn ls${k===l.topics.length?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)}">Урок ${l.n}<em>${k}/${l.topics.length}</em></a>`}).join("")}</div>
       <div><div class="mini-cap"><span>все недели</span><span>нажми, чтобы перейти</span></div>
       <div class="mini" style="--n:${PLAN.weeks.length};margin-top:6px">${PLAN.weeks.map(w=>{const ids=weekIds(w.n),kk=ids.filter(id=>done[id]).length,pc=ids.length?kk/ids.length*100:(w.end<t?100:0);
         return `<a href="#w-${w.n}" data-gw="${w.n}" class="${w.n===cur.n?"now":""}${w.end<t?" past":""}" style="--wc:var(${KIND[w.kind][1]})" title="Неделя ${w.n} · ${esc(w.span)} — ${esc(w.focus)}"><i style="height:${pc}%"></i><span>${w.n}</span></a>`}).join("")}</div></div>`;
@@ -823,4 +831,5 @@ initStore();
 
 </script>
 
+<script src="/assets/asks.js" defer></script>
 </body></html>

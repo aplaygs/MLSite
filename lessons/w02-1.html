@@ -1,0 +1,955 @@
+<title>Урок 2.1 · Как модель учится</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<style>
+/* Только для этого урока: матрицы в лаборатории умножения и «водопад» предсказания линейной модели. */
+.mxrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 14px}
+.mx{display:inline-grid;gap:4px;padding:6px;border-left:2px solid var(--muted);border-right:2px solid var(--muted);border-radius:6px}
+.mx .c{width:40px;height:36px;display:grid;place-items:center;border-radius:7px;background:var(--soft);font:500 15px var(--f-mono);font-variant-numeric:tabular-nums;transition:background-color .2s,color .2s}
+.mx .c.r{background:color-mix(in srgb,var(--accent) 26%,transparent)}
+.mx .c.k{background:color-mix(in srgb,var(--plum) 26%,transparent)}
+.mx .c.o{background:var(--warm);color:var(--surface)}
+.mx .c.q{color:var(--muted)}
+.mxcap{display:grid;justify-items:center;gap:4px;font:500 11px var(--f-mono);color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.mxop{font:500 22px var(--f-mono);color:var(--muted)}
+.calc{font:500 15px var(--f-mono);text-align:center;min-height:1.6em}
+.calc .a{color:var(--accent)} .calc .p{color:var(--plum)} .calc .w{color:var(--warm);font-weight:700}
+.wf{display:grid;gap:8px}
+.wfr{display:grid;grid-template-columns:150px minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:14px}
+.wfr .tr{position:relative;height:22px;background:var(--soft);border-radius:6px;overflow:hidden}
+.wfr .tr i{position:absolute;top:0;bottom:0;border-radius:6px;transition:left .25s,width .25s}
+.wfr .v{font:500 13px var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.wfr.tot{border-top:1px dashed var(--line);padding-top:8px;font-weight:600}
+@media (max-width:520px){.wfr{grid-template-columns:110px minmax(0,1fr) 54px}}
+.knob{cursor:grab}
+.knob:active{cursor:grabbing}
+</style>
+
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/tree#w-2">← Неделя 2 на сайте дерева</a><span class="mid">урок 1 из 3</span><a href="/tree#w-2">Урок 2 · скоро</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · урок 1 из 3 · 8 тем · ~4 часа</div>
+  <h1>Как модель учится</h1>
+  <p>На неделе 1 ты узнал, что обучение — это поиск параметров, при которых средний штраф минимален. Этот урок отвечает, как именно компьютер их ищет. Сначала язык, на котором говорят модели: векторы и матрицы. Потом производная и градиент — компас, который показывает, куда двигать параметры. Потом градиентный спуск — сам способ двигаться. И в конце всё это собирается в первую настоящую модель — линейную регрессию, и в одну важную деталь — масштабирование признаков. Математики ровно столько, сколько спрашивают на собеседованиях, и вся она — в лабораториях, которые можно потрогать.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Векторы</a><a href="#t2">Матрицы</a><a href="#t3">Производная</a><a href="#t4">Градиент</a><a href="#t5">Градиентный спуск</a><a href="#t6">Линейная регрессия</a><a href="#t7">Спуск для регрессии</a><a href="#t8">Масштабирование</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<div class="part"><span class="eyebrow">Часть 1 · 2 темы</span><h2>Язык, на котором говорят модели</h2><p>Любой объект для модели — это набор чисел, а весь датасет — таблица чисел. Векторы и матрицы — просто удобные слова и операции для этих наборов и таблиц. Без них не прочитать ни одну формулу в ML и ни одну строчку кода на numpy.</p></div>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 8 · <span class="dia">◆</span> Математика</div>
+  <h2>Векторы, скалярное произведение, норма</h2>
+  <p class="tldr">Вектор — это упорядоченный список чисел. Студент с тремя признаками (часы подготовки, посещаемость, средний балл) — это вектор из трёх чисел. Скалярное произведение двух векторов показывает, насколько они «смотрят в одну сторону», а норма — длину вектора.</p>
+  <div class="prose">
+    <p>Вектор можно представить двумя способами, и оба нужны:</p>
+    <ul>
+      <li><b>Точка в пространстве.</b> Студент <code>[6, 0.9]</code> — точка на плоскости «часы × посещаемость». Близкие точки — похожие студенты. На этом стоят kNN и кластеризация.</li>
+      <li><b>Стрелка из нуля.</b> У стрелки есть направление и длина. Так удобно думать о весах модели и об эмбеддингах: направление — «смысл», длина — «сила».</li>
+    </ul>
+    <p>Число элементов вектора называют <b>размерностью</b>. Студент с 30 признаками — вектор в 30-мерном пространстве. Нарисовать нельзя, но все формулы работают так же, как на плоскости. Поэтому интуицию берут из 2D, а считают в любом числе измерений.</p>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · тяни концы стрелок</span><span class="muted mono" id="vecEq">a·b = 0</span></div>
+    <div class="lab-grid">
+      <svg id="vecSvg" viewBox="0 0 360 360" role="img" aria-label="Два вектора на плоскости, угол между ними и проекция одного на другой"></svg>
+      <div class="ctrl">
+        <p class="muted" style="font-size:14px">Зелёная стрелка — <code>a</code>, сиреневая — <code>b</code>. Хватай кружок на конце и двигай. Жёлтый отрезок — проекция <code>b</code> на направление <code>a</code>: «сколько от b смотрит туда же, куда a».</p>
+        <div class="readout">
+          <div class="stat"><div class="v" id="vDot">0</div><div class="k">a·b — скалярное произведение</div></div>
+          <div class="stat"><div class="v" id="vCos">0</div><div class="k">cos угла — косинусное сходство</div></div>
+          <div class="stat"><div class="v" id="vNa">0</div><div class="k">‖a‖ — длина a</div></div>
+          <div class="stat"><div class="v" id="vNb">0</div><div class="k">‖b‖ — длина b</div></div>
+        </div>
+        <div class="btns">
+          <button class="btn vp" data-p="same">Одно направление</button>
+          <button class="btn vp" data-p="perp">Перпендикулярно</button>
+          <button class="btn vp" data-p="opp">В разные стороны</button>
+        </div>
+        <p class="verdict" id="vecMsg"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula">
+    <div class="fx"><span class="c1">a</span>·<span class="c2">b</span> = a₁b₁ + a₂b₂ + … + aₙbₙ = ‖<span class="c1">a</span>‖·‖<span class="c2">b</span>‖·<span class="c3">cos θ</span></div>
+    <div class="fx">‖<span class="c1">a</span>‖ = √(a₁² + a₂² + … + aₙ²)</div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--accent)">a</span>, <span class="s" style="color:var(--plum)">b</span> — два вектора одной размерности n</div>
+      <div><span class="s">‖a‖</span> — норма, то есть длина вектора. Это теорема Пифагора, только для n измерений</div>
+      <div><span class="s" style="color:var(--warm)">cos θ</span> — косинус угла между стрелками: 1 — смотрят одинаково, 0 — перпендикулярны, −1 — противоположно</div>
+    </div>
+  </div>
+  <div class="callout feel"><b class="h">Физический смысл</b><p>Скалярное произведение — это «сколько одна стрелка помогает другой». Толкаешь тележку под углом: полезна только та часть силы, что направлена вдоль пути. Ровно это и считает a·b, домноженное на длину пути. Две формулы в рамке — одно и то же число: слева его считают по координатам, справа видно его смысл.</p></div>
+
+  <h3 style="font-size:17px">Операции, которые встречаются постоянно</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Операция</th><th>Как считать</th><th>Где в ML</th></tr></thead>
+    <tbody>
+      <tr><td>Сложение <code>a + b</code></td><td>поэлементно: [1, 2] + [3, 5] = [4, 7]</td><td>шаг градиентного спуска: веса + сдвиг</td></tr>
+      <tr><td>Умножение на число <code>3a</code></td><td>каждый элемент × 3</td><td>learning rate × градиент</td></tr>
+      <tr><td>Скалярное произведение <code>a·b</code></td><td>сумма попарных произведений — одно число</td><td>предсказание линейной модели: w·x + b</td></tr>
+      <tr><td>Норма L2 <code>‖a‖₂</code></td><td>√(сумма квадратов) — обычная длина</td><td>евклидово расстояние в kNN, L2-регуляризация</td></tr>
+      <tr><td>Норма L1 <code>‖a‖₁</code></td><td>сумма модулей — «путь по кварталам»</td><td>манхэттенское расстояние, L1-регуляризация</td></tr>
+      <tr><td>Нормировка <code>a / ‖a‖</code></td><td>делим на длину — получаем длину 1</td><td>эмбеддинги перед поиском похожих</td></tr>
+      <tr><td>Косинусное сходство</td><td>a·b / (‖a‖·‖b‖)</td><td>похожесть текстов, поиск в RAG</td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <p><b>Расстояние</b> между точками — это норма их разности: <code>‖a − b‖</code>. С L2-нормой — обычная линейка, с L1 — сумма разностей по каждому признаку. Регуляризацию L1 и L2 из урока 1 называют так именно потому, что штрафуют L1- и L2-норму вектора весов.</p>
+    <p><b>Перпендикулярность</b> (ортогональность): <code>a·b = 0</code>. Признаки, которые «никак не связаны» в этом смысле, — ортогональны. Это пригодится в PCA: новые оси там специально делают перпендикулярными.</p>
+  </div>
+<pre>import numpy as np
+a = np.array([3, 4]); b = np.array([4, -3])
+a @ b                       <span class="cm"># 0 — скалярное произведение (то же: np.dot(a, b))</span>
+np.linalg.norm(a)           <span class="cm"># 5.0 — длина, L2</span>
+np.linalg.norm(a, ord=1)    <span class="cm"># 7 — L1</span>
+a * b                       <span class="cm"># [12, -12] — НЕ скалярное, а поэлементное!</span>
+cos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))</pre>
+  <div class="callout trap"><b class="h">Ловушка numpy</b><p><code>a * b</code> в numpy — поэлементное умножение, результат — вектор. Скалярное произведение — <code>a @ b</code> или <code>np.dot</code>, результат — число. Перепутать их — классическая тихая ошибка: код не падает, просто считает не то.</p></div>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Тексты и картинки нейросеть превращает в векторы — эмбеддинги — так, что похожие по смыслу объекты смотрят в похожие стороны. «Найди похожие документы» в RAG — это «найди векторы с наибольшим косинусным сходством». Длина эмбеддинга зависит от длины текста и прочего мусора, а угол — от смысла. Поэтому для текстов берут косинус, а не обычное расстояние.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Что такое косинусное сходство и почему для эмбеддингов его берут чаще евклидова расстояния?</summary>
+      <div class="a"><p>Это косинус угла между векторами: скалярное произведение, делённое на произведение длин. Значение от −1 до 1 и не зависит от длины векторов, только от направления. У эмбеддингов смысл закодирован в направлении, а длина часто зависит от посторонних вещей — длины текста, частоты слов. Если векторы заранее нормированы до длины 1, косинусное сходство и евклидово расстояние упорядочивают соседей одинаково, и тогда считают просто скалярное произведение — это быстрее.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Чему равно скалярное произведение перпендикулярных векторов и что это значит?</summary>
+      <div class="a"><p>Нулю: cos 90° = 0. Значит, у одного вектора нет составляющей вдоль другого — они независимы по направлению. Например, если вектор весов модели перпендикулярен изменению признаков, предсказание от этого изменения не меняется.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>a = [1, 2, 3], b = [4, 0, −1]. Найди a·b и ‖a‖₁.</summary>
+      <div class="a"><p>a·b = 4 + 0 − 3 = 1. ‖a‖₁ = 1 + 2 + 3 = 6.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.la.0">
+    <label class="tp"><input type="checkbox" data-id="math.la.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Векторы, скалярное произведение, норма</b></span></label>
+    <span class="note" data-d="math.la.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 8 · <span class="dia">◆</span> Математика</div>
+  <h2>Матрицы и матричное умножение</h2>
+  <p class="tldr">Матрица — таблица чисел. Весь датасет — матрица X: строки — объекты, столбцы — признаки. Матричное умножение одной операцией делает много скалярных произведений сразу: так модель предсказывает ответ для тысячи объектов одной строкой кода.</p>
+  <div class="prose">
+    <p>Размер матрицы пишут как «строки × столбцы». Датасет на 1500 студентов с 7 признаками — матрица <code>X</code> размера 1500 × 7, в numpy <code>X.shape == (1500, 7)</code>. Одна строка — вектор одного студента, один столбец — один признак у всех студентов.</p>
+    <p><b>Правило умножения.</b> Элемент результата в строке i и столбце j — это скалярное произведение i-й строки первой матрицы на j-й столбец второй. Поэтому длина строки слева обязана совпадать с длиной столбца справа:</p>
+  </div>
+  <div class="formula">
+    <div class="fx">(<span class="c1">n</span> × <span class="c3">k</span>) @ (<span class="c3">k</span> × <span class="c2">m</span>) = (<span class="c1">n</span> × <span class="c2">m</span>)</div>
+    <div class="fx">C<sub>ij</sub> = <span class="c1">строка i из A</span> · <span class="c2">столбец j из B</span></div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--warm)">k</span> — внутренние размеры: должны совпасть, иначе умножать нельзя. В результате они «сокращаются»</div>
+      <div><span class="s" style="color:var(--accent)">n</span> и <span class="s" style="color:var(--plum)">m</span> — внешние размеры, из них и состоит результат</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · умножение по шагам</span><span class="muted mono" id="mmState">шаг 0 из 4</span></div>
+    <div class="mxrow">
+      <div class="mxcap"><div class="mx" id="mA" style="grid-template-columns:repeat(3,40px)"></div>A · 2 × 3</div>
+      <span class="mxop">@</span>
+      <div class="mxcap"><div class="mx" id="mB" style="grid-template-columns:repeat(2,40px)"></div>B · 3 × 2</div>
+      <span class="mxop">=</span>
+      <div class="mxcap"><div class="mx" id="mC" style="grid-template-columns:repeat(2,40px)"></div>C · 2 × 2</div>
+    </div>
+    <p class="calc" id="mmCalc"></p>
+    <div class="btns"><button class="btn" id="mmPrev">← Назад</button><button class="btn" id="mmNext">Следующая клетка →</button><button class="btn" id="mmAll">Посчитать всё</button><button class="btn" id="mmSwap" aria-pressed="false">Поменять местами: B @ A</button></div>
+    <p class="verdict" id="mmMsg"></p>
+  </div>
+
+  <h3 style="font-size:17px">Что ещё нужно знать</h3>
+  <div class="prose"><ul>
+    <li><b>Матрица на вектор</b> — частый случай: <code>X @ w</code>, где X — (n × d), w — (d,). Результат — вектор из n чисел: по одному скалярному произведению на каждую строку. Это и есть предсказания линейной модели для всего датасета сразу.</li>
+    <li><b>Порядок важен:</b> <code>A @ B ≠ B @ A</code>. Часто одно из них вообще нельзя посчитать из-за размеров. Проверь кнопкой «Поменять местами».</li>
+    <li><b>Транспонирование</b> <code>X.T</code> — строки становятся столбцами: (n × d) → (d × n). Правило: <code>(AB)ᵀ = BᵀAᵀ</code>.</li>
+    <li><b>Единичная матрица</b> <code>I</code> — единицы на диагонали, нули вокруг. Умножение на неё ничего не меняет, как умножение на 1.</li>
+    <li><b>Обратная матрица</b> <code>A⁻¹</code> — такая, что <code>A @ A⁻¹ = I</code>. Есть только у квадратных и не у всех: если строки линейно зависимы (одна — комбинация других), обратной нет. Понадобится в теме 6, в формуле МНК.</li>
+    <li><b>Сложность</b> умножения (n × k) на (k × m) — O(n·k·m). Две матрицы 1000 × 1000 — миллиард умножений. Видеокарты и созданы для того, чтобы делать это параллельно.</li>
+  </ul></div>
+<pre>X = np.random.rand(1500, 7)     <span class="cm"># 1500 студентов, 7 признаков</span>
+w = np.random.rand(7)
+y_pred = X @ w                  <span class="cm"># shape (1500,) — все предсказания разом</span>
+X.T @ X                         <span class="cm"># (7, 1500) @ (1500, 7) = (7, 7) — встретится в МНК</span>
+X @ np.random.rand(5)           <span class="cm"># ValueError: matmul: ... size 7 is different from 5</span></pre>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Слой нейросети — это <code>X @ W + b</code>, где W — матрица весов, и потом нелинейность. Поэтому половина ошибок в нейросетях — несовпадение размеров. Привычка проверять <code>.shape</code> на каждом шаге и проговаривать «(n × k) на (k × m) даёт (n × m)» экономит часы отладки.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему матричное умножение не коммутативно? Приведи пример.</summary>
+      <div class="a"><p>Потому что элемент результата — это строка первой матрицы на столбец второй, и при перестановке перемножаются уже другие строки и столбцы. Иногда переставленное произведение даже не определено: (2 × 3) @ (3 × 5) можно, а (3 × 5) @ (2 × 3) нельзя. Даже у квадратных матриц результаты обычно разные — это видно в лаборатории.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>X — (100 × 4), w — (4,), y — (100,). Какой формы <code>X @ w</code>, <code>X.T @ y</code>, <code>X.T @ X</code>?</summary>
+      <div class="a"><p><code>X @ w</code> — (100,): предсказание на каждый объект. <code>X.T @ y</code> — (4,): по числу на признак. <code>X.T @ X</code> — (4 × 4): квадратная матрица «признак × признак». Две последние — ровно те, что стоят в формуле МНК.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Можно ли умножить (3 × 2) на (3 × 2)? А (3 × 2) на транспонированную (3 × 2)?</summary>
+      <div class="a"><p>Нет: внутренние размеры 2 и 3 не совпадают. Да: (3 × 2) @ (2 × 3) = (3 × 3).</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.la.1">
+    <label class="tp"><input type="checkbox" data-id="math.la.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Матрицы и матричное умножение</b></span></label>
+    <span class="note" data-d="math.la.1">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 2 · 3 темы</span><h2>Компас и шаги</h2><p>Функция потерь — это рельеф: горы там, где модель ошибается сильно, долины — где мало. Производная и градиент говорят, куда в этом рельефе вниз. Градиентный спуск — это шаги вниз. На этом обучается почти всё: от линейной регрессии до ChatGPT.</p></div>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 8 · Математика</div>
+  <h2>Производная и её смысл</h2>
+  <p class="tldr">Производная — это скорость изменения функции в точке. Геометрически — наклон касательной. Её знак говорит, растёт функция или падает, а ноль — что мы на вершине или на дне.</p>
+  <div class="prose">
+    <p>Едешь на машине: путь — функция от времени, а спидометр показывает производную — насколько быстро меняется путь прямо сейчас. Не средняя скорость за поездку, а мгновенная.</p>
+    <p>Как её посчитать «руками»: чуть сдвинь x на маленькое h и посмотри, на сколько изменилась функция. Отношение изменения функции к h — наклон секущей. Чем меньше h, тем точнее секущая прижимается к касательной:</p>
+  </div>
+  <div class="formula">
+    <div class="fx">f′(x) ≈ ( f(x + <span class="c3">h</span>) − f(x) ) / <span class="c3">h</span>,  при <span class="c3">h</span> → 0</div>
+    <div class="legend">
+      <div><span class="s">f′(x)</span> — производная в точке x, «наклон» функции</div>
+      <div><span class="s" style="color:var(--warm)">h</span> — маленький шаг. Двигай ползунок h в лаборатории: секущая превращается в касательную</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · наклон в каждой точке</span><span class="muted mono" id="dState">x = 1.00</span></div>
+    <div class="lab-grid">
+      <svg id="dSvg" viewBox="0 0 360 300" role="img" aria-label="График функции, касательная и секущая в выбранной точке"></svg>
+      <div class="ctrl">
+        <label for="dX"><span class="row"><span>Точка <code>x</code></span><span class="mono" id="dXv">1.00</span></span><input type="range" id="dX" min="0" max="6" step="0.01" value="1"></label>
+        <label for="dH"><span class="row"><span>Шаг <code>h</code> для секущей</span><span class="mono" id="dHv">1.00</span></span><input type="range" id="dH" min="0.02" max="2" step="0.01" value="1"></label>
+        <div class="readout">
+          <div class="stat"><div class="v" id="dD">0</div><div class="k">f′(x) — наклон касательной</div></div>
+          <div class="stat"><div class="v" id="dS">0</div><div class="k">наклон секущей с шагом h</div></div>
+        </div>
+        <p class="verdict" id="dMsg"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Сиреневая прямая — касательная (точный наклон). Жёлтая пунктирная — секущая через x и x + h (приближение). Уменьши h — они совпадут. Найди точки, где касательная горизонтальна: там f′ = 0.</p>
+  </div>
+
+  <h3 style="font-size:17px">Таблица, которой хватит на весь курс</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Функция</th><th>Производная</th><th>Где встретится</th></tr></thead>
+    <tbody>
+      <tr><td><code>c</code> (константа)</td><td>0</td><td>сдвиг не влияет на наклон</td></tr>
+      <tr><td><code>x</code>, <code>c·x</code></td><td>1, c</td><td>линейная модель</td></tr>
+      <tr><td><code>xⁿ</code></td><td>n·xⁿ⁻¹</td><td><code>x²</code> → <code>2x</code>: производная MSE</td></tr>
+      <tr><td><code>eˣ</code></td><td>eˣ</td><td>сигмоида, softmax</td></tr>
+      <tr><td><code>ln x</code></td><td>1 / x</td><td>log-loss</td></tr>
+      <tr><td><code>f + g</code></td><td>f′ + g′</td><td>сумма ошибок по объектам</td></tr>
+      <tr><td><code>f(g(x))</code></td><td>f′(g(x)) · g′(x)</td><td>цепное правило — основа backpropagation (неделя 3)</td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <p><b>Главный пример для ML.</b> Штраф за один объект в MSE: <code>(y − ŷ)²</code>. Производная по предсказанию: <code>−2(y − ŷ)</code>. Читается так: если модель недооценила (ŷ меньше y), производная отрицательная — увеличивай ŷ. Если переоценила — уменьшай. И чем больше промах, тем сильнее толчок. Это вся идея обучения в одной строке.</p>
+    <p><b>Где производная равна нулю</b>, функция «стоит на месте»: это минимум, максимум или перегиб. Для поиска минимума ищут именно такие точки. У выпуклой функции (форма чаши, как MSE линейной модели) такая точка одна — и это глобальный минимум.</p>
+  </div>
+  <div class="callout trap"><b class="h">Проверка градиента</b><p>Формулу на секущей используют на практике: когда пишешь производную руками (своя функция потерь, свой слой), сравнивают её с численной <code>(f(x + h) − f(x − h)) / 2h</code>. Не совпадают — в формуле ошибка. Это называется gradient checking. Симметричная разность точнее, чем сдвиг только вперёд.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Что означает производная и что значит, если она равна нулю?</summary>
+      <div class="a"><p>Производная — мгновенная скорость изменения функции, наклон касательной в точке. Положительная — функция растёт, отрицательная — падает. Ноль — стационарная точка: минимум, максимум или седло. В обучении модели ищут точку, где производная функции потерь по параметрам равна нулю, — там потери не уменьшаются ни в какую сторону.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Производная <code>3x² − 4x + 7</code>? В какой точке она равна нулю?</summary>
+      <div class="a"><p><code>6x − 4</code>. Ноль при x = 2/3 — это минимум параболы.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.calc.0">
+    <label class="tp"><input type="checkbox" data-id="math.calc.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Производная и её смысл</b></span></label>
+    <span class="note" data-d="math.calc.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="topic" id="t4">
+  <div class="eyebrow">Тема 4 из 8 · <span class="dia">◆</span> Математика</div>
+  <h2>Частные производные и градиент</h2>
+  <p class="tldr">У модели не один параметр, а много: функция потерь зависит от всех весов сразу. Частная производная — наклон по одному параметру, когда остальные заморожены. Градиент — вектор из всех частных производных. Он показывает направление самого крутого подъёма, а минус градиент — самого крутого спуска.</p>
+  <div class="prose">
+    <p>Стоишь на склоне горы. Шаг на восток — поднимаешься на 3 см, шаг на север — опускаешься на 1 см. Это две частные производные: по востоку +3, по северу −1. Вместе они — градиент <code>[3, −1]</code>: стрелка, куда круче всего вверх. Хочешь вниз — иди против стрелки.</p>
+  </div>
+  <div class="formula">
+    <div class="fx">∇L = [ <span class="c1">∂L/∂w₁</span>, <span class="c2">∂L/∂w₂</span>, …, ∂L/∂wₙ ]</div>
+    <div class="legend">
+      <div><span class="s">∇L</span> — «набла L», градиент функции потерь, вектор той же длины, что и вектор весов</div>
+      <div><span class="s" style="color:var(--accent)">∂L/∂w₁</span> — частная производная: как меняется L, если чуть сдвинуть только w₁</div>
+      <div>Длина градиента — крутизна склона. На дне ямы градиент равен нулевому вектору</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · рельеф функции потерь</span><span class="muted mono" id="gState">w = (0, 0)</span></div>
+    <div class="lab-grid">
+      <svg id="gSvg" viewBox="0 0 360 330" role="img" aria-label="Линии уровня функции потерь двух весов, точка и стрелка градиента"></svg>
+      <div class="ctrl">
+        <p class="muted" style="font-size:14px">Вид сверху на яму функции потерь: кольца — линии одинаковой ошибки, как на карте высот. Тяни точку. Красная стрелка — градиент (вверх по склону), зелёная — минус градиент (куда шагнёт спуск).</p>
+        <div class="readout">
+          <div class="stat"><div class="v" id="g1">0</div><div class="k">∂L/∂w₁</div></div>
+          <div class="stat"><div class="v" id="g2">0</div><div class="k">∂L/∂w₂</div></div>
+          <div class="stat"><div class="v" id="gL">0</div><div class="k">L — ошибка в точке</div></div>
+          <div class="stat"><div class="v" id="gN">0</div><div class="k">‖∇L‖ — крутизна</div></div>
+        </div>
+        <p class="verdict" id="gMsg"></p>
+      </div>
+    </div>
+  </div>
+  <div class="prose">
+    <p><b>Три свойства, которые видно в лаборатории</b> и которые спрашивают:</p>
+    <ul>
+      <li>Градиент <b>перпендикулярен линии уровня</b>: вдоль кольца ошибка не меняется, а поперёк — меняется быстрее всего.</li>
+      <li>Чем <b>гуще кольца</b>, тем круче склон и длиннее градиент.</li>
+      <li>Яма вытянутая: поперёк узкой стороны градиент большой, вдоль длинной — маленький. Поэтому <b>минус градиент не смотрит прямо на дно</b>. Это источник зигзагов в спуске (тема 5) и причина масштабировать признаки (тема 8).</li>
+    </ul>
+    <p><b>Градиент MSE для линейной модели</b> <code>ŷ = w·x + b</code> по каждому параметру:</p>
+  </div>
+  <div class="formula">
+    <div class="fx">∂L/∂w = −<sup>2</sup>⁄<sub>n</sub> · Σ <span class="c3">(yᵢ − ŷᵢ)</span> · <span class="c1">xᵢ</span></div>
+    <div class="fx">∂L/∂b = −<sup>2</sup>⁄<sub>n</sub> · Σ <span class="c3">(yᵢ − ŷᵢ)</span></div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--warm)">(yᵢ − ŷᵢ)</span> — ошибка на i-м объекте. Каждый объект «голосует» за то, куда двигать параметры</div>
+      <div><span class="s" style="color:var(--accent)">xᵢ</span> — признак объекта: голос по весу w умножается на признак. Объект с большим x сильнее тянет наклон</div>
+    </div>
+  </div>
+  <div class="callout feel"><b class="h">Физический смысл</b><p>Градиент — это сумма жалоб всех объектов. Каждый говорит: «я недооценён на столько-то, подними меня». Жалобы складываются, и модель двигается туда, куда её тянет большинство с учётом силы жалоб. Отсюда и чувствительность MSE к выбросам: выброс жалуется громче всех.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Что такое градиент и почему мы идём против него?</summary>
+      <div class="a"><p>Градиент — вектор частных производных функции по всем параметрам. Он показывает направление наискорейшего роста функции, а его длина — скорость роста. Мы минимизируем потери, поэтому шагаем в противоположную сторону — направление наискорейшего убывания. В точке минимума градиент равен нулю, и шаги затухают.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>L(w₁, w₂) = w₁² + 3w₂². Градиент в точке (1, 1)?</summary>
+      <div class="a"><p>∂L/∂w₁ = 2w₁ = 2, ∂L/∂w₂ = 6w₂ = 6. Градиент [2, 6]: по w₂ склон втрое круче.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.calc.2">
+    <label class="tp"><input type="checkbox" data-id="math.calc.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Частные производные и градиент</b></span></label>
+    <span class="note" data-d="math.calc.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="topic" id="t5">
+  <div class="eyebrow">Тема 5 из 8 · <span class="dia">◆</span> Математика</div>
+  <h2>Градиентный спуск и learning rate</h2>
+  <p class="tldr">Градиентный спуск: посчитай градиент, сделай маленький шаг против него, повтори. Размер шага задаёт learning rate. Маленький — спуск идёт вечность, слишком большой — модель перепрыгивает яму и улетает.</p>
+  <div class="formula">
+    <div class="fx"><span class="c1">w</span> ← <span class="c1">w</span> − <span class="c3">η</span> · <span class="c2">∇L(w)</span></div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--accent)">w</span> — вектор весов модели. Стрелка «←» значит «заменить на»</div>
+      <div><span class="s" style="color:var(--warm)">η</span> — «эта», learning rate (скорость обучения, lr). Гиперпараметр: выбираешь ты</div>
+      <div><span class="s" style="color:var(--plum)">∇L(w)</span> — градиент функции потерь в текущей точке</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · спуск в яму</span><span class="muted mono" id="sdState">шаг 0</span></div>
+    <div class="lab-grid">
+      <svg id="sdSvg" viewBox="0 0 360 330" role="img" aria-label="Путь градиентного спуска по линиям уровня функции потерь"></svg>
+      <div class="ctrl">
+        <label for="sdLr"><span class="row"><span>learning rate <code>η</code></span><span class="mono" id="sdLrv">0.10</span></span><input type="range" id="sdLr" min="0.01" max="0.56" step="0.01" value="0.1"></label>
+        <div class="btns">
+          <button class="btn lrp" data-v="0.03">Маленький</button><button class="btn lrp" data-v="0.22">Хороший</button><button class="btn lrp" data-v="0.47">Почти предел</button><button class="btn lrp" data-v="0.53">Слишком большой</button>
+        </div>
+        <div class="btns"><button class="btn" id="sdStep">Шаг</button><button class="btn" id="sdRun">20 шагов</button><button class="btn" id="sdReset">Сначала</button></div>
+        <div class="readout">
+          <div class="stat"><div class="v" id="sdL">0</div><div class="k">ошибка сейчас</div></div>
+          <div class="stat"><div class="v" id="sdN">0</div><div class="k">шагов сделано</div></div>
+        </div>
+        <p class="verdict" id="sdMsg"></p>
+      </div>
+    </div>
+    <svg id="sdCurve" viewBox="0 0 600 150" role="img" aria-label="Ошибка по шагам спуска"></svg>
+    <p class="muted" style="font-size:13.5px">Точку старта можно перетащить. Нижний график — ошибка после каждого шага в логарифмической шкале. Хороший спуск — ровно падающая кривая. Скачущая — lr на грани. Растущая — спуск разошёлся.</p>
+  </div>
+
+  <h3 style="font-size:17px">Как выбрать learning rate</h3>
+  <div class="prose"><ul>
+    <li><b>Слишком маленький:</b> ошибка падает, но медленно. Сотни лишних шагов, на больших моделях — часы и деньги.</li>
+    <li><b>Хороший:</b> ошибка уверенно падает и выходит на плато.</li>
+    <li><b>На грани:</b> спуск скачет с одного склона на другой, но в итоге сходится.</li>
+    <li><b>Слишком большой:</b> каждый шаг перелетает дно всё дальше, ошибка растёт до бесконечности (в коде — <code>nan</code> или <code>inf</code>).</li>
+    <li><b>Практика:</b> пробуют значения по логарифмической сетке — 0.1, 0.03, 0.01, 0.003 — и смотрят на кривую ошибки. Для нейросетей с оптимизатором Adam частый старт — 1e-3, для бустинга — 0.03–0.1.</li>
+  </ul></div>
+  <div class="callout feel"><b class="h">Почему есть предел</b><p>В лаборатории яма по вертикали вчетверо круче, чем по горизонтали. Допустимый шаг определяет самое крутое направление: чуть больше — и поперёк узкой стороны спуск разлетается, хотя вдоль пологой он бы ещё полз. Вытянутая яма — плохая яма. Как сделать её круглой — тема 8.</p></div>
+
+  <h3 style="font-size:17px">Сколько данных брать на один шаг</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Вариант</th><th>Градиент считается по</th><th>Плюсы и минусы</th></tr></thead>
+    <tbody>
+      <tr><td>Batch (полный) GD</td><td>всем n объектам</td><td>точный, плавный путь; на миллионах объектов один шаг очень дорогой</td></tr>
+      <tr><td>Стохастический (SGD)</td><td>одному случайному объекту</td><td>шаг дешёвый; путь шумный, зато шум помогает выскакивать из плохих мест</td></tr>
+      <tr><td>Mini-batch</td><td>пачке из 32–512 объектов</td><td>компромисс, стандарт в нейросетях: и шум терпимый, и видеокарта загружена</td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <p><b>Эпоха</b> — один полный проход по всем данным. При mini-batch размера 100 и 10 000 объектах эпоха — 100 шагов.</p>
+    <p><b>Когда остановиться:</b> заданное число шагов или эпох; ошибка почти перестала меняться; градиент почти нулевой; ошибка на валидации начала расти — early stopping из урока 1.</p>
+    <p><b>Улучшенные версии</b> (подробно — неделя 9, нейросети): momentum копит скорость, как шарик, и гасит зигзаги; Adam подбирает свой шаг для каждого параметра. В основе у всех — та же формула w ← w − η·∇L.</p>
+    <p><b>Локальные минимумы.</b> У линейной регрессии с MSE яма одна (функция выпуклая), спуск всегда находит глобальный минимум. У нейросетей рельеф сложный, но на практике большие сети редко застревают в плохих локальных минимумах — чаще мешают плато и седловые точки, где градиент почти ноль.</p>
+  </div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Что будет, если learning rate слишком большой? А слишком маленький?</summary>
+      <div class="a"><p>Слишком большой — шаги перескакивают минимум, ошибка колеблется или растёт, веса уходят в бесконечность, в логах появляется nan. Слишком маленький — сходимость очень медленная, за отведённое число шагов модель недообучится, и можно застрять на плато. Подбирают по кривой обучения, часто с расписанием: в начале больше, потом меньше.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Чем SGD отличается от обычного градиентного спуска?</summary>
+      <div class="a"><p>Обычный считает градиент по всей выборке — точно, но дорого. SGD — по одному объекту (или по мини-батчу), поэтому шаг в сотни раз дешевле, а оценка градиента шумная. В сумме SGD сходится быстрее по времени, умеет учиться на данных, которые не влезают в память, а шум помогает не застревать. Цена — путь дёргается, и в конце обычно уменьшают learning rate.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>w = 4, L(w) = w², η = 0.1. Чему равен w после одного шага?</summary>
+      <div class="a"><p>∇L = 2w = 8. w ← 4 − 0.1 · 8 = 3.2.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.calc.5">
+    <label class="tp"><input type="checkbox" data-id="math.calc.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Градиентный спуск и learning rate</b></span></label>
+    <span class="note" data-d="math.calc.5">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 3 · 3 темы</span><h2>Первая настоящая модель</h2><p>Всё, что было выше, складывается в линейную регрессию: вектор весов, матрица данных, MSE, градиент и спуск. Это не «простая модель для разминки» — её спрашивают на каждом ML-собеседовании, а на её примере проверяют, понимаешь ли ты обучение вообще.</p></div>
+
+<!-- ============ 6 ============ -->
+<section class="topic" id="t6">
+  <div class="eyebrow">Тема 6 из 8 · <span class="dia">◆</span> Классический ML</div>
+  <h2>Линейная регрессия и МНК</h2>
+  <p class="tldr">Линейная регрессия предсказывает число как взвешенную сумму признаков плюс сдвиг: <code>ŷ = w₁x₁ + w₂x₂ + … + b</code>. Метод наименьших квадратов (МНК) подбирает веса, при которых MSE минимальна, — и для этой модели минимум находится одной формулой.</p>
+  <div class="formula">
+    <div class="fx"><span class="c2">ŷ</span> = <span class="c1">w</span>·<span class="c4">x</span> + <span class="c3">b</span>   →   для всех объектов сразу:  <span class="c2">ŷ</span> = <span class="c4">X</span> @ <span class="c1">w</span> + <span class="c3">b</span></div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--teal)">x</span> — вектор признаков объекта, <span class="s" style="color:var(--teal)">X</span> — матрица всех объектов (тема 2)</div>
+      <div><span class="s" style="color:var(--accent)">w</span> — веса: по одному числу на признак, <span class="s" style="color:var(--warm)">b</span> — сдвиг (intercept): ответ при всех нулевых признаках</div>
+      <div><span class="s" style="color:var(--plum)">ŷ</span> — предсказание: скалярное произведение из темы 1 плюс константа</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · из чего складывается предсказание</span><span class="muted mono">балл = 18 + 4.5·часы + 0.35·посещаемость</span></div>
+    <p class="muted" style="font-size:14px">Модель для примера уже обучена (числа условные). Меняй признаки одного студента и смотри, какой вклад даёт каждый.</p>
+    <div class="ctrl" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));display:grid">
+      <label for="lrH"><span class="row"><span>Часы подготовки <code>x₁</code></span><span class="mono" id="lrHv">6</span></span><input type="range" id="lrH" min="0" max="10" step="0.5" value="6"></label>
+      <label for="lrA"><span class="row"><span>Посещаемость, % <code>x₂</code></span><span class="mono" id="lrAv">70</span></span><input type="range" id="lrA" min="0" max="100" step="1" value="70"></label>
+    </div>
+    <div class="wf" id="wf"></div>
+    <p class="verdict" id="lrMsg"></p>
+  </div>
+
+  <h3 style="font-size:17px">Как читать веса</h3>
+  <div class="prose"><ul>
+    <li><b>Вес — это эффект «при прочих равных».</b> w₁ = 4.5: плюс один час подготовки даёт плюс 4.5 балла, если посещаемость та же. Именно эта простота объяснения — главная сила линейной модели в банках, медицине и везде, где решение нужно обосновать.</li>
+    <li><b>Знак</b> — направление влияния, <b>модуль</b> — сила, но сравнивать модули можно только у признаков в одном масштабе. Часы (0–10) и посещаемость (0–100) напрямую не сравнить: тема 8.</li>
+    <li><b>Сдвиг b</b> — ответ при нулевых признаках. Часто он не имеет физического смысла («студент с нулевой посещаемостью и нулём часов»), это просто поправка уровня.</li>
+    <li><b>Нелинейность через признаки.</b> Модель линейна по весам, а не по признакам: добавь x², log(x), произведение двух признаков — и прямая станет кривой. Так из урока 1 получались полиномы.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">МНК: формула вместо спуска</h3>
+  <div class="prose"><p>MSE линейной модели — выпуклая чаша, и у неё есть точный ответ. Приравниваем градиент к нулю и решаем уравнение (сдвиг b прячут внутрь w, добавив к X столбец из единиц):</p></div>
+  <div class="formula">
+    <div class="fx"><span class="c1">w</span>* = (<span class="c4">X</span>ᵀ<span class="c4">X</span>)⁻¹ <span class="c4">X</span>ᵀ<span class="c2">y</span></div>
+    <div class="legend">
+      <div>Нормальное уравнение. <span class="s">XᵀX</span> — матрица (d × d) «признак × признак», <span class="s">Xᵀy</span> — вектор (d,): формы из вопроса в теме 2</div>
+      <div><span class="s">⁻¹</span> — обратная матрица. Именно с ней все проблемы метода</div>
+    </div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Проблема формулы</th><th>Почему</th><th>Что делают</th></tr></thead>
+    <tbody>
+      <tr><td>Дорого при многих признаках</td><td>обращение матрицы d × d — O(d³), а XᵀX ещё и O(n·d²)</td><td>градиентный спуск, тема 7</td></tr>
+      <tr><td>Нет обратной матрицы</td><td>признаки линейно зависимы: «рост в см» и «рост в м», дамми-ловушка one-hot</td><td>убрать дубли, псевдообратная, L2-регуляризация</td></tr>
+      <tr><td>Неустойчивость</td><td>сильно коррелированные признаки (мультиколлинеарность): веса огромные и прыгают от малейшего шума</td><td>Ridge (L2): (XᵀX + λI)⁻¹Xᵀy — обратная есть всегда</td></tr>
+      <tr><td>Не влезает в память</td><td>нужен весь X сразу</td><td>SGD по батчам</td></tr>
+    </tbody></table></div>
+<pre>from sklearn.linear_model import LinearRegression
+model = LinearRegression().fit(X_train, y_train)
+model.coef_, model.intercept_    <span class="cm"># веса w и сдвиг b</span>
+model.predict(X_test)            <span class="cm"># X_test @ coef_ + intercept_</span>
+
+<span class="cm"># то же руками; sklearn внутри решает через устойчивое разложение (lstsq), а не через inv</span>
+Xb = np.c_[np.ones(len(X_train)), X_train]
+w = np.linalg.lstsq(Xb, y_train, rcond=None)[0]</pre>
+  <div class="callout trap"><b class="h">Ловушка</b><p>Писать <code>np.linalg.inv(X.T @ X) @ X.T @ y</code> в рабочем коде не надо: явное обращение численно неустойчиво. Для понимания и на собеседовании — эта формула, в коде — <code>LinearRegression</code> или <code>np.linalg.lstsq</code>.</p></div>
+  <div class="prose"><p><b>Когда линейная регрессия подходит:</b> зависимость примерно линейная (смотри на график остатков: ошибки не должны образовывать дугу), нужна интерпретируемость, данных мало, нужен быстрый и надёжный бейзлайн. Для честных доверительных интервалов к весам есть классические предположения (независимые ошибки одинакового разброса), но для задачи «хорошо предсказывать» главное — проверка на валидации.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Какие есть способы получить решение линейной регрессии? В чём недостатки аналитического решения?</summary>
+      <div class="a"><p>Два способа: аналитический — нормальное уравнение w = (XᵀX)⁻¹Xᵀy, и итеративный — градиентный спуск (полный, стохастический, мини-батч). Недостатки формулы: обращение матрицы d × d стоит O(d³), нужна вся матрица в памяти, при линейно зависимых признаках обратной матрицы нет, а при сильно коррелированных решение неустойчиво. Поэтому при большом числе признаков или объектов используют спуск, а неустойчивость лечат L2-регуляризацией.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Как интерпретировать коэффициент линейной регрессии? Когда так делать нельзя?</summary>
+      <div class="a"><p>Коэффициент — на сколько изменится предсказание при увеличении признака на единицу при остальных неизменных. Нельзя сравнивать веса признаков в разных масштабах (сначала стандартизовать) и нельзя доверять весам при мультиколлинеарности: два почти одинаковых признака могут получить огромные веса разного знака. И это связь, а не причинность.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>В лаборатории студент: 4 часа, посещаемость 50 %. Посчитай прогноз в уме.</summary>
+      <div class="a"><p>18 + 4.5·4 + 0.35·50 = 18 + 18 + 17.5 = 53.5.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="ml.lin.0">
+    <label class="tp"><input type="checkbox" data-id="ml.lin.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Линейная регрессия и МНК</b></span></label>
+    <span class="note" data-d="ml.lin.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="topic" id="t7">
+  <div class="eyebrow">Тема 7 из 8 · <span class="dia">◆</span> Классический ML</div>
+  <h2>Градиентный спуск для регрессии</h2>
+  <p class="tldr">Вместо формулы веса можно найти спуском: начать с нулей и много раз сдвинуть их против градиента MSE. Ответ тот же, но метод работает и на миллионах признаков, и на данных, которые не влезают в память.</p>
+  <div class="formula">
+    <div class="fx">∇L = <sup>2</sup>⁄<sub>n</sub> · <span class="c4">X</span>ᵀ(<span class="c4">X</span><span class="c1">w</span> − <span class="c2">y</span>)</div>
+    <div class="legend">
+      <div>Та же формула, что в теме 4, но сразу для всех весов в матричном виде: <span class="s">Xw − y</span> — вектор ошибок, <span class="s">Xᵀ(…)</span> — каждый признак «собирает» свои голоса</div>
+    </div>
+  </div>
+<pre>w = np.zeros(X.shape[1]); b = 0.0; lr = 0.01
+for step in range(1000):
+    err = X @ w + b - y              <span class="cm"># (n,) ошибки, знак: предсказание минус правда</span>
+    grad_w = 2 / len(y) * X.T @ err  <span class="cm"># (d,)</span>
+    grad_b = 2 / len(y) * err.sum()
+    w -= lr * grad_w                 <span class="cm"># оба градиента посчитаны ДО обновления</span>
+    b -= lr * grad_b</pre>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · прямая учится сама</span><span class="muted mono" id="rgEq">ŷ = 0.00·x + 0.00</span></div>
+    <div class="lab-grid">
+      <svg id="rgSvg" viewBox="0 0 360 300" role="img" aria-label="Точки данных, текущая прямая модели и ответ МНК"></svg>
+      <div class="ctrl">
+        <label for="rgLr"><span class="row"><span>learning rate</span><span class="mono" id="rgLrv">0.020</span></span><input type="range" id="rgLr" min="0.002" max="0.036" step="0.001" value="0.02"></label>
+        <div class="btns"><button class="btn" id="rgPlay">▶ Пуск</button><button class="btn" id="rgStep">+10 шагов</button><button class="btn" id="rgReset">Сначала</button></div>
+        <div class="readout">
+          <div class="stat"><div class="v" id="rgN">0</div><div class="k">шагов</div></div>
+          <div class="stat"><div class="v" id="rgL">0</div><div class="k">MSE сейчас</div></div>
+          <div class="stat"><div class="v" id="rgW">0</div><div class="k">наклон w (МНК: <span id="rgWs">0</span>)</div></div>
+          <div class="stat"><div class="v" id="rgB">0</div><div class="k">сдвиг b (МНК: <span id="rgBs">0</span>)</div></div>
+        </div>
+        <p class="verdict" id="rgMsg"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">30 студентов: часы подготовки и балл. Сиреневая прямая — модель на текущем шаге, пунктир — точный ответ МНК. Нажми «Пуск» и посмотри внимательно: наклон находится быстро, а сдвиг ползёт. Почему — тема 8.</p>
+  </div>
+  <div class="prose">
+    <p><b>Зачем спуск, если есть формула:</b> при сотнях тысяч признаков (тексты, one-hot) формула не считается; данные приходят потоком (онлайн-обучение); можно остановиться раньше; та же схема обучает логистическую регрессию (неделя 3) и нейросети, у которых формулы нет вовсе. В sklearn это <code>SGDRegressor</code>.</p>
+  </div>
+<pre>from sklearn.linear_model import SGDRegressor
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+model = make_pipeline(StandardScaler(), SGDRegressor(learning_rate="invscaling", eta0=0.01, max_iter=1000, random_state=42))
+model.fit(X_train, y_train)      <span class="cm"># без StandardScaler SGD на сырых признаках часто разлетается</span></pre>
+  <div class="callout trap"><b class="h">Частые баги в самописном спуске</b><p>Знак градиента перепутан — ошибка растёт с первого шага. Забыли делить на n — работает, пока данных мало, потом взрывается. b обновили раньше, чем посчитали градиент для w, — шаги считаются по разным точкам. Нет масштабирования — подходящего lr не существует.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Запишите шаг градиентного спуска для линейной регрессии в векторном виде.</summary>
+      <div class="a"><p>w ← w − η · (2/n) · Xᵀ(Xw − y). Здесь Xw − y — вектор ошибок, Xᵀ — сборка градиента по каждому весу, η — learning rate. Сдвиг b либо обновляют отдельно по средней ошибке, либо добавляют столбец единиц в X. Сложность одного шага — O(n·d), в отличие от O(d³) у формулы.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>В лаборатории поставь learning rate на максимум. Что происходит и почему?</summary>
+      <div class="a"><p>Спуск разлетается: признак x доходит до 10, склон по w очень крутой, и шаг больше допустимого перелетает яму. Предел lr задаёт самое крутое направление.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="ml.lin.1">
+    <label class="tp"><input type="checkbox" data-id="ml.lin.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Градиентный спуск для регрессии</b></span></label>
+    <span class="note" data-d="ml.lin.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="topic" id="t8">
+  <div class="eyebrow">Тема 8 из 8 · <span class="dia">◆</span> Классический ML</div>
+  <h2>Масштабирование признаков</h2>
+  <p class="tldr">Признаки живут в разных масштабах: часы — от 0 до 10, минуты в приложении — от 0 до 600. Для градиентного спуска это вытянутая яма и зигзаги, для регуляризации и расстояний — нечестное сравнение. Масштабирование приводит признаки к одному порядку.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · та же задача, разный масштаб</span>
+      <div class="btns" role="group" aria-label="Масштаб признаков"><button class="btn scl" data-s="0" aria-pressed="true">Как есть</button><button class="btn scl" data-s="1" aria-pressed="false">После StandardScaler</button></div></div>
+    <div class="lab-grid">
+      <svg id="scSvg" viewBox="0 0 360 330" role="img" aria-label="Путь градиентного спуска в вытянутой и в круглой яме"></svg>
+      <div class="ctrl">
+        <p class="muted" style="font-size:14px">Для каждой ямы взят свой лучший learning rate — немного меньше предела, при котором спуск разлетается. Цель — подойти к дну на 1 % от стартового расстояния.</p>
+        <div class="readout">
+          <div class="stat"><div class="v" id="scN">0</div><div class="k">шагов до цели</div></div>
+          <div class="stat"><div class="v" id="scR">0</div><div class="k">во сколько раз яма вытянута</div></div>
+        </div>
+        <p class="verdict" id="scMsg"></p>
+      </div>
+    </div>
+  </div>
+  <div class="callout feel"><b class="h">Физический смысл</b><p>Вес при «минутах» почти ничего не меняет, если сдвинуть его на 1, а вес при «часах» — меняет сильно. Получается яма, крутая в одну сторону и пологая в другую. Learning rate ограничен крутой стороной (тема 5), и по пологой спуск ползёт годами. После масштабирования яма почти круглая, и минус градиент смотрит прямо на дно. В лаборатории темы 7 то же самое: признак x не центрирован, поэтому наклон и сдвиг «связаны» и сдвиг ползёт.</p></div>
+
+  <h3 style="font-size:17px">Способы</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Способ</th><th>Формула</th><th>Когда</th></tr></thead>
+    <tbody>
+      <tr><td><code>StandardScaler</code> (z-score)</td><td>(x − среднее) / стандартное отклонение → среднее 0, разброс 1</td><td>по умолчанию: линейные модели, SVM, нейросети, PCA</td></tr>
+      <tr><td><code>MinMaxScaler</code></td><td>(x − min) / (max − min) → от 0 до 1</td><td>нужен жёсткий диапазон: пиксели, входы нейросети; боится выбросов</td></tr>
+      <tr><td><code>RobustScaler</code></td><td>(x − медиана) / межквартильный размах</td><td>в признаке выбросы: один миллиардер не сжимает остальных в точку</td></tr>
+      <tr><td>Логарифм <code>np.log1p</code></td><td>log(1 + x)</td><td>длинный хвост: доходы, просмотры, цены. Часто перед StandardScaler</td></tr>
+    </tbody></table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Кому нужно</th><th>Почему</th></tr></thead>
+    <tbody>
+      <tr><td>Градиентный спуск: SGD, нейросети</td><td>форма ямы и скорость сходимости</td></tr>
+      <tr><td>Регуляризация L1, L2</td><td>штраф на веса честен только в одном масштабе</td></tr>
+      <tr><td>kNN, K-Means, SVM</td><td>расстояние иначе определяет признак с самыми большими числами</td></tr>
+      <tr><td>PCA</td><td>ищет направления наибольшего разброса — выберет признак с большими числами</td></tr>
+      <tr><td><b>Не нужно</b>: деревья, Random Forest, бустинг</td><td>дерево сравнивает признак с порогом, а порядок значений от масштаба не меняется</td></tr>
+      <tr><td><code>LinearRegression</code> (МНК)</td><td>на качество не влияет, но без масштаба веса не сравнить между собой</td></tr>
+    </tbody></table></div>
+<pre>from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+pipe = make_pipeline(StandardScaler(), SGDRegressor(random_state=42))
+pipe.fit(X_train, y_train)       <span class="cm"># среднее и разброс посчитаны только по train</span>
+pipe.predict(X_test)             <span class="cm"># test преобразован теми же числами</span></pre>
+  <div class="callout trap"><b class="h">Две ловушки</b><p>Первая — утечка: скейлер, обученный на всех данных, — это утечка через предобработку из урока 1. Только <code>fit</code> на train, лучше через Pipeline. Вторая — масштабировать таргет и забыть вернуть: если делал <code>StandardScaler</code> для y, предсказания нужно перевести обратно через <code>inverse_transform</code> (или <code>TransformedTargetRegressor</code>), иначе метрика посчитается в «стандартных отклонениях».</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Зачем масштабировать признаки и всегда ли это нужно?</summary>
+      <div class="a"><p>Чтобы градиентный спуск сходился быстро и устойчиво (яма функции потерь становится близкой к круглой), чтобы регуляризация штрафовала веса честно и чтобы расстояния в kNN, K-Means, SVM не определялись признаком с самыми большими числами. Деревьям и ансамблям на деревьях не нужно: они работают с порядком значений. Масштабирование обучают только на train и применяют одинаково ко всем выборкам.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>StandardScaler или MinMaxScaler?</summary>
+      <div class="a"><p>StandardScaler — разумный выбор по умолчанию: центрирует и приводит разброс к 1, меньше страдает от одного выброса. MinMaxScaler — когда нужен строгий диапазон [0, 1] (изображения, некоторые нейросети), но один выброс сжимает все остальные значения к краю. При тяжёлых выбросах — RobustScaler, при длинном хвосте — сначала логарифм.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Признак: 2, 4, 6. Что даст StandardScaler для значения 6? (стандартное отклонение ≈ 1.63)</summary>
+      <div class="a"><p>(6 − 4) / 1.63 ≈ 1.22.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="ml.lin.5">
+    <label class="tp"><input type="checkbox" data-id="ml.lin.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Масштабирование признаков</b></span></label>
+    <span class="note" data-d="ml.lin.5">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · как на собеседовании и в работе</div>
+  <h2>Практика</h2>
+  <p class="tldr">Пять задач. Устные отвечай вслух с таймером. Рабочие делай в учебном репозитории <code>ml-course</code> из урока 1.3, отдельным ноутбуком <code>week02_linreg.ipynb</code>.</p>
+  <div class="prac">
+    <div class="task"><span class="tg int">Собес · устно · 4 минуты</span>
+      <h3>«Расскажите, как обучается линейная регрессия»</h3>
+      <p class="ok">Готово, когда в ответе есть: модель, функция потерь, два способа решения с плюсами и минусами, зачем масштабирование.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a">
+        <p><b>Модель:</b> ŷ = Xw + b, взвешенная сумма признаков.</p>
+        <p><b>Цель:</b> минимизировать MSE — среднюю квадратичную ошибку. Функция выпуклая, минимум один.</p>
+        <p><b>Способ 1 — аналитический:</b> w = (XᵀX)⁻¹Xᵀy. Точно и сразу, но O(d³), требует всю матрицу, ломается при линейно зависимых признаках.</p>
+        <p><b>Способ 2 — градиентный спуск:</b> w ← w − η·(2/n)·Xᵀ(Xw − y). Масштабируется на большие данные и батчи, но нужен подбор learning rate и масштабирование признаков, иначе яма вытянутая и сходимость медленная.</p>
+        <p><b>Плюс к ответу:</b> «на практике — LinearRegression или Ridge в Pipeline со StandardScaler, а SGDRegressor — когда данных очень много».</p></div></details></div>
+
+    <div class="task"><span class="tg rev">Код-ревью · найди ошибки</span>
+      <h3>Коллега написал спуск, а ошибка растёт. Найди четыре проблемы.</h3>
+<pre>X = df[["hours", "app_minutes"]].values    <span class="cm"># часы 0–10, минуты 0–600</span>
+y = df["score"].values
+w = np.zeros(2); b = 0; lr = 0.5
+for step in range(100):
+    pred = X @ w + b
+    grad = X.T @ (y - pred)
+    w = w - lr * grad
+    b = b - lr * (X @ w + b - y).sum()</pre>
+      <p class="ok">Готово, когда нашёл четыре и написал исправление для каждой.</p>
+      <details><summary>Ответ</summary><div class="a"><ul style="margin:0;padding-left:20px;display:grid;gap:6px">
+        <li><b>Знак градиента:</b> <code>X.T @ (y - pred)</code> — это минус градиент, а потом его ещё и вычитают: спуск идёт вверх. Нужно <code>X.T @ (pred - y)</code>.</li>
+        <li><b>Нет деления на n</b> (и множителя 2): градиент растёт вместе с размером данных, lr = 0.5 гарантированно разлетается. Нужно <code>2 / len(y) * ...</code>.</li>
+        <li><b>Признаки не масштабированы:</b> минуты до 600 против часов до 10 — вытянутая яма, подходящего lr нет. StandardScaler перед спуском.</li>
+        <li><b>Градиент для b считается уже по новым w:</b> <code>X @ w + b</code> в последней строке использует обновлённые веса, и шаг по w и по b сделан из разных точек. Правильно — сначала посчитать оба градиента по одному <code>pred</code>, потом обновить оба параметра.</li></ul></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · numpy · 2 минуты</span>
+      <h3>«X — (1000, 3), w — (1, 3). Почему <code>X @ w</code> падает и как исправить?»</h3>
+      <p class="ok">Готово, когда назвал формы, правило умножения и два способа исправить.</p>
+      <details><summary>Ответ</summary><div class="a"><p>(1000 × 3) @ (1 × 3): внутренние размеры 3 и 1 не совпадают. Исправить: <code>X @ w.T</code> — получится (1000, 1), или привести w к одномерному <code>w.ravel()</code> / <code>w.reshape(-1)</code> — тогда <code>X @ w</code> даст (1000,). Второй вариант удобнее: ответ сразу совпадает по форме с y, и не будет тихого бродкастинга (1000, 1) − (1000,) → (1000, 1000) при вычитании.</p></div></details></div>
+
+    <div class="task"><span class="tg work">Работа · Jupyter, 40 минут</span>
+      <h3>Почему масштабирование не формальность: California Housing</h3>
+      <p>Задача от тимлида: «Возьми <code>sklearn.datasets.fetch_california_housing</code> (около 20 000 районов Калифорнии, 8 признаков, цена жилья; загрузится из интернета один раз). Раздели 80/20 с <code>random_state=42</code>. Сравни на тесте по R² и RMSE четыре модели: <code>DummyRegressor</code>, <code>LinearRegression</code>, <code>SGDRegressor</code> без масштабирования, <code>SGDRegressor</code> в Pipeline со <code>StandardScaler</code>. Отдельно выведи <code>coef_</code> линейной регрессии с масштабированием и без и объясни, почему сравнивать можно только вторые».</p>
+      <p class="ok">Готово, когда в ноутбуке таблица из четырёх строк и три фразы вывода.</p>
+      <details><summary>Что должно получиться</summary><div class="a"><p>Dummy — R² около 0. LinearRegression — R² около 0.6, со скейлером и без одинаково: МНК от масштаба не зависит. SGDRegressor без масштабирования обычно выдаёт бессмысленный результат — огромную ошибку и отрицательный R², потому что признаки вроде населения района в тысячах ломают яму. Со скейлером — около тех же 0.6. Точные числа зависят от версии и random_state, важна разница между строками.</p></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 2 минуты</span>
+      <h3>«У вас kNN и градиентный бустинг. Кому из них нужно масштабирование и почему?»</h3>
+      <p class="ok">Готово, когда объяснил через то, как каждая модель использует значения признаков.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>kNN — нужно: он считает расстояния, и признак в больших числах (доход в рублях) задавит все остальные (возраст в годах). Бустингу на деревьях — нет: каждое дерево сравнивает признак с порогом, а монотонное преобразование порядок значений не меняет, поэтому разбиения те же. Плюс к ответу: для деревьев масштабирование не вредит, просто бесполезно, а логарифм длинного хвоста тоже ничего не даст по той же причине.</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в дереве</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда прошёл «Проверку без ИИ» по теме. Галочки — те же, что в файле недели в Obsidian и на сайте дерева.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Вектор</b> — список чисел, объект для модели. <b>a·b</b> = Σ aᵢbᵢ = ‖a‖‖b‖cos θ. <b>‖a‖₂</b> — длина, <b>‖a‖₁</b> — сумма модулей.</li>
+      <li><b>Косинусное сходство</b> — угол без длины: похожесть эмбеддингов. В numpy <code>a @ b</code> — скалярное, <code>a * b</code> — поэлементное.</li>
+      <li><b>Матрицы:</b> (n × k) @ (k × m) = (n × m), элемент — строка на столбец. AB ≠ BA. <code>X @ w</code> — все предсказания сразу.</li>
+      <li><b>Производная</b> — наклон касательной, скорость изменения. 0 — дно или вершина. Численно: (f(x+h) − f(x−h)) / 2h.</li>
+      <li><b>Градиент</b> — вектор частных производных, направление самого крутого подъёма, перпендикулярен линиям уровня.</li>
+      <li><b>Спуск:</b> w ← w − η∇L. Маленький η — медленно, большой — разлёт. Предел задаёт самое крутое направление.</li>
+      <li><b>Batch / SGD / mini-batch</b> — градиент по всем, по одному, по пачке. Эпоха — проход по всем данным.</li>
+      <li><b>Линейная регрессия:</b> ŷ = Xw + b. Вес — эффект при прочих равных, сравнивать только в одном масштабе.</li>
+      <li><b>МНК:</b> w = (XᵀX)⁻¹Xᵀy. Минусы: O(d³), нет обратной при зависимых признаках, неустойчиво при коллинеарности → Ridge.</li>
+      <li><b>Спуск для регрессии:</b> ∇L = (2/n)Xᵀ(Xw − y). Работает на больших данных, нужен lr и масштабирование.</li>
+      <li><b>Масштабирование:</b> StandardScaler по умолчанию, MinMax — жёсткий диапазон, Robust — выбросы, log — длинный хвост. Деревьям не нужно.</li>
+      <li><b>Скейлер</b> — только fit на train, через Pipeline. Масштабировал y — верни inverse_transform.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без ИИ, 20 минут</b>
+    <p>Закрой урок. На листе бумаги: нарисуй два вектора и покажи их скалярное произведение через проекцию; перемножь (2 × 3) на (3 × 2) с размерами; выведи градиент MSE для ŷ = wx + b; нарисуй вытянутую яму и путь спуска с большим lr. Потом вслух за 4 минуты — «как обучается линейная регрессия». Где запнулся — туда и возвращаешься.</p>
+  </div>
+</section>
+</div>
+
+<script src="/assets/lesson.js"></script>
+<script>
+/* «1 шаг», «3 шага», «5 шагов» */
+const steps=n=>{const a=n%10,b=n%100;return `${n} ${a===1&&b!==11?"шаг":a>=2&&a<=4&&(b<12||b>14)?"шага":"шагов"}`}, stepsW=steps;
+
+/* ---------- тема 1: векторы ---------- */
+(function vectors(){
+  const svg=$("vecSvg"), F=frame(360,360,{l:20,r:20,t:20,b:20},[-5,5],[-5,5]);
+  const S={a:[3,1],b:[1,3]};
+  const P={same:[[3,1],[2.4,0.9]],perp:[[3,1],[-1,3]],opp:[[3,1],[-2.5,-1.2]]};
+  const arrow=(v,c,id)=>{const x=F.sx(v[0]),y=F.sy(v[1]);return `<line x1="${F.sx(0)}" y1="${F.sy(0)}" x2="${x}" y2="${y}" stroke="${c}" stroke-width="3" marker-end="url(#ah-${id})"/>
+    <circle class="knob" cx="${x}" cy="${y}" r="9" fill="${c}" fill-opacity=".25" stroke="${c}" stroke-width="2"/>`};
+  function draw(){
+    const [a,b]=[S.a,S.b], dot=a[0]*b[0]+a[1]*b[1], na=Math.hypot(...a), nb=Math.hypot(...b), cos=na&&nb?dot/(na*nb):0;
+    let s=`<defs>${[["a","var(--accent)"],["b","var(--plum)"]].map(([k,c])=>`<marker id="ah-${k}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="${c}"/></marker>`).join("")}</defs>`;
+    for(let i=-5;i<=5;i++){s+=`<line class="ax" x1="${F.sx(i)}" x2="${F.sx(i)}" y1="${F.y0}" y2="${F.y1}" stroke-opacity="${i?0.45:1}"/><line class="ax" y1="${F.sy(i)}" y2="${F.sy(i)}" x1="${F.x0}" x2="${F.x1}" stroke-opacity="${i?0.45:1}"/>`}
+    if(na>0.05){const k=dot/(na*na), p=[a[0]*k,a[1]*k];
+      s+=`<line x1="${F.sx(b[0])}" y1="${F.sy(b[1])}" x2="${F.sx(p[0])}" y2="${F.sy(p[1])}" stroke="var(--muted)" stroke-dasharray="4 4"/>
+        <line x1="${F.sx(0)}" y1="${F.sy(0)}" x2="${F.sx(p[0])}" y2="${F.sy(p[1])}" stroke="var(--warm)" stroke-width="7" stroke-opacity=".55" stroke-linecap="round"/>`;}
+    const a1=Math.atan2(a[1],a[0]),a2=Math.atan2(b[1],b[0]);let d=a2-a1;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;
+    const R=34,ex=F.sx(0)+R*Math.cos(a1+d),ey=F.sy(0)-R*Math.sin(a1+d);
+    s+=`<path d="M${F.sx(0)+R*Math.cos(a1)},${F.sy(0)-R*Math.sin(a1)} A${R},${R} 0 0 ${d>0?0:1} ${ex},${ey}" fill="none" stroke="var(--warm)" stroke-width="2"/>`;
+    s+=arrow(a,"var(--accent)","a")+arrow(b,"var(--plum)","b");
+    s+=`<text class="lbl" x="${F.sx(a[0])+12}" y="${F.sy(a[1])-10}" style="fill:var(--accent);font-weight:600">a</text><text class="lbl" x="${F.sx(b[0])+12}" y="${F.sy(b[1])-10}" style="fill:var(--plum);font-weight:600">b</text>`;
+    svg.innerHTML=s;
+    $("vDot").textContent=dot.toFixed(2); $("vCos").textContent=cos.toFixed(2); $("vNa").textContent=na.toFixed(2); $("vNb").textContent=nb.toFixed(2);
+    $("vecEq").textContent=`a·b = ${a[0].toFixed(1)}·${b[0].toFixed(1)} + ${a[1].toFixed(1)}·${b[1].toFixed(1)} = ${dot.toFixed(2)}`;
+    const deg=Math.round(Math.acos(Math.max(-1,Math.min(1,cos)))*180/Math.PI);
+    $("vecMsg").textContent=cos>0.95?`Угол ${deg}°: почти одно направление. Скалярное произведение близко к произведению длин — максимум возможного.`
+      :cos>0.15?`Угол ${deg}°: острый. Векторы «помогают» друг другу, скалярное произведение положительное.`
+      :cos>-0.15?`Угол ${deg}°: почти прямой. Проекция исчезает, скалярное произведение около нуля — векторы ортогональны.`
+      :`Угол ${deg}°: тупой. Векторы смотрят в разные стороны, скалярное произведение отрицательное.`;
+  }
+  let which=null;
+  const near=(p,v)=>Math.hypot(p.x-F.sx(v[0]),p.y-F.sy(v[1]))<22;
+  draggable(svg,p=>{which=near(p,S.b)?"b":near(p,S.a)?"a":null;return !!which},(x,y)=>{
+    const v=[Math.max(-4.8,Math.min(4.8,F.ix(x))),Math.max(-4.8,Math.min(4.8,F.iy(y)))].map(t=>Math.round(t*10)/10);
+    S[which]=v; draw();
+  });
+  document.querySelectorAll(".vp").forEach(bt=>bt.onclick=()=>{[S.a,S.b]=P[bt.dataset.p].map(v=>v.slice());draw()});
+  draw();
+})();
+
+/* ---------- тема 2: умножение матриц ---------- */
+(function matmul(){
+  const A0=[[1,2,0],[3,1,2]], B0=[[2,1],[0,3],[1,4]];
+  let swap=false, step=0;
+  const mul=(A,B)=>A.map(r=>B[0].map((_,j)=>r.reduce((s,v,k)=>s+v*B[k][j],0)));
+  function draw(){
+    const A=swap?B0:A0, B=swap?A0:B0, n=A.length, m=B[0].length, k=A[0].length, total=n*m, C=mul(A,B);
+    const ci=step?Math.floor((step-1)/m):-1, cj=step?(step-1)%m:-1;
+    const cell=(v,cls)=>`<span class="c ${cls}">${v}</span>`;
+    $("mA").style.gridTemplateColumns=`repeat(${A[0].length},40px)`; $("mB").style.gridTemplateColumns=`repeat(${m},40px)`; $("mC").style.gridTemplateColumns=`repeat(${m},40px)`;
+    $("mA").innerHTML=A.map((r,i)=>r.map(v=>cell(v,i===ci?"r":"")).join("")).join("");
+    $("mB").innerHTML=B.map(r=>r.map((v,j)=>cell(v,j===cj?"k":"")).join("")).join("");
+    $("mC").innerHTML=C.map((r,i)=>r.map((v,j)=>{const idx=i*m+j+1;return cell(idx<=step?v:"?",idx===step?"o":idx<=step?"":"q")}).join("")).join("");
+    $("mA").parentElement.lastChild.textContent=`${swap?"B":"A"} · ${n} × ${k}`;
+    $("mB").parentElement.lastChild.textContent=`${swap?"A":"B"} · ${B.length} × ${m}`;
+    $("mC").parentElement.lastChild.textContent=`результат · ${n} × ${m}`;
+    $("mmState").textContent=`шаг ${step} из ${total}`;
+    if(step){const r=A[ci], col=B.map(x=>x[cj]);
+      $("mmCalc").innerHTML=r.map((v,t)=>`<span class="a">${v}</span>·<span class="p">${col[t]}</span>`).join(" + ")+` = <span class="w">${C[ci][cj]}</span>`;
+      $("mmMsg").textContent=`Клетка в строке ${ci+1}, столбце ${cj+1}: строка ${ci+1} левой матрицы (зелёная) скалярно умножается на столбец ${cj+1} правой (сиреневый).`;
+    }else{$("mmCalc").innerHTML="";
+      $("mmMsg").textContent=swap?`(3 × 2) @ (2 × 3) — внутренние размеры 2 и 2 совпали, но результат 3 × 3, а не 2 × 2. Это совсем другое произведение: AB ≠ BA.`
+        :"Жми «Следующая клетка»: каждая клетка результата — одно скалярное произведение строки на столбец.";}
+    $("mmPrev").disabled=step===0; $("mmNext").disabled=step===total;
+  }
+  $("mmNext").onclick=()=>{const n=(swap?B0:A0).length*(swap?A0:B0)[0].length;if(step<n){step++;draw()}};
+  $("mmPrev").onclick=()=>{if(step>0){step--;draw()}};
+  $("mmAll").onclick=()=>{step=(swap?B0:A0).length*(swap?A0:B0)[0].length;draw()};
+  $("mmSwap").onclick=e=>{swap=!swap;step=0;e.currentTarget.setAttribute("aria-pressed",swap);e.currentTarget.textContent=swap?"Вернуть: A @ B":"Поменять местами: B @ A";draw()};
+  draw();
+})();
+
+/* ---------- тема 3: производная ---------- */
+(function deriv(){
+  const f=x=>0.15*x**3-0.9*x**2+0.6*x+4, df=x=>0.45*x*x-1.8*x+0.6;
+  const F=frame(360,300,{l:30,r:12,t:12,b:26},[0,6],[0,8]), XS=Array.from({length:241},(_,i)=>i/40);
+  function draw(){
+    const x=+$("dX").value, h=+$("dH").value, d=df(x), sec=(f(x+h)-f(x))/h;
+    let s=grid(F,[0,1,2,3,4,5,6],[0,2,4,6,8],v=>v,v=>v,"x","f(x)");
+    s+=`<path d="${pathOf(F,XS,f,[0,8])}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>`;
+    const tl=t=>f(x)+d*(t-x), sl=t=>f(x)+sec*(t-x);
+    s+=`<path d="${pathOf(F,[x-1.6,x+1.6],tl,[-1,9])}" stroke="var(--plum)" stroke-width="2.2"/>`;
+    s+=`<path d="${pathOf(F,[x-1,x+h+1],sl,[-1,9])}" stroke="var(--warm)" stroke-width="2" stroke-dasharray="6 5"/>`;
+    s+=`<circle cx="${F.sx(x+h)}" cy="${F.sy(f(x+h))}" r="4.5" fill="var(--warm)"/><circle cx="${F.sx(x)}" cy="${F.sy(f(x))}" r="6" fill="var(--plum)"/>`;
+    [0.367,3.633].forEach(c=>{s+=`<circle cx="${F.sx(c)}" cy="${F.sy(f(c))}" r="3" fill="none" stroke="var(--muted)"/>`});
+    $("dSvg").innerHTML=s;
+    $("dXv").textContent=x.toFixed(2); $("dHv").textContent=h.toFixed(2); $("dD").textContent=d.toFixed(2); $("dS").textContent=sec.toFixed(2);
+    $("dState").textContent=`x = ${x.toFixed(2)} · f(x) = ${f(x).toFixed(2)}`;
+    const gap=Math.abs(sec-d);
+    $("dMsg").textContent=(Math.abs(d)<0.15?(x<2?"Касательная почти горизонтальна: это вершина (локальный максимум), f′ ≈ 0.":"Касательная почти горизонтальна: это дно (локальный минимум), f′ ≈ 0. Сюда и стремится обучение.")
+      :d>0?`f′ > 0: функция растёт. Чтобы уменьшить f, двигайся влево.`:`f′ < 0: функция падает. Чтобы уменьшить f, двигайся вправо.`)
+      +` Секущая ошибается на ${gap.toFixed(2)}`+(gap<0.05?" — почти совпала с касательной.":", уменьши h.");
+  }
+  $("dX").oninput=draw; $("dH").oninput=draw; draw();
+})();
+
+/* ---------- темы 4, 5, 8: яма функции потерь ---------- */
+/* L(w) = A·(w1−c1)² + C·(w2−c2)², вид сверху: эллипсы-линии уровня. */
+function bowl(svg,A,C,c,xr,yr){
+  const F=frame(360,330,{l:30,r:10,t:10,b:26},xr,yr);
+  const L=(p)=>A*(p[0]-c[0])**2+C*(p[1]-c[1])**2, G=p=>[2*A*(p[0]-c[0]),2*C*(p[1]-c[1])];
+  function base(){
+    let s=grid(F,[xr[0],(xr[0]+xr[1])/2,xr[1]].map(v=>Math.round(v*10)/10),[yr[0],(yr[0]+yr[1])/2,yr[1]].map(v=>Math.round(v*10)/10),v=>v,v=>v,"w₁","w₂");
+    const sx=(F.x1-F.x0)/(xr[1]-xr[0]), sy=(F.y1-F.y0)/(yr[1]-yr[0]);
+    s+=`<clipPath id="cl-${svg.id}"><rect x="${F.x0}" y="${F.y0}" width="${F.x1-F.x0}" height="${F.y1-F.y0}"/></clipPath><g clip-path="url(#cl-${svg.id})">`;
+    [0.25,1,2.5,5,9,15,24,36,52].forEach((lv,i)=>{s+=`<ellipse cx="${F.sx(c[0])}" cy="${F.sy(c[1])}" rx="${Math.sqrt(lv/A)*sx}" ry="${Math.sqrt(lv/C)*sy}" fill="none" stroke="var(--teal)" stroke-opacity="${0.75-i*0.06}" stroke-width="1.2"/>`});
+    s+=`<circle cx="${F.sx(c[0])}" cy="${F.sy(c[1])}" r="4" fill="var(--teal)"/></g>`;
+    return s;
+  }
+  return {F,L,G,base};
+}
+
+(function gradLab(){
+  const svg=$("gSvg"), B=bowl(svg,0.5,2,[1,2],[-3,5],[-2,6]), F=B.F; let p=[-2,4.5];
+  function draw(){
+    const g=B.G(p), n=Math.hypot(...g), k=Math.min(1,2.2/Math.max(n,1e-9))*0.5;
+    let s=B.base();
+    s+=`<defs><marker id="gh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--red)"/></marker><marker id="gd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--accent)"/></marker></defs>`;
+    if(n>1e-6){s+=`<line x1="${F.sx(p[0])}" y1="${F.sy(p[1])}" x2="${F.sx(p[0]+g[0]*k)}" y2="${F.sy(p[1]+g[1]*k)}" stroke="var(--red)" stroke-width="2.5" marker-end="url(#gh)"/>`;
+      s+=`<line x1="${F.sx(p[0])}" y1="${F.sy(p[1])}" x2="${F.sx(p[0]-g[0]*k)}" y2="${F.sy(p[1]-g[1]*k)}" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#gd)"/>`;}
+    s+=`<circle class="knob" cx="${F.sx(p[0])}" cy="${F.sy(p[1])}" r="8" fill="var(--plum)" stroke="var(--surface)" stroke-width="2"/>`;
+    svg.innerHTML=s;
+    $("g1").textContent=g[0].toFixed(2); $("g2").textContent=g[1].toFixed(2); $("gL").textContent=B.L(p).toFixed(2); $("gN").textContent=n.toFixed(2);
+    $("gState").textContent=`w = (${p[0].toFixed(1)}, ${p[1].toFixed(1)})`;
+    $("gMsg").textContent=n<0.15?"Ты на дне: градиент почти нулевой, идти некуда. Это и есть минимум функции потерь."
+      :Math.abs(g[1])>3*Math.abs(g[0])?"Градиент почти вертикальный: по w₂ склон намного круче. Обрати внимание — минус градиент смотрит не на дно, а поперёк ямы."
+      :"Минус градиент — самый крутой спуск отсюда. Он перпендикулярен кольцу, на котором стоит точка, но не обязательно смотрит прямо на дно.";
+  }
+  draggable(svg,q=>Math.hypot(q.x-F.sx(p[0]),q.y-F.sy(p[1]))<24,(x,y)=>{p=[Math.max(-3,Math.min(5,F.ix(x))),Math.max(-2,Math.min(6,F.iy(y)))];draw()});
+  draw();
+})();
+
+(function descent(){
+  const svg=$("sdSvg"), B=bowl(svg,0.5,2,[1,2],[-3,5],[-2,6]), F=B.F;
+  let start=[-2.4,4.8], path=[start.slice()];
+  const lr=()=>+$("sdLr").value;
+  function curve(){
+    const Lv=path.map(B.L), CF=frame(600,150,{l:46,r:12,t:10,b:24},[0,Math.max(20,path.length-1)],[-4,3]);
+    let s=grid(CF,[0,Math.max(20,path.length-1)],[-4,-2,0,2],v=>v,v=>"10"+["⁻⁴","⁻³","⁻²","⁻¹","⁰","¹","²","³"][v+4],"шаг","ошибка");
+    s+=`<path d="${Lv.map((v,i)=>(i?"L":"M")+CF.sx(i).toFixed(1)+","+CF.sy(Math.max(-4,Math.min(3,Math.log10(Math.max(v,1e-4))))).toFixed(1)).join("")}" fill="none" stroke="var(--plum)" stroke-width="2.2"/>`;
+    $("sdCurve").innerHTML=s;
+  }
+  function draw(){
+    let s=B.base();
+    s+=`<path d="${path.map((q,i)=>(i?"L":"M")+F.sx(Math.max(-9,Math.min(11,q[0]))).toFixed(1)+","+F.sy(Math.max(-8,Math.min(12,q[1]))).toFixed(1)).join("")}" fill="none" stroke="var(--plum)" stroke-width="2"/>`;
+    path.forEach((q,i)=>{if(Math.abs(q[0])<20&&Math.abs(q[1])<20)s+=`<circle cx="${F.sx(q[0])}" cy="${F.sy(q[1])}" r="${i?3:7}" fill="var(--plum)" ${i?"":'class="knob" stroke="var(--surface)" stroke-width="2"'}/>`});
+    svg.innerHTML=s; curve();
+    const L=B.L(path[path.length-1]), n=path.length-1, L0=B.L(path[0]);
+    $("sdL").textContent=L>1e4?"∞":f2(L); $("sdN").textContent=n; $("sdLrv").textContent=lr().toFixed(2); $("sdState").textContent=`шаг ${n} · η = ${lr().toFixed(2)}`;
+    const v=lr();
+    $("sdMsg").textContent=!n?"Жми «Шаг» или «20 шагов». Перетащи стартовую точку, если хочешь начать в другом месте."
+      :L>L0*1.5?"Спуск разлетается: каждый шаг перелетает яму всё дальше. Learning rate больше предела — для этой ямы предел 0.5."
+      :L<0.01?`Сошлись за ${steps(n)}: ошибка почти ноль.`
+      :v>0.4?"Спуск скачет поперёк ямы с одного склона на другой — lr на грани. Ошибка всё равно падает, но рывками."
+      :v<0.06?"Каждый шаг крошечный: спуск идёт верно, но очень медленно. Посмотри на пологую кривую ошибки."
+      :"Спуск идёт уверенно. Заметь, что путь изгибается: сначала быстро гасит крутую сторону ямы, потом ползёт вдоль пологой.";
+  }
+  function stepN(k){for(let i=0;i<k;i++){const q=path[path.length-1];if(Math.abs(q[0])>1e6)break;const g=B.G(q);path.push([q[0]-lr()*g[0],q[1]-lr()*g[1]])}draw()}
+  $("sdStep").onclick=()=>stepN(1); $("sdRun").onclick=()=>stepN(20);
+  $("sdReset").onclick=()=>{path=[start.slice()];draw()};
+  $("sdLr").oninput=()=>{path=[start.slice()];draw()};
+  document.querySelectorAll(".lrp").forEach(b=>b.onclick=()=>{$("sdLr").value=b.dataset.v;path=[start.slice()];draw()});
+  draggable(svg,q=>Math.hypot(q.x-F.sx(path[0][0]),q.y-F.sy(path[0][1]))<24,(x,y)=>{start=[Math.max(-3,Math.min(5,F.ix(x))),Math.max(-2,Math.min(6,F.iy(y)))];path=[start.slice()];draw()});
+  draw();
+})();
+
+/* ---------- тема 6: вклад признаков ---------- */
+(function contrib(){
+  const W=[18,4.5,0.35];
+  function draw(){
+    const h=+$("lrH").value, a=+$("lrA").value, parts=[["сдвиг b",W[0]],[`4.5 × ${h} ч`,W[1]*h],[`0.35 × ${a} %`,W[2]*a]], tot=parts.reduce((s,p)=>s+p[1],0), MAX=100;
+    let acc=0;
+    $("wf").innerHTML=parts.map(([n,v],i)=>{const left=acc/MAX*100,w=v/MAX*100;acc+=v;const col=["var(--warm)","var(--accent)","var(--teal)"][i];
+      return `<div class="wfr"><span>${n}</span><span class="tr"><i style="left:${left}%;width:${w}%;background:${col}"></i></span><span class="v">+${v.toFixed(1)}</span></div>`}).join("")
+      +`<div class="wfr tot"><span>прогноз ŷ</span><span class="tr"><i style="left:0;width:${Math.min(100,tot)}%;background:var(--plum)"></i></span><span class="v">${tot.toFixed(1)}</span></div>`;
+    $("lrHv").textContent=h; $("lrAv").textContent=a;
+    $("lrMsg").textContent=`Прогноз ${tot.toFixed(1)} из 100. Каждый признак добавляет свой кусок независимо от других: ещё один час подготовки всегда даёт +4.5 балла, при любой посещаемости. Это и есть «линейная» модель — никаких взаимодействий, если их не добавить признаком.`;
+  }
+  $("lrH").oninput=draw; $("lrA").oninput=draw; draw();
+})();
+
+/* ---------- тема 7: спуск для регрессии ---------- */
+(function regGD(){
+  const r=rng(7), xs=[], ys=[];
+  for(let i=0;i<30;i++){const x=0.3+r()*9.4;xs.push(x);ys.push(Math.max(5,Math.min(98,20+6*x+gauss(r)*7)))}
+  const n=xs.length, mx=xs.reduce((a,b)=>a+b)/n, my=ys.reduce((a,b)=>a+b)/n;
+  const ws=xs.reduce((s,x,i)=>s+(x-mx)*(ys[i]-my),0)/xs.reduce((s,x)=>s+(x-mx)**2,0), bs=my-ws*mx;
+  const F=frame(360,300,{l:30,r:12,t:12,b:26},[0,10],[0,100]);
+  let w=0,b=0,steps=0,timer=null;
+  const mse=()=>xs.reduce((s,x,i)=>s+(w*x+b-ys[i])**2,0)/n;
+  function step(){const lr=+$("rgLr").value;let gw=0,gb=0;xs.forEach((x,i)=>{const e=w*x+b-ys[i];gw+=e*x;gb+=e});w-=lr*2/n*gw;b-=lr*2/n*gb;steps++}
+  function draw(){
+    let s=grid(F,[0,2,4,6,8,10],[0,25,50,75,100],v=>v,v=>v,"часы","балл");
+    s+=`<path d="${pathOf(F,[0,10],x=>ws*x+bs,[0,100])}" stroke="var(--ink)" stroke-opacity=".55" stroke-width="1.6" stroke-dasharray="6 5"/>`;
+    xs.forEach((x,i)=>{s+=`<circle cx="${F.sx(x)}" cy="${F.sy(ys[i])}" r="4" fill="var(--accent)"/>`});
+    if(isFinite(w)&&Math.abs(w)<1e4)s+=`<path d="${pathOf(F,[0,10],x=>w*x+b,[-20,120])}" stroke="var(--plum)" stroke-width="3"/>`;
+    $("rgSvg").innerHTML=s;
+    const L=mse(), bad=!isFinite(L)||L>1e6;
+    $("rgN").textContent=steps; $("rgL").textContent=bad?"∞":f2(L); $("rgW").textContent=bad?"—":w.toFixed(2); $("rgB").textContent=bad?"—":b.toFixed(2);
+    $("rgWs").textContent=ws.toFixed(2); $("rgBs").textContent=bs.toFixed(2); $("rgLrv").textContent=(+$("rgLr").value).toFixed(3);
+    $("rgEq").textContent=bad?"разошлось":`ŷ = ${w.toFixed(2)}·x + ${b.toFixed(2)}`;
+    $("rgMsg").textContent=bad?"Ошибка улетела в бесконечность: при x до 10 склон по w очень крутой, и этот learning rate больше допустимого. Уменьши его и начни сначала."
+      :!steps?"Модель стартует с нулей: прямая лежит на оси. Нажми «Пуск»."
+      :Math.abs(w-ws)<0.05&&Math.abs(b-bs)<0.3?`Сошлось за ${stepsW(steps)} к ответу МНК. Тот же результат, что и формула, только пришли пешком.`
+      :Math.abs(w-ws)<0.6?`Наклон почти найден (${w.toFixed(2)} против ${ws.toFixed(2)}), а сдвиг ещё далеко: ${b.toFixed(1)} против ${bs.toFixed(1)}. Признак не центрирован, и спуск ползёт вдоль длинной стороны ямы.`
+      :"Прямая быстро поворачивается к точкам: сначала спуск гасит самое крутое направление — наклон.";
+  }
+  function stop(){clearInterval(timer);timer=null;$("rgPlay").textContent="▶ Пуск"}
+  $("rgPlay").onclick=()=>{if(timer)return stop();$("rgPlay").textContent="❚❚ Пауза";
+    timer=setInterval(()=>{for(let i=0;i<4;i++)step();draw();if(steps>=2400||!isFinite(mse())||mse()>1e6)stop()},40)};
+  $("rgStep").onclick=()=>{for(let i=0;i<10;i++)step();draw()};
+  $("rgReset").onclick=()=>{stop();w=0;b=0;steps=0;draw()};
+  $("rgLr").oninput=()=>{stop();w=0;b=0;steps=0;draw()};
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)$("rgPlay").hidden=true;
+  draw();
+})();
+
+/* ---------- тема 8: масштабирование ---------- */
+(function scaling(){
+  const svg=$("scSvg"), CFG=[{A:0.15,C:6,c:[1,2],xr:[-6,8],yr:[-5,9],start:[-5,7.5]},{A:1.1,C:1.4,c:[1,2],xr:[-6,8],yr:[-5,9],start:[-5,7.5]}];
+  let mode=0;
+  function draw(){
+    const k=CFG[mode], B=bowl(svg,k.A,k.C,k.c,k.xr,k.yr), F=B.F, lr=0.95/(2*Math.max(k.A,k.C));
+    const path=[k.start.slice()], d0=Math.hypot(k.start[0]-k.c[0],k.start[1]-k.c[1]);
+    while(path.length<600){const q=path[path.length-1];if(Math.hypot(q[0]-k.c[0],q[1]-k.c[1])<0.01*d0)break;const g=B.G(q);path.push([q[0]-lr*g[0],q[1]-lr*g[1]])}
+    let s=B.base();
+    s+=`<path d="${path.map((q,i)=>(i?"L":"M")+F.sx(q[0]).toFixed(1)+","+F.sy(q[1]).toFixed(1)).join("")}" fill="none" stroke="var(--plum)" stroke-width="1.8"/>`;
+    path.slice(0,60).forEach((q,i)=>{s+=`<circle cx="${F.sx(q[0])}" cy="${F.sy(q[1])}" r="${i?2.6:6}" fill="var(--plum)"/>`});
+    svg.innerHTML=s;
+    const n=path.length-1, ratio=Math.max(k.A,k.C)/Math.min(k.A,k.C);
+    $("scN").textContent=n>=599?"600+":n; $("scR").textContent=ratio.toFixed(1)+"×";
+    $("scMsg").textContent=mode?`Яма почти круглая: минус градиент смотрит почти на дно, и спуск приходит за ${steps(n)}.`
+      :`Вытянутая яма: learning rate ограничен крутой стороной. Поперёк ямы спуск падает за пару шагов, а потом долго ползёт вдоль пологой — ${n>=599?"больше 600 шагов":steps(n)}.`;
+  }
+  document.querySelectorAll(".scl").forEach(b=>b.onclick=()=>{mode=+b.dataset.s;document.querySelectorAll(".scl").forEach(x=>x.setAttribute("aria-pressed",x===b));draw()});
+  draw();
+})();
+
+/* ---------- конспект для Obsidian и галочки ---------- */
+const MD=`---
+type: конспект
+tags: [ml, неделя-2]
+---
+# Как модель учится: урок 2.1
+
+## Векторы
+- Вектор — список чисел, объект для модели. a·b = Σ aᵢbᵢ = ‖a‖‖b‖cos θ.
+- ‖a‖₂ — длина (√ суммы квадратов), ‖a‖₁ — сумма модулей. Расстояние — норма разности.
+- Косинусное сходство — угол без длины, для эмбеддингов. numpy: a @ b — скалярное, a * b — поэлементное.
+
+## Матрицы
+- X: строки — объекты, столбцы — признаки. (n × k) @ (k × m) = (n × m), элемент — строка на столбец.
+- AB ≠ BA. X @ w — все предсказания разом. Обратная есть не у всех: зависимые строки.
+
+## Производная и градиент
+- Производная — наклон касательной, скорость изменения; 0 — дно или вершина. Численно: (f(x+h) − f(x−h)) / 2h.
+- Градиент — вектор частных производных, направление самого крутого подъёма, перпендикулярен линиям уровня.
+- Градиент MSE: ∂L/∂w = −2/n Σ (y − ŷ)x, ∂L/∂b = −2/n Σ (y − ŷ).
+
+## Градиентный спуск
+- w ← w − η∇L. Маленький η — медленно, большой — разлёт; предел задаёт самое крутое направление.
+- Batch — по всем, SGD — по одному, mini-batch — по пачке. Эпоха — проход по всем данным.
+
+## Линейная регрессия
+- ŷ = Xw + b. Вес — эффект при прочих равных; сравнивать только в одном масштабе.
+- МНК: w = (XᵀX)⁻¹Xᵀy. Минусы: O(d³), нет обратной при зависимых признаках, неустойчиво при коллинеарности → Ridge.
+- Спуск: ∇L = (2/n)Xᵀ(Xw − y), работает на больших данных.
+
+## Масштабирование
+- StandardScaler — по умолчанию; MinMax — диапазон [0, 1]; Robust — выбросы; log1p — длинный хвост.
+- Нужно: спуск, регуляризация, kNN, K-Means, SVM, PCA. Не нужно: деревья и ансамбли.
+- Только fit на train, через Pipeline. Масштабировал y — inverse_transform.
+`;
+initLesson({topics:[["math.la.0","Векторы, скалярное произведение, норма"],["math.la.1","Матрицы и матричное умножение"],["math.calc.0","Производная и её смысл"],["math.calc.2","Частные производные и градиент"],["math.calc.5","Градиентный спуск и learning rate"],["ml.lin.0","Линейная регрессия и МНК"],["ml.lin.1","Градиентный спуск для регрессии"],["ml.lin.5","Масштабирование признаков"]],md:MD});
+</script>
+<script src="/assets/asks.js" defer></script>

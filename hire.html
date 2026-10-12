@@ -1,0 +1,241 @@
+<!doctype html><html lang=ru><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Отборы · ML</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* «Отборы»: что спрашивают на стажировках. Тот же дизайн, что у дерева и уроков. */
+:root{
+  --bg:#F2F5F0; --surface:#FFFFFF; --ink:#16211B; --muted:#5A6A60; --line:#D9E1D9; --soft:#E8EEE7;
+  --accent:#2C7A50; --accent-soft:rgba(44,122,80,.16); --warm:#B7862A; --plum:#9A4C72; --teal:#2A7584; --red:#B4483A;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --accent-soft:rgba(93,187,135,.18); --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --accent-soft:rgba(93,187,135,.18); --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.55;padding-inline:16px;padding-block:0 72px}
+.wrap{max-width:980px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;letter-spacing:-.01em;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+
+.topnav{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;padding-block:16px 0;font-size:14px}
+.topnav a{text-decoration:none;font-weight:500}
+.topnav .mid{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+header.top{padding-block:36px 8px;display:grid;gap:12px}
+header.top h1{font-size:clamp(28px,5.2vw,44px);font-weight:700;line-height:1.08}
+header.top p{color:var(--muted);max-width:66ch}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+@media (max-width:720px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:4px;align-content:start}
+.kpi .v{font:700 28px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:15px;color:var(--muted);font-weight:500}
+.kpi .k{font-size:13px;color:var(--muted)}
+.kpi .bar{height:5px;border-radius:3px;background:var(--soft);overflow:hidden;margin-top:6px}
+.kpi .bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .4s ease}
+
+section.block{padding-block:48px 0;display:grid;gap:14px;scroll-margin-top:12px}
+section.block>h2{font-size:clamp(21px,3.2vw,28px)}
+section.block>p{color:var(--muted);max-width:70ch}
+
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:500 13px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer;transition:border-color .15s,background-color .15s,transform .15s}
+.seg button:hover{border-color:var(--accent)}
+.seg button:active{transform:scale(.97)}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.seg button em{font:normal 500 11px var(--f-mono);opacity:.7;margin-left:4px}
+
+.topics{display:grid;gap:8px}
+.tr{background:var(--surface);border:1px solid var(--line);border-radius:14px;scroll-margin-top:16px;transition:border-color .2s}
+.tr.flash{animation:flash 1.6s ease}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--warm)}100%{box-shadow:0 0 0 0 transparent}}
+.tr>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:12px 16px}
+.tr>summary::-webkit-details-marker{display:none}
+.tr:hover{border-color:color-mix(in srgb,var(--warm) 55%,var(--line))}
+.cnt{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;align-content:center;gap:0;background:color-mix(in srgb,var(--warm) 14%,transparent);color:var(--warm);border:1px solid color-mix(in srgb,var(--warm) 40%,transparent)}
+.cnt b{font:700 17px/1 var(--f-display)}
+.cnt span{font:500 9px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+.tr h3{font-size:15.5px;line-height:1.3}
+.tr .meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12.5px;color:var(--muted);margin-top:3px}
+.tr .meta .key{color:var(--warm)}
+.tr .meta .ok{color:var(--accent);font-weight:600}
+.chip{font:500 11.5px var(--f-mono);padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ink);text-decoration:none;white-space:nowrap;background:var(--bg);transition:border-color .15s,transform .15s}
+a.chip:hover{border-color:var(--accent);transform:translateY(-1px)}
+.chip.late{border-color:color-mix(in srgb,var(--red) 50%,var(--line));color:var(--red)}
+.chip.done{border-color:var(--accent);color:var(--accent)}
+.tr .side{display:flex;align-items:center;gap:8px}
+.chev{color:var(--muted);font-size:13px;transition:transform .2s}
+.tr[open] .chev{transform:rotate(90deg)}
+.asks{list-style:none;margin:0;padding:2px 16px 14px 82px;display:grid;gap:8px}
+@media (max-width:560px){.asks{padding-left:16px}.tr>summary{grid-template-columns:46px minmax(0,1fr)}.tr .side{grid-column:1/3;justify-content:flex-start}}
+.asks li{display:grid;gap:2px;font-size:14.5px;border-left:2px solid var(--line);padding-left:12px}
+.asks .src{font-size:12.5px;color:var(--muted)}
+.asks .src a{color:var(--muted)}
+.asks .src a:hover{color:var(--accent)}
+
+.gaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.gap{background:var(--surface);border:1px dashed color-mix(in srgb,var(--warm) 55%,var(--line));border-radius:14px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.gap b{font-weight:600}
+.gap .s{font-size:13px;color:var(--muted)}
+
+.cos{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.co{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:8px;align-content:start;transition:border-color .15s,transform .15s}
+.co:hover{border-color:var(--accent);transform:translateY(-1px)}
+.co h3{font-size:15.5px}
+.co .prog{font-size:13.5px;color:var(--muted)}
+.co .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.st{font:500 11px var(--f-mono);padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.st.go{border-color:var(--accent);color:var(--accent)} .st.wait{border-color:var(--warm);color:var(--warm)} .st.no{border-color:var(--red);color:var(--red)}
+.co .links{display:flex;gap:14px;font-size:13.5px;margin-top:2px}
+.co .links a{text-decoration:none;font-weight:500}
+
+.srcs{display:grid;gap:8px}
+.sr{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center}
+.sr .m{font-size:13px;color:var(--muted)}
+.sr .links{display:flex;gap:12px;font-size:13.5px}
+.sr .links a{text-decoration:none;font-weight:500}
+
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.how{grid-template-columns:1fr}}
+.how div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
+.how b.n{font:700 13px var(--f-mono);width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--accent);color:var(--surface)}
+.how p{font-size:14px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;font:500 13.5px var(--f-body);color:var(--surface);background:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:7px 14px;text-decoration:none;justify-self:start;transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.08)} .btn:active{transform:scale(.97)}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted)}
+footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body>
+<div class="wrap">
+  <nav class="topnav" aria-label="Навигация"><a href="/tree">← Дерево ML-инженера</a><span class="mid">отборы</span><a href="/tree#plan">План по неделям →</a></nav>
+  <header class="top">
+    <div class="eyebrow">Отборы · стажировки в ML</div>
+    <h1>Что спрашивают на отборах</h1>
+    <p>Каждый вопрос с собеседований и каждое требование стажировок привязано к теме дерева. Чем чаще тему спрашивают, тем выше она в списке. Справа — неделя плана, где она стоит. Метки ◎ с числом источников видны и у тем на сайте дерева, в уроках и в файлах недель Obsidian.</p>
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <section class="block" id="topics-block">
+    <div class="eyebrow">Темы</div>
+    <h2>Чаще всего спрашивают</h2>
+    <div class="seg" role="group" aria-label="Фильтр тем" id="seg"></div>
+    <div class="topics" id="topics"><p class="muted">Загружаю…</p></div>
+  </section>
+
+  <section class="block" id="gaps-block" hidden>
+    <div class="eyebrow">Пробелы</div>
+    <h2>Спрашивают, а в дереве нет</h2>
+    <p>Кандидаты в план. Агент предлагает, в какую неделю поставить тему, и добавляет её только после твоего «да».</p>
+    <div class="gaps" id="gaps"></div>
+  </section>
+
+  <section class="block" id="companies">
+    <div class="eyebrow">Компании</div>
+    <h2>Стажировки</h2>
+    <p>Заметка на каждую программу в Obsidian: условия, сроки, этапы и что требуют. Статус меняешь в свойствах заметки.</p>
+    <div class="cos" id="cos"></div>
+  </section>
+
+  <section class="block" id="sources">
+    <div class="eyebrow">Источники</div>
+    <h2>Разборы собеседований и видео</h2>
+    <div class="srcs" id="srcs"></div>
+  </section>
+
+  <section class="block" id="how">
+    <div class="eyebrow">Как пополнять</div>
+    <h2>Нашёл что-то про отборы</h2>
+    <div class="how">
+      <div><b class="n">1</b><b>Кинь во входящие</b><p>Ссылку на стажировку, видео с YouTube, расшифровку или свои заметки после собеседования — в заметку «Входящие отборов».</p></div>
+      <div><b class="n">2</b><b>«Разбери отборы»</b><p>Агент заведёт заметку компании или разбор собеседования и привяжет каждый вопрос к теме дерева.</p></div>
+      <div><b class="n">3</b><b>Метка в плане</b><p>У темы появится ◎ на сайте, в уроке и в неделе. Если темы нет в плане — агент предложит неделю.</p></div>
+    </div>
+    <a class="btn" id="inboxLink" href="#">Открыть «Входящие отборов» в Obsidian</a>
+  </section>
+
+  <footer>Данные — заметки «Отборы/Компании» и «Собеседования» в Obsidian и .agents/data/ml_hiring.json. Сборка страницы в Obsidian: <code>hire.py build</code>.</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const MON=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+let H=null, P=null, FILTER="all";
+const obs=f=>`obsidian://open?vault=${encodeURIComponent(H.vault)}&file=${encodeURIComponent(f.replace(/\.md$/,""))}`;
+const plural=(n,a,b,c)=>{const x=n%10,y=n%100;return x===1&&y!==11?a:x>=2&&x<=4&&(y<12||y>14)?b:c};
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+function weekChip(t){
+  if(t.done)return `<span class="chip done">✓ пройдено</span>`;
+  if(!t.week)return `<span class="chip late" title="Тема стоит в «После января», а её уже спрашивают">после января</span>`;
+  const w=(P&&P.weeks||[]).find(x=>x.n===t.week), past=w&&w.end<today();
+  return `<a class="chip${past?" late":""}" href="/tree#w-${t.week}" title="${w?esc(w.focus):""}">неделя ${t.week}${past?" · хвост":""} →</a>`;
+}
+function srcLink(name){
+  const s=[...H.sources,...H.companies].find(x=>x.name===name);
+  if(!s)return esc(name);
+  return `<a href="${obs(s.file)}">${esc(name)}</a>`+(s.url?` · <a href="${esc(s.url)}" target="_blank" rel="noopener">оригинал ↗</a>`:"");
+}
+function renderKpis(){
+  const T=H.topics, k=T.filter(t=>t.done).length, inPlan=T.filter(t=>t.week).length;
+  const pct=T.length?k/T.length*100:0;
+  $("kpis").innerHTML=`
+    <div class="kpi"><span class="k">Тем спрашивают</span><span class="v">${T.length}</span><span class="k">${H.gaps.length?`и ещё ${H.gaps.length} нет в дереве`:"все есть в дереве"}</span></div>
+    <div class="kpi"><span class="k">Уже пройдено</span><span class="v">${k}<small> / ${T.length}</small></span><div class="bar"><i style="width:${pct}%"></i></div></div>
+    <div class="kpi"><span class="k">Стоят в плане до января</span><span class="v">${inPlan}<small> / ${T.length}</small></span><span class="k">${T.length-inPlan?`${T.length-inPlan} — после января`:"все в плане"}</span></div>
+    <div class="kpi"><span class="k">Источники</span><span class="v">${H.sources.length+H.companies.filter(c=>c.asks).length}</span><span class="k">${H.sources.length} ${plural(H.sources.length,"разбор","разбора","разборов")} · ${H.companies.length} ${plural(H.companies.length,"стажировка","стажировки","стажировок")}</span></div>`;
+}
+function renderSeg(){
+  const T=H.topics, opts=[["all","Все",T.length],["todo","Не пройдено",T.filter(t=>!t.done).length],["soon","В плане",T.filter(t=>t.week&&!t.done).length],["later","После января",T.filter(t=>!t.week&&!t.done).length]];
+  $("seg").innerHTML=opts.map(([v,l,n])=>`<button data-f="${v}" aria-pressed="${v===FILTER}">${l}<em>${n}</em></button>`).join("");
+}
+function renderTopics(){
+  const T=H.topics.filter(t=>FILTER==="all"||(FILTER==="todo"&&!t.done)||(FILTER==="soon"&&t.week&&!t.done)||(FILTER==="later"&&!t.week&&!t.done));
+  if(!H.topics.length){$("topics").innerHTML=`<div class="empty">Пока пусто. Кинь первый разбор собеседования или условия стажировки во «Входящие отборов».</div>`;return}
+  if(!T.length){$("topics").innerHTML=`<div class="empty">В этом фильтре тем нет.</div>`;return}
+  $("topics").innerHTML=T.map(t=>`<details class="tr" id="t-${t.id}">
+    <summary><span class="cnt" title="В скольких источниках спрашивают"><b>${t.count}</b><span>${plural(t.count,"раз","раза","раз")}</span></span>
+      <div><h3>${esc(t.title)}</h3><div class="meta"><span>${esc(t.module)}</span>${t.key?'<span class="key">◆ ключевая</span>':""}<span>${t.asks.length} ${plural(t.asks.length,"вопрос","вопроса","вопросов")}</span></div></div>
+      <span class="side">${weekChip(t)}<span class="chev" aria-hidden="true">›</span></span></summary>
+    <ul class="asks">${t.asks.map(a=>`<li><span>${esc(a.what)}</span><span class="src">${srcLink(a.source)}${a.where?` · ${esc(a.where)}`:""}</span></li>`).join("")}</ul>
+  </details>`).join("");
+}
+function renderRest(){
+  $("gaps-block").hidden=!H.gaps.length;
+  $("gaps").innerHTML=H.gaps.map(g=>`<div class="gap"><b>${esc(g.what)}</b><span class="s">${srcLink(g.source)}${g.where?` · ${esc(g.where)}`:""}</span>${g.suggest?`<span class="s">Куда: ${esc(g.suggest)}</span>`:""}</div>`).join("");
+  const cls=s=>["оффер","собеседование","тест","подал"].includes(s)?"go":["подаюсь","изучаю"].includes(s)?"wait":["отказ","не подхожу"].includes(s)?"no":"";
+  $("cos").innerHTML=H.companies.length?H.companies.map(c=>`<div class="co"><h3>${esc(c.name)}</h3><span class="prog">${esc(c.program||c.company)}</span>
+    <div class="row"><span class="st ${cls(c.status)}">${esc(c.status)}</span>${c.opens?`<span class="chip">отбор: ${esc(c.opens)}</span>`:""}${c.deadline?`<span class="chip">до ${esc(c.deadline)}</span>`:""}${c.asks?`<span class="chip">◎ ${c.asks}</span>`:""}</div>
+    <div class="links">${c.url?`<a href="${esc(c.url)}" target="_blank" rel="noopener">Страница ↗</a>`:""}<a href="${obs(c.file)}">Заметка в Obsidian</a></div></div>`).join("")
+    :`<div class="empty">Заметок о стажировках пока нет.</div>`;
+  $("srcs").innerHTML=H.sources.length?H.sources.map(s=>{const d=s.date&&/^\d{4}-\d{2}-\d{2}$/.test(s.date)?`${+s.date.slice(8)} ${MON[+s.date.slice(5,7)-1]} ${s.date.slice(0,4)}`:"";
+    return `<div class="sr"><div><b>${esc(s.name)}</b><div class="m">${[s.track,s.level,d,`${s.asks} ${plural(s.asks,"вопрос","вопроса","вопросов")} к темам`].filter(Boolean).map(esc).join(" · ")}</div></div>
+    <div class="links"><a href="${obs(s.file)}">Разбор</a>${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">Видео ↗</a>`:""}</div></div>`}).join("")
+    :`<div class="empty">Разборов пока нет.</div>`;
+  $("inboxLink").href=obs("60_Машинное обучение/Отборы/Входящие отборов.md");
+}
+function jump(){
+  const m=location.hash.match(/^#t-(.+)$/); if(!m)return;
+  let el=document.getElementById("t-"+m[1]);
+  if(!el&&FILTER!=="all"){FILTER="all";renderSeg();renderTopics();el=document.getElementById("t-"+m[1])}
+  if(!el)return;
+  el.open=true; el.scrollIntoView({block:"start"}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+}
+$("seg").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b)return;FILTER=b.dataset.f;renderSeg();renderTopics()});
+addEventListener("hashchange",jump);
+Promise.all([fetch("/api/hire").then(r=>r.json()),fetch("/api/plan").then(r=>r.json()).catch(()=>null)]).then(([h,p])=>{
+  H=h;P=p;renderKpis();renderSeg();renderTopics();renderRest();
+  if(document.fonts)document.fonts.ready.then(jump);else jump();
+}).catch(()=>{$("topics").innerHTML=`<div class="empty">Сервер не отвечает: открой сайт через ссылку в Obsidian или запусти «Тренажёр и дерево».</div>`});
+</script>
+</body></html>
