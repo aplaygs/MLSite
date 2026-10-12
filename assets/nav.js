@@ -1,12 +1,30 @@
 /* Верхняя навигация сайта: Дерево · План · Отборы и кнопка текущей недели.
    Подключение: <script src="/assets/nav.js"></script> в начале <body> (или с defer — тогда появится после загрузки).
    Высота панели — CSS-переменная --navh; прилипающие элементы страницы ставят top: var(--navh). */
+/* Плавность: переход между страницами — короткое растворение (View Transitions, Chrome 126+);
+   если страница открыта со ссылкой на место (#w-2, #t-…), она сначала встаёт на это место невидимой,
+   потом проявляется. Страница сообщает «готово» через window.siteReady(); страховка — 900 мс. */
+(function () {
+  const root = document.documentElement;
+  const st0 = document.createElement("style");
+  st0.textContent = `@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.2s;animation-timing-function:ease}
+::view-transition-group(sitenav){animation-duration:0s}
+.wrap{transition:opacity .2s ease}
+html.arrive .wrap{opacity:0}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}.wrap{transition:none}}`;
+  document.head.appendChild(st0);
+  if (location.hash) root.classList.add("arrive");
+  let done = false;
+  window.siteReady = () => { if (done) return; done = true; requestAnimationFrame(() => root.classList.remove("arrive")); };
+  setTimeout(window.siteReady, 900);
+})();
 (function () {
   if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
   const CSS = `
 :root{--navh:52px}
 html{scroll-padding-top:calc(var(--navh) + 8px)}
-.sitenav{position:sticky;top:0;z-index:30;margin-inline:-16px;padding-inline:16px;background:color-mix(in srgb,var(--bg) 86%,transparent);
+.sitenav{view-transition-name:sitenav;position:sticky;top:0;z-index:30;margin-inline:-16px;padding-inline:16px;background:color-mix(in srgb,var(--bg) 86%,transparent);
   -webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
 .sitenav .in{max-width:1180px;margin:0 auto;height:var(--navh);display:flex;align-items:center;gap:6px}
 .sitenav .brand{display:flex;align-items:center;gap:8px;margin-right:10px;text-decoration:none;color:var(--ink);font:700 14px var(--f-display,system-ui);letter-spacing:-.01em;white-space:nowrap}

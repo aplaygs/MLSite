@@ -154,8 +154,8 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 
   <section class="block" id="gaps-block" hidden>
     <div class="eyebrow">Пробелы</div>
-    <h2>Спрашивают, а в дереве нет</h2>
-    <p>Кандидаты в план. Агент предлагает, в какую неделю поставить тему, и добавляет её только после твоего «да».</p>
+    <h2>Вопросы без темы в дереве</h2>
+    <p>Это не отдельные собеседования, а вопросы из разборов, для которых в дереве пока нет подходящей темы. Встретится такой вопрос во втором источнике — он поднимется в «Поставить в план», и агент предложит неделю.</p>
     <div class="gaps" id="gaps"></div>
   </section>
 
@@ -251,18 +251,22 @@ function renderRest(){
     :`<div class="empty">Разборов пока нет.</div>`;
   $("inboxLink").href=obs("60_Машинное обучение/Отборы/Входящие отборов.md");
 }
-function jump(){
-  const m=location.hash.match(/^#t-(.+)$/); if(!m)return;
-  let el=document.getElementById("t-"+m[1]);
-  if(!el&&FILTER!=="all"){FILTER="all";renderSeg();renderTopics();el=document.getElementById("t-"+m[1])}
-  if(!el)return;
-  el.open=true; el.scrollIntoView({block:"start"}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+/* Переход к теме по #t-<id>: тема раскрыта, прокрутка — мгновенно при открытии страницы (она ещё невидима), плавно — при клике внутри страницы. */
+function jump(smooth){
+  const m=location.hash.match(/^#t-(.+)$/); if(!m)return window.siteReady&&window.siteReady();
+  const id=decodeURIComponent(m[1]);
+  let el=document.getElementById("t-"+id);
+  if(!el&&FILTER!=="all"){FILTER="all";renderSeg();renderTopics();el=document.getElementById("t-"+id)}
+  if(el){el.open=true;
+    el.scrollIntoView({block:"start",behavior:smooth&&!matchMedia("(prefers-reduced-motion: reduce)").matches?"smooth":"auto"});
+    el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");}
+  window.siteReady&&window.siteReady();
 }
 $("seg").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b)return;FILTER=b.dataset.f;renderSeg();renderTopics()});
-addEventListener("hashchange",jump);
+addEventListener("hashchange",()=>jump(true));
 Promise.all([fetch("/api/hire").then(r=>r.json()),fetch("/api/plan").then(r=>r.json()).catch(()=>null)]).then(([h,p])=>{
   H=h;P=p;renderKpis();renderSeg();renderTopics();renderRest();
-  if(document.fonts)document.fonts.ready.then(jump);else jump();
+  if(document.fonts)document.fonts.ready.then(()=>jump(false));else jump(false);
 }).catch(()=>{$("topics").innerHTML=`<div class="empty">Сервер не отвечает: открой сайт через ссылку в Obsidian или запусти «Тренажёр и дерево».</div>`});
 </script>
 </body></html>

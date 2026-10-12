@@ -524,7 +524,7 @@ const MODULES=[
  groups:[
   {id:"port",t:"Портфолио",items:["!BRS-проект доведён до рабочего состояния","!README: задача, данные, метрики, как запустить","Второй проект на реальных данных","Третий проект: NLP или сервис в Docker","Профиль на Kaggle","Пост или статья о проекте"]},
   {id:"cv",t:"Резюме",items:["!Одна страница, стек сверху","!Проекты с цифрами::метрика, объём данных","!Опыт описан как есть::что сделано, для кого, на каких данных","Ссылки на GitHub и Telegram"]},
-  {id:"apply",t:"Куда подаваться",items:["Яндекс: стажировка и ШАД","Т-Банк: стажировки и Т-Образование","Сбер: SberSeasons","VK: VK Education","Ozon: Route 256","Avito, МТС, Лаборатория Касперского","Сроки отборов в календаре::обычно осень–зима на лето","Wildberries (RWB): стажировки и junior","X5 Tech: стажировки","Magnit Tech и Самокат: стажировки","2ГИС и Контур: стажировки","Junior ML на hh.ru: что требуют::выписать требования 10 вакансий в «Отборы»"]},
+  {id:"apply",t:"Куда подаваться",items:["Яндекс: стажировка и ШАД","Т-Банк: стажировки и Т-Образование","Сбер: SberSeasons","VK: VK Education","Ozon: Route 256","Avito, МТС, Лаборатория Касперского","Сроки отборов в календаре::обычно осень–зима на лето","Wildberries (RWB): стажировки и junior","X5 Tech: стажировки","Magnit Tech и Самокат: стажировки","2ГИС и Контур: стажировки","Junior ML на hh.ru: что требуют::выписать требования 10 вакансий в «Отборы»","МегаФон и Cloud.ru: стажировки","Selectel и JetBrains: стажировки"]},
   {id:"int",t:"Собеседования",items:["!Алгоритмическая секция: live coding","!ML-теория: 50 типовых вопросов","Python-секция","SQL-секция","Облегчённый ML system design","!Рассказ о проекте за 3 минуты","Поведенческие вопросы::метод STAR","Mock-интервью с другом"]},
   {id:"comm",t:"Сообщество",items:["ODS (Open Data Science)","Хакатоны и конкурсы","Telegram-каналы по ML"]}
  ],res:[["Tech Interview Handbook","https://www.techinterviewhandbook.org/"],["ODS.ai","https://ods.ai/"],["Яндекс: стажировки","https://yandex.ru/yaintern/"],["Т-Образование","https://education.tbank.ru/"]]}
@@ -779,7 +779,8 @@ function buildPlan(){
   syncAll(); updatePlan();
   const m=location.hash.match(/^#w-(\d+)$/);
   if(m&&!box.dataset.jumped){box.dataset.jumped="1";const n=+m[1];
-    const jump=()=>goWeek(n,true); setTimeout(jump,120); if(document.fonts)document.fonts.ready.then(()=>setTimeout(jump,60))}
+    const jump=()=>{goWeek(n,true);window.siteReady&&window.siteReady()}; setTimeout(jump,120); if(document.fonts)document.fonts.ready.then(()=>setTimeout(jump,60))}
+  else window.siteReady&&window.siteReady();
 }
 function goWeek(n,instant){
   if(PAGE==="tree"){location.href="/plan#w-"+n;return}
