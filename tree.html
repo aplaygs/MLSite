@@ -1,0 +1,808 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Дерево ML-инженера</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: botanical plate. A radial "flower" of 15 branch-petals is the navigator; below it the full route reads top-down by tier (roots → fruit). */
+:root{
+  --bg:#F2F5F0; --surface:#FFFFFF; --ink:#16211B; --muted:#5A6A60; --line:#D9E1D9; --soft:#E8EEE7;
+  --accent:#2C7A50; --key:#B7862A;
+  --s1:#8F6040; --s2:#6E7D2F; --s3:#2C7A50; --s4:#2A7584; --s5:#9A4C72; --s6:#B7862A;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --key:#E0B456;
+  --s1:#C89470; --s2:#A9B95C; --s3:#5DBB87; --s4:#5BB3C2; --s5:#D684AC; --s6:#E0B456; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --key:#E0B456;
+  --s1:#C89470; --s2:#A9B95C; --s3:#5DBB87; --s4:#5BB3C2; --s5:#D684AC; --s6:#E0B456; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;font-weight:500;letter-spacing:-.01em}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+
+/* Hero */
+header.top{padding-block:40px 8px;display:grid;gap:10px}
+header.top h1{font-size:clamp(28px,5vw,46px);font-weight:700;line-height:1.08}
+header.top p{max-width:64ch;margin:0;color:var(--muted)}
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:32px;align-items:center;padding-block:12px 32px}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.flower{width:100%;max-width:640px;height:auto;display:block;margin:0 auto;overflow:visible}
+.flower .pet{cursor:pointer;transition:transform .25s ease}
+.flower a:hover .pet,.flower a:focus .pet,.flower a.hl .pet{transform:translateX(8px)}
+.flower a:focus{outline:none}
+.flower a:focus-visible .petal-base{stroke-width:2.5}
+.petal-base{stroke-width:1.2}
+.plabel{font-family:var(--f-body);font-weight:600;font-size:13px;fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:3.5px;stroke-linejoin:round}
+.ppct{font-family:var(--f-mono);font-size:10.5px;fill:var(--muted);paint-order:stroke;stroke:var(--bg);stroke-width:3px}
+.ring-t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:500}
+.c-num{font-family:var(--f-display);font-size:26px;font-weight:700;fill:var(--ink)}
+.c-cap{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.08em;fill:var(--muted);text-transform:uppercase}
+@media (prefers-reduced-motion:reduce){.flower .pet{transition:none}}
+
+.panel{display:grid;gap:20px;min-width:0}
+.kpi{display:grid;gap:4px}
+.kpi .big{font-family:var(--f-display);font-size:38px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.kpi .big small{font-size:18px;color:var(--muted);font-weight:500}
+.bar{height:6px;border-radius:3px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .4s ease}
+.stages{display:grid;gap:9px}
+.srow{display:grid;grid-template-columns:118px 1fr 52px;gap:10px;align-items:center;font-size:13.5px}
+.srow b{font-weight:600}
+.srow .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.next{border-top:1px solid var(--line);padding-top:16px;display:grid;gap:8px}
+.next ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.next ol a{color:var(--ink);text-decoration:none;border-bottom:1px dashed var(--line)}
+.next ol a:hover{border-bottom-color:var(--accent)}
+.sync{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+
+/* Toolbar */
+.tools{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding-block:10px;margin-bottom:8px}
+.tools .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-left:auto}
+@media (max-width:640px){.tools .legend{display:none}}
+.btn{font:500 13px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.diamond{color:var(--key);font-size:10px}
+.tag{font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;padding:1px 5px;border-radius:4px;border:1px solid var(--s4);color:var(--s4);white-space:nowrap;vertical-align:1px}
+
+/* Tiers & modules */
+.tier{padding-block:36px 4px;display:grid;gap:6px;scroll-margin-top:56px}
+details.card>summary{list-style:none;display:flex;gap:10px;align-items:baseline}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::before{content:"›";color:var(--muted);transition:transform .2s;display:inline-block}
+details.card[open]>summary::before{transform:rotate(90deg)}
+details.card[open]>summary{margin-bottom:12px}
+.tier .eyebrow{color:var(--tc)}
+.tier h2{font-size:clamp(22px,3vw,28px)}
+.tier p{margin:0;max-width:70ch;color:var(--muted)}
+.mod{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;scroll-margin-top:72px}
+.mod.flash{animation:flash 1.4s ease}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--mc)}100%{box-shadow:0 0 0 0 transparent}}
+.mod>details>summary{list-style:none;cursor:pointer;padding:18px 20px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 16px;align-items:center}
+.mod>details>summary::-webkit-details-marker{display:none}
+.mdot{width:14px;height:14px;border-radius:50% 0;background:var(--mc);transform:rotate(-45deg)}
+.mod h3{font-size:18px}
+.mmeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.prio{font-family:var(--f-mono);font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.prio.core{border-color:var(--key);color:var(--key)}
+.mprog{display:grid;gap:5px;justify-items:end;min-width:92px}
+.mprog .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mprog .bar{width:92px}
+.mprog .bar i{background:var(--mc)}
+.mwhy{grid-column:2/4;margin:0;color:var(--muted);font-size:14px;max-width:80ch}
+.chev{transition:transform .2s;color:var(--muted);font-size:12px}
+details[open] .chev{transform:rotate(90deg)}
+.mbody{padding:4px 20px 20px;display:grid;gap:18px}
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px 28px}
+.grp{min-width:0}
+.grp h4{margin:0 0 6px;font:600 12px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mc)}
+.grp ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.it{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:4px 6px;margin-inline:-6px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1.4}
+.it:hover{background:var(--soft)}
+.it input{position:absolute;opacity:0;width:1px;height:1px}
+.box{width:16px;height:16px;margin-top:1px;border:1.5px solid var(--muted);border-radius:4px;display:grid;place-items:center}
+.it input:checked+.box{background:var(--mc);border-color:var(--mc)}
+.it input:checked+.box::after{content:"";width:8px;height:4px;border:2px solid var(--surface);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.it input:checked~.tx .t{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.it input:disabled+.box{opacity:.6}
+.tx .h{display:block;font-size:12.5px;color:var(--muted)}
+.tx .d{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);margin-left:4px}
+.res{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;border-top:1px dashed var(--line);padding-top:12px}
+.res b{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+body.focus .it:not(.key){display:none}
+body.focus .mod.later{opacity:.55}
+
+/* Plan, BRS, Obsidian */
+section.block{padding-block:48px 0;display:grid;gap:14px}
+section.block>h2{font-size:clamp(22px,3vw,28px)}
+section.block>p{margin:0;max-width:72ch;color:var(--muted)}
+.weeks{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13.5px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.w{font-family:var(--f-mono);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+tr.now td{background:var(--soft)}
+.two{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:24px}
+@media (max-width:860px){.two{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;min-width:0}
+.card h3{font-size:15px;margin-bottom:10px}
+.files{display:grid;gap:10px;font-size:14px}
+.files code{font-family:var(--f-mono);font-size:12.5px;color:var(--s4)}
+.fix{margin:0;padding-left:22px;display:grid;gap:12px;font-size:14px}
+.fix li::marker{font-family:var(--f-mono);color:var(--s5)}
+.fix b{font-weight:600}
+.fix .lk{font-size:12.5px}
+.nums{font-family:var(--f-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+.obs{display:grid;gap:10px;font-size:14px;align-content:start}
+.obs ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.note{font-size:12.5px;color:var(--muted)}
+footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
+
+/* Plan by weeks */
+.wnav{display:grid;gap:12px;margin-top:6px}
+.wact{display:flex;flex-wrap:wrap;gap:8px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--surface);text-decoration:none}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.ls{text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.btn.ls em{font:normal 500 11px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.btn.ls.full{border-color:var(--accent)} .btn.ls.full em{color:var(--accent)}
+.mini{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:3px}
+.mini a{position:relative;height:24px;border-radius:5px;background:var(--soft);overflow:hidden;display:grid;place-items:center;text-decoration:none;color:var(--muted);font:500 10px var(--f-mono);border-bottom:2px solid var(--wc)}
+.mini a i{position:absolute;left:0;bottom:0;width:100%;background:var(--wc);opacity:.35;transition:height .4s ease}
+.mini a span{position:relative}
+.mini a.now{color:var(--ink);box-shadow:0 0 0 1.5px var(--wc) inset;font-weight:700}
+.mini a.past:not(.now) span{opacity:.7}
+.mini a:hover{box-shadow:0 0 0 1.5px var(--wc) inset;color:var(--ink)}
+.mini-cap{display:flex;justify-content:space-between;font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.mini a i{transition:none}}
+.kpi .link{font-size:13px;color:var(--accent);text-decoration:none;border-bottom:1px dashed var(--accent);justify-self:start}
+.tl{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:4px}
+.tl a{position:relative;display:grid;place-items:center;height:44px;border-radius:8px;background:var(--soft);color:var(--ink);text-decoration:none;overflow:hidden;font:500 12px var(--f-mono);border:1px solid transparent;border-bottom:3px solid var(--wc)}
+.tl a i{position:absolute;left:0;bottom:0;width:100%;background:var(--wc);opacity:.35;transition:height .4s ease}
+.tl a span{position:relative}
+.tl a.now{border-color:var(--wc);box-shadow:0 0 0 2px var(--wc) inset}
+.tl a.full i{opacity:.75}
+.tl a.full span{color:var(--surface)}
+.tl a:hover{border-color:var(--wc)}
+.tl-months{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:4px;font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tl-months span{border-top:2px solid var(--line);padding-top:4px}
+.miles{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--muted)}
+.miles b{color:var(--ink);font-weight:600}
+.legend2{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}
+.legend2 i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--wc);margin-right:6px;vertical-align:-1px}
+.wk{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;scroll-margin-top:72px}
+.wk.now{border-color:var(--wc);box-shadow:0 0 0 1px var(--wc)}
+.wk.flash{animation:flash2 1.4s ease}
+@keyframes flash2{0%{box-shadow:0 0 0 3px var(--wc)}100%{box-shadow:0 0 0 0 transparent}}
+.wk>details>summary{list-style:none;cursor:pointer;padding:16px 20px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 16px;align-items:center}
+.wk>details>summary::-webkit-details-marker{display:none}
+.wnum{font:700 15px var(--f-display);width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--wc);color:var(--surface)}
+.wk h3{font-size:17px}
+.wfocus{grid-column:2/4;margin:0;color:var(--muted);font-size:14px}
+.chip{font:500 11px var(--f-mono);padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.now{border-color:var(--wc);color:var(--wc)}
+.chip.ok{border-color:var(--s3);color:var(--s3)}
+.chip.late{border-color:var(--s5);color:var(--s5)}
+.wbody{padding:2px 20px 18px;display:grid;gap:14px}
+.mtag{font:500 10.5px var(--f-mono);color:var(--mc);margin-left:6px;white-space:nowrap}
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:14px}
+.tasks li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px}
+.tasks .st{width:16px;height:16px;margin-top:2px;border-radius:50%;border:1.5px dashed var(--muted)}
+.tasks .st.ok{border:0;background:var(--s3)}
+.wfoot{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;border-top:1px dashed var(--line);padding-top:12px}
+.wfoot a{color:var(--accent)}
+.lessons{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.lsn{display:grid;gap:3px;align-content:start;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-decoration:none;transition:border-color .15s,transform .15s}
+.lsn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.lsn .ln{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.lsn b{font:500 15px var(--f-display);line-height:1.3}
+.lsn .lm{font-size:12.5px;color:var(--muted)}
+.lsn .lp{display:flex;align-items:center;gap:8px;margin-top:6px;font:12px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.lsn .lp i{flex:1;height:5px;border-radius:3px;background:var(--soft);overflow:hidden}
+.lsn .lp i::after{content:"";display:block;height:100%;width:var(--p,0%);background:var(--accent);border-radius:3px;transition:width .3s}
+.lsn.full{border-color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.lsn{transition:none}}
+.later{opacity:.9}
+@media (max-width:640px){.wk>details>summary{grid-template-columns:auto minmax(0,1fr)}.wk .mprog{grid-column:1/3;justify-items:start}.wfocus{grid-column:1/3}.tl a{height:36px}}
+
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Roadmap · ML-инженер · стажировка</div>
+    <h1>Дерево ML-инженера</h1>
+    <p>Пятнадцать веток на шести ярусах, от корней до плодов. Нажми на лепесток, чтобы перейти к ветке, и отмечай пройденные темы. Ниже — план по неделям до собеседований. Галочки — те же, что в файлах недель в Obsidian: отметил здесь — появилось там, и наоборот.</p>
+  </header>
+
+  <div class="hero">
+    <svg class="flower" id="flower" viewBox="-330 -330 660 660" role="img" aria-label="Цветок из 15 веток обучения"></svg>
+    <aside class="panel">
+      <div class="kpi" id="kWeekBox" hidden>
+        <span class="eyebrow" id="kWeekTitle">Эта неделя</span>
+        <div class="big" id="kWeek">0<small> / 0</small></div>
+        <div class="bar"><i id="kWeekBar" style="width:0%"></i></div>
+        <div class="wnav" id="kWeekNav"></div>
+      </div>
+      <div class="kpi">
+        <span class="eyebrow">Ключевое к стажировке</span>
+        <div class="big" id="kKey">0<small> / 0</small></div>
+        <div class="bar"><i id="kKeyBar" style="width:0%"></i></div>
+        <span class="note">Темы с ромбом <span class="diamond">◆</span>. Их спрашивают на отборах в первую очередь.</span>
+      </div>
+      <div class="stages" id="stageBars"></div>
+      <div class="next">
+        <span class="eyebrow" id="nextTitle">Следующие ключевые темы</span>
+        <ol id="nextList"></ol>
+      </div>
+      <div class="sync" id="sync" role="status">Загружаю галочки из Obsidian…</div>
+    </aside>
+  </div>
+
+  <div class="routewrap">
+  <div class="tools">
+    <button class="btn" id="bFocus" aria-pressed="false">Только ключевое</button>
+    <button class="btn" id="bFold">Свернуть все</button>
+    <div class="legend">
+      <span><span class="diamond">◆</span> спрашивают на отборе</span>
+    </div>
+  </div>
+
+  <div id="route"></div>
+  </div>
+
+  <section class="block" id="plan">
+    <div class="eyebrow">План по неделям</div>
+    <h2>Темы до 27 декабря, январь — повторение и собеседования</h2>
+    <p>Каждая тема дерева стоит в одной неделе. Четыре дорожки: код, теория, алгоритмы, проект. Алгоритмы — только частые паттерны и 3–4 задачи LeetCode в неделю, основное время — ML, Python и нейросети. Не успел — тема уходит в хвосты, план не ломается.</p>
+    <div class="tl" id="timeline"></div>
+    <div class="tl-months" id="tlMonths"></div>
+    <div class="miles" id="miles"></div>
+    <div class="legend2">
+      <span style="--wc:var(--s3)"><i></i>новые темы</span>
+      <span style="--wc:var(--key)"><i></i>хвосты</span>
+      <span style="--wc:var(--s5)"><i></i>повторение и собеседования</span>
+      <span>заливка — сколько тем пройдено</span>
+    </div>
+    <div id="planWeeks"><p class="muted">Загружаю план из Obsidian…</p></div>
+  </section>
+
+  <section class="block" id="brs">
+    <div class="eyebrow">Проекты</div>
+    <h2>Два проекта на этом дереве</h2>
+    <p>Один сюжет для резюме: «делаю ML-инструменты для учёбы». Проекты закрывают темы плана на практике, задачи по ним стоят в дорожке «Проект» каждой недели. Подробный разбор — в Obsidian, «BRS — разбор и новая концепция».</p>
+    <div class="two" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      <div class="card">
+        <h3>А · Ранняя диагностика академического риска</h3>
+        <div class="files">
+          <div><span class="tag">недели 2–9</span> Реальные открытые данные OULAD: оценки и активность студентов по дням.</div>
+          <div>Предсказать на неделе N курса, что студент провалит курс, чтобы куратор успел вмешаться. Валидация во времени: учимся на прошлых семестрах, проверяем на следующем.</div>
+          <div class="note">EDA → бейзлайн (константа, логрегрессия) → CatBoost → PR-AUC и порог под recall → калибровка → SHAP-карточки → FastAPI в Docker → README с ограничениями.</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Б · Помощник по документам вуза (RAG)</h3>
+        <div class="files">
+          <div><span class="tag">недели 10–11</span> Открытые документы МИРЭА: положения, правила, учебные планы.</div>
+          <div>Ответы со ссылкой на источник. Главное — оценка качества на своём наборе из 50–100 вопросов: Recall@k и MRR для поиска, проверка ответов.</div>
+          <div class="note">Разбор PDF → нарезка → эмбеддинги → поиск FAISS или Qdrant вместе с BM25 → реранкинг → LLM с цитатами.</div>
+        </div>
+      </div>
+    </div>
+    <details class="card">
+      <summary style="cursor:pointer;font-weight:600">Что было не так в первой версии BRS — повод для честного рассказа на собеседовании</summary>
+      <ol class="fix">
+          <li><b>Тестовая выборка участвует в обучении.</b> <span class="nums">eval_set=(X_test, y_test)</span>: CatBoost выбрал лучшую итерацию по тесту и сохранил 136 деревьев из 250. Метрики на тесте завышены. Нужна отдельная валидационная выборка. <a class="lk" href="#m-mlp">Валидация →</a></li>
+          <li><b>Нет бейзлайна.</b> Простая логистическая регрессия обгоняет CatBoost по PR-AUC (0.938 против 0.887): таргет в генераторе — линейная формула. <a class="lk" href="#m-mlp">Бейзлайн →</a></li>
+          <li><b>Модель учит формулу, которую ты сам задал.</b> Данные синтетические. <span class="nums">avg_lab_score</span> в формулу риска не входит, но получил 10% важности, то есть модель подстраивается под шум. Первый вопрос на интервью будет «откуда данные». <a class="lk" href="#m-data">EDA и утечки →</a></li>
+          <li><b>Порог 0.5 при 8% положительных.</b> Recall 0.75: каждого четвёртого студента в зоне риска модель пропускает. Для раннего предупреждения порог подбирают под recall. <a class="lk" href="#m-mlp">Выбор порога →</a></li>
+          <li><b>В тесте 24 положительных примера.</b> Одна ошибка сдвигает метрику на несколько пунктов. Нужна кросс-валидация. <a class="lk" href="#m-mlp">k-fold →</a></li>
+          <li><b>Код без структуры.</b> Всё на уровне модуля, пути относительные, <span class="nums">predict.py</span> пустой и не в git, версии в requirements не зафиксированы. <a class="lk" href="#m-python">Инженерия кода →</a></li>
+          <li><b>README обещает шесть модулей</b>, а готова часть одного. Опиши то, что работает, остальное вынеси в раздел «Планы». <a class="lk" href="#m-career">Портфолио →</a></li>
+        </ol>
+    </details>
+  </section>
+
+  <section class="block" id="obsidian">
+    <div class="eyebrow">Второй мозг</div>
+    <h2>Связка с Obsidian</h2>
+    <div class="two">
+      <div class="card obs">
+        <h3>Где что лежит</h3>
+        <ul>
+          <li>Файлы недель — <span class="nums">60_Машинное обучение/План ML</span>. Галочки там и здесь одни и те же.</li>
+          <li>«План ML» — обзор: текущая неделя, хвосты, прогресс по всем неделям.</li>
+          <li>«После января — по желанию» — темы, которые не нужны к первым собеседованиям.</li>
+          <li>Конспект темы — дописывай прямо после галочки: <span class="nums">- [x] Тема — [[Мой конспект]]</span>.</li>
+        </ul>
+        <div class="row" id="obsLinks"></div>
+      </div>
+      <div class="card obs">
+        <h3>Как пользоваться</h3>
+        <ul>
+          <li>На компьютере — эта страница: удобно смотреть всё дерево и отмечать.</li>
+          <li>С телефона — файл недели в Obsidian: те же темы и галочки.</li>
+          <li>Неделя тяжёлая в вузе — не догоняй всё сразу: ◆ ключевые первыми, остальное уйдёт в хвосты.</li>
+          <li>В воскресенье агент собирает план недели и смотрит хвосты.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>Составлено 11.10.2026, план по неделям — 12.10.2026. Ключевые темы отобраны по типичным программам стажировок в ML: алгоритмическая секция, ML-теория, SQL и Python.</footer>
+</div>
+
+<script>
+const STAGES=[
+ {id:1,name:"Корни",sub:"фундамент",ring:"Корни · фундамент",c:"--s1",d:"Python, инструменты, математика и алгоритмы. Всё остальное растёт отсюда. Алгоритмы тянутся параллельно до самого оффера."},
+ {id:2,name:"Ствол",sub:"данные",ring:"Ствол · данные",c:"--s2",d:"Как достать, почистить и понять данные: SQL, Pandas, статистика."},
+ {id:3,name:"Ветви",sub:"классический ML",ring:"Ветви · классический ML",c:"--s3",d:"Классические модели и честная оценка качества. Это главное, что спрашивают на ML-стажировке."},
+ {id:4,name:"Крона",sub:"нейросети",ring:"Крона · нейросети",c:"--s4",d:"Нейросети и специализации. Начинать, когда классический ML держится уверенно."},
+ {id:5,name:"Плоды",sub:"продакшен",ring:"Плоды · продакшен",c:"--s5",d:"Модель превращается в сервис, которым можно пользоваться."},
+ {id:6,name:"Солнце",sub:"карьера",ring:"Карьера",c:"--s6",d:"Идёт параллельно с первого дня: портфолио, резюме, собеседования."}
+];
+const PRIO={core:"Ключевое к стажировке",plus:"Желательно",later:"После стажировки"};
+/* Item syntax: "!" = key for interviews, "::" = hint, " #brs" = used in BRS project */
+const MODULES=[
+{id:"tools",short:"Инструменты",name:"Инструменты разработчика",stage:1,prio:"core",
+ why:"Среда, в которой ты работаешь каждый день. Без неё любой проект ломается на этапе «у меня не запускается».",
+ groups:[
+  {id:"term",t:"Терминал и Linux",items:["!Навигация и файлы::cd, ls, pwd, mkdir, cp, mv, rm","Просмотр файлов::cat, less, head, tail -f","!Поиск::grep, find","Пайпы и перенаправления::|, >, >>, 2>&1","Права доступа::chmod, chown, sudo","Переменные окружения, PATH, .zshrc","Процессы::ps, htop, kill, фоновые задачи","SSH-ключи, ssh и scp","curl для HTTP-запросов"]},
+  {id:"git",t:"Git и GitHub",items:["!init, add, commit, status, log","!Ветки: branch, switch, merge #brs","Разрешение merge-конфликтов","rebase и когда его не использовать","!remote, push, pull, clone #brs","!.gitignore для данных, моделей и секретов #brs","Conventional Commits::feat:, fix:, docs: #brs","Pull Request и code review","stash, reset и revert","README как витрина проекта #brs"]},
+  {id:"env",t:"Окружение",items:["!venv: зачем изолировать зависимости #brs","!requirements.txt #brs","Фиксация версий::== вместо >=","pyproject.toml и uv","Секреты в .env, а не в коде"]},
+  {id:"ide",t:"Рабочие инструменты",items:["!Отладчик в VS Code::breakpoints, step into, watch","Jupyter Notebook и Lab","Google Colab и Kaggle Notebooks::бесплатный GPU","Markdown","Линтер и форматтер::ruff","pre-commit хуки"]}
+ ],res:[["Missing Semester (MIT)","https://missing.csail.mit.edu/"],["Pro Git на русском","https://git-scm.com/book/ru/v2"],["Learn Git Branching","https://learngitbranching.js.org/?locale=ru_RU"]]},
+{id:"python",short:"Python",name:"Python",stage:1,prio:"core",
+ why:"Главный язык ML. На стажировках Python проверяют отдельно от ML: от изменяемости объектов до генераторов.",
+ groups:[
+  {id:"base",t:"Основы",items:["Типы данных::int, float, str, bool, None","!Изменяемые и неизменяемые объекты::почему def f(x=[]) — ловушка","Условия и циклы, else у цикла","!Функции: аргументы по умолчанию, *args, **kwargs","Область видимости::LEGB, global, nonlocal","Строки, срезы, f-strings","is и ==, истинность объектов"]},
+  {id:"coll",t:"Коллекции",items:["!list, tuple, dict, set и сложность операций","!Comprehensions::списки, словари, множества","Распаковка, zip, enumerate","sorted с key=, lambda","!collections::Counter, defaultdict, deque","copy и deepcopy"]},
+  {id:"err",t:"Ошибки, файлы, логи",items:["!try / except / else / finally","Свои исключения и raise","!Контекстные менеджеры и with","Файлы и pathlib","json и csv","logging вместо print"]},
+  {id:"oop",t:"ООП",items:["!Классы, __init__, self","Атрибуты класса и экземпляра","!Наследование и super()","Инкапсуляция и @property","!Dunder-методы::__len__, __getitem__, __repr__, __eq__","@classmethod и @staticmethod","dataclasses","Абстрактные классы и протоколы"]},
+  {id:"adv",t:"Продвинутый Python",items:["!Итераторы и генераторы, yield","!Декораторы и замыкания","Type hints и mypy","Модули, пакеты, импорты","!if __name__ == '__main__' и функция main()","CLI-скрипты::argparse, typer","functools::partial, lru_cache","GIL, потоки и процессы","asyncio: базовое понимание"]},
+  {id:"eng",t:"Инженерия кода",items:["!Структура проекта::src/, tests/, configs/","!pytest: тесты, фикстуры, parametrize","PEP 8 и docstrings","Конфиги вместо хардкода::yaml, pydantic-settings","Профилирование::timeit, cProfile"]}
+ ],res:[["Хендбук Яндекса по Python","https://education.yandex.ru/handbook/python"],["«Поколение Python» на Stepik","https://stepik.org/course/58852"],["Real Python","https://realpython.com/"]]},
+{id:"math",short:"Математика",name:"Математика для ML",stage:1,prio:"core",
+ why:"Без неё ML сводится к заучиванию вызовов sklearn. На собеседовании могут попросить вывести градиент логистической регрессии или объяснить, что делает PCA.",
+ groups:[
+  {id:"la",t:"Линейная алгебра",items:["!Векторы, скалярное произведение, норма","!Матрицы и матричное умножение","Линейные преобразования и их геометрия","Линейная независимость, базис, ранг","Обратная матрица и системы уравнений","!Собственные значения и векторы","SVD и связь с PCA","Проекции и метод наименьших квадратов"]},
+  {id:"calc",t:"Анализ и оптимизация",items:["Производная и её смысл","!Правило цепочки::на нём держится backprop","!Частные производные и градиент","Матричное дифференцирование: базовые формулы","Выпуклые функции","!Градиентный спуск и learning rate","SGD, mini-batch, momentum, Adam","Множители Лагранжа: идея"]},
+  {id:"prob",t:"Теория вероятностей",items:["!Условная вероятность и формула Байеса","Независимость событий","!Матожидание и дисперсия","!Распределения::Бернулли, биномиальное, Пуассона, нормальное #brs","Закон больших чисел и ЦПТ","Ковариация и корреляция","!Метод максимального правдоподобия (MLE)","MAP и априорные распределения"]},
+  {id:"info",t:"Теория информации",items:["!Энтропия","!Кросс-энтропия::это и есть log-loss","KL-дивергенция","Взаимная информация"]},
+  {id:"disc",t:"Дискретная математика",items:["Комбинаторика::перестановки, сочетания","Графы: базовые понятия","Логика и множества"]}
+ ],res:[["3Blue1Brown: линейная алгебра","https://www.3blue1brown.com/topics/linear-algebra"],["Mathematics for Machine Learning","https://mml-book.github.io/"],["Seeing Theory","https://seeing-theory.brown.edu/"]]},
+{id:"algo",short:"Алгоритмы",name:"Алгоритмы и структуры данных",stage:1,prio:"core",
+ why:"Первая секция почти на любой стажировке. Это навык, а не тема: решай понемногу каждый день.",
+ groups:[
+  {id:"cx",t:"Сложность",items:["!Big O по времени и памяти","Амортизированная сложность::почему append за O(1)","!Сложность операций list, dict, set"]},
+  {id:"ds",t:"Структуры данных",items:["Массив и динамический массив","!Хеш-таблица","!Стек, очередь, deque","Связный список","!Куча (heapq)","Бинарное дерево и BST","Граф: список и матрица смежности","Trie","DSU (система непересекающихся множеств)"]},
+  {id:"pat",t:"Паттерны задач",items:["!Хеширование::Two Sum, Contains Duplicate, Valid Anagram","!Два указателя","!Скользящее окно","Префиксные суммы","!Бинарный поиск, в том числе по ответу","Стек и монотонный стек","Связные списки: разворот, быстрый и медленный указатели","!Деревья: DFS и BFS","Куча и Top-K","Интервалы: сортировка и слияние","Backtracking::перестановки, подмножества","Графы: BFS, DFS, топологическая сортировка","Алгоритм Дейкстры","!Динамическое программирование: 1D и 2D","Жадные алгоритмы","Битовые операции"]},
+  {id:"sort",t:"Сортировки",items:["!Merge sort и quick sort","Counting sort","Устойчивость сортировки"]},
+  {id:"int",t:"Подготовка к секции",items:["!Решать вслух и проговаривать сложность","!Тест-кейсы и крайние случаи до запуска","LeetCode 75 или NeetCode 150","50 решённых задач","100 решённых задач","200 решённых задач","Участие в контестах"]}
+ ],res:[["NeetCode Roadmap","https://neetcode.io/roadmap"],["LeetCode 75","https://leetcode.com/studyplan/leetcode-75/"],["Хендбук Яндекса по алгоритмам","https://education.yandex.ru/handbook/algorithms"]]},
+{id:"sql",short:"SQL",name:"SQL и базы данных",stage:2,prio:"core",
+ why:"В компаниях данные лежат в базах. SQL-задача часто стоит прямо в тестовом задании на стажировку.",
+ groups:[
+  {id:"base",t:"Основы",items:["!SELECT, WHERE, ORDER BY, LIMIT, DISTINCT","!Агрегаты и GROUP BY","!HAVING и чем он отличается от WHERE","NULL, COALESCE, IS NULL","CASE WHEN","LIKE, IN, BETWEEN"]},
+  {id:"join",t:"Соединения",items:["!INNER и LEFT JOIN","RIGHT, FULL, CROSS JOIN","Self-join","UNION и UNION ALL"]},
+  {id:"adv",t:"Продвинутый SQL",items:["!Подзапросы","!CTE (WITH)","!Оконные функции::ROW_NUMBER, RANK, LAG, LEAD, SUM OVER","Работа с датами","Retention и когорты"]},
+  {id:"design",t:"Устройство БД",items:["Нормализация 1–3 НФ","Первичные и внешние ключи","!Индексы и B-дерево","Транзакции и ACID","EXPLAIN ANALYZE"]},
+  {id:"py",t:"SQL из Python",items:["PostgreSQL локально::pgAdmin у тебя уже стоит","psycopg и SQLAlchemy","pandas.read_sql"]}
+ ],res:[["SQL Academy","https://sql-academy.org/ru"],["LeetCode Top SQL 50","https://leetcode.com/studyplan/top-sql-50/"],["PostgreSQL Tutorial","https://www.postgresqltutorial.com/"]]},
+{id:"data",short:"Анализ данных",name:"Анализ данных: NumPy, Pandas, графики",stage:2,prio:"core",
+ why:"Большая часть работы ML-инженера — подготовка данных. Pandas и NumPy должны работать на автомате.",
+ groups:[
+  {id:"np",t:"NumPy",items:["!ndarray, dtype, shape","Индексация, срезы, булевы маски","!Broadcasting","!Векторизация вместо циклов","Агрегаты по осям::axis=0 и axis=1","reshape, stack, concatenate","np.linalg","Случайные числа и seed #brs","np.clip, np.where, np.percentile #brs"]},
+  {id:"pd",t:"Pandas",items:["!Series и DataFrame #brs","Чтение и запись CSV, Parquet, Excel #brs","!loc и iloc, фильтрация","!Пропуски::isna, fillna, dropna","Типы данных и category","!groupby, agg, transform","!merge, join, concat","pivot_table и melt","apply и почему он медленный","Даты::to_datetime, resample","Строковые методы .str","Дубликаты и выбросы"]},
+  {id:"viz",t:"Визуализация",items:["!matplotlib: fig и ax #brs","seaborn","Гистограмма, boxplot, scatter","Heatmap корреляций","plotly"]},
+  {id:"eda",t:"EDA",items:["!Описательная статистика и распределения признаков","!Анализ таргета и дисбаланса","Корреляции между признаками","!Утечка данных::признак, который знает ответ","Письменные выводы по EDA"]}
+ ],res:[["Python Data Science Handbook","https://jakevdp.github.io/PythonDataScienceHandbook/"],["100 NumPy exercises","https://github.com/rougier/numpy-100"],["Kaggle Learn: Pandas","https://www.kaggle.com/learn/pandas"]]},
+{id:"stats",short:"Статистика",name:"Статистика и A/B-тесты",stage:2,prio:"plus",
+ why:"Помогает отличить настоящее улучшение модели от шума. В Avito, Ozon и банках A/B-тесты спрашивают постоянно.",
+ groups:[
+  {id:"desc",t:"Описательная статистика",items:["Среднее, медиана, мода","!Дисперсия, стандартное отклонение, квантили","Выбросы и IQR"]},
+  {id:"inf",t:"Выборки и оценки",items:["Генеральная совокупность и выборка","!Стандартная ошибка","!Доверительные интервалы","Бутстрап для доверительных интервалов"]},
+  {id:"test",t:"Проверка гипотез",items:["!Нулевая гипотеза и p-value","!Ошибки I и II рода, мощность","t-тест, z-тест для долей","Хи-квадрат","Манна–Уитни","Множественные сравнения::Бонферрони, FDR"]},
+  {id:"ab",t:"A/B-тесты",items:["!Дизайн эксперимента и выбор метрик","Размер выборки и MDE","Проблема подглядывания","CUPED","Ratio-метрики и дельта-метод","SRM: проверка разбиения"]},
+  {id:"causal",t:"Причинность",items:["!Корреляция не означает причинность","Парадокс Симпсона","Конфаундеры"]}
+ ],res:[["StatQuest","https://www.youtube.com/@statquest"],["Seeing Theory","https://seeing-theory.brown.edu/"]]},
+{id:"ml",short:"Классический ML",name:"Классическое машинное обучение",stage:3,prio:"core",
+ why:"Ядро ML-собеседования. Нужно понимать, как модель устроена внутри, и уметь написать простые алгоритмы с нуля.",
+ groups:[
+  {id:"base",t:"Фундамент",items:["!Типы задач::регрессия, классификация, кластеризация, ранжирование","!Обучение с учителем и без","!Функция потерь и эмпирический риск","!Train, validation и test","!Переобучение и недообучение","!Bias–variance trade-off"]},
+  {id:"lin",t:"Линейные модели",items:["!Линейная регрессия и МНК","!Градиентный спуск для регрессии","!Регуляризация L1, L2, ElasticNet","!Логистическая регрессия, сигмоида, log-loss","Многоклассовая классификация::softmax, one-vs-rest","!Масштабирование признаков"]},
+  {id:"other",t:"Другие модели",items:["kNN и метрики расстояния","Проклятие размерности","Наивный Байес","SVM: отступ, hinge loss, ядра"]},
+  {id:"tree",t:"Деревья и ансамбли",items:["!Дерево решений: Gini и энтропия","!Глубина дерева и переобучение","!Бутстрап и бэггинг","!Random Forest и OOB-оценка","!Градиентный бустинг: обучение на антиградиент","!XGBoost, LightGBM, CatBoost: в чём разница #brs","Стекинг и блендинг"]},
+  {id:"unsup",t:"Обучение без учителя",items:["!K-Means и метод локтя","DBSCAN и иерархическая кластеризация","Silhouette score","!PCA","t-SNE и UMAP","Поиск аномалий::Isolation Forest"]},
+  {id:"scratch",t:"Написать с нуля на NumPy",items:["!Линейная регрессия на градиентном спуске","!Логистическая регрессия","kNN","Дерево решений","K-Means"]}
+ ],res:[["Хендбук Яндекса по ML","https://education.yandex.ru/handbook/ml"],["mlcourse.ai","https://mlcourse.ai/"],["scikit-learn User Guide","https://scikit-learn.org/stable/user_guide.html"]]},
+{id:"mlp",short:"Практика ML",name:"Практика ML: валидация, признаки, интерпретация",stage:3,prio:"core",
+ why:"То, что отличает рабочую модель от красивых цифр. Здесь лежат почти все ошибки BRS-проекта.",
+ groups:[
+  {id:"val",t:"Валидация",items:["!Hold-out и k-fold","!Стратифицированное разбиение #brs","Group k-fold::один студент не попадает и в train, и в test","!Валидация во времени, TimeSeriesSplit","!Отдельная выборка для early stopping #brs","Nested CV"]},
+  {id:"met",t:"Метрики",items:["!Матрица ошибок, precision, recall, F1","!ROC-AUC и PR-AUC: когда какую #brs","!Выбор порога под задачу","Log-loss","!MSE, RMSE, MAE, R²","MAPE и её подводные камни","Метрики ранжирования::NDCG, MAP@k, Recall@k","!Связь ML-метрики с бизнес-метрикой"]},
+  {id:"feat",t:"Признаки",items:["!Кодирование категорий::OHE, target encoding","Заполнение пропусков","!Feature engineering::агрегаты, даты, взаимодействия","Отбор признаков","!Pipeline и ColumnTransformer"]},
+  {id:"imb",t:"Дисбаланс классов",items:["!class_weight и веса объектов","Подбор порога вместо ресэмплинга","Oversampling и SMOTE: когда не нужны"]},
+  {id:"tune",t:"Гиперпараметры",items:["GridSearch и RandomSearch","!Optuna","!Early stopping"]},
+  {id:"interp",t:"Интерпретация и калибровка",items:["!Feature importance и permutation importance","!SHAP #brs","Partial dependence","Калибровка вероятностей::calibration curve, Platt, isotonic"]},
+  {id:"flow",t:"Рабочий процесс",items:["!Бейзлайн перед сложной моделью::dummy, логистическая регрессия","Фиксация случайности #brs","Kaggle: Titanic","Kaggle: House Prices","Kaggle: одно живое соревнование до конца"]}
+ ],res:[["Kaggle Competitions","https://www.kaggle.com/competitions"],["Документация CatBoost","https://catboost.ai/docs/"],["Документация SHAP","https://shap.readthedocs.io/"]]},
+{id:"dl",short:"Deep Learning",name:"Deep Learning и PyTorch",stage:4,prio:"plus",
+ why:"База для NLP, CV и LLM. Для стажировки хватит уверенного MLP, CNN и понимания backprop.",
+ groups:[
+  {id:"nn",t:"Основы нейросетей",items:["!Перцептрон и MLP","!Функции активации::ReLU, GELU, sigmoid, tanh","!Прямой проход и backpropagation","Граф вычислений","Инициализация весов","!Функции потерь::MSE, cross-entropy"]},
+  {id:"pt",t:"PyTorch",items:["!Тензоры и autograd","!nn.Module","!Dataset и DataLoader::__len__ и __getitem__ из ООП-ветки","!Цикл обучения::zero_grad, backward, step","Оптимизаторы::SGD, Adam, AdamW","Learning rate scheduler","Обучение на GPU и Apple MPS","Сохранение и загрузка state_dict"]},
+  {id:"train",t:"Обучение на практике",items:["!Dropout и weight decay","!BatchNorm и LayerNorm","Аугментации","!Transfer learning и fine-tuning","Mixed precision","Переобучить один батч для отладки","Логирование::TensorBoard, W&B"]},
+  {id:"arch",t:"Архитектуры",items:["!CNN: свёртка, пулинг, ResNet","RNN, LSTM, GRU: идея","!Attention и self-attention","!Transformer целиком","Эмбеддинги","Автоэнкодеры"]},
+  {id:"scratch",t:"С нуля",items:["micrograd по Карпатому","MLP для MNIST на чистом PyTorch"]}
+ ],res:[["Karpathy: Neural Networks Zero to Hero","https://karpathy.ai/zero-to-hero.html"],["Dive into Deep Learning","https://d2l.ai/"],["PyTorch Tutorials","https://pytorch.org/tutorials/"]]},
+{id:"nlp",short:"NLP и LLM",name:"NLP и LLM",stage:4,prio:"plus",
+ why:"Самое востребованное направление сейчас. Модули 3 и 5 из README BRS (антиплагиат и RAG) отсюда.",
+ groups:[
+  {id:"classic",t:"Классический NLP",items:["Токенизация и нормализация","Лемматизация для русского::pymorphy3","!Bag-of-words и TF-IDF","!Классификация текстов: TF-IDF и логистическая регрессия"]},
+  {id:"emb",t:"Эмбеддинги",items:["word2vec, fastText","!Контекстные эмбеддинги","!sentence-transformers","!Косинусное сходство"]},
+  {id:"tr",t:"Трансформеры",items:["!BERT и GPT: encoder и decoder","Токенизаторы BPE и WordPiece","!Hugging Face transformers","Fine-tuning для классификации","LoRA и PEFT"]},
+  {id:"llm",t:"LLM-инженерия",items:["!Промпт-инжиниринг","Работа с LLM через API, structured output","!RAG: chunking, retrieval, reranking","!Векторные БД::Qdrant, FAISS","Оценка качества RAG","Агенты и tool use","Галлюцинации и как с ними бороться","Детекция сгенерированного текста, perplexity"]},
+  {id:"met",t:"Метрики",items:["Perplexity","BLEU и ROUGE","LLM-as-a-judge"]}
+ ],res:[["Hugging Face LLM Course","https://huggingface.co/learn/llm-course"],["NLP Course Лены Войта","https://lena-voita.github.io/nlp_course.html"],["The Illustrated Transformer","https://jalammar.github.io/illustrated-transformer/"]]},
+{id:"cv",short:"Comp. Vision",name:"Computer Vision",stage:4,prio:"later",
+ why:"Специализация на выбор. Пригодится для QR-модуля, но для первой стажировки не обязательна.",
+ groups:[
+  {id:"base",t:"Основы",items:["Изображение как тензор, каналы","OpenCV: чтение, ресайз, фильтры","Распознавание QR-кодов в OpenCV","Аугментации::albumentations"]},
+  {id:"tasks",t:"Задачи",items:["Классификация::ResNet, EfficientNet","Детекция объектов::YOLO","Сегментация::U-Net","Vision Transformer","CLIP и мультимодальность"]}
+ ],res:[["Stanford CS231n","https://cs231n.github.io/"]]},
+{id:"mlops",short:"MLOps",name:"MLOps и продакшен",stage:5,prio:"plus",
+ why:"Модель в ноутбуке никому не помогает. Сервис в Docker с понятным API — сильный плюс к резюме стажёра.",
+ groups:[
+  {id:"api",t:"Сервис",items:["!HTTP и REST","!FastAPI: эндпоинты и pydantic-схемы","!Сохранение и загрузка модели::joblib, .cbm, ONNX #brs","Батч- и онлайн-инференс","Очереди задач::Celery и Redis"]},
+  {id:"docker",t:"Контейнеры",items:["!Dockerfile, образ, контейнер","!docker compose","Тома и сети"]},
+  {id:"exp",t:"Воспроизводимость",items:["!MLflow: трекинг экспериментов","Model registry","DVC для данных","Конфиги через Hydra"]},
+  {id:"qa",t:"Качество",items:["!Тесты для ML-кода","!CI в GitHub Actions::линтер и тесты"]},
+  {id:"mon",t:"Мониторинг",items:["Логирование запросов","!Data drift и concept drift","Evidently","Переобучение по расписанию"]},
+  {id:"cloud",t:"Деплой",items:["Linux-сервер и systemd","Деплой на VPS или PaaS","Объектное хранилище S3"]}
+ ],res:[["Made With ML","https://madewithml.com/"],["FastAPI: учебник","https://fastapi.tiangolo.com/ru/tutorial/"],["MLOps Zoomcamp","https://github.com/DataTalksClub/mlops-zoomcamp"]]},
+{id:"sysd",short:"ML-дизайн",name:"ML System Design",stage:5,prio:"plus",
+ why:"Умение спроектировать ML-систему от задачи до мониторинга. Стажёров спрашивают в облегчённом виде, но спрашивают.",
+ groups:[
+  {id:"fw",t:"Схема ответа",items:["!Бизнес-задача → ML-задача","!Офлайн- и онлайн-метрики","!Данные, разметка, источники","Бейзлайн и итерации","Деплой, мониторинг, A/B-тест"]},
+  {id:"cases",t:"Типовые кейсы",items:["!Прогноз оттока::модуль 2 BRS","Антифрод::модуль 1 BRS, QR-посещаемость","Поиск и ранжирование","Модерация контента"]},
+  {id:"rec",t:"Рекомендательные системы",items:["!Коллаборативная фильтрация","Матричные разложения, ALS","Content-based","Two-tower модели","Холодный старт","Метрики::Precision@k, NDCG"]},
+  {id:"time",t:"Время и данные",items:["Временные ряды: лаги, скользящие окна","!Утечки во времени::признак из будущего","Feature store: идея"]},
+  {id:"ethics",t:"Данные о людях",items:["Персональные данные и 152-ФЗ","Справедливость модели::не штрафовать за общежитие"]}
+ ],res:[["Evidently: 500+ ML system design кейсов","https://www.evidentlyai.com/ml-system-design"]],books:"Chip Huyen «Designing ML Systems»; Бабушкин, Кравченко «Machine Learning System Design»"},
+{id:"career",short:"Карьера",name:"Карьера: портфолио и стажировки",stage:6,prio:"core",
+ why:"Идёт параллельно со всем остальным. Без этой ветки знания не превращаются в оффер.",
+ groups:[
+  {id:"port",t:"Портфолио",items:["!BRS-проект доведён до рабочего состояния","!README: задача, данные, метрики, как запустить","Второй проект на реальных данных","Третий проект: NLP или сервис в Docker","Профиль на Kaggle","Пост или статья о проекте"]},
+  {id:"cv",t:"Резюме",items:["!Одна страница, стек сверху","!Проекты с цифрами::метрика, объём данных","!Опыт описан как есть::что сделано, для кого, на каких данных","Ссылки на GitHub и Telegram"]},
+  {id:"apply",t:"Куда подаваться",items:["Яндекс: стажировка и ШАД","Т-Банк: стажировки и Т-Образование","Сбер: SberSeasons","VK: VK Education","Ozon: Route 256","Avito, МТС, Лаборатория Касперского","Сроки отборов в календаре::обычно осень–зима на лето"]},
+  {id:"int",t:"Собеседования",items:["!Алгоритмическая секция: live coding","!ML-теория: 50 типовых вопросов","Python-секция","SQL-секция","Облегчённый ML system design","!Рассказ о проекте за 3 минуты","Поведенческие вопросы::метод STAR","Mock-интервью с другом"]},
+  {id:"comm",t:"Сообщество",items:["ODS (Open Data Science)","Хакатоны и конкурсы","Telegram-каналы по ML"]}
+ ],res:[["Tech Interview Handbook","https://www.techinterviewhandbook.org/"],["ODS.ai","https://ods.ai/"],["Яндекс: стажировки","https://yandex.ru/yaintern/"],["Т-Образование","https://education.tbank.ru/"]]}
+];
+
+
+/* ---------- model ---------- */
+const ITEMS={}, ORDER=[];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+MODULES.forEach(m=>{m.ids=[];m.keyIds=[];m.groups.forEach(g=>{g.parsed=g.items.map((raw,i)=>{
+  let s=raw,key=false,brs=false;
+  if(s.startsWith("!")){key=true;s=s.slice(1)}
+  if(s.endsWith(" #brs")){brs=true;s=s.slice(0,-5)}
+  const [t,h]=s.split("::");
+  const id=`${m.id}.${g.id}.${i}`;
+  const it={id,t,h:h||"",key,brs,m,g};
+  ITEMS[id]=it;ORDER.push(id);m.ids.push(id);if(key)m.keyIds.push(id);
+  return it;})})});
+const KEY_ORDER=ORDER.filter(id=>ITEMS[id].key&&ITEMS[id].m.prio==="core");
+let done={}; let mode="local"; let canWrite=true;
+
+/* ---------- flower ---------- */
+const R0=62,R1=252,W=33,N=MODULES.length,STEP=360/N;
+const rad=a=>a*Math.PI/180, pt=(r,a)=>[r*Math.cos(rad(a)),r*Math.sin(rad(a))];
+function angleOf(i){return -90+i*STEP}
+function buildFlower(){
+  const svg=document.getElementById("flower");
+  let defs="",petals="",rings="";
+  const petalD=`M${R0},0 C${R0+46},${W*1.15} ${R1-54},${W} ${R1},0 C${R1-54},${-W} ${R0+46},${-W*1.15} ${R0},0Z`;
+  MODULES.forEach((m,i)=>{
+    const a=angleOf(i), col=`var(${STAGES[m.stage-1].c})`;
+    const flip=(((a%360)+360)%360)>90&&(((a%360)+360)%360)<270;
+    defs+=`<clipPath id="cp-${m.id}"><circle id="cc-${m.id}" cx="0" cy="0" r="${R0}"/></clipPath>`;
+    petals+=`<a href="#m-${m.id}" data-m="${m.id}" aria-label="${esc(m.name)}"><g transform="rotate(${a})"><g class="pet">
+      <path class="petal-base" d="${petalD}" fill="${col}" fill-opacity=".12" stroke="${col}" stroke-opacity=".6"/>
+      <path d="${petalD}" fill="${col}" fill-opacity=".8" clip-path="url(#cp-${m.id})"/>
+      <g transform="${flip?`rotate(180 ${(R0+R1)/2+14} 0)`:""}">
+        <text class="plabel" x="${(R0+R1)/2+14}" y="-1" text-anchor="middle">${esc(m.short)}</text>
+        <text class="ppct" id="pp-${m.id}" x="${(R0+R1)/2+14}" y="13" text-anchor="middle">0%</text>
+      </g></g></g></a>`;
+  });
+  STAGES.forEach(s=>{
+    const idx=MODULES.map((m,i)=>m.stage===s.id?i:-1).filter(i=>i>=0);
+    const a0=angleOf(idx[0])-STEP/2+1.2, a1=angleOf(idx[idx.length-1])+STEP/2-1.2, mid=(a0+a1)/2;
+    const bottom=Math.sin(rad(mid))>0.15, r=286, large=(a1-a0)>180?1:0;
+    const [x0,y0]=pt(r,a0),[x1,y1]=pt(r,a1);
+    const d=bottom?`M${x1},${y1} A${r},${r} 0 ${large} 0 ${x0},${y0}`:`M${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1}`;
+    const [lx0,ly0]=pt(266,a0),[lx1,ly1]=pt(266,a1);
+    rings+=`<path d="M${lx0},${ly0} A266,266 0 ${large} 1 ${lx1},${ly1}" fill="none" stroke="var(${s.c})" stroke-width="3" stroke-linecap="round"/>
+      <path id="ring-${s.id}" d="${d}" fill="none"/>
+      <text class="ring-t" fill="var(${s.c})" dominant-baseline="middle"><textPath href="#ring-${s.id}" startOffset="50%" text-anchor="middle">${esc(s.ring)}</textPath></text>`;
+  });
+  svg.innerHTML=`<defs>${defs}</defs>${rings}${petals}
+    <circle r="${R0-6}" fill="var(--surface)" stroke="var(--line)"/>
+    <text class="c-num" id="cNum" y="6" text-anchor="middle">0%</text>
+    <text class="c-cap" y="24" text-anchor="middle">всего тем</text>
+    <text class="c-cap" y="-24" text-anchor="middle" id="cCount">0 / ${ORDER.length}</text>`;
+  svg.querySelectorAll("a").forEach(a=>{
+    a.addEventListener("click",e=>{e.preventDefault();goTo(a.dataset.m)});
+  });
+}
+function goTo(mid){
+  const sec=document.getElementById("m-"+mid); if(!sec)return;
+  const det=sec.querySelector("details"); det.open=true;
+  sec.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+  sec.classList.remove("flash"); void sec.offsetWidth; sec.classList.add("flash");
+}
+
+/* ---------- route ---------- */
+function buildRoute(){
+  let html="";
+  STAGES.forEach(s=>{
+    html+=`<div class="tier" style="--tc:var(${s.c})"><span class="eyebrow">Ярус ${s.id} · ${esc(s.name)}</span><h2>${esc(s.sub[0].toUpperCase()+s.sub.slice(1))}</h2><p>${esc(s.d)}</p></div>`;
+    MODULES.filter(m=>m.stage===s.id).forEach(m=>{
+      html+=`<section class="mod ${m.prio}" id="m-${m.id}" style="--mc:var(${s.c})"><details open data-m="${m.id}">
+        <summary><span class="mdot" aria-hidden="true"></span>
+          <div class="mmeta"><h3>${esc(m.name)}</h3><span class="prio ${m.prio}">${PRIO[m.prio]}</span></div>
+          <div class="mprog"><span class="n" id="mn-${m.id}">0 / ${m.ids.length}</span><div class="bar"><i id="mb-${m.id}" style="width:0%"></i></div></div>
+          <p class="mwhy">${esc(m.why)}</p></summary>
+        <div class="mbody"><div class="groups">`+
+        m.groups.map(g=>`<div class="grp"><h4>${esc(g.t)}</h4><ul>`+g.parsed.map(it=>`<li><label class="it${it.key?" key":""}" title="${it.key?"Спрашивают на отборе":""}">
+          <input type="checkbox" id="c-${it.id}" data-id="${it.id}"><span class="box" aria-hidden="true"></span>
+          <span class="tx"><span class="t">${it.key?'<span class="diamond" aria-label="ключевое">◆</span> ':""}${esc(it.t)}<span class="d" data-d="${it.id}"></span></span>${it.h?`<span class="h">${esc(it.h)}</span>`:""}</span></label></li>`).join("")+`</ul></div>`).join("")+
+        `</div><div class="res"><b>Материалы</b>${m.res.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join("")}${m.books?`<span class="muted">${esc(m.books)}</span>`:""}</div></div></details></section>`;
+    });
+  });
+  document.getElementById("route").innerHTML=html;
+  document.getElementById("route").addEventListener("change",onTick);
+}
+function onTick(e){
+    const id=e.target.dataset.id; if(!id)return;
+    if(!canWrite){e.target.checked=!!done[id];return}
+    if(e.target.checked){done[id]=today();pending.set[id]=done[id];pending.unset.delete(id)}
+    else{delete done[id];pending.unset.add(id);delete pending.set[id]}
+    syncOne(id); updateProgress(); persist();
+}
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+const fmt=iso=>{const [y,m,d]=iso.split("-");return `${d}.${m}`};
+
+/* ---------- progress ---------- */
+function syncOne(id){
+  document.querySelectorAll(`input[data-id="${id}"]`).forEach(cb=>cb.checked=!!done[id]);
+  document.querySelectorAll(`[data-d="${id}"]`).forEach(dd=>dd.textContent=done[id]?fmt(done[id]):"");
+}
+function syncAll(){ORDER.forEach(syncOne)}
+function updateProgress(){
+  const total=ORDER.length, n=ORDER.filter(id=>done[id]).length;
+  document.getElementById("cNum").textContent=Math.round(n/total*100)+"%";
+  document.getElementById("cCount").textContent=`${n} / ${total}`;
+  MODULES.forEach(m=>{
+    const k=m.ids.filter(id=>done[id]).length, p=k/m.ids.length;
+    document.getElementById("cc-"+m.id).setAttribute("r",R0+(R1-R0)*p);
+    document.getElementById("pp-"+m.id).textContent=Math.round(p*100)+"%";
+    document.getElementById("mn-"+m.id).textContent=`${k} / ${m.ids.length}`;
+    document.getElementById("mb-"+m.id).style.width=(p*100)+"%";
+  });
+  const kd=KEY_ORDER.filter(id=>done[id]).length;
+  document.getElementById("kKey").innerHTML=`${kd}<small> / ${KEY_ORDER.length}</small>`;
+  document.getElementById("kKeyBar").style.width=(kd/KEY_ORDER.length*100)+"%";
+  document.getElementById("stageBars").innerHTML=STAGES.map(s=>{
+    const ids=MODULES.filter(m=>m.stage===s.id).flatMap(m=>m.ids), k=ids.filter(id=>done[id]).length;
+    return `<div class="srow" style="--accent:var(${s.c})"><b>${esc(s.name)}</b><div class="bar"><i style="width:${k/ids.length*100}%"></i></div><span class="n">${k}/${ids.length}</span></div>`}).join("");
+  const nxt=KEY_ORDER.filter(id=>!done[id]&&ITEMS[id].m.stage<=3).slice(0,5);
+  document.getElementById("nextList").innerHTML=nxt.length?nxt.map(id=>`<li><a href="#m-${ITEMS[id].m.id}" data-go="${ITEMS[id].m.id}">${esc(ITEMS[id].t)}</a> <span class="muted">· ${esc(ITEMS[id].m.short)}</span></li>`).join(""):"<li>Ключевые темы первых трёх ярусов пройдены.</li>";
+  updatePlan();
+  try{localStorage.setItem("mlroad.cache",JSON.stringify(done))}catch(e){}
+}
+document.getElementById("nextList").addEventListener("click",e=>{const a=e.target.closest("[data-go]");if(a){e.preventDefault();goTo(a.dataset.go)}});
+
+/* ---------- storage: синхронизация с Obsidian ---------- */
+// На сервер уходят только изменения (set/unset), сервер накладывает их на то, что сейчас в файлах недель.
+// Каждые 15 секунд, при возврате на вкладку и после сохранения страница сверяется с Obsidian.
+let pending={set:{},unset:new Set()}, saving=false, again=false, tmr=null, online=false;
+const hhmm=()=>new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+const setSync=(t,bad)=>{const el=document.getElementById("sync");el.textContent=t;el.style.color=bad?"var(--s5)":""};
+const hasPending=()=>Object.keys(pending.set).length>0||pending.unset.size>0;
+const canon=o=>JSON.stringify(Object.keys(o).sort().map(k=>[k,o[k]]));
+function applyServer(srv){
+  const merged={...srv};
+  for(const k in pending.set)merged[k]=pending.set[k];
+  pending.unset.forEach(k=>delete merged[k]);
+  const changed=canon(merged)!==canon(done);
+  done=merged; if(changed){syncAll();updateProgress()}
+  return changed;
+}
+function persist(){clearTimeout(tmr);tmr=setTimeout(flush,500);setSync("Сохраняю в Obsidian…")}
+async function flush(){
+  if(saving){again=true;return}
+  if(!hasPending())return;
+  saving=true;
+  const body={set:{...pending.set},unset:[...pending.unset]};
+  pending={set:{},unset:new Set()};
+  try{const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(!r.ok)throw new Error(await r.text());
+    const d=await r.json(); applyServer(d.done||{}); online=true;
+    setSync("Сохранено в Obsidian · "+hhmm())}
+  catch(e){Object.assign(pending.set,body.set);body.unset.forEach(k=>{if(!(k in pending.set))pending.unset.add(k)});online=false;
+    setSync("Не сохранено: нет связи с Obsidian. Запусти «Тренажёр и дерево» — отметки отправятся сами.",true)}
+  saving=false; if(again||hasPending()){again=false;setTimeout(flush,1500)}
+}
+async function load(quiet){
+  try{if(PLAN)await refreshPlan();
+    const r=await fetch("/api/tree");const d=await r.json();
+    const changed=applyServer(d.done||{}); online=true;
+    if(hasPending()){flush();return}
+    setSync((changed&&quiet?"Подтянул отметки из Obsidian · ":"Синхронизировано с Obsidian · ")+hhmm())}
+  catch(e){online=false;setSync("Нет связи с Obsidian: запусти «Тренажёр и дерево». Пока отметки не сохраняются.",true)}
+}
+async function initStore(){
+  mode="db";
+  try{const c=JSON.parse(localStorage.getItem("mlroad.cache")||"null");if(c&&typeof c==="object"){done=c;syncAll();updateProgress()}}catch(e){}
+  await load();
+  window.addEventListener("focus",()=>{if(!saving)load(true)});
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!saving)load(true)});
+  setInterval(()=>{if(!document.hidden&&!saving)load(true)},15000);
+}
+
+/* ---------- toolbar & export ---------- */
+function setFocus(on){document.body.classList.toggle("focus",on);document.getElementById("bFocus").setAttribute("aria-pressed",on);try{localStorage.setItem("mlroad.focus",on?"1":"0")}catch(e){}}
+document.getElementById("bFocus").onclick=()=>setFocus(!document.body.classList.contains("focus"));
+document.getElementById("bFold").onclick=e=>{
+  const ds=[...document.querySelectorAll("#route details")], anyOpen=ds.some(d=>d.open);
+  ds.forEach(d=>d.open=!anyOpen); e.target.textContent=anyOpen?"Развернуть все":"Свернуть все";
+};
+
+/* ---------- plan by weeks ---------- */
+let PLAN=null;
+const TRACKS=[["code","Код"],["theory","Теория"],["algo","Алгоритмы"],["proj","Проект и карьера"]];
+const KIND={learn:["новые темы","--s3"],buffer:["хвосты","--key"],review:["повторение и собеседования","--s5"]};
+const MON=["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
+const obsLink=f=>`obsidian://open?vault=${encodeURIComponent(PLAN.vault)}&file=${encodeURIComponent(f.replace(/\.md$/,""))}`;
+const weekIds=n=>ORDER.filter(id=>(PLAN.assign[id]||[0])[0]===n);
+const curWeek=()=>{const t=today();return PLAN.weeks.find(w=>w.start<=t&&t<=w.end)};
+function itemHTML(it){
+  return `<li><label class="it${it.key?" key":""}"><input type="checkbox" data-id="${it.id}"><span class="box" aria-hidden="true"></span>
+    <span class="tx"><span class="t">${it.key?'<span class="diamond" aria-label="ключевое">◆</span> ':""}${esc(it.t)}<span class="mtag" style="--mc:var(${STAGES[it.m.stage-1].c})">${esc(it.m.short)}</span><span class="d" data-d="${it.id}"></span></span>${it.h?`<span class="h">${esc(it.h)}</span>`:""}</span></label></li>`;
+}
+const weekLessons=n=>(PLAN.lessons||[]).filter(l=>l.week===n);
+function lessonsHTML(w){
+  const L=weekLessons(w.n); if(!L.length)return "";
+  const hrs=m=>m>=60?`~${String(Math.round(m/30)/2).replace(".",",")} ч`:`~${m} мин`;
+  return `<div class="lessons">${L.map(l=>`<a class="lsn" id="ls-${w.n}-${l.n}" href="/lessons/${encodeURIComponent(l.file)}">
+    <span class="ln">Урок ${l.n} из ${L.length} · ${hrs(l.minutes)}</span><b>${esc(l.title)}</b><span class="lm">${esc(l.focus)}</span>
+    <span class="lp"><i></i><span id="lp-${w.n}-${l.n}">0 / ${l.topics.length}</span></span></a>`).join("")}</div>`;
+}
+function weekHTML(w){
+  const ids=weekIds(w.n), [kname,kc]=KIND[w.kind];
+  const groups=TRACKS.map(([tk,tt])=>{
+    const its=ids.filter(id=>PLAN.assign[id][1]===tk).map(id=>ITEMS[id]);
+    const tasks=tk==="proj"?w.tasks:[];
+    if(!its.length&&!tasks.length)return "";
+    return `<div class="grp"><h4>${tt}</h4><ul>${its.map(itemHTML).join("")}</ul>${tasks.length?`<ul class="tasks" style="margin-top:6px">${tasks.map(t=>`<li><span class="st${t.done?" ok":""}" title="${t.done?"сделано":"задача проекта"}"></span><span>${esc(t.text)}</span></li>`).join("")}</ul>`:""}</div>`}).join("");
+  return `<section class="wk" id="w-${w.n}" style="--wc:var(${kc});--mc:var(${kc})"><details data-w="${w.n}">
+    <summary><span class="wnum">${w.n}</span>
+      <div class="mmeta"><h3>${esc(w.span)}</h3><span class="chip" id="ws-${w.n}"></span></div>
+      <div class="mprog"><span class="n" id="wn-${w.n}"></span><div class="bar"><i id="wb-${w.n}" style="width:0%"></i></div></div>
+      <p class="wfocus">${esc(w.focus)}</p></summary>
+    <div class="wbody">${lessonsHTML(w)}${ids.length||w.tasks.length?`<div class="groups">${groups}</div>`:""}
+      <div class="wfoot"><span class="muted">${kname}${w.kind==="learn"?" · LeetCode 3–4 задачи":""}</span><a href="${obsLink(w.file)}">открыть неделю в Obsidian</a></div></div>
+  </details></section>`;
+}
+function laterHTML(){
+  const ids=weekIds(0), byMod={};
+  ids.forEach(id=>{(byMod[ITEMS[id].m.id]=byMod[ITEMS[id].m.id]||[]).push(ITEMS[id])});
+  return `<section class="wk later" id="w-0" style="--wc:var(--muted)"><details>
+    <summary><span class="wnum" style="background:var(--soft);color:var(--muted)">∞</span>
+      <div class="mmeta"><h3>После января — по желанию</h3><span class="chip">${ids.length} тем</span></div>
+      <div class="mprog"><span class="n" id="wn-0"></span><div class="bar"><i id="wb-0" style="width:0%"></i></div></div>
+      <p class="wfocus">Продвинутые разделы, Computer Vision, редкие алгоритмы, дополнительные проекты. Не нужно к первым собеседованиям.</p></summary>
+    <div class="wbody"><div class="groups">${MODULES.filter(m=>byMod[m.id]).map(m=>`<div class="grp" style="--mc:var(${STAGES[m.stage-1].c})"><h4>${esc(m.short)}</h4><ul>${byMod[m.id].map(itemHTML).join("")}</ul></div>`).join("")}</div>
+      <div class="wfoot"><a href="${obsLink(PLAN.later_file)}">открыть в Obsidian</a></div></div>
+  </details></section>`;
+}
+function buildPlan(){
+  const cur=curWeek(), box=document.getElementById("planWeeks");
+  box.innerHTML=PLAN.weeks.map(weekHTML).join("")+laterHTML();
+  box.querySelectorAll("details[data-w]").forEach(d=>{if(cur&&+d.dataset.w===cur.n)d.open=true});
+  if(!box.dataset.bound){box.addEventListener("change",onTick);box.dataset.bound="1"}
+  const tl=document.getElementById("timeline");
+  tl.style.setProperty("--n",PLAN.weeks.length);
+  tl.innerHTML=PLAN.weeks.map(w=>`<a href="#w-${w.n}" data-wk="${w.n}" style="--wc:var(${KIND[w.kind][1]})" title="Неделя ${w.n} · ${esc(w.span)} — ${esc(w.focus)}"><i id="tl-${w.n}" style="height:0%"></i><span>${w.n}</span></a>`).join("");
+  tl.onclick=e=>{const a=e.target.closest("[data-wk]");if(a){e.preventDefault();goWeek(+a.dataset.wk)}};
+  const months=document.getElementById("tlMonths"); months.style.setProperty("--n",PLAN.weeks.length);
+  let html="",prev=null,span=0;
+  const flush=()=>{if(prev!==null)html+=`<span style="grid-column:span ${span}">${MON[prev]}</span>`};
+  PLAN.weeks.forEach(w=>{const m=+w.start.slice(5,7)-1;if(m!==prev){flush();prev=m;span=1}else span++});flush();
+  months.innerHTML=html;
+  const d=iso=>{const [y,m,dd]=iso.split("-");return `${+dd} ${MON[+m-1]}`};
+  document.getElementById("miles").innerHTML=`<span>Сегодня: <b>${cur?`неделя ${cur.n}`:"вне плана"}</b></span><span>Новые темы до <b>${d(PLAN.deadline)}</b></span><span>Собеседования с <b>${d(PLAN.interviews_from)}</b></span>`;
+  document.getElementById("obsLinks").innerHTML=`<a class="btn" href="${obsLink(PLAN.overview_file)}">Открыть «План ML»</a>`+(cur?`<a class="btn" href="${obsLink(cur.file)}">Неделя ${cur.n} в Obsidian</a>`:"");
+  syncAll(); updatePlan();
+  const m=location.hash.match(/^#w-(\d+)$/);
+  if(m&&!box.dataset.jumped){box.dataset.jumped="1";const n=+m[1];
+    const jump=()=>goWeek(n,true); setTimeout(jump,120); if(document.fonts)document.fonts.ready.then(()=>setTimeout(jump,60))}
+}
+function goWeek(n,instant){
+  const sec=document.getElementById("w-"+n); if(!sec)return;
+  sec.querySelector("details").open=true;
+  sec.scrollIntoView({behavior:instant||matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+  sec.classList.remove("flash"); void sec.offsetWidth; sec.classList.add("flash");
+}
+function updatePlan(){
+  if(!PLAN)return;
+  const t=today(), cur=curWeek();
+  [...PLAN.weeks,{n:0}].forEach(w=>{
+    const ids=weekIds(w.n), k=ids.filter(id=>done[id]).length, n=ids.length, pct=n?k/n*100:0;
+    const keys=ids.filter(id=>ITEMS[id].key), kd=keys.filter(id=>done[id]).length;
+    const ne=document.getElementById("wn-"+w.n), be=document.getElementById("wb-"+w.n);
+    if(ne)ne.textContent=n?`${k} / ${n}${keys.length?` · ◆ ${kd}/${keys.length}`:""}`:"без новых тем";
+    if(be)be.style.width=pct+"%";
+    if(!w.n)return;
+    const tl=document.getElementById("tl-"+w.n); if(tl){tl.style.height=(n?pct:(w.end<t?100:0))+"%";tl.parentElement.classList.toggle("now",cur&&cur.n===w.n);tl.parentElement.classList.toggle("full",n>0&&k===n)}
+    const ch=document.getElementById("ws-"+w.n), sec=document.getElementById("w-"+w.n);
+    let txt,cls;
+    if(cur&&cur.n===w.n){txt="сейчас";cls="now"}
+    else if(w.end<t){txt=k===n?"готово":`хвосты: ${n-k}`;cls=k===n?"ok":"late"}
+    else{txt="впереди";cls=""}
+    if(ch){ch.textContent=txt;ch.className="chip "+cls}
+    if(sec)sec.classList.toggle("now",cur&&cur.n===w.n);
+    weekLessons(w.n).forEach(l=>{const a=document.getElementById(`ls-${w.n}-${l.n}`),t=document.getElementById(`lp-${w.n}-${l.n}`);if(!a||!t)return;
+      const k=l.topics.filter(id=>done[id]).length;t.textContent=`${k} / ${l.topics.length}`;a.style.setProperty("--p",(k/l.topics.length*100)+"%");a.classList.toggle("full",k===l.topics.length)});
+  });
+  const box=document.getElementById("kWeekBox");
+  if(cur){
+    const ids=weekIds(cur.n), k=ids.filter(id=>done[id]).length;
+    box.hidden=false;
+    document.getElementById("kWeekTitle").textContent=`Неделя ${cur.n} плана · ${cur.span}`;
+    document.getElementById("kWeek").innerHTML=`${k}<small> / ${ids.length}</small>`;
+    document.getElementById("kWeekBar").style.width=(ids.length?k/ids.length*100:0)+"%";
+    const L=weekLessons(cur.n);
+    document.getElementById("kWeekNav").innerHTML=`<div class="wact"><a class="btn pri" href="#w-${cur.n}" data-gw="${cur.n}">Открыть неделю ${cur.n} →</a>${L.map(l=>{const k=l.topics.filter(id=>done[id]).length;return `<a class="btn ls${k===l.topics.length?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)}">Урок ${l.n}<em>${k}/${l.topics.length}</em></a>`}).join("")}</div>
+      <div><div class="mini-cap"><span>все недели</span><span>нажми, чтобы перейти</span></div>
+      <div class="mini" style="--n:${PLAN.weeks.length};margin-top:6px">${PLAN.weeks.map(w=>{const ids=weekIds(w.n),kk=ids.filter(id=>done[id]).length,pc=ids.length?kk/ids.length*100:(w.end<t?100:0);
+        return `<a href="#w-${w.n}" data-gw="${w.n}" class="${w.n===cur.n?"now":""}${w.end<t?" past":""}" style="--wc:var(${KIND[w.kind][1]})" title="Неделя ${w.n} · ${esc(w.span)} — ${esc(w.focus)}"><i style="height:${pc}%"></i><span>${w.n}</span></a>`}).join("")}</div></div>`;
+    const open=ids.filter(id=>!done[id]).sort((a,b)=>ITEMS[b].key-ITEMS[a].key).slice(0,5);
+    document.getElementById("nextTitle").textContent="Дальше на этой неделе";
+    document.getElementById("nextList").innerHTML=open.length?open.map(id=>`<li><a href="#w-${cur.n}" data-gw="${cur.n}">${ITEMS[id].key?'<span class="diamond">◆</span> ':""}${esc(ITEMS[id].t)}</a> <span class="muted">· ${esc(ITEMS[id].m.short)}</span></li>`).join(""):"<li>Неделя закрыта — красота.</li>";
+  }
+}
+document.getElementById("kWeekNav").addEventListener("click",e=>{const a=e.target.closest("[data-gw]");if(a){e.preventDefault();goWeek(+a.dataset.gw)}});
+document.getElementById("nextList").addEventListener("click",e=>{const a=e.target.closest("[data-gw]");if(a){e.preventDefault();goWeek(+a.dataset.gw)}});
+async function refreshPlan(){
+  const r=await fetch("/api/plan"); const p=await r.json();
+  const changed=!PLAN||JSON.stringify(p)!==JSON.stringify(PLAN);
+  PLAN=p; if(changed)buildPlan();
+}
+async function loadPlan(){
+  try{await refreshPlan()}catch(e){document.getElementById("planWeeks").innerHTML='<p class="muted">Не удалось загрузить план: запусти «Тренажёр и дерево».</p>'}
+}
+
+/* ---------- boot ---------- */
+buildFlower(); buildRoute(); updateProgress(); loadPlan();
+try{if(localStorage.getItem("mlroad.focus")==="1")setFocus(true)}catch(e){}
+initStore();
+
+</script>
+
+</body></html>

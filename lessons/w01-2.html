@@ -1,0 +1,1048 @@
+<title>Python изнутри</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lesson notebook from the same tree series. Single reading column, each topic is a "leaf" with a live lab (interactive chart) in the middle. */
+:root{
+  --bg:#F2F5F0; --surface:#FFFFFF; --ink:#16211B; --muted:#5A6A60; --line:#D9E1D9; --soft:#E8EEE7;
+  --accent:#2C7A50; --accent-soft:rgba(44,122,80,.16); --warm:#B7862A; --plum:#9A4C72; --teal:#2A7584; --red:#B4483A;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --accent-soft:rgba(93,187,135,.18); --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --accent-soft:rgba(93,187,135,.18); --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.62;padding-inline:16px;padding-block:0 72px}
+.wrap{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.dia{color:var(--warm)}
+
+header.top{padding-block:44px 8px;display:grid;gap:12px}
+header.top h1{font-size:clamp(28px,5.4vw,44px);font-weight:700;line-height:1.1}
+header.top p{color:var(--muted);max-width:62ch}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.toc a{font-size:13.5px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.toc a:hover{border-color:var(--accent)}
+
+section.topic{padding-block:56px 8px;display:grid;gap:18px;scroll-margin-top:16px}
+section.topic>h2{font-size:clamp(22px,3.6vw,30px)}
+.tldr{font-size:18px;line-height:1.5;border-left:3px solid var(--accent);padding-left:14px}
+.prose{display:grid;gap:12px;max-width:68ch}
+.prose ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.callout{background:var(--soft);border-radius:12px;padding:14px 16px;display:grid;gap:6px;font-size:15px}
+.callout b.h{font:600 12px var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.callout.brs b.h{color:var(--teal)}
+.callout.trap b.h{color:var(--red)}
+.callout.feel b.h{color:var(--warm)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:8px;align-content:start;min-width:0}
+.card h3{font-size:15px}
+.card p{font-size:14px;color:var(--muted)}
+.card svg{width:100%;height:auto;display:block}
+.card .ex{font-size:13.5px;color:var(--ink)}
+
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:14px}
+.lab-h{display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;align-items:baseline}
+.lab-h .eyebrow{color:var(--accent)}
+.lab svg{width:100%;height:auto;display:block;touch-action:pan-y}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:18px;align-items:center}
+@media (max-width:700px){.lab-grid{grid-template-columns:1fr}}
+.ctrl{display:grid;gap:12px}
+.ctrl label{display:grid;gap:4px;font-size:14px}
+.ctrl .row{display:flex;justify-content:space-between;gap:8px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:500 13.5px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.readout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{background:var(--soft);border-radius:10px;padding:10px 12px}
+.stat .v{font:700 22px var(--f-display);font-variant-numeric:tabular-nums}
+.stat .k{font-size:12.5px;color:var(--muted)}
+.verdict{font-size:14.5px;min-height:3em}
+
+.ax{stroke:var(--line);stroke-width:1}
+.tk{fill:var(--muted);font:11px var(--f-mono)}
+.lbl{fill:var(--muted);font:12px var(--f-body)}
+
+.formula{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;overflow-x:auto}
+.fx{font:500 clamp(17px,3vw,22px) var(--f-mono);white-space:nowrap}
+.fx .c1{color:var(--accent)} .fx .c2{color:var(--plum)} .fx .c3{color:var(--warm)} .fx .c4{color:var(--teal)}
+.legend{display:grid;gap:6px;font-size:14.5px}
+.legend span.s{font-family:var(--f-mono);font-weight:500}
+
+.split{display:flex;height:46px;border-radius:10px;overflow:hidden;font:600 13px var(--f-body)}
+.split div{display:flex;align-items:center;justify-content:center;color:var(--surface)}
+.sp-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.sp-legend{grid-template-columns:1fr}}
+.sp-legend div{display:grid;gap:4px;font-size:14px}
+.sp-legend b{font-family:var(--f-display);font-weight:500;font-size:14px}
+
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+tr.cur td{background:var(--accent-soft)}
+
+pre{margin:0;background:var(--soft);border-radius:10px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--f-mono)}
+pre .cm{color:var(--muted)} pre .hl{color:var(--accent);font-weight:500} pre .bad{color:var(--red);text-decoration:line-through}
+
+details.q{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+details.q summary{cursor:pointer;padding:12px 16px;font-weight:500;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary .t{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--plum);white-space:nowrap}
+details.q summary .t.self{color:var(--teal)}
+details.q[open] summary{border-bottom:1px solid var(--line)}
+details.q .a{padding:12px 16px 14px;display:grid;gap:8px;font-size:15px}
+.qs{display:grid;gap:8px}
+
+.boards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.boards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.boards figure{margin:0;display:grid;gap:4px;text-align:center;font-size:13px}
+.boards figcaption b{display:block;font-weight:600}
+
+.end{padding-block:64px 0;display:grid;gap:16px}
+.end h2{font-size:clamp(22px,3.6vw,30px)}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:10px}
+.sheet ol{margin:0;padding-left:22px;display:grid;gap:8px}
+#mdArea{width:100%;font:12px var(--f-mono);background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+body{margin:0} [hidden]{display:none!important}
+.topnav{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;padding-block:16px 0;font-size:14px}
+.topnav a{text-decoration:none;font-weight:500}
+.topnav .mid{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.part{padding-block:64px 0;display:grid;gap:8px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.part h2{font-size:clamp(24px,4vw,34px);font-weight:700}
+.part p{color:var(--muted);max-width:64ch}
+.bars{display:grid;gap:8px}
+.brow{display:grid;grid-template-columns:92px minmax(0,1fr) 120px;gap:10px;align-items:center;font-size:14px}
+.brow b{font-family:var(--f-mono);font-weight:500}
+.brow .track{height:14px;background:var(--soft);border-radius:7px;overflow:hidden}
+.brow .track i{display:block;height:100%;border-radius:7px;transition:width .25s}
+.brow .tm{font-family:var(--f-mono);font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:520px){.brow{grid-template-columns:70px minmax(0,1fr) 92px}}
+.cells{display:flex;flex-wrap:wrap;gap:4px}
+.cell{width:30px;height:30px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;font:500 12px var(--f-mono);font-variant-numeric:tabular-nums}
+.cell.on{background:var(--accent-soft);border-color:var(--accent)}
+.cell.mv{background:var(--warm);border-color:var(--warm);color:var(--surface)}
+.prac{display:grid;gap:12px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:10px;min-width:0}
+.task .tg{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.tg.int{color:var(--plum)} .tg.work{color:var(--teal)} .tg.lc{color:var(--warm)} .tg.rev{color:var(--red)}
+.task h3{font-size:16px;line-height:1.35}
+.task .ok{font-size:14px;color:var(--muted)}
+.task details{border-top:1px dashed var(--line);padding-top:8px}
+.task details summary{cursor:pointer;font-size:14px;color:var(--accent);font-weight:500}
+.task details .a{display:grid;gap:8px;padding-top:8px;font-size:15px}
+.topics{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 16px}
+.tp{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:5px 6px;border-radius:7px;cursor:pointer;font-size:14.5px}
+.tp:hover{background:var(--soft)}
+.tp input{position:absolute;opacity:0;width:1px;height:1px}
+.tp .bx{width:16px;height:16px;margin-top:2px;border:1.5px solid var(--muted);border-radius:4px}
+.tp input:checked+.bx{background:var(--accent);border-color:var(--accent)}
+.tp input:checked~span:last-child{color:var(--muted);text-decoration:line-through}
+.tp input:disabled+.bx{opacity:.5}
+.tp input:focus-visible+.bx{outline:2px solid var(--accent);outline-offset:2px}
+
+.legb .lv{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px 10px;display:grid;gap:6px;background:var(--surface);transition:background .2s,border-color .2s}
+.legb>.lv{background:var(--soft)}
+.legb .lv>span{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.legb .lv.miss{border-color:var(--warm);border-style:dashed}
+.legb .lv.hit{border-color:var(--accent);background:var(--accent-soft)}
+.slice{display:flex;gap:5px;flex-wrap:wrap;padding-top:8px}
+.sc-cell{position:relative;width:42px;display:grid;justify-items:center;gap:1px;padding:4px 0;border-radius:8px;border:1.5px solid var(--line);background:var(--surface)}
+.sc-cell .ch{font:600 18px var(--f-body)}
+.sc-cell .ip,.sc-cell .in{font:10.5px var(--f-mono);color:var(--muted)}
+.sc-cell.pick{border-color:var(--accent);background:var(--accent-soft)}
+.sc-cell .ord{position:absolute;top:-9px;right:-7px;background:var(--plum);color:var(--surface);border-radius:999px;font:600 10px var(--f-mono);padding:1px 6px}
+#memCode{min-height:150px}
+button:disabled{opacity:.45;cursor:default}
+</style>
+
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w01-1.html">← Урок 1 · Фундамент ML</a><span class="mid">урок 2 из 3</span><a href="/lessons/w01-3.html">Урок 3 · Хеши и инструменты →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 1 · урок 2 из 3 · 11 тем · ~3–4 часа</div>
+  <h1>Python изнутри</h1>
+  <p>Все темы колонки «Код». Главная идея урока: переменная в Python — не коробка с данными, а ярлык, приклеенный к объекту. Поймёшь это — и половина вопросов «что выведет этот код» на собеседовании решается сама. Сложность операций list, dict и set мы разобрали в уроке 1, здесь — как ими пользоваться.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#p1">Типы и изменяемость</a><a href="#p2">is и ==</a><a href="#p3">Условия и циклы</a><a href="#p4">Функции</a><a href="#p5">Область видимости</a><a href="#p6">Строки и срезы</a><a href="#p7">list, tuple, dict, set</a><a href="#p8">Comprehensions</a><a href="#p9">Распаковка, zip, enumerate</a><a href="#p10">collections</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="p1">
+  <div class="eyebrow">Темы 1–2 из 11 · Типы данных · <span class="dia">◆</span> Изменяемые и неизменяемые объекты</div>
+  <h2>Имена — это ярлыки на объектах</h2>
+  <p class="tldr">Строка <code>a = [1, 2]</code> не кладёт список «в a». Она создаёт объект-список и приклеивает к нему ярлык a. Строка <code>b = a</code> приклеивает к тому же объекту второй ярлык. Копии не появляется.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Тип</th><th>Пример</th><th>Изменяемый?</th><th>Может быть ключом dict</th></tr></thead>
+    <tbody>
+      <tr><td>int, float, bool</td><td><code>5</code>, <code>0.1</code>, <code>True</code></td><td>нет</td><td>да</td></tr>
+      <tr><td>str</td><td><code>"ML"</code></td><td>нет</td><td>да</td></tr>
+      <tr><td>None</td><td><code>None</code></td><td>нет</td><td>да</td></tr>
+      <tr><td>tuple</td><td><code>(1, 2)</code></td><td>нет*</td><td>да, если внутри всё неизменяемое</td></tr>
+      <tr><td>list</td><td><code>[1, 2]</code></td><td><b>да</b></td><td>нет</td></tr>
+      <tr><td>dict, set</td><td><code>{"a": 1}</code>, <code>{1, 2}</code></td><td><b>да</b></td><td>нет</td></tr>
+    </tbody></table></div>
+  <p class="muted" style="font-size:13.5px">* сам кортеж изменить нельзя, но если в нём лежит список, список менять можно. Это популярный вопрос, он есть в практике.</p>
+
+  <h3 style="font-size:17px">Типы подробно: что про них спрашивают</h3>
+  <div class="prose"><ul>
+    <li><b>int</b> не переполняется: <code>2 ** 1000</code> посчитается точно. Python сам берёт столько памяти, сколько нужно. В numpy так нельзя: <code>np.int64</code> переполняется молча.</li>
+    <li><b>Деление.</b> <code>7 / 2 = 3.5</code> — всегда float. <code>7 // 2 = 3</code> — целая часть вниз, <code>7 % 2 = 1</code> — остаток. С минусом: <code>-7 // 2 = -4</code> (вниз, а не к нулю), <code>-7 % 2 = 1</code>. Ловят на собесе.</li>
+    <li><b>float</b> хранится в двоичном виде, поэтому <code>0.1 + 0.2 == 0.3</code> → <b>False</b> (там 0.30000000000000004). Числа сравнивают с допуском: <code>math.isclose(a, b)</code> или <code>np.isclose</code>. Деньги в коде считают в копейках (int) или через <code>decimal.Decimal</code>.</li>
+    <li><b>round</b> округляет к чётному: <code>round(2.5) = 2</code>, <code>round(3.5) = 4</code>. Это «банковское» округление, оно не сдвигает среднее.</li>
+    <li><b>NaN</b> (<code>float("nan")</code>) — «не число», так pandas и numpy помечают пропуски. <code>nan == nan</code> → <b>False</b>. Проверяют через <code>math.isnan(x)</code> или <code>pd.isna(x)</code>.</li>
+    <li><b>bool</b> — подкласс int: <code>True == 1</code>, <code>True + True == 2</code>. Поэтому <code>sum(p &gt; 0.5 for p in probs)</code> считает количество, а <code>np.mean(y_pred == y_true)</code> — это accuracy.</li>
+    <li><b>None</b> — единственный объект «значения нет». Функция без <code>return</code> возвращает None. Проверка — только <code>is None</code>.</li>
+    <li><b>str</b> — неизменяемая последовательность символов Юникода (подробно в теме 7).</li>
+    <li><b>Преобразования:</b> <code>int("42")</code>, <code>float("3.5")</code>, <code>str(5)</code>, <code>int(3.9) = 3</code> (отбрасывает дробь, не округляет), <code>int("3.5")</code> → ValueError.</li>
+    <li><b>Проверка типа:</b> <code>isinstance(x, (int, float))</code>, а не <code>type(x) == int</code>: isinstance учитывает наследование (True — тоже int).</li>
+  </ul></div>
+  <div class="callout feel"><b class="h">Динамическая типизация</b><p>Тип есть у объекта, а не у имени: <code>x = 5</code>, потом <code>x = "пять"</code> — можно. Python строгий: <code>"5" + 5</code> — ошибка, сам он не угадывает. Аннотации <code>def f(x: int) -&gt; float:</code> ничего не проверяют при запуске, это подсказки для людей, IDE и mypy. В рабочем коде их пишут почти всегда.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · память Python по шагам</span>
+      <div class="btns" role="group" aria-label="Сценарий">
+        <button class="btn sc" data-s="0" aria-pressed="true">Общий список</button>
+        <button class="btn sc" data-s="1" aria-pressed="false">Числа</button>
+        <button class="btn sc" data-s="2" aria-pressed="false">Ловушка def</button>
+        <button class="btn sc" data-s="3" aria-pressed="false">copy и deepcopy</button>
+      </div></div>
+    <div class="lab-grid" style="align-items:start">
+      <pre id="memCode" aria-label="Код сценария"></pre>
+      <svg id="memSvg" viewBox="0 0 380 260" role="img" aria-label="Имена слева, объекты справа, стрелки — какой ярлык на каком объекте"></svg>
+    </div>
+    <div class="btns"><button class="btn" id="memPrev">← Назад</button><button class="btn" id="memNext">Следующая строка →</button><span class="mono muted" id="memStep" style="align-self:center;font-size:12.5px"></span></div>
+    <p class="verdict" id="memNote"></p>
+  </div>
+  <div class="prose">
+    <p><b>Правило на всю жизнь:</b> методы вроде <code>append</code>, <code>sort</code>, <code>update</code> меняют объект на месте, и это видят все его ярлыки. Операции вроде <code>+</code>, срезов, <code>sorted()</code> создают новый объект. С неизменяемыми типами (числа, строки) «изменение» всегда создаёт новый объект, поэтому ловушек нет.</p>
+  </div>
+  <h3 style="font-size:17px">Как аргументы попадают в функцию</h3>
+  <div class="prose">
+    <p>В Python нет выбора «по значению или по ссылке». Функция получает <b>новый ярлык на тот же объект</b>. Отсюда два правила:</p>
+    <ul>
+      <li>Если функция <b>меняет</b> изменяемый объект (<code>lst.append</code>), изменение видно снаружи.</li>
+      <li>Если функция <b>перевешивает</b> ярлык (<code>lst = [9]</code>), снаружи ничего не меняется: перевесили только локальный ярлык.</li>
+    </ul>
+  </div>
+<pre>def add(lst):  lst.append(1)      <span class="cm"># снаружи список изменится</span>
+def reset(lst): lst = []          <span class="cm"># снаружи ничего не изменится</span>
+
+a = [1, 2]; a += [3]              <span class="cm"># list: += меняет тот же объект (как extend)</span>
+t = (1, 2); t += (3,)             <span class="cm"># tuple: += создаёт новый кортеж, ярлык перевешен</span></pre>
+
+  <h3 style="font-size:17px">Копии: поверхностная и глубокая</h3>
+  <div class="prose"><ul>
+    <li><code>b = a</code> — не копия, второй ярлык.</li>
+    <li><code>a.copy()</code>, <code>list(a)</code>, <code>a[:]</code>, <code>copy.copy(a)</code> — <b>поверхностная</b> копия: новый внешний список, но внутри те же объекты. Для списка чисел этого хватает.</li>
+    <li><code>copy.deepcopy(a)</code> — <b>глубокая</b>: рекурсивно копирует всё. Нужна, когда внутри списки, словари, объекты.</li>
+  </ul></div>
+  <p class="muted" style="font-size:13.5px">Умножение списка <code>* n</code> тоже копирует только ярлыки. Для чисел это безопасно, для вложенных списков — нет: попробуй ответить на вопрос 2 в практике.</p>
+  <div class="callout trap"><b class="h">Где это ломает ML-код</b><p><code>df2 = df</code> не копирует таблицу pandas. Изменишь df2 — изменится df. Нужно <code>df2 = df.copy()</code>. То же с numpy: срез массива — это окно в тот же массив, а не копия.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему <code>def f(x, acc=[])</code> — ловушка и как правильно?</summary>
+      <div class="a"><p>Значение по умолчанию вычисляется один раз, когда выполняется строка <code>def</code>, а не при каждом вызове. Все вызовы без acc получают один и тот же список, и он копит значения. Правильно: <code>def f(x, acc=None):</code> и внутри <code>if acc is None: acc = []</code>.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Как передаются аргументы в Python — по значению или по ссылке?</summary>
+      <div class="a"><p>Ни так, ни так: «по ссылке на объект» (call by object reference). Функция получает ярлык на тот же объект. Изменяемый объект можно изменить внутри, и это увидят снаружи. Присваивание внутри функции перевешивает только локальный ярлык и снаружи ничего не меняет.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Чем copy отличается от deepcopy?</summary>
+      <div class="a"><p>copy создаёт новый контейнер, но кладёт в него те же вложенные объекты: изменишь вложенный список — изменится и в оригинале. deepcopy рекурсивно копирует все вложенные объекты, копия полностью независима. Цена — время и память.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что выведет <code>print(0.1 + 0.2 == 0.3, -7 // 2, round(2.5))</code>?</summary>
+      <div class="a"><p><code>False -4 2</code>. Двоичные дроби неточны, целочисленное деление округляет вниз, round — к чётному.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="p2">
+  <div class="eyebrow">Тема 3 из 11 · Python</div>
+  <h2>is и ==, истинность объектов</h2>
+  <p class="tldr"><code>==</code> спрашивает «равны ли значения». <code>is</code> спрашивает «это один и тот же объект, один и тот же ярлык на одном предмете».</p>
+  <div class="prose">
+    <ul>
+      <li><code>[1, 2] == [1, 2]</code> → True: значения одинаковые. <code>[1, 2] is [1, 2]</code> → False: это два разных списка.</li>
+      <li><code>is</code> используют почти только с None: <code>if x is None</code>. Для чисел и строк <code>is</code> иногда случайно даёт True, потому что Python переиспользует маленькие числа. Полагаться на это нельзя.</li>
+    </ul>
+    <p><b>Истинность.</b> В <code>if</code> можно подставить любой объект. Ложными считаются: <code>False</code>, <code>None</code>, <code>0</code>, <code>0.0</code>, пустая строка <code>""</code>, пустые <code>[]</code>, <code>()</code>, <code>{}</code>, <code>set()</code>. Всё остальное истинно. Поэтому пишут <code>if not scores:</code> вместо <code>if len(scores) == 0:</code>.</p>
+  </div>
+  <div class="callout trap"><b class="h">Ловушка</b><p><code>if x:</code> и <code>if x is not None:</code> — разные проверки. Если x может быть 0 (например, ноль пропусков) — первая проверка считает это «нет значения». Для чисел пиши явно <code>is not None</code>.</p></div>
+
+  <h3 style="font-size:17px">and, or и сравнения</h3>
+  <div class="prose"><ul>
+    <li><code>and</code> и <code>or</code> возвращают <b>не True/False, а один из операндов</b>. <code>x or y</code> — первый истинный (или последний). <code>x and y</code> — первый ложный (или последний). Отсюда идиома <code>name = user_name or "аноним"</code>. Но если 0 — допустимое значение, она его съест (та же ловушка, что выше).</li>
+    <li><b>Ленивость</b> (short-circuit): <code>x and f()</code> не вызовет f, если x ложно. Удобно: <code>if lst and lst[0] &gt; 0</code> — не упадёт на пустом списке.</li>
+    <li><b>Цепочки сравнений:</b> <code>0 &lt; p &lt; 1</code> работает как в математике и значит <code>0 &lt; p and p &lt; 1</code>.</li>
+    <li><b>any и all:</b> <code>any(p &gt; 0.9 for p in probs)</code> — есть ли хоть один; <code>all(...)</code> — все ли. Обе останавливаются, как только ответ ясен. Для пустой коллекции <code>any([]) = False</code>, <code>all([]) = True</code>.</li>
+    <li><b>Под капотом:</b> <code>==</code> вызывает метод <code>__eq__</code>, истинность — <code>__bool__</code>, а если его нет, <code>__len__</code>. Так свои классы учат вести себя как встроенные.</li>
+    <li><b>Маленькие числа и строки кешируются</b> (от −5 до 256 и короткие строки-идентификаторы). Поэтому <code>a = 256; b = 256; a is b</code> → True, а с 257 может быть False. Это деталь реализации, а не правило языка.</li>
+  </ul></div>
+  <div class="callout trap"><b class="h">Ловушка numpy и pandas</b><p><code>if df:</code> или <code>if np.array([1, 0]):</code> → <code>ValueError: The truth value ... is ambiguous</code>. У массива нет одной истинности. Пиши явно: <code>if not df.empty</code>, <code>if arr.any()</code>, <code>if arr.all()</code>, <code>if len(arr)</code>. И для условий по столбцам — <code>&amp;</code>, <code>|</code> со скобками, а не <code>and</code>/<code>or</code>: <code>df[(df.age &gt; 18) &amp; (df.debt == 0)]</code>.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем <code>is</code> отличается от <code>==</code>? Когда использовать <code>is</code>?</summary>
+      <div class="a"><p><code>==</code> сравнивает значения через <code>__eq__</code>, <code>is</code> проверяет, что это один объект (одинаковый <code>id</code>). <code>is</code> используют для синглтонов: <code>None</code>, <code>True</code>, <code>False</code>. Для чисел и строк — только <code>==</code>: совпадение по <code>is</code> зависит от кеширования интерпретатора.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что вернёт <code>[] or 0 or "x" or 5</code> и <code>1 and [] and 3</code>?</summary>
+      <div class="a"><p><code>"x"</code> — первый истинный операнд. <code>[]</code> — первый ложный.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="p3">
+  <div class="eyebrow">Тема 4 из 11 · Python</div>
+  <h2>Условия и циклы, else у цикла</h2>
+  <p class="tldr">У циклов for и while в Python есть необычная часть <code>else</code>: она выполняется, если цикл дошёл до конца и не вышел через <code>break</code>.</p>
+<pre>for student in students:
+    if student.debt:
+        print("Нашли должника:", student.name)
+        <span class="hl">break</span>
+<span class="hl">else</span>:
+    print("Должников нет")   <span class="cm"># сработает, только если break не было</span></pre>
+  <div class="prose"><ul>
+    <li><code>for x in коллекция</code> — основной цикл. <code>range(n)</code> нужен, только когда действительно нужны числа.</li>
+    <li><code>while условие</code> — когда число шагов заранее неизвестно, например в бинарном поиске.</li>
+    <li><code>break</code> — выйти из цикла, <code>continue</code> — перейти к следующему шагу.</li>
+    <li>Тернарный оператор: <code>label = "риск" if p > 0.5 else "норма"</code>.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Всё, что ещё нужно про условия и циклы</h3>
+  <div class="prose"><ul>
+    <li><b>if / elif / else</b> — проверяются сверху вниз, выполняется первая истинная ветка. Порядок важен: сначала узкие условия, потом широкие.</li>
+    <li><b>range(start, stop, step)</b>: stop не включается, как в срезах. <code>range(10, 0, -2)</code> → 10, 8, 6, 4, 2. range не создаёт список, он ленивый и весит одинаково для 10 и для миллиарда.</li>
+    <li><b>while ... else</b> работает так же, как for ... else: else выполнится, если цикл закончился без break.</li>
+    <li><b>Обход словаря:</b> <code>for k in d</code> — ключи, <code>for k, v in d.items()</code> — пары, <code>for v in d.values()</code> — значения.</li>
+    <li><b>Выйти из вложенных циклов</b> одним break нельзя: break выходит только из ближайшего. Выносят циклы в функцию и делают <code>return</code>.</li>
+    <li><b>pass</b> — пустая команда-заглушка там, где синтаксис требует тела.</li>
+    <li><b>Моржовый оператор</b> <code>:=</code> присваивает прямо в условии: <code>while (line := f.readline()):</code>.</li>
+    <li><b>match / case</b> (Python 3.10+) — сопоставление с образцом, похоже на switch. Встречается редко, достаточно узнать в чужом коде.</li>
+  </ul></div>
+  <div class="callout trap"><b class="h">Нельзя менять коллекцию, по которой идёшь</b>
+<pre>nums = [1, 2, 2, 3]
+for x in nums:
+    if x == 2:
+        nums.remove(x)    <span class="cm"># пропустит вторую двойку: элементы сдвинулись под итератором</span>
+print(nums)               <span class="cm"># [1, 2, 3]</span>
+nums = [x for x in nums if x != 2]   <span class="cm"># правильно: собрать новый список</span></pre>
+  <p>Со словарём ещё жёстче: изменение размера во время обхода даёт <code>RuntimeError</code>. Обходи копию: <code>for k in list(d):</code>.</p></div>
+  <div class="callout feel"><b class="h">Как работает for внутри</b><p><code>for x in obj</code> вызывает <code>iter(obj)</code> и потом <code>next()</code>, пока не кончится (исключение <code>StopIteration</code>). Поэтому for умеет ходить по чему угодно: спискам, строкам, файлам построчно, генераторам, DataLoader в PyTorch. Генератор можно пройти только один раз — второй for по нему ничего не выдаст.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Когда выполняется <code>else</code> у цикла?</summary>
+      <div class="a"><p>Когда цикл завершился сам — перебрал все элементы или условие while стало ложным, и при этом не было <code>break</code>. Типичное применение — поиск: break, если нашли, else — «не нашли».</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="topic" id="p4">
+  <div class="eyebrow">Тема 5 из 11 · <span class="dia">◆</span> Python</div>
+  <h2>Функции: значения по умолчанию, *args, **kwargs</h2>
+  <p class="tldr"><code>*args</code> собирает лишние позиционные аргументы в кортеж, <code>**kwargs</code> — лишние именованные в словарь. Звёздочки при вызове делают обратное: распаковывают.</p>
+<pre>def train(model_name, *datasets, lr=0.1, **params):
+    print(model_name, datasets, lr, params)
+
+train("catboost", "train.csv", "extra.csv", lr=0.05, depth=6, verbose=0)
+<span class="cm"># catboost ('train.csv', 'extra.csv') 0.05 {'depth': 6, 'verbose': 0}</span></pre>
+  <div class="prose">
+    <p><b>Порядок параметров</b> всегда такой: обычные → <code>*args</code> → только именованные → <code>**kwargs</code>.</p>
+    <p><b>Где это в ML каждый день:</b> гиперпараметры хранят в словаре и передают модели одной звёздочкой-двойкой. Так работают конфиги, Optuna и GridSearch.</p>
+  </div>
+<pre>params = {"depth": 6, "learning_rate": 0.05, "iterations": 500}
+model = CatBoostClassifier(<span class="hl">**params</span>)   <span class="cm"># то же, что depth=6, learning_rate=0.05, ...</span></pre>
+  <div class="callout trap"><b class="h">Ловушка из темы 1</b><p>Значение по умолчанию создаётся один раз. Изменяемые значения по умолчанию (<code>[]</code>, <code>{}</code>) не используй никогда, только <code>None</code>. Посмотри сценарий «Ловушка def» в лаборатории выше.</p></div>
+
+  <h3 style="font-size:17px">Все виды параметров</h3>
+<pre>def f(a, b, /, c, d=1, *args, e, f=2, **kwargs): ...
+<span class="cm"># a, b    — только позиционно (до /)
+# c, d    — как угодно: по порядку или по имени
+# *args   — все лишние позиционные
+# e, f    — только по имени (после * или *args)
+# **kwargs — все лишние именованные</span></pre>
+  <div class="prose"><ul>
+    <li><b>Позиционные</b> — по порядку: <code>f(1, 2)</code>. <b>Именованные</b> — по имени: <code>f(a=1, b=2)</code>. Позиционные всегда идут перед именованными.</li>
+    <li><b>Только по имени</b> — всё после <code>*</code>: <code>def split(X, *, test_size=0.2)</code>. Вызвать <code>split(X, 0.3)</code> нельзя, только <code>split(X, test_size=0.3)</code>. Так защищают от путаницы, и так устроены почти все параметры sklearn.</li>
+    <li><b>Только позиционно</b> — всё до <code>/</code>. Встречается во встроенных функциях: <code>len(obj, /)</code>.</li>
+    <li><b>Распаковка при вызове:</b> <code>f(*[1, 2])</code> — как <code>f(1, 2)</code>; <code>f(**{"a": 1})</code> — как <code>f(a=1)</code>.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Что ещё знать про функции</h3>
+  <div class="prose"><ul>
+    <li><b>Возврат нескольких значений</b> — на самом деле один кортеж: <code>return mean, std</code> → <code>m, s = stats(x)</code>.</li>
+    <li>Нет <code>return</code> — функция вернёт <code>None</code>. Частая ошибка: <code>a = a.sort()</code> — sort меняет на месте и возвращает None, теперь <code>a</code> равно None.</li>
+    <li><b>Функции — обычные объекты.</b> Их можно положить в переменную, список, словарь, передать в другую функцию: <code>sorted(students, key=get_score)</code>, <code>df.apply(clean_text)</code>.</li>
+    <li><b>lambda</b> — функция в одну строку без имени: <code>key=lambda s: s["score"]</code>. Только одно выражение, без присваиваний. Для чего-то длиннее — обычный <code>def</code>.</li>
+    <li><b>Документация и типы:</b></li>
+  </ul></div>
+<pre>def recall_at_k(y_true: list[int], scores: list[float], k: int = 10) -&gt; float:
+    """Доля положительных объектов, попавших в топ-k по скору."""
+    ...</pre>
+  <div class="callout trap"><b class="h">sort и sorted</b><p><code>a.sort()</code> меняет список на месте и возвращает None. <code>sorted(a)</code> возвращает новый список и работает с любой коллекцией. Сортировка с ключом: <code>sorted(pairs, key=lambda p: p[1], reverse=True)</code>. По двум полям: <code>key=lambda s: (-s.score, s.name)</code> — по убыванию балла, при равенстве по имени. Сортировка в Python <b>стабильная</b>: равные элементы сохраняют исходный порядок.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Что такое <code>*args</code> и <code>**kwargs</code>?</summary>
+      <div class="a"><p><code>*args</code> собирает лишние позиционные аргументы в кортеж, <code>**kwargs</code> — лишние именованные в словарь. Имена args и kwargs — соглашение, важны звёздочки. При вызове звёздочки распаковывают список и словарь в аргументы. Применение: обёртки и декораторы, которые передают аргументы дальше (<code>def wrapper(*args, **kwargs): return func(*args, **kwargs)</code>), конфиги гиперпараметров.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Можно ли вызвать <code>def f(a, *, b): ...</code> как <code>f(1, 2)</code>?</summary>
+      <div class="a"><p>Нет: b только именованный. Нужно <code>f(1, b=2)</code>, иначе TypeError.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="topic" id="p5">
+  <div class="eyebrow">Тема 6 из 11 · Python</div>
+  <h2>Область видимости: LEGB</h2>
+  <p class="tldr">Встретив имя, Python ищет его в четырёх местах по порядку: Local (внутри функции), Enclosing (во внешней функции), Global (в модуле), Built-in (встроенные вроде len). Находит в первом — и останавливается.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · где Python найдёт имя</span>
+      <div class="btns" role="group" aria-label="Какое имя ищем">
+        <button class="btn nm" data-n="z">z</button><button class="btn nm" data-n="y">y</button><button class="btn nm" data-n="x">x</button><button class="btn nm" data-n="len">len</button><button class="btn nm" data-n="w">w</button>
+      </div></div>
+    <div class="lab-grid" style="align-items:start">
+<pre>x = "глобальная"
+
+def outer():
+    y = "из внешней функции"
+    def inner():
+        z = "локальная"
+        print(z, y, x, len, w)
+    inner()</pre>
+      <div class="legb" id="legb">
+        <div class="lv" data-l="B"><span>Built-in · встроенные</span>
+          <div class="lv" data-l="G"><span>Global · модуль</span>
+            <div class="lv" data-l="E"><span>Enclosing · outer()</span>
+              <div class="lv" data-l="L"><span>Local · inner()</span></div></div></div></div>
+      </div>
+    </div>
+    <p class="verdict" id="legbMsg">Нажми на имя, чтобы увидеть путь поиска.</p>
+  </div>
+  <div class="prose">
+    <p><b>Присваивание делает имя локальным.</b> Если внутри функции есть <code>x = ...</code>, то x локальная во всей функции, даже в строках до присваивания. Отсюда <code>UnboundLocalError</code>, он есть в практике. Чтобы изменить глобальную переменную, пишут <code>global x</code>, а переменную внешней функции — <code>nonlocal y</code>. В нормальном коде это редкость: лучше вернуть значение из функции.</p>
+    <p><b>Читать глобальную переменную можно без global</b>, писать — нет. Изменить содержимое глобального списка (<code>log.append(x)</code>) тоже можно: это не присваивание имени, а вызов метода.</p>
+  </div>
+
+  <h3 style="font-size:17px">Замыкания</h3>
+  <div class="prose"><p>Внутренняя функция запоминает переменные внешней, даже когда внешняя уже завершилась. Это замыкание (closure). На нём построены декораторы, фабрики функций, колбэки.</p></div>
+<pre>def make_counter():
+    count = 0
+    def step():
+        <span class="hl">nonlocal</span> count     <span class="cm"># без этого count += 1 даст UnboundLocalError</span>
+        count += 1
+        return count
+    return step
+
+c = make_counter()
+c(); c()
+print(c())                 <span class="cm"># 3 — count живёт внутри замыкания</span></pre>
+  <div class="callout trap"><b class="h">Позднее связывание: классика собеса</b>
+<pre>fs = [lambda: i for i in range(3)]
+print([f() for f in fs])          <span class="cm"># [2, 2, 2], а не [0, 1, 2]</span>
+fs = [lambda i=i: i for i in range(3)]   <span class="cm"># [0, 1, 2]: значение зафиксировано при создании</span></pre>
+  <p>Замыкание помнит не значение, а саму переменную. Функции вызываются после цикла, и все видят последнее значение i. Значение по умолчанию вычисляется в момент создания функции — поэтому второй вариант работает (тот же механизм, что в ловушке <code>def f(x=[])</code>).</p></div>
+  <div class="prose"><ul>
+    <li>У comprehension своя область видимости: переменная <code>x</code> из <code>[x for x in a]</code> наружу не вытекает.</li>
+    <li>А у обычного цикла — нет: после <code>for i in range(3)</code> переменная <code>i</code> существует и равна 2.</li>
+    <li><code>if</code>, <code>for</code>, <code>with</code> не создают новую область видимости, в отличие от C++ и Java. Области создают только функции, классы, модули и comprehensions.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Что такое LEGB и замыкание?</summary>
+      <div class="a"><p>LEGB — порядок поиска имени: Local, Enclosing, Global, Built-in. Замыкание — функция, которая сохраняет доступ к переменным объемлющей функции после её завершения. Чтобы изменить такую переменную, нужен <code>nonlocal</code>. На замыканиях основаны декораторы.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что выведет код ниже?<br><code>def outer():<br>&nbsp;&nbsp;x = 1<br>&nbsp;&nbsp;def inner(): return x * 10<br>&nbsp;&nbsp;x = 2<br>&nbsp;&nbsp;return inner()<br>print(outer())</code></summary>
+      <div class="a"><p><code>20</code>. Замыкание читает переменную в момент вызова, а не в момент создания функции. К вызову x уже равен 2.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="topic" id="p6">
+  <div class="eyebrow">Тема 7 из 11 · Python</div>
+  <h2>Строки, срезы, f-strings</h2>
+  <p class="tldr">Срез <code>s[start:stop:step]</code> берёт элементы с start включительно до stop не включая, шагая на step. Отрицательный индекс считает с конца. Срезы работают для строк, списков, кортежей и почти так же — для массивов numpy.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · песочница срезов</span><span class="mono" id="slCode" style="font-size:15px"></span></div>
+    <div class="slice" id="slCells"></div>
+    <div class="ctrl" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));display:grid">
+      <label for="slA"><span class="row"><span>start <input type="checkbox" id="slAn"> пусто</span><span class="mono" id="slAv"></span></span><input type="range" id="slA" min="-8" max="8" step="1" value="1"></label>
+      <label for="slB"><span class="row"><span>stop <input type="checkbox" id="slBn"> пусто</span><span class="mono" id="slBv"></span></span><input type="range" id="slB" min="-8" max="8" step="1" value="6"></label>
+      <label for="slC"><span class="row"><span>step</span><span class="mono" id="slCv"></span></span><input type="range" id="slC" min="-3" max="3" step="1" value="2"></label>
+    </div>
+    <div class="stat"><div class="v" id="slRes"></div><div class="k">результат</div></div>
+    <div class="btns"><button class="btn slp" data-p="1,6,2">s[1:6:2]</button><button class="btn slp" data-p="n,n,-1">s[::-1]</button><button class="btn slp" data-p="-3,n,1">s[-3:]</button><button class="btn slp" data-p="n,3,1">s[:3]</button></div>
+  </div>
+  <div class="prose">
+    <p><b>f-strings</b> — основной способ собирать строки:</p>
+  </div>
+<pre>p, name, n = 0.08667, "CatBoost", 1500
+f"{name}: {p:.3f}"        <span class="cm"># 'CatBoost: 0.087' — три знака после запятой</span>
+f"доля: {p:.1%}"          <span class="cm"># 'доля: 8.7%' — сразу в процентах</span>
+f"{n:,}".replace(",", " ")  <span class="cm"># '1 500' — разделитель тысяч</span>
+f"{p=}"                   <span class="cm"># 'p=0.08667' — удобно для отладки</span></pre>
+  <div class="prose"><p>Полезные методы строк: <code>strip()</code>, <code>split(",")</code>, <code>",".join(список)</code>, <code>lower()</code>, <code>replace()</code>, <code>startswith()</code>. Строки неизменяемы: каждый метод возвращает новую строку.</p></div>
+
+  <h3 style="font-size:17px">Срезы: правила, которые спрашивают</h3>
+  <div class="prose"><ul>
+    <li><b>Индекс за границей — ошибка, срез за границей — нет.</b> <code>s[100]</code> → IndexError, а <code>s[2:100]</code> спокойно вернёт хвост, <code>s[100:]</code> — пустую строку.</li>
+    <li>Срез всегда создаёт <b>новый объект</b> (у list и str). <code>a[:]</code> — быстрый способ сделать поверхностную копию списка.</li>
+    <li>Отрицательный шаг идёт справа налево, и тогда start должен быть правее stop: <code>s[5:1:-1]</code>.</li>
+    <li>Срезом можно присваивать в список: <code>a[1:3] = [9, 9, 9]</code> — заменит два элемента тремя.</li>
+    <li>В numpy срез — <b>не копия</b>, а окно в тот же массив (это было в теме 1). В pandas вместо срезов — <code>.iloc[0:5]</code> по номерам и <code>.loc[...]</code> по меткам.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Методы строк на каждый день</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Задача</th><th>Метод</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td>Убрать пробелы и переносы по краям</td><td><code>strip</code>, <code>lstrip</code>, <code>rstrip</code></td><td><code>" ML\n".strip()</code> → <code>"ML"</code></td></tr>
+      <tr><td>Разбить и склеить</td><td><code>split</code>, <code>join</code></td><td><code>"a,b".split(",")</code>; <code>", ".join(names)</code></td></tr>
+      <tr><td>Регистр</td><td><code>lower</code>, <code>upper</code>, <code>title</code></td><td>нормализация текста перед сравнением</td></tr>
+      <tr><td>Найти подстроку</td><td><code>in</code>, <code>find</code>, <code>index</code>, <code>count</code></td><td><code>find</code> вернёт −1, <code>index</code> бросит ошибку</td></tr>
+      <tr><td>Заменить</td><td><code>replace</code></td><td><code>s.replace(",", ".")</code> — запятые в числах из Excel</td></tr>
+      <tr><td>Начало и конец</td><td><code>startswith</code>, <code>endswith</code></td><td><code>f.endswith((".csv", ".tsv"))</code> — можно кортеж</td></tr>
+      <tr><td>Что внутри</td><td><code>isdigit</code>, <code>isalpha</code>, <code>isspace</code></td><td>проверка ввода</td></tr>
+      <tr><td>Разделить на три части</td><td><code>partition</code></td><td><code>"key=val".partition("=")</code> → <code>("key", "=", "val")</code></td></tr>
+      <tr><td>Дополнить нулями</td><td><code>zfill</code></td><td><code>"7".zfill(3)</code> → <code>"007"</code></td></tr>
+    </tbody></table></div>
+<pre>f"{name:&gt;10}|"     <span class="cm"># выровнять вправо на 10 символов: '  CatBoost|'</span>
+f"{p:08.3f}"       <span class="cm"># '0000.087' — ширина 8, нули слева</span>
+r"C:\new\data"      <span class="cm"># raw-строка: обратный слэш не экранирует. Для путей Windows и регулярок</span>
+"""многострочная
+строка"""           <span class="cm"># тройные кавычки, ими же пишут docstring</span>
+"ab" * 3            <span class="cm"># 'ababab'</span>
+"abc" &lt; "abd"       <span class="cm"># True: строки сравниваются посимвольно, по кодам символов</span></pre>
+
+  <h3 style="font-size:17px">Юникод, байты и кодировки</h3>
+  <div class="prose">
+    <p><code>str</code> — текст из символов Юникода, <code>bytes</code> — сырые байты. Между ними — кодировка: <code>"Привет".encode("utf-8")</code> даёт bytes, <code>.decode("utf-8")</code> — обратно. Кириллица в UTF-8 занимает 2 байта на букву, поэтому <code>len("Привет") = 6</code>, а <code>len("Привет".encode()) = 12</code>.</p>
+    <p>На практике это всплывает при чтении файлов: <code>UnicodeDecodeError</code> при открытии CSV из старого Excel. Лечится явной кодировкой: <code>pd.read_csv(path, encoding="cp1251")</code> или <code>open(path, encoding="utf-8")</code>. Всегда указывай <code>encoding</code> у <code>open</code>.</p>
+  </div>
+  <div class="callout trap"><b class="h">Склейка в цикле</b><p>Строки неизменяемы, поэтому <code>s += x</code> в цикле каждый раз копирует всю строку — O(n²) суммарно (разбирали в уроке 1, «Скрытые O(n)»). Собирай кусочки в список и склеивай один раз: <code>"".join(parts)</code>.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как развернуть строку и проверить палиндром?</summary>
+      <div class="a"><p><code>s[::-1]</code>. Палиндром с учётом регистра и пробелов: <code>t = "".join(c.lower() for c in s if c.isalnum())</code>, затем <code>t == t[::-1]</code>. Без лишней памяти — два указателя с концов навстречу друг другу (LeetCode 125, Valid Palindrome).</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что вернёт <code>"data.csv"[-4:]</code>, <code>"abc"[5:]</code>, <code>"abc"[5]</code>?</summary>
+      <div class="a"><p><code>".csv"</code>, пустую строку, IndexError.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="topic" id="p7">
+  <div class="eyebrow">Тема 8 из 11 · <span class="dia">◆</span> Python</div>
+  <h2>list, tuple, dict, set: что когда брать</h2>
+  <p class="tldr">Выбор коллекции — это выбор операций, которые должны быть быстрыми. Нужен порядок и доступ по номеру — list. Нужен поиск по ключу — dict. Нужна уникальность и быстрое «есть ли» — set. Нужна неизменяемая запись — tuple.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Коллекция</th><th>Свойства</th><th>Быстро</th><th>Типичное применение</th></tr></thead>
+    <tbody>
+      <tr><td><b>list</b> <code>[ ]</code></td><td>упорядочен, изменяем, повторы можно</td><td>a[i], append</td><td>последовательность наблюдений, история метрик по эпохам</td></tr>
+      <tr><td><b>tuple</b> <code>( )</code></td><td>упорядочен, неизменяем</td><td>a[i]</td><td>форма массива <code>(1500, 7)</code>, пара (признак, важность), ключ dict</td></tr>
+      <tr><td><b>dict</b> <code>{k: v}</code></td><td>ключ → значение, хранит порядок вставки</td><td>d[key], key in d</td><td>гиперпараметры, конфиг, подсчёты</td></tr>
+      <tr><td><b>set</b> <code>{ }</code></td><td>без повторов, без порядка</td><td>x in s, &amp;, |, −</td><td>уникальные id, пересечение двух выборок</td></tr>
+    </tbody></table></div>
+  <p class="muted" style="font-size:13.5px">Пустое множество — только <code>set()</code>: запись <code>{}</code> создаёт пустой словарь. Сложность каждой операции — в таблице урока 1, тема 10.</p>
+
+  <h3 style="font-size:17px">list: методы</h3>
+<pre>a.append(x)        <span class="cm"># один элемент в конец</span>
+a.extend([x, y])   <span class="cm"># несколько; a.append([x, y]) положит ОДИН элемент-список</span>
+a.insert(i, x); a.pop(); a.pop(i); a.remove(x)   <span class="cm"># remove — первое вхождение, нет — ValueError</span>
+a.index(x); a.count(x); a.reverse(); a.clear()
+a.sort(key=..., reverse=True)  <span class="cm"># на месте; sorted(a) — новый список</span></pre>
+
+  <h3 style="font-size:17px">dict: методы</h3>
+<pre>d[k]               <span class="cm"># нет ключа → KeyError</span>
+d.get(k, 0)        <span class="cm"># нет ключа → 0 (по умолчанию None)</span>
+d.setdefault(k, []).append(x)   <span class="cm"># взять или создать — то, что делает defaultdict</span>
+d.pop(k, None)     <span class="cm"># удалить и вернуть значение, без ошибки если нет</span>
+d.update(other); d | other      <span class="cm"># слить словари; при совпадении ключей побеждает правый</span>
+d.keys(); d.values(); d.items() <span class="cm"># «виды»: живые окна в словарь, не копии</span>
+max(d, key=d.get)  <span class="cm"># ключ с максимальным значением</span>
+{v: k for k, v in d.items()}    <span class="cm"># развернуть словарь</span></pre>
+
+  <h3 style="font-size:17px">set: операции</h3>
+<pre>a | b    a.union(b)                 <span class="cm"># всё из обоих</span>
+a &amp; b    a.intersection(b)          <span class="cm"># общее</span>
+a - b    a.difference(b)            <span class="cm"># есть в a, нет в b</span>
+a ^ b    a.symmetric_difference(b)  <span class="cm"># ровно в одном из двух</span>
+a &lt;= b   a.issubset(b)              <span class="cm"># a целиком внутри b</span>
+s.add(x); s.discard(x); s.remove(x) <span class="cm"># remove — ошибка, если нет; discard — молча</span>
+frozenset(a)                        <span class="cm"># неизменяемое множество, может быть ключом dict</span></pre>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Проверить, что train и test не пересекаются по студентам: <code>set(train.student_id) &amp; set(test.student_id)</code> должно быть пустым. Признаки, которые есть в train, но пропали в проде: <code>set(train_cols) - set(prod_cols)</code>. Список словарей <code>[{"name": ..., "score": ...}, ...]</code> — естественный формат JSON и ответов API, <code>pd.DataFrame(records)</code> превращает его в таблицу.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем list отличается от tuple и зачем нужен tuple?</summary>
+      <div class="a"><p>tuple неизменяем: после создания нельзя добавить, удалить или заменить элемент. Поэтому он хешируемый (если внутри тоже неизменяемые объекты) и может быть ключом словаря или элементом множества. Он чуть легче по памяти и сообщает читателю: «эта запись не меняется». Функции возвращают несколько значений именно кортежем.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Почему list не может быть ключом словаря?</summary>
+      <div class="a"><p>Словарь кладёт ключ в ячейку по его хешу (урок 3). Если ключ изменится, изменится и хеш, и словарь больше не найдёт значение. Поэтому ключами могут быть только хешируемые, то есть неизменяемые, объекты. Вместо списка берут tuple.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="topic" id="p8">
+  <div class="eyebrow">Тема 9 из 11 · <span class="dia">◆</span> Python</div>
+  <h2>Comprehensions</h2>
+  <p class="tldr">Comprehension — короткая запись «пройди по коллекции, отфильтруй, преобразуй, собери результат». Читается справа налево: откуда берём, что оставляем, во что превращаем.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · конвейер</span></div>
+    <p class="mono" style="font-size:15px"><span style="color:var(--plum)">[x ** 2</span> <span style="color:var(--accent)">for x in nums</span> <span style="color:var(--warm)">if x % 2 == 0]</span></p>
+    <label for="cmpIn" class="ctrl"><span>nums — поменяй числа через запятую</span><input id="cmpIn" type="text" value="3, 4, 7, 10, 12, 15" style="font:15px var(--f-mono);padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)"></label>
+    <div class="tbl"><table><thead><tr><th>x</th><th>x % 2 == 0?</th><th>x ** 2</th></tr></thead><tbody id="cmpRows"></tbody></table></div>
+    <div class="stat"><div class="v mono" id="cmpOut" style="font-family:var(--f-mono)"></div><div class="k">результат</div></div>
+  </div>
+<pre><span class="cm"># словарь и множество — так же</span>
+lengths = {name: len(name) for name in ["Аня", "Боря"]}   <span class="cm"># {'Аня': 3, 'Боря': 4}</span>
+courses = {c for _, c in visits}                        <span class="cm"># уникальные курсы</span>
+<span class="cm"># без квадратных скобок — генератор: не строит список в памяти</span>
+total = sum(x ** 2 for x in nums)</pre>
+  <div class="callout trap"><b class="h">Когда не надо</b><p>Если внутри comprehension два вложенных for, три условия и вызов с побочным эффектом (print, запись в файл) — пиши обычный цикл. Comprehension нужен для коротких понятных преобразований.</p></div>
+
+  <h3 style="font-size:17px">Где ставить if</h3>
+<pre>[x for x in nums if x &gt; 0]              <span class="cm"># фильтр: if в КОНЦЕ, else нельзя</span>
+[x if x &gt; 0 else 0 for x in nums]       <span class="cm"># замена: тернарник В НАЧАЛЕ, else обязателен</span></pre>
+  <div class="prose"><p>Это два разных if. Первый решает, попадёт ли элемент в результат. Второй — во что превратится каждый элемент. Путают постоянно.</p></div>
+
+  <h3 style="font-size:17px">Вложенные циклы</h3>
+<pre>matrix = [[1, 2], [3, 4], [5, 6]]
+flat = [x for row in matrix for x in row]      <span class="cm"># [1, 2, 3, 4, 5, 6]</span>
+<span class="cm"># порядок for — как в обычных вложенных циклах, сверху вниз:
+# for row in matrix:
+#     for x in row:</span>
+pairs = [(a, b) for a in "xy" for b in [1, 2]]  <span class="cm"># [('x',1), ('x',2), ('y',1), ('y',2)]</span>
+transposed = [[row[i] for row in matrix] for i in range(2)]  <span class="cm"># comprehension внутри comprehension</span></pre>
+
+  <h3 style="font-size:17px">Генераторы: ленивые comprehension</h3>
+  <div class="prose">
+    <ul>
+      <li><code>[...]</code> строит весь список сразу в памяти. <code>(...)</code> — <b>генераторное выражение</b>: выдаёт элементы по одному, когда их просят. Память O(1) вместо O(n).</li>
+      <li>Если генератор — единственный аргумент функции, скобки можно не дублировать: <code>sum(x ** 2 for x in nums)</code>, <code>max(len(w) for w in words)</code>.</li>
+      <li>Генератор <b>одноразовый</b>: прошёл его один раз — он пуст. Нужен дважды — сделай список.</li>
+      <li>Функция с <code>yield</code> вместо <code>return</code> — генераторная функция. Так читают огромные файлы по кусочкам и пишут батчи для обучения. Подробно — в теме генераторов позже в плане.</li>
+    </ul>
+    <p><b>Скорость:</b> comprehension быстрее цикла с <code>append</code> примерно в 1.5–2 раза: меньше вызовов методов в интерпретаторе. Но для чисел numpy всё равно быстрее в десятки раз (урок 1). <code>map</code> и <code>filter</code> делают то же, что comprehension, но в Python-коде их пишут реже: comprehension читается проще.</p>
+  </div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем list comprehension отличается от генераторного выражения?</summary>
+      <div class="a"><p>List comprehension сразу создаёт весь список в памяти, его можно обходить сколько угодно раз и брать по индексу. Генераторное выражение ленивое: вычисляет элементы по одному при обходе, занимает O(1) памяти, но проходится один раз и не поддерживает индексацию. Для больших данных и для передачи в <code>sum</code>, <code>any</code>, <code>max</code> берут генератор.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Напиши словарь «слово → длина» только для слов длиннее 3 букв.</summary>
+      <div class="a"><p><code>{w: len(w) for w in words if len(w) &gt; 3}</code></p></div></details>
+  </div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="topic" id="p9">
+  <div class="eyebrow">Тема 10 из 11 · Python</div>
+  <h2>Распаковка, zip, enumerate</h2>
+  <p class="tldr">Три приёма, которые убирают из кода индексы <code>range(len(...))</code>. На собеседовании код с ними выглядит заметно увереннее.</p>
+<pre>a, b = b, a                              <span class="cm"># обмен без временной переменной</span>
+first, *rest = [10, 20, 30]              <span class="cm"># first=10, rest=[20, 30]</span>
+X_train, X_test, y_train, y_test = train_test_split(X, y)  <span class="cm"># распаковка кортежа</span>
+
+for i, row in enumerate(rows, start=1):  <span class="cm"># номер и элемент сразу</span>
+    print(i, row)
+
+names = ["attendance", "gpa", "labs"]
+imps  = [0.21, 0.20, 0.24]
+for name, imp in zip(names, imps):       <span class="cm"># идём по двум спискам параллельно</span>
+    print(f"{name}: {imp:.0%}")
+ranking = dict(zip(names, imps))         <span class="cm"># два списка → словарь</span>
+top = sorted(zip(imps, names), reverse=True)[:2]  <span class="cm"># топ-2 признака</span></pre>
+  <p class="muted" style="font-size:13.5px">zip останавливается на самом коротком списке и молча теряет хвост. Если длины обязаны совпадать — <code>zip(a, b, strict=True)</code>, тогда будет ошибка.</p>
+
+  <h3 style="font-size:17px">Ещё приёмы распаковки</h3>
+<pre>for i, (name, imp) in enumerate(zip(names, imps)):  <span class="cm"># вложенная распаковка</span>
+    ...
+_, counts = np.unique(y, return_counts=True)   <span class="cm"># _ — «это значение мне не нужно»</span>
+head, *_, tail = [1, 2, 3, 4]                   <span class="cm"># первый и последний</span>
+merged = [*train_ids, *val_ids]                 <span class="cm"># склеить списки</span>
+config = {**defaults, **user_params}            <span class="cm"># слить словари, правый побеждает</span>
+names, imps = zip(*pairs)                       <span class="cm"># «разzip-овать» список пар обратно в два</span>
+list(zip(*matrix))                              <span class="cm"># транспонировать матрицу</span>
+from itertools import zip_longest
+list(zip_longest([1, 2, 3], ["a"], fillvalue=None))  <span class="cm"># не теряет хвост</span></pre>
+  <div class="prose"><ul>
+    <li>Количество имён слева должно совпадать с длиной справа, иначе <code>ValueError: too many values to unpack</code>. Звёздочка забирает «всё остальное» и делает это гибким.</li>
+    <li><b>zip и enumerate ленивые</b>, как генераторы: <code>zip(a, b)</code> — не список. Чтобы посмотреть содержимое, оберни в <code>list(...)</code>.</li>
+    <li>Всё это работает с любыми итерируемыми объектами: строками, файлами, генераторами, словарями (по ключам).</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как пройти по списку с индексом? А по двум спискам одновременно?</summary>
+      <div class="a"><p><code>for i, x in enumerate(a)</code> вместо <code>for i in range(len(a))</code>. По двум — <code>for x, y in zip(a, b)</code>; если длины должны совпадать — <code>strict=True</code>, если нет — <code>itertools.zip_longest</code>.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="topic" id="p10">
+  <div class="eyebrow">Тема 11 из 11 · <span class="dia">◆</span> Python</div>
+  <h2>collections: Counter, defaultdict, deque</h2>
+  <p class="tldr">Три готовых инструмента из стандартной библиотеки, которые заменяют десяток строк ручного кода. Counter считает, defaultdict группирует, deque — быстрая очередь с двух концов.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · живой Counter и defaultdict</span></div>
+    <label for="ctIn" class="ctrl"><span>Слова через пробел</span><textarea id="ctIn" rows="2" style="font:15px var(--f-mono);padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%">модель данные модель метрика данные модель признак валидация метрика модель</textarea></label>
+    <div class="lab-grid" style="align-items:start">
+      <div><p class="mono" style="font-size:13px;color:var(--plum)">Counter(words).most_common(3)</p><div class="bars" id="ctBars"></div></div>
+      <div><p class="mono" style="font-size:13px;color:var(--teal)">by_letter = defaultdict(list)</p><pre id="ddOut" style="font-size:12.5px"></pre></div>
+    </div>
+  </div>
+<pre>from collections import Counter, defaultdict, deque
+
+Counter(y_train)                   <span class="cm"># Counter({0: 828, 1: 72}) — баланс классов одной строкой</span>
+Counter(words).most_common(3)      <span class="cm"># три самых частых</span>
+
+groups = defaultdict(list)         <span class="cm"># нет ключа — создастся пустой список сам</span>
+for student, course in visits:
+    groups[course].append(student)
+
+q = deque()                        <span class="cm"># очередь</span>
+q.append(x); q.popleft()           <span class="cm"># O(1) с обоих концов; у list pop(0) — O(n)</span>
+last5 = deque(maxlen=5)            <span class="cm"># хранит только последние 5, например последние лоссы</span></pre>
+
+  <h3 style="font-size:17px">Counter: всё, что умеет</h3>
+<pre>c = Counter("abracadabra")         <span class="cm"># считает что угодно итерируемое</span>
+c["a"]                             <span class="cm"># 5</span>
+c["z"]                             <span class="cm"># 0 — нет ключа, но и нет KeyError</span>
+c.update(["a", "z"])               <span class="cm"># досчитать новые</span>
+c.total()                          <span class="cm"># сумма всех счётчиков (Python 3.10+)</span>
+Counter("listen") == Counter("silent")   <span class="cm"># True — анаграммы (урок 3)</span>
+c1 + c2; c1 - c2                   <span class="cm"># сложить и вычесть счётчики; минус отбрасывает ≤ 0</span>
+c1 &amp; c2                            <span class="cm"># минимум по каждому ключу: «общие элементы с повторами»</span></pre>
+  <div class="prose"><p>Counter — это подкласс dict, у него есть все методы словаря. В pandas аналог — <code>df.col.value_counts()</code>, в numpy — <code>np.unique(a, return_counts=True)</code>.</p></div>
+
+  <h3 style="font-size:17px">defaultdict: какую фабрику передать</h3>
+<pre>defaultdict(int)     <span class="cm"># счётчик: d[k] += 1</span>
+defaultdict(list)    <span class="cm"># группировка: d[k].append(x)</span>
+defaultdict(set)     <span class="cm"># уникальные значения на ключ: d[k].add(x)</span>
+defaultdict(lambda: defaultdict(int))   <span class="cm"># вложенный: d[курс][студент] += 1</span></pre>
+  <div class="prose"><ul>
+    <li>Передаётся <b>функция-фабрика</b>, а не значение: <code>defaultdict(list)</code>, не <code>defaultdict([])</code>.</li>
+    <li>Ключ создаётся <b>даже при чтении</b>: <code>if d["x"]:</code> добавит в словарь ключ "x". Проверять наличие — только <code>"x" in d</code>.</li>
+    <li>Обычный dict делает то же через <code>d.get(k, 0) + 1</code> или <code>d.setdefault(k, [])</code>, но длиннее.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">deque: где пригодится</h3>
+  <div class="prose"><ul>
+    <li><code>append</code>, <code>appendleft</code>, <code>pop</code>, <code>popleft</code> — все O(1). <code>rotate(k)</code> — прокрутить по кругу.</li>
+    <li><b>Очередь</b> (первым пришёл — первым ушёл): <code>append</code> + <code>popleft</code>. На ней пишут поиск в ширину (BFS) по графу — частая задача на собесе.</li>
+    <li><b>Стек</b> (последним пришёл — первым ушёл): обычный list с <code>append</code> + <code>pop</code> справляется сам.</li>
+    <li><b>Скользящее окно</b>: <code>deque(maxlen=k)</code> сама выбрасывает старые элементы. Скользящее среднее лосса, последние k событий.</li>
+    <li>Доступ к середине <code>dq[i]</code> — O(n). Если он нужен часто — это задача не для deque.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем defaultdict отличается от dict.get и setdefault?</summary>
+      <div class="a"><p>defaultdict при обращении к отсутствующему ключу вызывает фабрику и сохраняет результат в словарь. <code>get</code> только возвращает значение по умолчанию и ничего не сохраняет. <code>setdefault</code> сохраняет, но значение по умолчанию создаётся при каждом вызове, даже если ключ уже есть. defaultdict короче и быстрее для подсчётов и группировок.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Как одной строкой найти три самых частых класса в <code>y</code>?</summary>
+      <div class="a"><p><code>Counter(y).most_common(3)</code></p></div></details>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · как на собеседовании и в работе</div>
+  <h2>Практика</h2>
+  <p class="tldr">«Что выведет этот код?» — самый частый формат Python-секции. Сначала ответь сам, вслух объясни почему, потом открывай. Ошибся — вернись в лабораторию памяти.</p>
+  <div class="prac">
+    <div class="task"><span class="tg int">Собес · что выведет · 7 задач</span>
+      <h3>Ответь на каждую за 30 секунд</h3>
+      <div class="qs">
+        <details class="q"><summary><span class="t">1</span><code>def f(x, acc=[]): acc.append(x); return acc</code> → <code>print(f(1), f(2))</code></summary><div class="a"><p><code>[1, 2] [1, 2]</code>. Оба вызова вернули один и тот же список по умолчанию, а print вывел его дважды уже после обоих вызовов.</p></div></details>
+        <details class="q"><summary><span class="t">2</span><code>grid = [[0] * 3] * 3; grid[0][0] = 1; print(grid)</code></summary><div class="a"><p><code>[[1, 0, 0], [1, 0, 0], [1, 0, 0]]</code>. <code>* 3</code> скопировал три ярлыка на один и тот же внутренний список. Правильно: <code>[[0] * 3 for _ in range(3)]</code>.</p></div></details>
+        <details class="q"><summary><span class="t">3</span><code>t = (1, [2, 3]); t[1].append(4); print(t)</code></summary><div class="a"><p><code>(1, [2, 3, 4])</code>. Кортеж нельзя изменить, но список внутри — можно. Бонус: <code>t[1] += [5]</code> упадёт с TypeError, но список всё равно станет <code>[2, 3, 4, 5]</code>: сначала список расширяется на месте, потом не получается присвоить элемент кортежа.</p></div></details>
+        <details class="q"><summary><span class="t">4</span><code>print([] == [], [] is [])</code></summary><div class="a"><p><code>True False</code>. Значения равны, но объекты разные.</p></div></details>
+        <details class="q"><summary><span class="t">5</span><code>for i in range(3):<br>&nbsp;&nbsp;if i == 5: break<br>else: print("не нашли")</code></summary><div class="a"><p>Выведет «не нашли»: цикл дошёл до конца без break.</p></div></details>
+        <details class="q"><summary><span class="t">6</span><code>x = 10<br>def f(): print(x); x = 5<br>f()</code></summary><div class="a"><p><code>UnboundLocalError</code>. Из-за <code>x = 5</code> имя x локальное во всей функции, а в момент print ему ещё ничего не присвоено.</p></div></details>
+        <details class="q"><summary><span class="t">7</span><code>d = {[1, 2]: "a"}</code></summary><div class="a"><p><code>TypeError: unhashable type: 'list'</code>. Ключ должен быть хешируемым, список изменяем. Нужен <code>(1, 2)</code>.</p></div></details>
+      </div>
+    </div>
+
+    <div class="task"><span class="tg rev">Код-ревью</span>
+      <h3>Найди минимум пять проблем и перепиши функцию</h3>
+<pre>def load_scores(path, cache={}):
+    if path in cache:
+        return cache[path]
+    rows = open(path).read().split("\n")
+    scores = []
+    for i in range(len(rows)):
+        if rows[i] != "":
+            scores.append(float(rows[i].split(",")[1]))
+    if scores == None or len(scores) == 0:
+        print("пусто")
+    cache[path] = scores
+    return scores</pre>
+      <p class="ok">Готово, когда назвал проблемы и написал исправленную версию.</p>
+      <details><summary>Ответ</summary><div class="a"><ul style="margin:0;padding-left:20px;display:grid;gap:6px">
+        <li><b>Изменяемый кеш по умолчанию.</b> Он общий для всех вызовов и спрятан в сигнатуре. Хуже того, функция отдаёт тот же список, что лежит в кеше: вызывающий его изменит — испортит кеш. Лучше <code>functools.lru_cache</code> или явный кеш, а наружу отдавать копию.</li>
+        <li><b>Файл не закрывается.</b> Нужен <code>with open(path, encoding="utf-8") as f</code>.</li>
+        <li><b><code>range(len(rows))</code></b> вместо прямого прохода <code>for line in f</code>.</li>
+        <li><b><code>scores == None</code></b> → сравнивать с None через <code>is</code>. К тому же scores никогда не None, проверка мертва. Достаточно <code>if not scores</code>.</li>
+        <li><b>Заголовок CSV упадёт на float()</b>, а ручной split ломается на кавычках. Нужен модуль <code>csv</code> или pandas.</li>
+        <li><b>print вместо ошибки или logging.</b> Пустой файл, скорее всего, ошибка: лучше <code>raise ValueError</code>.</li></ul>
+<pre>import csv
+from functools import lru_cache
+
+@lru_cache(maxsize=32)
+def load_scores(path: str) -> tuple[float, ...]:
+    with open(path, encoding="utf-8") as f:
+        scores = tuple(float(row["score"]) for row in csv.DictReader(f))
+    if not scores:
+        raise ValueError(f"В {path} нет оценок")
+    return scores   <span class="cm"># tuple нельзя испортить снаружи</span></pre></div></details></div>
+
+    <div class="task"><span class="tg work">Работа · 20 минут</span>
+      <h3>Аналитика посещений без pandas</h3>
+<pre>visits = [("Аня","Python"),("Боря","SQL"),("Аня","SQL"),("Вика","Python"),
+          ("Аня","Python"),("Боря","Python"),("Вика","ML"),("Аня","ML"),
+          ("Гоша","SQL"),("Вика","SQL"),("Боря","ML"),("Вика","Python")]</pre>
+      <p>Только стандартная библиотека. Посчитай: 1) сколько посещений у каждого, по убыванию; 2) какие курсы посещал каждый; 3) кто был на всех курсах; 4) самый популярный курс. Каждый пункт — одна-две строки.</p>
+      <p class="ok">Готово, когда ответы совпали и нет ни одного <code>range(len(...))</code>.</p>
+      <details><summary>Ожидаемый результат и решение</summary><div class="a">
+<pre>from collections import Counter, defaultdict
+Counter(s for s, _ in visits).most_common()
+<span class="cm"># [('Аня', 4), ('Вика', 4), ('Боря', 3), ('Гоша', 1)]</span>
+by_student = defaultdict(set)
+for s, c in visits: by_student[s].add(c)
+<span class="cm"># Аня: ML, Python, SQL · Боря: ML, Python, SQL · Вика: ML, Python, SQL · Гоша: SQL</span>
+all_courses = {c for _, c in visits}
+[s for s, cs in by_student.items() if cs == all_courses]   <span class="cm"># ['Аня', 'Боря', 'Вика']</span>
+Counter(c for _, c in visits).most_common(1)               <span class="cm"># [('Python', 5)]</span></pre>
+        <p>Через неделю это же будет одна строка pandas: <code>df.groupby("student").size()</code>. Но собеседование по Python часто запрещает pandas, а логику группировки нужно понимать.</p></div></details></div>
+
+    <div class="task"><span class="tg lc">LeetCode · easy</span>
+      <h3>169. Majority Element и 14. Longest Common Prefix</h3>
+      <p><a href="https://leetcode.com/problems/majority-element/" target="_blank" rel="noopener">169. Majority Element</a> — реши через Counter, потом скажи сложность по времени и памяти. <a href="https://leetcode.com/problems/longest-common-prefix/" target="_blank" rel="noopener">14. Longest Common Prefix</a> — подсказка: <code>zip(*strs)</code> идёт по строкам столбцами.</p>
+      <p class="ok">Готово, когда оба решения приняты и ты проговорил сложность вслух.</p>
+      <details><summary>Разбор</summary><div class="a">
+<pre>def majorityElement(nums):
+    return Counter(nums).most_common(1)[0][0]       <span class="cm"># O(n) время, O(n) память</span>
+
+def longestCommonPrefix(strs):
+    prefix = []
+    for chars in zip(*strs):          <span class="cm"># ('f','f','f'), ('l','l','l'), ...</span>
+        if len(set(chars)) != 1:
+            break
+        prefix.append(chars[0])
+    return "".join(prefix)            <span class="cm"># O(суммарной длины строк)</span></pre>
+        <p>Для 169 интервьюер может спросить решение за O(1) памяти. Это алгоритм голосования Бойера–Мура, его разберём позже.</p></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 2 минуты</span>
+      <h3>«Что такое *args и **kwargs и где вы их использовали?»</h3>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>*args собирает лишние позиционные аргументы в кортеж, **kwargs — лишние именованные в словарь. При вызове звёздочки распаковывают коллекцию в аргументы. Пример из ML: гиперпараметры хранятся в словаре и передаются в модель как <code>Model(**params)</code>. Так же устроены обёртки и декораторы, которые пробрасывают аргументы дальше: <code>def wrapper(*args, **kwargs): return f(*args, **kwargs)</code>.</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в дереве</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда без подсказок ответил на вопросы по теме. Галочки — те же, что в файле недели в Obsidian и на сайте дерева.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Переменная — ярлык на объекте.</b> <code>b = a</code> не копирует. Методы на месте меняют объект для всех ярлыков.</li>
+      <li><b>Изменяемые:</b> list, dict, set. <b>Неизменяемые:</b> числа, str, tuple, None. Ключи dict — только неизменяемые.</li>
+      <li><b>is</b> — тот же объект, <b>==</b> — равные значения. <code>is</code> — только с None.</li>
+      <li><b>Ложные значения:</b> False, None, 0, "", пустые коллекции.</li>
+      <li><b>for … else:</b> else срабатывает, если не было break.</li>
+      <li><b>Значение по умолчанию создаётся один раз</b> — только None, никаких [] и {}.</li>
+      <li><b>*args</b> → кортеж, <b>**kwargs</b> → словарь. <code>Model(**params)</code>.</li>
+      <li><b>LEGB:</b> Local → Enclosing → Global → Built-in. Присваивание делает имя локальным.</li>
+      <li><b>Срез</b> <code>[start:stop:step]</code>, stop не включается. f-строки: <code>{p:.3f}</code>, <code>{p:.1%}</code>, <code>{p=}</code>.</li>
+      <li><b>Comprehension:</b> <code>[преобразование for x in коллекция if условие]</code>.</li>
+      <li><b>enumerate, zip, распаковка</b> вместо <code>range(len())</code>. <b>Counter</b> считает, <b>defaultdict</b> группирует, <b>deque</b> — очередь.</li>
+      <li><b>Числа:</b> <code>0.1 + 0.2 != 0.3</code> → <code>math.isclose</code>; <code>-7 // 2 = -4</code>; <code>round(2.5) = 2</code>; <code>nan != nan</code>; bool — это int.</li>
+      <li><b>Аргументы</b> передаются ярлыком на объект: изменить объект можно, перевесить чужой ярлык — нет. <b>copy</b> — внешний уровень, <b>deepcopy</b> — всё.</li>
+      <li><b>and/or</b> возвращают операнд; <code>if df:</code> у pandas — ошибка, пиши <code>df.empty</code>, <code>arr.any()</code>.</li>
+      <li><b>Замыкание</b> помнит переменную, а не значение: <code>lambda i=i: i</code> в цикле. Для записи — <code>nonlocal</code>.</li>
+      <li><b>Фильтр</b> — if в конце comprehension, <b>замена</b> — тернарник в начале. Генератор <code>( )</code> ленивый и одноразовый.</li>
+      <li><code>a.sort()</code> возвращает None; <code>sorted(a, key=..., reverse=True)</code> — новый список, сортировка стабильная.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без ИИ, 15 минут</b>
+    <p>Закрой урок. Нарисуй на бумаге ярлыки и объекты для сценария «copy и deepcopy». Ответь вслух на 7 задач «что выведет» вразнобой. Напиши из головы решение задачи про посещения. Где запнулся — туда и возвращаешься.</p>
+  </div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- memory visualizer ---------- */
+const SC=[
+ {code:["a = [1, 2]","b = a","b.append(3)","b = b + [4]"],steps:[
+  {ln:0,names:{a:"o1"},objs:{o1:["list","[1, 2]"]},note:"Создан список, на него приклеен ярлык a."},
+  {ln:1,names:{a:"o1",b:"o1"},objs:{o1:["list","[1, 2]"]},note:"b = a — второй ярлык на тот же объект. Копии нет."},
+  {ln:2,names:{a:"o1",b:"o1"},objs:{o1:["list","[1, 2, 3]"]},chg:"o1",note:"append меняет объект на месте. a тоже видит 3: это один и тот же список."},
+  {ln:3,names:{a:"o1",b:"o2"},objs:{o1:["list","[1, 2, 3]"],o2:["list","[1, 2, 3, 4]"]},chg:"o2",note:"Оператор + создаёт новый список, и ярлык b переклеивается на него. a остаётся на старом."}]},
+ {code:["x = 5","y = x","y += 1"],steps:[
+  {ln:0,names:{x:"i5"},objs:{i5:["int","5"]},note:"Объект 5, ярлык x."},
+  {ln:1,names:{x:"i5",y:"i5"},objs:{i5:["int","5"]},note:"y = x — тот же объект, как со списком."},
+  {ln:2,names:{x:"i5",y:"i6"},objs:{i5:["int","5"],i6:["int","6"]},chg:"i6",note:"Число нельзя изменить. += создал новый объект 6 и переклеил y. x по-прежнему 5, поэтому с числами ловушек нет."}]},
+ {code:["def add(item, box=[]):","    box.append(item)","    return box","","r1 = add('кот')","r2 = add('пёс')"],steps:[
+  {ln:0,names:{"box (default)":"d"},objs:{d:["list","[]"]},note:"Пустой список создаётся один раз, в момент выполнения строки def. Он хранится внутри функции."},
+  {ln:4,names:{"box (default)":"d",r1:"d"},objs:{d:["list","['кот']"]},chg:"d",note:"Первый вызов дописал 'кот' в этот самый список и вернул его."},
+  {ln:5,names:{"box (default)":"d",r1:"d",r2:"d"},objs:{d:["list","['кот', 'пёс']"]},chg:"d",note:"Второй вызов дописал в тот же список. r1 и r2 — один объект, и r1 «сам» изменился. Лечится box=None."}]},
+ {code:["import copy","a = [[1, 2], [3]]","b = copy.copy(a)","b[0].append(99)","c = copy.deepcopy(a)"],steps:[
+  {ln:1,names:{a:"#1"},objs:{"#1":["list","[#2, #3]"],"#2":["list","[1, 2]"],"#3":["list","[3]"]},note:"Внешний список хранит не числа, а ярлыки на два внутренних списка #2 и #3."},
+  {ln:2,names:{a:"#1",b:"#4"},objs:{"#1":["list","[#2, #3]"],"#4":["list","[#2, #3]"],"#2":["list","[1, 2]"],"#3":["list","[3]"]},chg:"#4",note:"copy копирует только внешний список. Внутри копии — ярлыки на те же #2 и #3."},
+  {ln:3,names:{a:"#1",b:"#4"},objs:{"#1":["list","[#2, #3]"],"#4":["list","[#2, #3]"],"#2":["list","[1, 2, 99]"],"#3":["list","[3]"]},chg:"#2",note:"Меняем внутренний список через b, и a тоже видит 99. Поверхностная копия делит внутренности."},
+  {ln:4,names:{a:"#1",b:"#4",c:"#5"},objs:{"#1":["list","[#2, #3]"],"#4":["list","[#2, #3]"],"#2":["list","[1, 2, 99]"],"#3":["list","[3]"],"#5":["list","[#6, #7]"],"#6":["list","[1, 2, 99]"],"#7":["list","[3]"]},chg:"#5",note:"deepcopy копирует всё рекурсивно, включая внутренние списки. c полностью независим от a."}]}
+];
+let sc=0,st=0;
+function drawMem(){
+  const S=SC[sc],P=S.steps[st];
+  $("memCode").innerHTML=S.code.map((l,i)=>i===P.ln?`<span class="hl">${esc(l)||" "}   ◀</span>`:i<P.ln||S.steps.slice(0,st).some(x=>x.ln===i)?esc(l):`<span class="cm">${esc(l)}</span>`).join("\n");
+  const names=Object.keys(P.names),objs=Object.keys(P.objs),rowN=Math.max(34,Math.min(48,240/Math.max(names.length,1))),rowO=Math.min(48,250/objs.length);
+  const ny=i=>12+i*rowN, oy=i=>6+i*rowO, oh=Math.min(30,rowO-6);
+  let s=`<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="var(--muted)"/></marker></defs>`;
+  s+=`<text class="lbl" x="6" y="9" style="font-size:10px">имена</text><text class="lbl" x="196" y="9" style="font-size:10px">объекты</text>`;
+  names.forEach((n,i)=>{const oi=objs.indexOf(P.names[n]),y1=ny(i)+15,y2=oy(oi)+oh/2+6;
+    s+=`<path d="M128,${y1} C160,${y1} 162,${y2} 194,${y2}" fill="none" stroke="var(--muted)" stroke-width="1.6" marker-end="url(#arr)"/>`;
+    s+=`<rect x="6" y="${ny(i)+2}" width="122" height="26" rx="13" fill="var(--soft)" stroke="var(--accent)"/><text x="67" y="${ny(i)+19}" text-anchor="middle" style="font:500 12.5px var(--f-mono);fill:var(--ink)">${esc(n)}</text>`});
+  objs.forEach((k,i)=>{const [t,v]=P.objs[k],ch=P.chg===k,y=oy(i)+6;
+    s+=`<rect x="196" y="${y}" width="178" height="${oh}" rx="7" fill="${ch?"var(--accent-soft)":"var(--surface)"}" stroke="${ch?"var(--accent)":"var(--line)"}" stroke-width="${ch?2:1}"/>`;
+    s+=`<text x="204" y="${y+oh/2+4}" style="font:11px var(--f-mono);fill:var(--muted)">${k.startsWith("#")?k+" ":""}${t}</text><text x="366" y="${y+oh/2+4.5}" text-anchor="end" style="font:500 12.5px var(--f-mono);fill:var(--ink)">${esc(v)}</text>`});
+  $("memSvg").innerHTML=s;
+  $("memNote").textContent=P.note;$("memStep").textContent=`шаг ${st+1} из ${S.steps.length}`;
+  $("memPrev").disabled=st===0;$("memNext").disabled=st===S.steps.length-1;
+}
+document.querySelectorAll(".sc").forEach(b=>b.onclick=()=>{sc=+b.dataset.s;st=0;document.querySelectorAll(".sc").forEach(x=>x.setAttribute("aria-pressed",x===b));drawMem()});
+$("memPrev").onclick=()=>{if(st>0){st--;drawMem()}};
+$("memNext").onclick=()=>{if(st<SC[sc].steps.length-1){st++;drawMem()}};
+drawMem();
+
+/* ---------- LEGB ---------- */
+const FOUND={z:"L",y:"E",x:"G",len:"B",w:null};
+const ORDER=["L","E","G","B"];
+document.querySelectorAll(".nm").forEach(b=>b.onclick=()=>{
+  const n=b.dataset.n,f=FOUND[n];document.querySelectorAll(".nm").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  const stop=f?ORDER.indexOf(f):3;
+  document.querySelectorAll("#legb .lv").forEach(el=>{const i=ORDER.indexOf(el.dataset.l);el.classList.toggle("hit",f&&el.dataset.l===f);el.classList.toggle("miss",i<stop||(!f&&i<=stop))});
+  const nm={L:"Local",E:"Enclosing",G:"Global",B:"Built-in"};
+  $("legbMsg").textContent=f?`Ищем ${n}: ${ORDER.slice(0,stop+1).map(x=>nm[x]).join(" → ")}. Найдено в ${nm[f]}, дальше Python не смотрит.`:`Ищем w: Local → Enclosing → Global → Built-in. Нигде нет — NameError: name 'w' is not defined.`;
+});
+
+/* ---------- slices ---------- */
+const S6="МАШИННОЕ",SL=S6.length;
+function pyslice(L,a,b,c){
+  const out=[];
+  if(c>0){const s=a==null?0:a<0?Math.max(0,a+L):Math.min(a,L),e=b==null?L:b<0?Math.max(0,b+L):Math.min(b,L);for(let i=s;i<e;i+=c)out.push(i)}
+  else{const s=a==null?L-1:a<0?Math.max(-1,a+L):Math.min(a,L-1),e=b==null?-1:b<0?Math.max(-1,b+L):Math.min(b,L-1);for(let i=s;i>e;i+=c)out.push(i)}
+  return out;
+}
+function drawSlice(){
+  const a=$("slAn").checked?null:+$("slA").value,b=$("slBn").checked?null:+$("slB").value,c=+$("slC").value;
+  $("slAv").textContent=a==null?"—":a;$("slBv").textContent=b==null?"—":b;$("slCv").textContent=c;
+  $("slA").disabled=a==null;$("slB").disabled=b==null;
+  $("slCode").textContent=`s[${a??""}:${b??""}${c===1?"":":"+c}]`;
+  if(c===0){$("slRes").textContent="ValueError: шаг не может быть 0";$("slCells").innerHTML=cellsHTML([]);return}
+  const idx=pyslice(SL,a,b,c);
+  $("slCells").innerHTML=cellsHTML(idx);
+  $("slRes").textContent=`'${idx.map(i=>S6[i]).join("")}'`;
+}
+function cellsHTML(idx){
+  return [...S6].map((ch,i)=>{const k=idx.indexOf(i);return `<div class="sc-cell ${k>=0?"pick":""}"><span class="ip">${i}</span><span class="ch">${ch}</span><span class="in">${i-SL}</span>${k>=0?`<span class="ord">${k+1}</span>`:""}</div>`}).join("");
+}
+["slA","slB","slC","slAn","slBn"].forEach(id=>$(id).addEventListener("input",drawSlice));
+document.querySelectorAll(".slp").forEach(b=>b.onclick=()=>{const [a,bb,c]=b.dataset.p.split(",");
+  $("slAn").checked=a==="n";if(a!=="n")$("slA").value=a;$("slBn").checked=bb==="n";if(bb!=="n")$("slB").value=bb;$("slC").value=c;drawSlice()});
+drawSlice();
+
+/* ---------- comprehension ---------- */
+function drawCmp(){
+  const nums=$("cmpIn").value.split(/[,\s]+/).filter(Boolean).map(Number).filter(v=>Number.isFinite(v)&&Number.isInteger(v)).slice(0,12);
+  $("cmpRows").innerHTML=nums.map(x=>{const ok=x%2===0;return `<tr style="${ok?"":"opacity:.45"}"><td class="n">${x}</td><td>${ok?"да, проходит":"нет, отброшен"}</td><td class="n">${ok?x*x:"—"}</td></tr>`}).join("")||`<tr><td colspan="3">Введи целые числа через запятую</td></tr>`;
+  $("cmpOut").textContent="["+nums.filter(x=>x%2===0).map(x=>x*x).join(", ")+"]";
+}
+$("cmpIn").addEventListener("input",drawCmp);drawCmp();
+
+/* ---------- Counter / defaultdict ---------- */
+function drawCt(){
+  const words=$("ctIn").value.toLowerCase().split(/\s+/).filter(Boolean),cnt=new Map();
+  words.forEach(w=>cnt.set(w,(cnt.get(w)||0)+1));
+  const top=[...cnt].sort((a,b)=>b[1]-a[1]).slice(0,3),mx=top.length?top[0][1]:1;
+  $("ctBars").innerHTML=top.map(([w,c])=>`<div class="brow" style="grid-template-columns:96px minmax(0,1fr) 30px"><b>${esc(w)}</b><div class="track"><i style="width:${c/mx*100}%;background:var(--plum)"></i></div><span class="tm">${c}</span></div>`).join("")||`<p class="muted">Введи слова</p>`;
+  const g=new Map();words.forEach(w=>{const k=w[0];if(!g.has(k))g.set(k,[]);g.get(k).push(w)});
+  $("ddOut").textContent="for w in words:\n    by_letter[w[0]].append(w)\n\n"+[...g].map(([k,v])=>`'${k}': ${JSON.stringify(v).replace(/"/g,"'")}`).join("\n");
+}
+$("ctIn").addEventListener("input",drawCt);drawCt();
+
+/* ---------- local site: nav + topic ticks ---------- */
+const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const TOPICS=[["python.base.0","Типы данных"],["python.base.1","Изменяемые и неизменяемые объекты"],["python.base.6","is и ==, истинность объектов"],["python.base.2","Условия и циклы, else у цикла"],["python.base.3","Функции: аргументы по умолчанию, *args, **kwargs"],["python.base.4","Область видимости"],["python.base.5","Строки, срезы, f-strings"],["python.coll.0","list, tuple, dict, set и сложность операций"],["python.coll.1","Comprehensions"],["python.coll.2","Распаковка, zip, enumerate"],["python.coll.4","collections"]];
+function initTopics(){
+  if(LOCAL)$("topnav").hidden=false;
+  const box=$("topicList"),note=$("topicNote");
+  box.innerHTML=TOPICS.map(([id,t])=>`<li><label class="tp"><input type="checkbox" id="tp-${id}" data-id="${id}" ${LOCAL?"":"disabled"}><span class="bx" aria-hidden="true"></span><span>${t}</span></label></li>`).join("");
+  if(!LOCAL){note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";return}
+  const apply=d=>TOPICS.forEach(([id])=>{$("tp-"+id).checked=!!d[id]});
+  const day=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+  fetch("/api/tree").then(r=>r.json()).then(j=>apply(j.done||{})).catch(()=>{note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
+  box.addEventListener("change",async e=>{
+    const id=e.target.dataset.id;if(!id)return;
+    const body=e.target.checked?{set:{[id]:day()}}:{unset:[id]};
+    try{const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      if(!r.ok)throw 0;const j=await r.json();apply(j.done||{});note.textContent="Сохранено в файле недели в Obsidian";}
+    catch(err){e.target.checked=!e.target.checked;note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево»."}
+  });
+}
+initTopics();
+
+/* ---------- copy to Obsidian ---------- */
+const MD=`---
+type: конспект
+tags: [ml, неделя-1, python]
+---
+# Python изнутри: урок 2
+
+## Имена и объекты
+- Переменная — ярлык на объекте. b = a не копирует: оба ярлыка на одном объекте.
+- Изменяемые: list, dict, set. Неизменяемые: int, float, str, tuple, None.
+- Методы (append, sort, update) меняют объект на месте; +, срезы, sorted() создают новый.
+- copy — копия только внешнего уровня, deepcopy — всего. df2 = df не копирует таблицу: нужен df.copy().
+
+## is и ==, истинность
+- == равенство значений, is тот же объект. is — только для None.
+- Ложные: False, None, 0, "", пустые коллекции. Для чисел пиши is not None.
+
+## Циклы
+- for … else: else выполняется, если не было break.
+
+## Функции
+- Значение по умолчанию создаётся один раз при def → только None, не [] и {}.
+- *args → кортеж, **kwargs → словарь; Model(**params).
+
+## LEGB
+- Local → Enclosing → Global → Built-in. Присваивание внутри функции делает имя локальным (UnboundLocalError).
+
+## Строки и срезы
+- s[start:stop:step], stop не включается, отрицательные индексы с конца, s[::-1] — разворот.
+- f"{p:.3f}", f"{p:.1%}", f"{p=}".
+
+## Коллекции
+- list — порядок и индекс; tuple — неизменяемая запись, ключ dict; dict — по ключу; set — уникальность и быстрое in.
+- Ключ dict должен быть хешируемым.
+
+## Comprehensions, распаковка
+- [f(x) for x in xs if cond]; {k: v for ...}; sum(x for x in xs) — генератор.
+- a, b = b, a; first, *rest = xs; enumerate(xs, start=1); zip(a, b); dict(zip(keys, values)).
+
+## collections
+- Counter(...).most_common(k); defaultdict(list) для группировки; deque — O(1) с обоих концов, maxlen.
+`;
+$("bCopy").onclick=()=>{
+  const ta=$("mdArea"),fb=()=>{ta.hidden=false;ta.value=MD;ta.focus();ta.select();$("copyMsg").textContent="Текст выделен, нажми Cmd+C"};
+  try{navigator.clipboard.writeText(MD).then(()=>$("copyMsg").textContent="Скопировано",fb)}catch(e){fb()}
+};
+</script>

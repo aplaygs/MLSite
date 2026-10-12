@@ -1,0 +1,1300 @@
+<title>Фундамент машинного обучения</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lesson notebook from the same tree series. Single reading column, each topic is a "leaf" with a live lab (interactive chart) in the middle. */
+:root{
+  --bg:#F2F5F0; --surface:#FFFFFF; --ink:#16211B; --muted:#5A6A60; --line:#D9E1D9; --soft:#E8EEE7;
+  --accent:#2C7A50; --accent-soft:rgba(44,122,80,.16); --warm:#B7862A; --plum:#9A4C72; --teal:#2A7584; --red:#B4483A;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --accent-soft:rgba(93,187,135,.18); --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --accent-soft:rgba(93,187,135,.18); --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.62;padding-inline:16px;padding-block:0 72px}
+.wrap{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.dia{color:var(--warm)}
+
+header.top{padding-block:44px 8px;display:grid;gap:12px}
+header.top h1{font-size:clamp(28px,5.4vw,44px);font-weight:700;line-height:1.1}
+header.top p{color:var(--muted);max-width:62ch}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.toc a{font-size:13.5px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.toc a:hover{border-color:var(--accent)}
+
+section.topic{padding-block:56px 8px;display:grid;gap:18px;scroll-margin-top:16px}
+section.topic>h2{font-size:clamp(22px,3.6vw,30px)}
+.tldr{font-size:18px;line-height:1.5;border-left:3px solid var(--accent);padding-left:14px}
+.prose{display:grid;gap:12px;max-width:68ch}
+.prose ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.callout{background:var(--soft);border-radius:12px;padding:14px 16px;display:grid;gap:6px;font-size:15px}
+.callout b.h{font:600 12px var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.callout.brs b.h{color:var(--teal)}
+.callout.trap b.h{color:var(--red)}
+.callout.feel b.h{color:var(--warm)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:8px;align-content:start;min-width:0}
+.card h3{font-size:15px}
+.card p{font-size:14px;color:var(--muted)}
+.card svg{width:100%;height:auto;display:block}
+.card .ex{font-size:13.5px;color:var(--ink)}
+
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:14px}
+.lab-h{display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;align-items:baseline}
+.lab-h .eyebrow{color:var(--accent)}
+.lab svg{width:100%;height:auto;display:block;touch-action:pan-y}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:18px;align-items:center}
+@media (max-width:700px){.lab-grid{grid-template-columns:1fr}}
+.ctrl{display:grid;gap:12px}
+.ctrl label{display:grid;gap:4px;font-size:14px}
+.ctrl .row{display:flex;justify-content:space-between;gap:8px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:500 13.5px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.readout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{background:var(--soft);border-radius:10px;padding:10px 12px}
+.stat .v{font:700 22px var(--f-display);font-variant-numeric:tabular-nums}
+.stat .k{font-size:12.5px;color:var(--muted)}
+.verdict{font-size:14.5px;min-height:3em}
+
+.ax{stroke:var(--line);stroke-width:1}
+.tk{fill:var(--muted);font:11px var(--f-mono)}
+.lbl{fill:var(--muted);font:12px var(--f-body)}
+
+.formula{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;overflow-x:auto}
+.fx{font:500 clamp(17px,3vw,22px) var(--f-mono);white-space:nowrap}
+.fx .c1{color:var(--accent)} .fx .c2{color:var(--plum)} .fx .c3{color:var(--warm)} .fx .c4{color:var(--teal)}
+.legend{display:grid;gap:6px;font-size:14.5px}
+.legend span.s{font-family:var(--f-mono);font-weight:500}
+
+.split{display:flex;height:46px;border-radius:10px;overflow:hidden;font:600 13px var(--f-body)}
+.split div{display:flex;align-items:center;justify-content:center;color:var(--surface)}
+.sp-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.sp-legend{grid-template-columns:1fr}}
+.sp-legend div{display:grid;gap:4px;font-size:14px}
+.sp-legend b{font-family:var(--f-display);font-weight:500;font-size:14px}
+
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+tr.cur td{background:var(--accent-soft)}
+
+pre{margin:0;background:var(--soft);border-radius:10px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--f-mono)}
+pre .cm{color:var(--muted)} pre .hl{color:var(--accent);font-weight:500} pre .bad{color:var(--red);text-decoration:line-through}
+
+details.q{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+details.q summary{cursor:pointer;padding:12px 16px;font-weight:500;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary .t{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--plum);white-space:nowrap}
+details.q summary .t.self{color:var(--teal)}
+details.q[open] summary{border-bottom:1px solid var(--line)}
+details.q .a{padding:12px 16px 14px;display:grid;gap:8px;font-size:15px}
+.qs{display:grid;gap:8px}
+
+.boards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.boards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.boards figure{margin:0;display:grid;gap:4px;text-align:center;font-size:13px}
+.boards figcaption b{display:block;font-weight:600}
+
+.end{padding-block:64px 0;display:grid;gap:16px}
+.end h2{font-size:clamp(22px,3.6vw,30px)}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:10px}
+.sheet ol{margin:0;padding-left:22px;display:grid;gap:8px}
+#mdArea{width:100%;font:12px var(--f-mono);background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+body{margin:0} [hidden]{display:none!important}
+.topnav{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;padding-block:16px 0;font-size:14px}
+.topnav a{text-decoration:none;font-weight:500}
+.topnav .mid{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.part{padding-block:64px 0;display:grid;gap:8px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.part h2{font-size:clamp(24px,4vw,34px);font-weight:700}
+.part p{color:var(--muted);max-width:64ch}
+.bars{display:grid;gap:8px}
+.brow{display:grid;grid-template-columns:92px minmax(0,1fr) 120px;gap:10px;align-items:center;font-size:14px}
+.brow b{font-family:var(--f-mono);font-weight:500}
+.brow .track{height:14px;background:var(--soft);border-radius:7px;overflow:hidden}
+.brow .track i{display:block;height:100%;border-radius:7px;transition:width .25s}
+.brow .tm{font-family:var(--f-mono);font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:520px){.brow{grid-template-columns:70px minmax(0,1fr) 92px}}
+.cells{display:flex;flex-wrap:wrap;gap:4px}
+.cell{width:30px;height:30px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;font:500 12px var(--f-mono);font-variant-numeric:tabular-nums}
+.cell.on{background:var(--accent-soft);border-color:var(--accent)}
+.cell.mv{background:var(--warm);border-color:var(--warm);color:var(--surface)}
+.prac{display:grid;gap:12px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:10px;min-width:0}
+.task .tg{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.tg.int{color:var(--plum)} .tg.work{color:var(--teal)} .tg.lc{color:var(--warm)} .tg.rev{color:var(--red)}
+.task h3{font-size:16px;line-height:1.35}
+.task .ok{font-size:14px;color:var(--muted)}
+.task details{border-top:1px dashed var(--line);padding-top:8px}
+.task details summary{cursor:pointer;font-size:14px;color:var(--accent);font-weight:500}
+.task details .a{display:grid;gap:8px;padding-top:8px;font-size:15px}
+.topics{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 16px}
+.tp{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:5px 6px;border-radius:7px;cursor:pointer;font-size:14.5px}
+.tp:hover{background:var(--soft)}
+.tp input{position:absolute;opacity:0;width:1px;height:1px}
+.tp .bx{width:16px;height:16px;margin-top:2px;border:1.5px solid var(--muted);border-radius:4px}
+.tp input:checked+.bx{background:var(--accent);border-color:var(--accent)}
+.tp input:checked~span:last-child{color:var(--muted);text-decoration:line-through}
+.tp input:disabled+.bx{opacity:.5}
+.tp input:focus-visible+.bx{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/tree#w-1">← Неделя 1 на сайте дерева</a><span class="mid">урок 1 из 3</span><a href="/lessons/w01-2.html">Урок 2 · Python →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 1 · урок 1 из 3 · 10 тем · ~3–4 часа</div>
+  <h1>Фундамент машинного обучения</h1>
+  <p>Первая часть — шесть тем теории ML. Они складываются в одну историю: что предсказываем, откуда берём ответы, как штрафуем модель, как честно её проверяем и почему она ошибается. Вторая часть — четыре темы про скорость кода: Big O, массивы, амортизация и сложность коллекций Python. Ползунки на графиках двигай обязательно: самое важное видно именно там. В конце — практика как на собеседовании и в работе.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Типы задач</a><a href="#t2">С учителем и без</a><a href="#t3">Функция потерь</a><a href="#t4">Train, val, test</a><a href="#t5">Переобучение</a><a href="#t6">Bias–variance</a><a href="#t7">Big O</a><a href="#t8">Массивы</a><a href="#t9">Амортизация</a><a href="#t10">list, dict, set</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+<div class="part"><span class="eyebrow">Часть 1 · 6 тем</span><h2>Как устроено обучение модели</h2></div>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <h2>Типы задач</h2>
+  <p class="tldr">Любая ML-модель — это функция «вход → ответ». Тип задачи определяется тем, какой нужен ответ. От этого зависит всё остальное: модель, функция потерь, метрика.</p>
+  <div class="cards">
+    <div class="card"><svg viewBox="0 0 160 100" aria-hidden="true" id="ic-reg"></svg><h3>Регрессия</h3><p>Ответ — число на шкале. Ошибка — насколько промахнулся.</p><p class="ex">Сколько баллов БРС наберёт студент к сессии</p></div>
+    <div class="card"><svg viewBox="0 0 160 100" aria-hidden="true" id="ic-cls"></svg><h3>Классификация</h3><p>Ответ — один из классов. Обычно модель выдаёт вероятность, потом её режут порогом.</p><p class="ex">Будет ли у студента долг: да или нет. Это твой BRS</p></div>
+    <div class="card"><svg viewBox="0 0 160 100" aria-hidden="true" id="ic-clu"></svg><h3>Кластеризация</h3><p>Правильных ответов нет вообще. Модель сама собирает похожих в группы.</p><p class="ex">Какие типы студентов бывают по посещаемости и оценкам</p></div>
+    <div class="card"><svg viewBox="0 0 160 100" aria-hidden="true" id="ic-rank"></svg><h3>Ранжирование</h3><p>Важен порядок, а не сами числа. Ошибка — когда нужное оказалось внизу.</p><p class="ex">Какие 10 методичек показать первыми в поиске</p></div>
+  </div>
+  <div class="callout trap"><b class="h">Ловушки</b>
+    <p>Логистическая регрессия решает классификацию, несмотря на слово «регрессия» в названии. Её спрашивают на собеседованиях именно ради этой путаницы.</p>
+    <p>Оценку 2, 3, 4, 5 можно предсказывать и как классы, и как число. Если важно, что промах 4 → 5 лучше, чем 2 → 5, это скорее регрессия.</p>
+  </div>
+
+  <h3 style="font-size:17px">Словарь, без которого дальше никак</h3>
+  <div class="prose"><ul>
+    <li><b>Объект</b> (sample, строка) — то, про что делаем прогноз: один студент, одна транзакция, одна картинка.</li>
+    <li><b>Признаки</b> (features, X) — что мы знаем про объект: посещаемость, средний балл, курс. Таблица признаков — матрица <code>X</code> размера «объекты × признаки».</li>
+    <li><b>Целевая переменная</b> (target, label, y) — то, что предсказываем. Есть только в обучении с учителем.</li>
+    <li><b>Модель</b> — функция <code>ŷ = f(X)</code> с настраиваемыми числами внутри.</li>
+    <li><b>Параметры</b> — числа, которые модель подбирает сама при обучении: веса линейной регрессии, пороги в узлах дерева.</li>
+    <li><b>Гиперпараметры</b> — настройки, которые выбираешь ты до обучения: глубина дерева, число деревьев, сила регуляризации. Их подбирают по валидации (тема 4).</li>
+    <li><b>Обучение</b> (<code>fit</code>) — подбор параметров по данным. <b>Инференс</b> (<code>predict</code>) — использование готовой модели на новых объектах.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Какими бывают признаки</h3>
+  <div class="prose"><ul>
+    <li><b>Числовые</b> — возраст, баллы, сумма. С ними можно считать «больше/меньше» и разности.</li>
+    <li><b>Категориальные</b> — факультет, город. Порядка нет: «ФКН > ВМК» — бессмыслица. Модели нужно закодировать их в числа (one-hot и др., неделя про признаки).</li>
+    <li><b>Порядковые</b> — курс 1–4, размер S/M/L. Порядок есть, но «расстояние» между значениями не обязательно одинаковое.</li>
+    <li><b>Бинарные</b> — да/нет, частный случай категориального.</li>
+    <li><b>Сырые данные</b> — текст, картинки, звук, время. Их превращают в числа: эмбеддинги, пиксели, признаки из даты (день недели, час).</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Подвиды и другие задачи</h3>
+  <div class="prose"><ul>
+    <li><b>Бинарная классификация</b> — 2 класса (долг / нет). <b>Многоклассовая</b> — один из K классов (какая цифра на картинке). <b>Multi-label</b> — у объекта может быть несколько меток сразу (теги статьи: «ML», «Python», «карьера»).</li>
+    <li><b>Прогноз временных рядов</b> — регрессия, где важен порядок во времени: продажи на завтра, нагрузка на сервер.</li>
+    <li><b>Поиск аномалий</b> — найти странные объекты: фрод, поломки датчиков. Часто без учителя, потому что примеров аномалий мало.</li>
+    <li><b>Понижение размерности</b> — сжать 300 признаков до 2–50, сохранив главное. Для визуализации и ускорения (PCA, t-SNE, UMAP).</li>
+    <li><b>Рекомендации</b> — по сути ранжирование товаров/фильмов для конкретного человека.</li>
+    <li><b>Генерация</b> — создать новый объект: текст (LLM), картинку (диффузия).</li>
+  </ul></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Задача</th><th>Что на выходе</th><th>Чем учат и меряют</th><th>Модели в sklearn</th></tr></thead>
+    <tbody>
+      <tr><td>Регрессия</td><td>число</td><td>MSE, MAE; метрики RMSE, MAE, R²</td><td><code>LinearRegression</code>, <code>RandomForestRegressor</code></td></tr>
+      <tr><td>Классификация</td><td>класс + вероятность</td><td>log-loss; метрики accuracy, precision, recall, F1, ROC-AUC</td><td><code>LogisticRegression</code>, <code>RandomForestClassifier</code></td></tr>
+      <tr><td>Кластеризация</td><td>номер группы</td><td>своя цель у алгоритма; метрика silhouette</td><td><code>KMeans</code>, <code>DBSCAN</code></td></tr>
+      <tr><td>Ранжирование</td><td>порядок</td><td>метрики NDCG, MAP, Precision@k</td><td>в CatBoost и LightGBM (<code>YetiRank</code>, <code>lambdarank</code>)</td></tr>
+    </tbody></table></div>
+  <p class="muted" style="font-size:13.5px">Метрики подробно — на отдельной неделе. Сейчас важно одно: тип задачи определяет, какой список метрик вообще имеет смысл.</p>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем регрессия отличается от классификации? Можно ли решать классификацию регрессией?</summary>
+      <div class="a"><p>В регрессии целевая переменная непрерывная, в классификации — из конечного набора классов. Формально классификацию 0/1 можно решать линейной регрессией, но она выдаст числа вне [0, 1], а MSE плохо штрафует уверенные ошибки. Поэтому берут логистическую регрессию: она выдаёт вероятность и учится на log-loss (тема 3).</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Предсказать, на сколько минут студент опоздает на пару. И разбить 1500 студентов на группы без меток. Какие это типы?</summary>
+      <div class="a"><p>Опоздание в минутах — регрессия, ответ это число. Группы без меток — кластеризация.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <h2>Обучение с учителем и без</h2>
+  <p class="tldr">Вся разница в одном вопросе: есть ли в данных правильные ответы.</p>
+  <div class="cards">
+    <div class="card"><h3>С учителем</h3><p>Есть пары «вопрос → ответ»: признаки X и правильный ответ y. Как решебник: учишься на задачах, где ответ уже написан. Сюда относятся регрессия и классификация.</p><p class="ex">В BRS учитель — столбец <code>is_at_risk</code></p></div>
+    <div class="card"><h3>Без учителя</h3><p>Есть только X. Модель ищет структуру сама: группы, сжатие, странные объекты. Как разложить по парам высыпанные носки, когда никто не подписал, где чей.</p><p class="ex">Найти подозрительные отметки по QR, когда примеров фрода нет</p></div>
+    <div class="card"><h3>Самообучение</h3><p>Ответы берутся из самих данных. LLM учится угадывать следующее слово, и «правильный ответ» — это просто следующее слово текста.</p><p class="ex">Поэтому GPT мог учиться на всём интернете без ручной разметки</p></div>
+  </div>
+  <div class="prose">
+    <p>Есть ещё <b>обучение с подкреплением</b>: правильных ответов нет, зато есть награда за действия. Так учат играть в игры, управлять роботом и дообучают чат-ботов по оценкам людей. Пока просто запомни, что оно существует.</p>
+    <p><b>Обучение с частичной разметкой</b> (semi-supervised): размечено 1 000 объектов из 100 000. Модель учится на размеченных, потом сама проставляет метки там, где уверена (псевдоразметка), и доучивается. Так экономят на разметке.</p>
+    <p><b>Самообучение подробнее</b> (self-supervised). Задачу придумывают из самих данных: закрыть слово в тексте и угадать его (так учили BERT), угадать следующее слово (GPT), понять, что два кропа одной фотки — одно и то же (контрастивное обучение). Модель учит полезные представления данных — эмбеддинги. Потом их дообучают на маленькой размеченной задаче: это и есть fine-tuning.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Тип</th><th>Что есть в данных</th><th>Типичные задачи</th><th>Примеры алгоритмов</th></tr></thead>
+    <tbody>
+      <tr><td>С учителем</td><td>X и y</td><td>регрессия, классификация, ранжирование</td><td>линейные модели, деревья, бустинг, нейросети</td></tr>
+      <tr><td>Без учителя</td><td>только X</td><td>кластеризация, понижение размерности, аномалии</td><td>KMeans, DBSCAN, PCA, Isolation Forest</td></tr>
+      <tr><td>Частичная разметка</td><td>X и немного y</td><td>то же, что с учителем, но дешевле</td><td>псевдоразметка, self-training</td></tr>
+      <tr><td>Самообучение</td><td>X, y достаём из X</td><td>предобучение LLM и моделей картинок</td><td>BERT, GPT, CLIP</td></tr>
+      <tr><td>С подкреплением</td><td>действия и награды</td><td>игры, роботы, RLHF для чат-ботов</td><td>Q-learning, PPO</td></tr>
+    </tbody></table></div>
+  <div class="callout feel"><b class="h">Главное на практике</b><p>Правильные ответы (разметка) — обычно самое дорогое в ML. Модель стоит копейки, а чтобы 10 000 студентов честно пометили «был долг / не было», нужны годы архивов. В BRS разметку ты сгенерировал сам, поэтому модель учит твою же формулу.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Где взять метки, если их нет?</summary>
+      <div class="a"><p>Разметить вручную, в том числе через асессоров. Достать из логов поведения: клик означает интерес, возврат товара означает недовольство. Получить правилами-эвристиками, это слабая разметка. Размечать только самые неуверенные примеры модели, это активное обучение. Или начать без учителя: кластеры и аномалии.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Модель по прошлым сессиям учится предсказывать, будет ли долг. С учителем или без?</summary>
+      <div class="a"><p>С учителем: про прошлые сессии известно, у кого был долг, это и есть y.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <h2>Функция потерь и эмпирический риск</h2>
+  <p class="tldr">Функция потерь — штраф за один ответ модели. Эмпирический риск — средний штраф по всем примерам. Обучить модель значит подобрать параметры, при которых средний штраф минимален.</p>
+
+  <div class="lab" id="lossLab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · двигай прямую</span><span class="muted mono" id="lossEq">ŷ = 0.30·x + 3.00</span></div>
+    <div class="lab-grid">
+      <svg id="lossSvg" viewBox="0 0 360 356" role="img" aria-label="Точки, прямая модели и квадраты ошибок"></svg>
+      <div class="ctrl">
+        <p class="muted" style="font-size:14px">Ось X — часы подготовки, ось Y — балл за контрольную из 10. Прямая — модель. Квадрат у каждой точки — её штраф в MSE: сторона равна промаху.</p>
+        <label for="sW"><span class="row"><span>Наклон <code>w</code></span><span class="mono" id="vW">0.30</span></span><input type="range" id="sW" min="-1" max="2.5" step="0.01" value="0.3"></label>
+        <label for="sB"><span class="row"><span>Сдвиг <code>b</code></span><span class="mono" id="vB">3.00</span></span><input type="range" id="sB" min="-4" max="8" step="0.05" value="3"></label>
+        <div class="btns">
+          <button class="btn" id="bMse" aria-pressed="true">Квадраты (MSE)</button>
+          <button class="btn" id="bMae" aria-pressed="false">Отрезки (MAE)</button>
+        </div>
+        <div class="btns">
+          <button class="btn" id="bBest">Подобрать лучшую</button>
+          <button class="btn" id="bOut" aria-pressed="false">Добавить выброс</button>
+        </div>
+        <div class="readout">
+          <div class="stat"><div class="v" id="rMse">0</div><div class="k">MSE · средняя площадь квадратов</div></div>
+          <div class="stat"><div class="v" id="rMae">0</div><div class="k">MAE · средняя длина отрезков</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout feel"><b class="h">Физический смысл</b><p>MSE буквально равна средней площади этих квадратов. Обучение — это компьютер, который сам крутит ползунки, пока общая площадь не станет минимальной. Градиентный спуск на неделе 2 — способ крутить их умно, а не наугад.</p></div>
+
+  <div class="formula">
+    <div class="fx"><span class="c3">L</span>(<span class="c1">y</span>, <span class="c2">ŷ</span>) = (<span class="c1">y</span> − <span class="c2">ŷ</span>)²</div>
+    <div class="fx"><span class="c4">R̂</span>(<span class="c3">w</span>) = <sup>1</sup>⁄<sub>n</sub> · Σ (<span class="c1">yᵢ</span> − <span class="c2">ŷᵢ</span>)²</div>
+    <div class="legend">
+      <div><span class="s c1" style="color:var(--accent)">y</span> — правильный ответ из данных (настоящий балл)</div>
+      <div><span class="s" style="color:var(--plum)">ŷ</span> — «игрек с крышкой», ответ модели. Крышка в ML всегда значит «оценка, предсказание»</div>
+      <div><span class="s" style="color:var(--warm)">L</span> — штраф за один пример. <span class="s" style="color:var(--warm)">w</span> — параметры модели, то есть ползунки</div>
+      <div><span class="s" style="color:var(--teal)">R̂</span> — эмпирический риск: сложи (Σ) штрафы всех n примеров и раздели на n</div>
+    </div>
+  </div>
+
+  <div class="prose">
+    <p><b>Зачем возводить в квадрат?</b></p>
+    <ul>
+      <li>Штраф всегда положительный: промах вверх и вниз не гасят друг друга.</li>
+      <li>Большие промахи наказываются сильнее: ошибся на 2 — штраф 4, ошибся на 10 — штраф 100.</li>
+      <li>Функция гладкая, у неё легко считать производную. Это понадобится для градиентного спуска.</li>
+    </ul>
+    <p>Обратная сторона: один выброс тянет всю прямую на себя. Нажми «Добавить выброс», потом «Подобрать лучшую» и посмотри, как наклонится прямая. MAE штрафует промах линейно, поэтому к выбросам спокойнее.</p>
+    <p><b>Эмпирический</b> значит «посчитанный на имеющихся данных». Настоящий риск — средний штраф на всех студентах, которые вообще когда-либо будут, включая будущих. Его посчитать нельзя. Мы минимизируем то, что можем посчитать, и надеемся, что эти два числа близки. Когда они расходятся, это переобучение из темы 5.</p>
+  </div>
+
+  <h3 style="font-size:17px">Для классификации: log-loss</h3>
+  <div class="prose"><p>Модель выдаёт вероятность <code>p</code> правильного класса. Штраф равен <code>−ln(p)</code>: почти бесплатно, если модель уверенно права, и очень дорого, если уверенно ошиблась. Если модель сказала «99%, что сдаст», а студент завалил, штраф огромный.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Вероятность правильного класса</th><th>Штраф −ln(p)</th><th>Как это читать</th></tr></thead>
+    <tbody>
+      <tr><td class="n">0.90</td><td class="n">0.11</td><td>уверенно и верно</td></tr>
+      <tr><td class="n">0.50</td><td class="n">0.69</td><td>подбросила монетку</td></tr>
+      <tr><td class="n">0.10</td><td class="n">2.30</td><td>уверенно ошиблась</td></tr>
+      <tr><td class="n">0.01</td><td class="n">4.61</td><td>очень уверенно ошиблась</td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <p>Полная формула для бинарной классификации, где <code>y</code> равен 0 или 1, а <code>p</code> — вероятность класса 1:</p>
+    <pre>log-loss = −[ y·ln(p) + (1 − y)·ln(1 − p) ]</pre>
+    <p>Выглядит страшно, но это та же таблица: если y = 1, остаётся <code>−ln(p)</code>, если y = 0 — <code>−ln(1 − p)</code>. Для K классов это <b>кросс-энтропия</b>: <code>−ln(вероятность настоящего класса)</code>. Её используют все нейросети-классификаторы.</p>
+    <p><b>Почему не MSE для классификации?</b> Если модель сказала 0.01, а правда 1, MSE даст штраф всего 0.98 — максимум 1. Log-loss даст 4.6 и уходит в бесконечность при p → 0. Модель гораздо сильнее наказывается за уверенную ложь, и градиент не затухает.</p>
+  </div>
+
+  <h3 style="font-size:17px">Все функции потерь, которые спросят</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Функция</th><th>Формула на один пример</th><th>Когда брать</th></tr></thead>
+    <tbody>
+      <tr><td>MSE</td><td><code>(y − ŷ)²</code></td><td>стандарт для регрессии; большие ошибки особенно плохи</td></tr>
+      <tr><td>RMSE</td><td><code>√MSE</code></td><td>то же, но в единицах y («ошибаемся в среднем на ~2 балла»). Чаще как метрика</td></tr>
+      <tr><td>MAE</td><td><code>|y − ŷ|</code></td><td>есть выбросы; все ошибки одинаково важны</td></tr>
+      <tr><td>Huber</td><td>квадрат для малых ошибок, модуль для больших</td><td>компромисс: гладкая как MSE, устойчивая как MAE</td></tr>
+      <tr><td>MAPE</td><td><code>|y − ŷ| / |y|</code></td><td>важна ошибка в процентах (продажи). Ломается при y около 0</td></tr>
+      <tr><td>Log-loss</td><td><code>−ln(p настоящего класса)</code></td><td>классификация с вероятностями: логрег, бустинг, нейросети</td></tr>
+      <tr><td>Hinge</td><td><code>max(0, 1 − y·ŷ)</code>, y = ±1</td><td>SVM: штрафует, только если объект близко к границе или не с той стороны</td></tr>
+    </tbody></table></div>
+
+  <h3 style="font-size:17px">Классика собеса: MSE → среднее, MAE → медиана</h3>
+  <div class="prose">
+    <p>Пусть модель вообще не смотрит на признаки и всем отвечает одно число <code>c</code>. Какое <code>c</code> лучше?</p>
+    <ul>
+      <li>Под MSE лучшее <code>c</code> — <b>среднее</b> y.</li>
+      <li>Под MAE — <b>медиана</b> y.</li>
+    </ul>
+    <p>Пример: зарплаты 50, 60, 70 и 1000 тысяч. Среднее 295 — его утащил один миллионер. Медиана 65 — на выброс ей плевать. Вот почему MSE чувствительна к выбросам, а MAE нет: это одно и то же свойство, что у среднего и медианы. Такая константная модель — <b>бейзлайн</b>: любая настоящая модель обязана быть лучше (<code>DummyRegressor(strategy="mean")</code> / <code>"median"</code>).</p>
+  </div>
+
+  <h3 style="font-size:17px">Как ищут минимум</h3>
+  <div class="prose">
+    <ul>
+      <li><b>Формулой.</b> Для линейной регрессии с MSE минимум считается сразу, одной формулой (нормальное уравнение). Быстро на маленьких данных, но с миллионом признаков нужна огромная матрица.</li>
+      <li><b>Градиентным спуском.</b> Стоишь на склоне в тумане и шагаешь туда, где круче всего вниз. Градиент показывает направление роста ошибки, шагаем против него: <code>w ← w − lr · градиент</code>. <code>lr</code> (learning rate) — длина шага: слишком маленький — ползёшь вечность, слишком большой — перепрыгиваешь яму и улетаешь. Подробно — неделя 2.</li>
+      <li><b>Перебором и жадно.</b> Деревья не дифференцируемы: в каждом узле перебирают признаки и пороги и берут тот, что сильнее всего уменьшает ошибку.</li>
+    </ul>
+    <p><b>Регуляризация</b> — дописываем к риску штраф за сложность: <code>Риск + λ · (размер весов)</code>. Модель теперь ищет компромисс между «точно на train» и «простая». Подробно — в теме 5.</p>
+  </div>
+
+  <div class="callout brs"><b class="h">Где это в BRS</b><p>CatBoost учился, уменьшая Logloss (видно в <code>catboost_info/test_error.tsv</code>), а качество ты смотрел по PR-AUC. Функция потерь — то, что оптимизирует модель, и она должна быть гладкой. Метрика — то, по чему её судят люди. Это разные вещи, и это нормально.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем функция потерь отличается от метрики?</summary>
+      <div class="a"><p>Функцию потерь минимизирует алгоритм при обучении, поэтому она должна быть дифференцируемой или хотя бы удобной для оптимизации: MSE, log-loss. Метрика нужна людям и бизнесу, чтобы оценить результат: accuracy, recall, ROC-AUC. Многие метрики не гладкие, их нельзя напрямую оптимизировать градиентом. Поэтому учимся на одной функции, а оцениваем по другой.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Почему MSE чувствительна к выбросам?</summary>
+      <div class="a"><p>Ошибка возводится в квадрат: выброс с промахом 10 даёт штраф 100, столько же, сколько сто точек с промахом 1. Чтобы уменьшить этот один штраф, модель сдвигает прямую к выбросу. MAE или Huber loss растут линейно и меньше реагируют на выбросы.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Модель ошиблась на 3 балла. Какой штраф даст MSE и какой MAE?</summary>
+      <div class="a"><p>MSE: 3² = 9. MAE: |3| = 3.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Какую константу предсказывать, чтобы минимизировать MSE? А MAE?</summary>
+      <div class="a"><p>Для MSE — среднее целевой переменной, для MAE — медиану. Отсюда и устойчивость MAE к выбросам: медиана не реагирует на крайние значения, среднее реагирует.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Почему для классификации берут log-loss, а не MSE?</summary>
+      <div class="a"><p>Log-loss сильно и неограниченно штрафует уверенные ошибки, MSE на вероятностях ограничена единицей. Для логистической регрессии log-loss ещё и выпуклая: у неё одна яма, и градиентный спуск находит минимум. С MSE поверх сигмоиды появляются плоские участки и плохие локальные минимумы.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>RMSE или MAE — что выбрать как метрику?</summary>
+      <div class="a"><p>RMSE — если большие ошибки непропорционально плохи (ошибиться на 10 хуже, чем десять раз на 1). MAE — если все ошибки одинаково важны или в данных выбросы. Обе в единицах целевой переменной, их легко объяснить бизнесу. RMSE всегда ≥ MAE; чем больше разрыв, тем больше крупных ошибок.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="topic" id="t4">
+  <div class="eyebrow">Тема 4 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <h2>Train, validation и test</h2>
+  <p class="tldr">Данные делят на три части, чтобы честно узнать, как модель поведёт себя на данных, которых она никогда не видела.</p>
+  <div class="split" role="img" aria-label="Train 60 процентов, validation 20, test 20">
+    <div style="flex:60;background:var(--accent)">Train · 60%</div>
+    <div style="flex:20;background:var(--warm)">Val · 20%</div>
+    <div style="flex:20;background:var(--plum)">Test · 20%</div>
+  </div>
+  <div class="sp-legend">
+    <div><b style="color:var(--accent)">Train — учебник с решениями</b><span>На нём модель учится, то есть подбирает параметры. Смотрит сколько угодно раз.</span></div>
+    <div><b style="color:var(--warm)">Validation — пробник</b><span>По нему выбираешь настройки: глубину дерева, сколько деревьев, когда остановиться. Сравниваешь модели. Смотришь много раз.</span></div>
+    <div><b style="color:var(--plum)">Test — настоящий экзамен</b><span>Открываешь один раз, в самом конце. Это число ты честно пишешь в README и называешь на собеседовании.</span></div>
+  </div>
+  <div class="prose">
+    <p><b>Почему нельзя проверять на train?</b> Это как сдать экзамен по билетам, которые выучил наизусть: будет 100%, но про знания это ничего не говорит.</p>
+    <p><b>Зачем отдельный test, если есть validation?</b> Если 50 раз подбирать настройки под пробник, ты подстроишься и под него. Пробник перестаёт быть честным. Тест остаётся нетронутым, поэтому его оценка честная.</p>
+    <p><b>Правила разбиения:</b></p>
+    <ul>
+      <li>Перемешать данные перед разбиением.</li>
+      <li>При редком классе делить со <code>stratify</code>. В BRS положительных 8%: без стратификации в тест могло попасть 15 должников вместо 24.</li>
+      <li>Один объект — в одной части. Если у студента пять записей за пять семестров, все пять идут в одну часть, иначе модель узнаёт его «в лицо».</li>
+      <li>Данные во времени делят по времени: учимся на прошлом, проверяем на будущем. Иначе модель подсматривает в будущее.</li>
+    </ul>
+  </div>
+  <div class="callout trap"><b class="h">Утечка данных</b><p>Любая ситуация, когда при обучении модель видит информацию, которой у неё не будет в реальной работе. Самая частая форма: тест так или иначе участвовал в обучении или в выборе настроек. Метрики получаются красивыми, а в реальности модель работает хуже.</p></div>
+  <div class="callout brs"><b class="h">Где это в BRS</b><p>Ровно эта ошибка в <code>train.py</code>: <code>eval_set=(X_test, y_test)</code>. CatBoost смотрел на тест, чтобы решить, сколько деревьев оставить (оставил 136 из 250). Тест работал пробником, итоговая оценка на нём завышена. Исправление:</p>
+<pre><span class="cm"># 1) откладываем честный тест: 20%</span>
+X_tmp, X_test, y_tmp, y_test = train_test_split(
+    X, y, test_size=0.20, stratify=y, random_state=42)
+<span class="cm"># 2) из оставшихся 80% берём четверть на валидацию: 0.25 × 80% = 20%</span>
+X_train, X_val, y_train, y_val = train_test_split(
+    X_tmp, y_tmp, test_size=0.25, stratify=y_tmp, random_state=42)
+
+model.fit(X_train, y_train, <span class="bad">eval_set=(X_test, y_test)</span> <span class="hl">eval_set=(X_val, y_val)</span>)
+<span class="cm"># тест трогаем один раз, в самом конце</span></pre>
+  </div>
+
+  <h3 style="font-size:17px">Сколько отдавать на каждую часть</h3>
+  <div class="prose"><ul>
+    <li>Тысячи объектов — 60/20/20 или 70/15/15.</li>
+    <li>Миллионы — хватит 98/1/1: 1% от миллиона — это 10 000 объектов, для честной оценки достаточно.</li>
+    <li>Сотни объектов — одна валидация слишком шумная: от того, кто в неё попал, метрика скачет на 5–10 пунктов. Тут нужна кросс-валидация.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Кросс-валидация</h3>
+  <div class="split" role="img" aria-label="5 фолдов: в каждом раунде один фолд — валидация">
+    <div style="flex:1;background:var(--warm)">1</div><div style="flex:1;background:var(--accent)">2</div><div style="flex:1;background:var(--accent)">3</div><div style="flex:1;background:var(--accent)">4</div><div style="flex:1;background:var(--accent)">5</div>
+  </div>
+  <div class="prose">
+    <p><b>K-fold</b>: делим train на K частей (фолдов), обычно 5. Обучаем K раз: каждый раз одна часть — валидация (жёлтая), остальные — обучение. Каждый объект ровно один раз побывал в валидации. Итог — среднее K метрик и их разброс: «ROC-AUC 0.87 ± 0.02». Разброс показывает, насколько можно верить числу.</p>
+    <p>Тест при этом всё равно откладывается отдельно до кросс-валидации. CV заменяет только валидацию.</p>
+    <p>После того как настройки выбраны, модель обычно переобучают на всём train целиком — K моделей из CV были только для оценки.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Схема</th><th>Когда</th><th>В sklearn</th></tr></thead>
+    <tbody>
+      <tr><td>K-fold</td><td>обычные данные, классы сбалансированы</td><td><code>KFold(5, shuffle=True)</code></td></tr>
+      <tr><td>Стратифицированный</td><td>классификация, особенно с редким классом</td><td><code>StratifiedKFold</code> — по умолчанию в <code>cross_val_score</code> для классификаторов</td></tr>
+      <tr><td>По группам</td><td>у одного студента/пациента много строк</td><td><code>GroupKFold</code></td></tr>
+      <tr><td>По времени</td><td>данные во времени: учимся на прошлом, проверяем на будущем</td><td><code>TimeSeriesSplit</code></td></tr>
+      <tr><td>Leave-one-out</td><td>совсем мало данных (десятки)</td><td><code>LeaveOneOut</code>, n обучений — дорого</td></tr>
+    </tbody></table></div>
+<pre>from sklearn.model_selection import cross_val_score
+scores = cross_val_score(model, X_train, y_train, cv=5, scoring="roc_auc")
+print(f"{scores.mean():.3f} ± {scores.std():.3f}")</pre>
+
+  <h3 style="font-size:17px">Все виды утечек</h3>
+  <div class="prose"><ul>
+    <li><b>Утечка таргета.</b> Признак появляется только после события, которое предсказываем: «оплатил пересдачу», «дата закрытия долга». На тесте всё отлично, в проде этого признака ещё нет.</li>
+    <li><b>Утечка через предобработку.</b> Скейлер, заполнение пропусков средним, отбор признаков, target encoding посчитаны на всех данных до разбиения. Статистики теста попали в обучение.</li>
+    <li><b>Дубликаты.</b> Одинаковые строки в train и test — модель просто вспоминает ответ.</li>
+    <li><b>Группы.</b> Записи одного человека по обе стороны разбиения.</li>
+    <li><b>Время.</b> Случайное разбиение данных во времени: модель учится на «завтра» и проверяется на «вчера».</li>
+    <li><b>Подбор по тесту.</b> Тест использован для выбора гиперпараметров или early stopping.</li>
+  </ul>
+  <p><b>Главный признак утечки</b> — подозрительно хорошая метрика. ROC-AUC 0.99 на реальной задаче — сначала ищи утечку, потом радуйся. Посмотри важность признаков: если один признак решает всё, проверь, не появляется ли он после события.</p>
+  <p><b>Защита от утечки через предобработку — Pipeline.</b> Он делает <code>fit</code> всех шагов только на обучающей части, в том числе внутри каждого фолда кросс-валидации:</p></div>
+<pre>from sklearn.pipeline import make_pipeline
+model = make_pipeline(StandardScaler(), LogisticRegression())
+model.fit(X_train, y_train)      <span class="cm"># скейлер увидел только train</span>
+cross_val_score(model, X_train, y_train, cv=5)  <span class="cm"># и в CV тоже честно</span></pre>
+  <div class="callout feel"><b class="h">Тест должен быть похож на жизнь</b><p>Если модель будет работать на студентах следующего года, тест — это последний год, а не случайные 20%. Если данные в проде меняются (новая программа обучения, другой вуз), это <b>сдвиг распределения</b> (data drift): на тесте 0.9, в жизни 0.7. Поэтому модели в проде мониторят и переобучают.</p></div>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Зачем нужна валидационная выборка, если есть тестовая?</summary>
+      <div class="a"><p>Валидация нужна для выбора гиперпараметров, ранней остановки и сравнения моделей. Каждый такой выбор немного подгоняет модель под валидацию, поэтому её оценка становится оптимистичной. Тест не участвует ни в одном решении и даёт несмещённую оценку качества на новых данных. Когда данных мало, вместо одной валидации делают кросс-валидацию (неделя 6).</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Что такое утечка данных? Приведи пример.</summary>
+      <div class="a"><p>Это когда при обучении модель получает информацию, недоступную в момент реального прогноза. Примеры: тест использован для early stopping; признак «оплатил пересдачу» в задаче предсказания долга (он появляется только после долга); нормализация посчитана по всем данным до разбиения; записи одного человека попали и в train, и в test.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Ты подобрал max_depth, глядя на метрику тестовой выборки. Что не так с итоговым числом?</summary>
+      <div class="a"><p>Оно оптимистичное: тест участвовал в выборе настройки и стал пробником. Честной оценки у тебя больше нет. Нужна новая отложенная выборка или кросс-валидация для подбора.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Что такое кросс-валидация и сколько моделей обучается при 5-fold?</summary>
+      <div class="a"><p>Train делится на 5 частей, модель обучается 5 раз, каждый раз на 4 частях, а оценивается на пятой. Итог — среднее и разброс пяти метрик. Обучается 5 моделей; если подбираешь 10 вариантов гиперпараметров — 50. Финальную модель потом обучают на всём train.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Как делить данные, если это временной ряд?</summary>
+      <div class="a"><p>Только по времени: train — прошлое, val и test — будущее. Для CV — <code>TimeSeriesSplit</code>: окно обучения растёт, валидация всегда после него. Перемешивать нельзя, иначе модель подсматривает в будущее.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="topic" id="t5">
+  <div class="eyebrow">Тема 5 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <h2>Переобучение и недообучение</h2>
+  <p class="tldr">Недообучение: модель слишком простая и не видит закономерность. Переобучение: модель зазубрила обучающие данные вместе с шумом и плохо работает на новых.</p>
+  <div class="prose"><p>Недообучение — пришёл на экзамен, прочитав только оглавление. Переобучение — вызубрил 30 билетов слово в слово, а на экзамене вопрос сформулировали по-другому.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · сложность модели</span><span class="muted mono" id="degLabel">степень 3</span></div>
+    <svg id="fitSvg" viewBox="0 0 600 300" role="img" aria-label="Обучающие точки, настоящая закономерность и кривая модели"></svg>
+    <div class="ctrl">
+      <label for="sDeg"><span class="row"><span>Сложность модели: степень многочлена</span><span class="mono" id="vDeg">3</span></span><input type="range" id="sDeg" min="0" max="11" step="1" value="3"></label>
+      <div class="btns"><button class="btn" id="bTest" aria-pressed="false">Показать новые данные</button></div>
+      <div class="readout">
+        <div class="stat"><div class="v" id="rTr">0</div><div class="k">Ошибка на train (MSE)</div></div>
+        <div class="stat"><div class="v" id="rTe">0</div><div class="k">Ошибка на новых данных (MSE)</div></div>
+      </div>
+      <p class="verdict" id="verdict"></p>
+    </div>
+    <svg id="errSvg" viewBox="0 0 600 220" role="img" aria-label="Ошибка на обучающих и новых данных в зависимости от сложности"></svg>
+    <p class="muted" style="font-size:13.5px">Зелёные точки — 12 обучающих измерений с шумом. Пунктир — настоящая закономерность, модель её не видит. Нижний график: ошибка на train (зелёная) падает всегда, ошибка на новых данных (сиреневая) сначала падает, потом растёт. Шкала ошибки логарифмическая: каждая линия сетки в 10 раз больше предыдущей.</p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Ситуация</th><th>Ошибка train</th><th>Ошибка val</th><th>Что делать</th></tr></thead>
+    <tbody>
+      <tr><td>Недообучение</td><td>высокая</td><td>высокая</td><td>модель сложнее, больше признаков, меньше регуляризации</td></tr>
+      <tr><td>Норма</td><td>низкая</td><td>чуть выше train</td><td>всё хорошо</td></tr>
+      <tr><td>Переобучение</td><td>очень низкая</td><td>высокая</td><td>больше данных, модель проще, регуляризация, early stopping</td></tr>
+    </tbody></table></div>
+  <div class="callout brs"><b class="h">Где это в BRS</b><p><code>avg_lab_score</code> не входит в формулу риска, но получил 10% важности. Модель нашла закономерность в шуме. Это лёгкая форма переобучения, и её видно только потому, что ты знаешь настоящую формулу.</p></div>
+
+  <h3 style="font-size:17px">Откуда берётся</h3>
+  <div class="prose"><ul>
+    <li><b>Переобучение:</b> модель слишком гибкая для такого объёма данных; мало данных; много шумных или бесполезных признаков (на 100 объектов 500 признаков — что-нибудь случайно совпадёт); слишком долгое обучение нейросети или бустинга.</li>
+    <li><b>Недообучение:</b> модель слишком простая (прямая на кривую зависимость); нет нужных признаков; слишком сильная регуляризация; обучение остановили слишком рано.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Кривые обучения: как поставить диагноз</h3>
+  <div class="prose">
+    <p>Есть два графика, их часто путают:</p>
+    <ul>
+      <li><b>Validation curve</b> — ошибка в зависимости от сложности (как в лаборатории выше). Помогает выбрать гиперпараметр.</li>
+      <li><b>Learning curve</b> — ошибка в зависимости от размера обучающей выборки. Отвечает на вопрос «поможет ли собрать больше данных».</li>
+    </ul>
+    <p>Как читать learning curve:</p>
+    <ul>
+      <li>Кривые train и val сошлись, но обе плохие — <b>недообучение</b>. Больше данных <b>не поможет</b>, нужна модель сложнее или новые признаки.</li>
+      <li>Между кривыми большой зазор, и val всё ещё улучшается — <b>переобучение</b>. Больше данных <b>поможет</b>.</li>
+    </ul>
+    <p>В sklearn: <code>learning_curve(model, X, y, cv=5)</code> и <code>validation_curve(...)</code>.</p>
+  </div>
+
+  <h3 style="font-size:17px">Регуляризация</h3>
+  <div class="prose">
+    <p>Штраф за сложность прямо в функции потерь: <code>Loss = ошибка + λ · штраф за веса</code>. Большие веса означают, что модель резко реагирует на мелкие изменения признаков, то есть подстраивается под шум. Штраф заставляет её быть скромнее.</p>
+    <ul>
+      <li><b>L2</b> (Ridge): штраф — сумма квадратов весов. Все веса плавно уменьшаются, но не до нуля. Хороша, когда признаки коррелируют.</li>
+      <li><b>L1</b> (Lasso): штраф — сумма модулей весов. Часть весов становится ровно 0 — модель сама выкидывает бесполезные признаки. Это отбор признаков.</li>
+      <li><b>Elastic Net</b> — L1 и L2 вместе.</li>
+      <li><b>λ</b> (в sklearn — <code>alpha</code>): больше λ — проще модель, выше bias, ниже variance. λ = 0 — регуляризации нет.</li>
+    </ul>
+  </div>
+  <div class="callout trap"><b class="h">Ловушка sklearn</b><p>В <code>LogisticRegression</code> и <code>SVC</code> сила задаётся через <code>C = 1/λ</code>. Значит, <b>меньше C — сильнее регуляризация</b>. В <code>Ridge</code> и <code>Lasso</code> наоборот: больше <code>alpha</code> — сильнее. И не забудь масштабировать признаки: штраф на веса нечестен, если один признак в рублях, а другой в долях.</p></div>
+  <div class="prose">
+    <p><b>Другие способы бороться с переобучением:</b></p>
+    <ul>
+      <li><b>Early stopping</b> — останавливаем обучение, когда ошибка на валидации перестала падать (бустинг, нейросети).</li>
+      <li><b>Ограничить модель</b>: <code>max_depth</code>, <code>min_samples_leaf</code> у деревьев, меньше слоёв у нейросети.</li>
+      <li><b>Dropout</b> — случайно выключаем нейроны при обучении, сеть не может полагаться на один путь.</li>
+      <li><b>Аугментации</b> — искусственно размножаем данные: повороты и кропы картинок, перефразирование текста.</li>
+      <li><b>Ансамбли</b> — усреднение многих моделей (тема 6).</li>
+      <li><b>Отбор признаков</b> — убрать шумные и бесполезные.</li>
+    </ul>
+  </div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как понять, что модель переобучилась, и что с этим делать?</summary>
+      <div class="a"><p>Признак — большой разрыв: на train ошибка низкая, на валидации заметно выше. Ещё видно по кривым обучения: ошибка на валидации начинает расти, пока на train продолжает падать. Что делать: собрать больше данных, упростить модель (меньше глубина, меньше признаков), добавить регуляризацию L1 или L2, остановить обучение раньше (early stopping), для нейросетей — dropout и аугментации, для деревьев — ансамбли.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Accuracy на train 99%, на validation 71%. Что происходит?</summary>
+      <div class="a"><p>Переобучение: модель запомнила обучающую выборку, на новых данных теряет почти 30 пунктов.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Чем L1 отличается от L2?</summary>
+      <div class="a"><p>L2 штрафует сумму квадратов весов и равномерно их уменьшает, но почти никогда не зануляет. L1 штрафует сумму модулей и зануляет часть весов, поэтому даёт отбор признаков и разреженную модель. Геометрически: у L1 область допустимых весов — ромб с углами на осях, и оптимум чаще попадает в угол, где один из весов 0.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Поможет ли добавить данных?</summary>
+      <div class="a"><p>Смотря что с моделью. Постройте learning curve. Если переобучение (большой зазор train/val) — да, поможет. Если недообучение (обе ошибки высокие и сошлись) — нет, нужна модель сложнее или лучшие признаки.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="topic" id="t6">
+  <div class="eyebrow">Тема 6 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <h2>Bias–variance trade-off</h2>
+  <p class="tldr">Ошибка модели складывается из трёх частей. Смещение (bias): модель систематически бьёт не туда. Разброс (variance): модель сильно меняется от конкретной выборки. Шум: его не убрать ничем.</p>
+  <div class="boards" id="boards"></div>
+  <div class="callout feel"><b class="h">Физический смысл</b><p>Представь, что ты 25 раз собрал новый датасет и 25 раз обучил одну и ту же модель. Bias — насколько средняя из 25 моделей промахивается мимо правды. Variance — насколько 25 моделей не согласны друг с другом.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · 25 датасетов, 25 моделей</span>
+      <div class="btns" role="group" aria-label="Сложность модели">
+        <button class="btn bvd" data-d="1" aria-pressed="false">Прямая</button>
+        <button class="btn bvd" data-d="3" aria-pressed="true">Степень 3</button>
+        <button class="btn bvd" data-d="9" aria-pressed="false">Степень 9</button>
+      </div></div>
+    <svg id="bvSvg" viewBox="0 0 600 300" role="img" aria-label="25 моделей, их среднее и настоящая закономерность"></svg>
+    <p class="muted" style="font-size:13.5px">Тонкие линии — 25 моделей, каждая обучена на своих 15 точках. Жирная — их среднее. Пунктир — правда. Прямая: все линии одинаковые, но мимо (bias). Степень 9: в среднем близко, но каждая гуляет как хочет (variance).</p>
+    <div class="btns"><button class="btn" id="bResample">Собрать новые 25 датасетов</button></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Модель</th><th>Bias²</th><th>Variance</th><th>Сумма</th></tr></thead>
+      <tbody id="bvTable"></tbody></table></div>
+  </div>
+
+  <div class="formula">
+    <div class="fx">Ошибка = <span class="c2">Bias²</span> + <span class="c4">Variance</span> + <span class="c3">σ²</span></div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--plum)">Bias²</span> — квадрат промаха средней модели мимо правды. Лечится сложностью: больше признаков, мощнее модель, бустинг</div>
+      <div><span class="s" style="color:var(--teal)">Variance</span> — насколько модели гуляют вокруг своего среднего. Лечится данными и упрощением: регуляризация, бэггинг, Random Forest</div>
+      <div><span class="s" style="color:var(--warm)">σ²</span> — шум в самих данных. Студент заболел перед экзаменом, и никакие признаки этого не знали</div>
+    </div>
+  </div>
+  <div class="prose">
+    <p><b>Связь с темой 5:</b> высокий bias и есть недообучение, высокая variance — переобучение. Усложняешь модель — bias падает, variance растёт. Яма на графике ошибки из темы 5 — точка, где их сумма минимальна. Это и называется trade-off, компромисс.</p>
+    <p><b>Задел на неделю 6:</b> Random Forest усредняет много переобученных деревьев. Это ровно то, что ты видишь на графике со степенью 9: отдельные линии безумные, а среднее спокойное. Так снижается variance. Бустинг делает наоборот: строит простые деревья друг за другом, каждое исправляет систематическую ошибку прошлых. Так снижается bias.</p>
+  </div>
+  <h3 style="font-size:17px">Ручки сложности у разных моделей</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Модель</th><th>Ручка</th><th>Повернул так — растёт variance</th><th>Повернул так — растёт bias</th></tr></thead>
+    <tbody>
+      <tr><td>Дерево</td><td><code>max_depth</code></td><td>глубже</td><td>мельче</td></tr>
+      <tr><td>kNN</td><td><code>n_neighbors</code> (k)</td><td>k = 1: смотрит на одного соседа</td><td>k = n: всем отвечает одно и то же</td></tr>
+      <tr><td>Линейная модель</td><td>регуляризация</td><td>слабее (маленький alpha, большой C)</td><td>сильнее</td></tr>
+      <tr><td>Полином</td><td>степень</td><td>выше</td><td>ниже</td></tr>
+      <tr><td>Бустинг</td><td>число деревьев, глубина</td><td>больше деревьев без early stopping</td><td>мало деревьев</td></tr>
+      <tr><td>Нейросеть</td><td>слои, эпохи, dropout</td><td>больше слоёв и эпох, меньше dropout</td><td>наоборот</td></tr>
+    </tbody></table></div>
+  <div class="callout feel"><b class="h">Как это выглядит на практике</b><p>Bias и variance по отдельности на реальных данных никто не считает: для этого нужны сотни датасетов, как в лаборатории. Работаешь по прокси: ошибка на train высокая — проблема bias; train хорошо, а val плохо — проблема variance. Шум оценивают по здравому смыслу: если даже эксперт угадывает в 80% случаев, модели с 95% не будет.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Объясни bias–variance trade-off.</summary>
+      <div class="a"><p>Для квадратичной функции потерь ожидаемая ошибка на новом объекте раскладывается на bias² (систематическое отклонение средней модели от истины), variance (чувствительность модели к конкретной обучающей выборке) и неустранимый шум. Простые модели имеют высокий bias и низкую variance, сложные — наоборот. Задача — подобрать сложность, при которой сумма минимальна. На практике её ищут по ошибке на валидации.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Почему Random Forest снижает variance, а бустинг снижает bias?</summary>
+      <div class="a"><p>Random Forest обучает глубокие деревья (низкий bias, высокая variance) на разных бутстреп-выборках и усредняет их. Усреднение слабо связанных ошибок уменьшает разброс. Бустинг последовательно добавляет неглубокие деревья (высокий bias), каждое учится на ошибках текущего ансамбля. Это шаг за шагом уменьшает систематическую ошибку.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Дерево глубины 1 и дерево глубины 30: у какого высокий bias, у какого высокая variance?</summary>
+      <div class="a"><p>Глубина 1 — высокий bias: один вопрос не может описать сложную зависимость. Глубина 30 — высокая variance: дерево подстраивается под каждую точку и меняется от любой новой выборки.</p></div></details>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 2 · 4 темы</span><h2>Сколько стоит код</h2><p>Модель может быть умной, но если предсказание идёт час, ей никто не пользуется. Эти четыре темы — язык, на котором на собеседовании обсуждают скорость любого решения.</p></div>
+
+<!-- ============ 7 ============ -->
+<section class="topic" id="t7">
+  <div class="eyebrow">Тема 7 из 10 · <span class="dia">◆</span> Алгоритмы</div>
+  <h2>Big O по времени и памяти</h2>
+  <p class="tldr">Big O отвечает на один вопрос: во сколько раз дольше будет работать код, если данных станет в 10 раз больше. Это не секунды, а форма роста.</p>
+  <div class="prose"><p>Ищешь друга в аудитории на 300 человек:</p>
+    <ul>
+      <li><b>O(1)</b> — знаешь его место. Сколько бы людей ни было, идёшь сразу туда.</li>
+      <li><b>O(log n)</b> — люди сидят по алфавиту: глянул в середину, отбросил половину, снова в середину. Для 300 человек хватит 9 шагов, для миллиона — 20.</li>
+      <li><b>O(n)</b> — обходишь все ряды. Людей вдвое больше — идёшь вдвое дольше.</li>
+      <li><b>O(n log n)</b> — рассадить всех по алфавиту, то есть отсортировать. Чуть хуже, чем n.</li>
+      <li><b>O(n²)</b> — найти двоих с одинаковым днём рождения, сравнивая каждого с каждым. Людей вдвое больше — работы вчетверо.</li>
+      <li><b>O(2ⁿ)</b> — перебрать все возможные компании из этих людей (каждый либо идёт, либо нет). Плюс один человек — работы вдвое больше. Уже на n = 50 не дождёшься.</li>
+      <li><b>O(n!)</b> — перебрать все способы рассадить людей по порядку. На n = 15 это больше триллиона.</li>
+    </ul></div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · растим данные</span><span class="mono muted" id="nLabel">n = 1 000</span></div>
+    <label for="sN" class="ctrl"><span class="row" style="display:flex;justify-content:space-between"><span>Размер данных n</span><span class="mono" id="vN">1 000</span></span><input type="range" id="sN" min="1" max="7" step="0.5" value="3"></label>
+    <div class="bars" id="boBars"></div>
+    <p class="muted" style="font-size:13.5px">Ширина полосы — число операций в логарифмической шкале. Время посчитано так, будто одна операция занимает 1 наносекунду. В Python простая операция в десятки раз медленнее, так что реальные числа ещё больше. Сдвинь до миллиона и посмотри на O(n²).</p>
+  </div>
+  <div class="prose">
+    <p><b>Как считать на собеседовании:</b></p>
+    <ul>
+      <li>Константы отбрасываем: <code>3n + 5</code> → O(n). Нам важна форма, а не точное число.</li>
+      <li>Младшие слагаемые отбрасываем: <code>n² + n</code> → O(n²). При больших n квадрат съедает всё.</li>
+      <li>Вложенные циклы перемножаются: цикл по n внутри цикла по m — O(n·m).</li>
+      <li>Циклы друг за другом складываются, остаётся самый тяжёлый: O(n) + O(n²) → O(n²).</li>
+      <li>Память считается так же: создал список из n элементов — O(n) дополнительной памяти.</li>
+      <li>Если на каждом шаге задача <b>делится пополам</b> — это log n. Пример — бинарный поиск ниже.</li>
+      <li>Если данных два разных размера, пишешь обе буквы: O(n + m), O(n·m). Сводить к одной n нельзя.</li>
+    </ul>
+<pre><span class="cm"># бинарный поиск в отсортированном списке: O(log n)</span>
+def binary_search(a, target):
+    lo, hi = 0, len(a) - 1
+    while lo &lt;= hi:
+        mid = (lo + hi) // 2
+        if a[mid] == target:
+            return mid
+        if a[mid] &lt; target:
+            lo = mid + 1        <span class="cm"># отбросили левую половину</span>
+        else:
+            hi = mid - 1        <span class="cm"># отбросили правую</span>
+    return -1
+<span class="cm"># в Python готовое: import bisect; bisect.bisect_left(a, target)</span></pre>
+
+    <p><b>Лучший, средний и худший случай.</b> Поиск в списке: если элемент первый — 1 шаг, если последний или его нет — n шагов. Big O обычно называют для <b>худшего</b> случая, если не сказано иначе. Исключения, где важен средний: хеш-таблица (O(1) в среднем, O(n) в худшем) и быстрая сортировка (n log n в среднем, n² в худшем).</p>
+    <p><b>Big O, Θ и Ω.</b> Строго говоря, O — оценка сверху («не хуже чем»), Ω — снизу («не лучше чем»), Θ — точная. На собеседованиях везде говорят O и имеют в виду точную оценку. Знать разницу достаточно на уровне одной фразы.</p>
+    <p><b>Память: что считается.</b> Считают <b>дополнительную</b> память, сам вход обычно не считают. Рекурсия тратит память на стек вызовов: глубина рекурсии n — O(n) памяти, даже если ты ничего не создаёшь. В Python глубина рекурсии ограничена ~1000, поэтому глубокую рекурсию переписывают циклом.</p>
+  </div>
+
+  <h3 style="font-size:17px">Сколько данных выдержит решение</h3>
+  <div class="prose"><p>Грубое правило: Python делает около 10⁷ простых операций в секунду (C++ — около 10⁸–10⁹). На LeetCode по ограничению на n можно угадать, какую сложность от тебя ждут:</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>n до</th><th>Укладывается за ~1 с в Python</th><th>Типичное решение</th></tr></thead>
+    <tbody>
+      <tr><td class="n">20</td><td>O(2ⁿ)</td><td>перебор всех подмножеств</td></tr>
+      <tr><td class="n">3 000</td><td>O(n²)</td><td>двойной цикл</td></tr>
+      <tr><td class="n">10⁵ – 10⁶</td><td>O(n log n)</td><td>сортировка, бинарный поиск</td></tr>
+      <tr><td class="n">10⁷</td><td>O(n)</td><td>один проход, хеш-таблица</td></tr>
+      <tr><td class="n">больше</td><td>O(log n) или O(1)</td><td>формула, бинарный поиск по ответу</td></tr>
+    </tbody></table></div>
+
+  <h3 style="font-size:17px">Скрытые O(n) в Python</h3>
+  <div class="prose"><p>Код выглядит как один цикл, а на деле O(n²). Это главные места, где ловят на собеседовании:</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Медленно</th><th>Почему</th><th>Быстро</th></tr></thead>
+    <tbody>
+      <tr><td><code>if x in my_list</code> в цикле</td><td>каждая проверка O(n)</td><td><code>s = set(my_list)</code> до цикла</td></tr>
+      <tr><td><code>s += ch</code> для строк в цикле</td><td>строка неизменяема, каждый раз копируется</td><td>собрать в список, потом <code>"".join(parts)</code></td></tr>
+      <tr><td><code>a.pop(0)</code>, <code>a.insert(0, x)</code></td><td>сдвиг всех элементов</td><td><code>collections.deque</code>: <code>popleft()</code></td></tr>
+      <tr><td><code>a[1:]</code> в рекурсии или цикле</td><td>срез — это копия, O(k)</td><td>передавать индекс начала</td></tr>
+      <tr><td><code>sorted()</code>, <code>min()</code>, <code>max()</code>, <code>a.count(x)</code> внутри цикла</td><td>каждый вызов — полный проход</td><td>посчитать один раз до цикла</td></tr>
+      <tr><td><code>a.index(x)</code>, <code>a.remove(x)</code></td><td>линейный поиск</td><td>хранить словарь «значение → индекс»</td></tr>
+      <tr><td>цикл <code>for</code> по строкам DataFrame</td><td>каждая строка — тяжёлый Python-объект</td><td>векторные операции pandas/numpy</td></tr>
+    </tbody></table></div>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>kNN при каждом предсказании меряет расстояние до всех n обучающих точек: O(n·d), где d — число признаков. Поэтому он медленный на больших данных. А матрица попарных расстояний для 100 000 объектов — это 10¹⁰ чисел по 8 байт, то есть 80 ГБ памяти. Вот что значит O(n²) по памяти.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Какая сложность у этой функции? <code>for x in a: for y in a: if x + y == 0: return True</code></summary>
+      <div class="a"><p>O(n²) по времени: каждую пару проверяем во вложенном цикле. O(1) по памяти. Улучшение: положить элементы в set и для каждого x проверить <code>-x in seen</code>. Получится O(n) по времени и O(n) по памяти. Это классический обмен памяти на скорость.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Сортировка, а потом один проход по списку. Итоговая сложность?</summary>
+      <div class="a"><p>O(n log n) + O(n) = O(n log n): остаётся самое тяжёлое слагаемое.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 8 + 9 ============ -->
+<section class="topic" id="t8">
+  <div class="eyebrow">Тема 8 из 10 · Алгоритмы</div>
+  <h2>Массив и динамический массив</h2>
+  <p class="tldr">Массив — ячейки памяти подряд, плечом к плечу. Поэтому до любой ячейки можно дойти сразу, а вставка в начало заставляет двигать всех.</p>
+  <div class="prose">
+    <p>Память компьютера — длинная улица с пронумерованными домами. Массив занимает кусок улицы подряд. Если массив начинается с дома 1000, а каждый элемент занимает 8 домов, то элемент номер i живёт в доме <code>1000 + i·8</code>. Одно умножение и одно сложение: <b>доступ по индексу O(1)</b>, хоть элементов десять, хоть миллиард.</p>
+    <p>Вставить элемент в начало — как подсесть на край занятой скамейки: всем приходится сдвинуться на одно место. <b>Вставка и удаление в начале — O(n)</b>. В конце сдвигать никого не нужно.</p>
+    <p><b>Динамический массив</b> — массив, который умеет расти. Он заранее берёт место с запасом (ёмкость), а когда запас кончается, переезжает в новое место вдвое больше и копирует туда всё. <b>list в Python — это динамический массив</b> ссылок на объекты.</p>
+    <p><b>Статический массив</b> (в C, Java <code>int[]</code>) имеет фиксированный размер: сколько попросил при создании, столько и есть. Динамический прячет переезды от тебя.</p>
+  </div>
+  <h3 style="font-size:17px">list против numpy: почему numpy в 50 раз быстрее</h3>
+  <div class="prose">
+    <p>В list лежат не сами числа, а <b>ссылки</b> на объекты, разбросанные по памяти. Каждое число в Python — полноценный объект примерно на 28 байт: тип, счётчик ссылок, само значение. Поэтому в один list можно положить и число, и строку, и другой список.</p>
+    <p><code>numpy.array</code> хранит сами числа подряд, одного типа, по 8 байт. Отсюда три выигрыша:</p>
+    <ul>
+      <li><b>Память</b> — в 4–5 раз меньше: миллион float — 8 МБ против ~32 МБ.</li>
+      <li><b>Скорость</b> — операция над всем массивом (<code>a * 2</code>) выполняется одним циклом на C, без проверки типа каждого элемента. Это называется <b>векторизация</b>.</li>
+      <li><b>Кэш процессора</b> — процессор подтягивает память кусками. Когда данные лежат подряд, следующий элемент уже в кэше. Ссылки по всей памяти — постоянные промахи кэша.</li>
+    </ul>
+    <p>Pandas внутри построен на numpy. Поэтому в ML правило: никаких циклов по элементам, только операции над целыми столбцами.</p>
+  </div>
+  <h3 style="font-size:17px">Массив против связного списка</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Операция</th><th>Массив</th><th>Связный список</th></tr></thead>
+    <tbody>
+      <tr><td>Взять i-й элемент</td><td class="n">O(1)</td><td class="n">O(n): идём по ссылкам с начала</td></tr>
+      <tr><td>Вставить/удалить в начале</td><td class="n">O(n)</td><td class="n">O(1)</td></tr>
+      <tr><td>Вставить рядом с известным узлом</td><td class="n">O(n)</td><td class="n">O(1)</td></tr>
+      <tr><td>Добавить в конец</td><td class="n">O(1)*</td><td class="n">O(1), если храним хвост</td></tr>
+      <tr><td>Память</td><td>компактно, дружит с кэшем</td><td>+ ссылка на каждый узел, разбросано</td></tr>
+    </tbody></table></div>
+  <p class="muted" style="font-size:13.5px">В Python связный список руками почти не пишут, но на LeetCode он встречается часто (Reverse Linked List, Merge Two Sorted Lists). <code>deque</code> внутри — связный список блоков: быстрые оба конца, но медленный доступ к середине.</p>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему numpy быстрее списков Python?</summary>
+      <div class="a"><p>Numpy хранит числа одного типа подряд в памяти, а операции над массивом выполняются циклом на C без проверки типа каждого элемента (векторизация). List хранит ссылки на отдельные Python-объекты, каждый элемент обрабатывается интерпретатором. Плюс непрерывная память лучше использует кэш процессора.</p></div></details>
+  </div>
+</section>
+<section class="topic" id="t9" style="padding-top:8px">
+  <div class="eyebrow">Тема 9 из 10 · Алгоритмы</div>
+  <h2>Амортизированная сложность</h2>
+  <p class="tldr">Иногда append дорогой: массив переезжает и копирует всё. Но переезды так редки, что в среднем на один append приходится постоянная работа. Это и называется амортизированная O(1).</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · динамический массив</span><span class="mono muted" id="daCap">длина 0 · ёмкость 1</span></div>
+    <div class="cells" id="daCells" aria-live="polite"></div>
+    <div class="btns">
+      <button class="btn" id="daAdd">append</button>
+      <button class="btn" id="daAdd10">append ×10</button>
+      <button class="btn" id="daIns">insert(0, x)</button>
+      <button class="btn" id="daReset">Сначала</button>
+    </div>
+    <p class="verdict" id="daMsg">Нажимай append и следи: когда ёмкость кончается, массив переезжает (жёлтые ячейки — копирование).</p>
+    <svg id="daChart" viewBox="0 0 600 150" role="img" aria-label="Стоимость каждой операции append"></svg>
+    <div class="readout">
+      <div class="stat"><div class="v" id="daTotal">0</div><div class="k">всего операций (запись + копирования)</div></div>
+      <div class="stat"><div class="v" id="daAvg">0</div><div class="k">в среднем на один append</div></div>
+    </div>
+  </div>
+  <div class="prose">
+    <p><b>Почему среднее не растёт.</b> Переезды случаются на длинах 1, 2, 4, 8, 16… Копирований всего 1 + 2 + 4 + … + n, и эта сумма меньше 2n. Плюс n самих записей. На один append выходит меньше 3 операций при любом n. Столбики на графике — редкие дорогие переезды, а среднее остаётся ровным.</p>
+    <p>Python растит список не вдвое, а примерно на 12%, но принцип тот же: запас растёт пропорционально длине, значит append — амортизированная O(1).</p>
+    <p><b>Почему растить в разы, а не на +10 ячеек?</b> При +10 переезд случается каждые 10 append, а копировать приходится всё больше: суммарно ~n²/20 операций, то есть O(n) на append. Рост в разы — единственный способ сделать переезды экспоненциально редкими.</p>
+    <p><b>Амортизированная ≠ средняя.</b> Средняя сложность — про случайность: «в среднем по всем входам». Амортизированная — гарантия: <b>любая</b> последовательность из n операций стоит O(n) в сумме, без всякой удачи. Но отдельная операция может быть дорогой: если нужен строгий отклик каждого вызова (игра, торговля), этот скачок может помешать.</p>
+    <p>Где ещё встречается: <code>dict</code> и <code>set</code> тоже переезжают в таблицу побольше, когда заполняются (урок 3). <code>"".join</code> и <code>StringBuilder</code> в Java работают по тому же принципу.</p>
+  </div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему append в Python за O(1), если иногда список копируется целиком?</summary>
+      <div class="a"><p>Это амортизированная оценка. Список выделяет память с запасом, пропорциональным текущей длине. Полное копирование происходит редко, и его стоимость раскладывается на все предыдущие дешёвые append. Суммарная работа на n добавлений — O(n), значит в среднем O(1) на операцию. Отдельный append в худшем случае стоит O(n).</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Нажми insert(0, x) пять раз подряд. Почему каждая вставка дороже предыдущей?</summary>
+      <div class="a"><p>Каждый раз сдвигаются все элементы, а их становится больше. Вставка в начало — O(n). Если нужна очередь с добавлением и удалением с обоих концов, берут <code>collections.deque</code> (урок 2).</p></div></details>
+  </div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="topic" id="t10">
+  <div class="eyebrow">Тема 10 из 10 · <span class="dia">◆</span> Алгоритмы</div>
+  <h2>Сложность операций list, dict, set</h2>
+  <p class="tldr">list быстро берёт по номеру, но медленно ищет по значению. dict и set быстро ищут по значению, потому что внутри у них хеш-таблица (урок 3).</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Операция</th><th>list</th><th>dict, set</th></tr></thead>
+    <tbody>
+      <tr><td>Взять по индексу <code>a[i]</code></td><td class="n">O(1)</td><td>нет индексов</td></tr>
+      <tr><td>Добавить в конец <code>append</code></td><td class="n">O(1)*</td><td>—</td></tr>
+      <tr><td>Добавить или удалить по ключу</td><td>—</td><td class="n">O(1)*</td></tr>
+      <tr><td>Вставить или удалить в начале</td><td class="n">O(n)</td><td>—</td></tr>
+      <tr><td>Удалить последний <code>pop()</code></td><td class="n">O(1)</td><td>—</td></tr>
+      <tr><td>Проверить <code>x in ...</code></td><td class="n">O(n)</td><td class="n">O(1)*</td></tr>
+      <tr><td>Длина <code>len</code></td><td class="n">O(1)</td><td class="n">O(1)</td></tr>
+      <tr><td>Отсортировать</td><td class="n">O(n log n)</td><td>—</td></tr>
+    </tbody></table></div>
+  <p class="muted" style="font-size:13.5px">* в среднем: для append — амортизированно, для dict и set — при нормальной хеш-функции. Худший случай у dict и set — O(n), он бывает, когда много ключей попадают в одну ячейку.</p>
+
+  <h3 style="font-size:17px">Полная таблица: list и tuple</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Операция</th><th>Сложность</th><th>Комментарий</th></tr></thead>
+    <tbody>
+      <tr><td><code>a[i]</code>, <code>a[i] = x</code></td><td class="n">O(1)</td><td>адрес считается формулой</td></tr>
+      <tr><td><code>a.append(x)</code>, <code>a.pop()</code></td><td class="n">O(1)*</td><td>работа с концом</td></tr>
+      <tr><td><code>a.pop(i)</code>, <code>a.insert(i, x)</code>, <code>del a[i]</code></td><td class="n">O(n − i)</td><td>сдвиг хвоста; в начале — O(n)</td></tr>
+      <tr><td><code>x in a</code>, <code>a.index(x)</code>, <code>a.count(x)</code>, <code>a.remove(x)</code></td><td class="n">O(n)</td><td>линейный поиск</td></tr>
+      <tr><td><code>a[i:j]</code></td><td class="n">O(j − i)</td><td>срез создаёт копию</td></tr>
+      <tr><td><code>a.extend(b)</code>, <code>a + b</code></td><td class="n">O(len b) / O(len a + len b)</td><td><code>+</code> создаёт новый список</td></tr>
+      <tr><td><code>a.copy()</code>, <code>list(a)</code>, <code>a[:]</code></td><td class="n">O(n)</td><td>поверхностная копия</td></tr>
+      <tr><td><code>min</code>, <code>max</code>, <code>sum</code>, обход <code>for</code></td><td class="n">O(n)</td><td>один проход</td></tr>
+      <tr><td><code>a.sort()</code>, <code>sorted(a)</code></td><td class="n">O(n log n)</td><td>Timsort; на почти отсортированных данных быстрее</td></tr>
+      <tr><td><code>a.reverse()</code></td><td class="n">O(n)</td><td>на месте</td></tr>
+    </tbody></table></div>
+  <p class="muted" style="font-size:13.5px">tuple — те же операции чтения с той же сложностью, но изменять нельзя. Зато tuple хешируемый (если внутри тоже неизменяемое) и может быть ключом словаря.</p>
+
+  <h3 style="font-size:17px">Полная таблица: dict и set</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Операция</th><th>Сложность</th><th>Комментарий</th></tr></thead>
+    <tbody>
+      <tr><td><code>d[k]</code>, <code>d[k] = v</code>, <code>d.get(k)</code>, <code>del d[k]</code></td><td class="n">O(1)*</td><td>через хеш ключа</td></tr>
+      <tr><td><code>k in d</code>, <code>x in s</code></td><td class="n">O(1)*</td><td>проверяет ключи, не значения</td></tr>
+      <tr><td><code>v in d.values()</code></td><td class="n">O(n)</td><td>значения не хешируются — обычный перебор</td></tr>
+      <tr><td><code>s.add(x)</code>, <code>s.discard(x)</code></td><td class="n">O(1)*</td><td></td></tr>
+      <tr><td>обход, <code>len</code></td><td class="n">O(n), O(1)</td><td>dict помнит порядок вставки с Python 3.7</td></tr>
+      <tr><td><code>a | b</code> (объединение)</td><td class="n">O(len a + len b)</td><td></td></tr>
+      <tr><td><code>a &amp; b</code> (пересечение)</td><td class="n">O(min(len a, len b))</td><td>перебирает меньшее, проверяет в большем</td></tr>
+      <tr><td><code>a - b</code> (разность)</td><td class="n">O(len a)</td><td></td></tr>
+      <tr><td><code>set(a)</code>, <code>dict(...)</code></td><td class="n">O(n)</td><td>построение — один проход</td></tr>
+    </tbody></table></div>
+
+  <div class="prose">
+    <p><b>Что можно положить в set и использовать ключом dict:</b> только хешируемые объекты — числа, строки, tuple из неизменяемых, frozenset. list, dict, set — нельзя: <code>TypeError: unhashable type: 'list'</code>. Причина: если объект изменится, его хеш станет другим, и словарь его потеряет. Подробно — урок 3.</p>
+    <p><b>Цена скорости — память:</b> set из миллиона чисел занимает в несколько раз больше, чем list: хеш-таблица держит запас пустых ячеек.</p>
+    <p><b>Как выбирать:</b> нужен порядок и доступ по номеру — list. Нужна быстрая проверка «есть ли» или убрать дубли — set. Нужно найти что-то по ключу или посчитать — dict. Данные не меняются и нужен ключ из нескольких полей — tuple.</p>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · живой замер</span></div>
+    <p style="font-size:14.5px">Сейчас твой браузер положит 100 000 чисел в массив и в множество и выполнит 2 000 поисков в каждом. Это JavaScript, но list и set в Python ведут себя так же.</p>
+    <div class="btns"><button class="btn" id="bBench">Замерить</button></div>
+    <div class="readout">
+      <div class="stat"><div class="v" id="bList">—</div><div class="k">массив: 2 000 поисков <code>in</code></div></div>
+      <div class="stat"><div class="v" id="bSet">—</div><div class="k">множество: 2 000 поисков</div></div>
+    </div>
+    <p class="verdict" id="bMsg"></p>
+  </div>
+  <div class="callout brs"><b class="h">Где это в практике</b><p>Фильтруешь 1 000 000 строк датасета по списку из 50 000 разрешённых id? <code>if row_id in allowed_list</code> даст 5·10¹⁰ сравнений, а <code>allowed = set(allowed_list)</code> одной строкой выше превращает это в миллион быстрых проверок. В pandas то же самое делает <code>df[df.id.isin(allowed)]</code>.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему <code>x in list</code> медленнее, чем <code>x in set</code>?</summary>
+      <div class="a"><p>list проверяет элементы по очереди, пока не найдёт, это O(n). set считает хеш x и сразу идёт в нужную ячейку хеш-таблицы, это O(1) в среднем. Цена — память: set тратит больше места, и элементы должны быть хешируемыми, то есть неизменяемыми.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · как на собеседовании и в работе</div>
+  <h2>Практика</h2>
+  <p class="tldr">Шесть задач. Устные отвечай вслух с таймером: на собеседовании думают голосом. Рабочие делай в своём BRS-репозитории, как будто это задача от тимлида.</p>
+  <div class="prac">
+    <div class="task"><span class="tg int">Собес · устно · 3 минуты</span>
+      <h3>«На train ROC-AUC 0.98, на тесте 0.71. Что будете делать?»</h3>
+      <p class="ok">Готово, когда ответ уложился в 3 минуты и в нём есть диагноз, причины и минимум три действия.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a">
+        <p><b>Диагноз:</b> большой разрыв train и test — переобучение (высокая variance).</p>
+        <p><b>Сначала проверить, нет ли ошибки:</b> одинаково ли распределены train и test, нет ли утечки или, наоборот, сдвига во времени. Иногда 0.98 на train — следствие утечки признака, который на тесте ведёт себя иначе.</p>
+        <p><b>Действия:</b> упростить модель (глубина, число листьев), добавить регуляризацию, early stopping по валидации, собрать больше данных, убрать шумные признаки, перейти на кросс-валидацию для честного выбора настроек.</p>
+        <p><b>Плюс к ответу:</b> «смотрел бы кривые обучения и validation curve, чтобы понять, где начинается переобучение».</p></div></details></div>
+
+    <div class="task"><span class="tg rev">Код-ревью · найди ошибки</span>
+      <h3>Коллега прислал код. Найди минимум пять проблем.</h3>
+<pre>df = pd.read_csv("students.csv")
+X = StandardScaler().fit_transform(df.drop(columns="is_at_risk"))
+y = df["is_at_risk"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+scores = {}
+for d in [1, 3, 5, 10, None]:
+    m = DecisionTreeClassifier(max_depth=d).fit(X_train, y_train)
+    scores[d] = m.score(X_test, y_test)
+best = max(scores, key=scores.get)
+print("Итог на тесте:", scores[best])</pre>
+      <p class="ok">Готово, когда нашёл пять и для каждой написал одной строкой, как исправить.</p>
+      <details><summary>Ответ</summary><div class="a"><ul style="margin:0;padding-left:20px;display:grid;gap:6px">
+        <li><b>student_id остался в признаках.</b> Удалили только таргет. Модель может зацепиться за id, это мусорный признак.</li>
+        <li><b>Скейлер обучен на всех данных до разбиения</b>: среднее и разброс теста протекли в обучение. Правильно — fit на train, transform на test, лучше через Pipeline. Деревьям скейлинг вообще не нужен.</li>
+        <li><b>Нет stratify</b> при 8% положительных: в тест может попасть заметно меньше должников.</li>
+        <li><b>Глубина выбрана по тесту</b>: тест стал пробником, «итог» оптимистичен. Нужна валидация или кросс-валидация.</li>
+        <li><b>Метрика accuracy при дисбалансе</b>: модель «всегда 0» даёт 92%. Нужна PR-AUC или recall при выбранном пороге.</li>
+        <li><b>Нет random_state</b>: результат не воспроизводится от запуска к запуску.</li></ul></div></details></div>
+
+    <div class="task"><span class="tg work">Работа · Jupyter, 30 минут</span>
+      <h3>Честное разбиение и бейзлайн на настоящем датасете</h3>
+      <p>Задача от тимлида: «Возьми <code>sklearn.datasets.load_breast_cancer</code> (569 пациентов, 30 признаков, диагноз). Разбей на train, val и test 60/20/20 со stratify. Обучи бейзлайн <code>DummyClassifier</code>, логистическую регрессию в Pipeline со <code>StandardScaler</code> и <code>DecisionTreeClassifier</code>. Глубину дерева выбери по val. Итог — таблица: модель, accuracy и ROC-AUC на тесте».</p>
+      <p class="ok">Готово, когда в ноутбуке таблица из трёх строк и две фразы вывода, а тест использован один раз, в последней ячейке. Код разбиения — в теме 4.</p>
+      <details><summary>Что должно получиться</summary><div class="a"><p>Dummy даёт accuracy около 0.63, это доля большего класса, и ROC-AUC 0.5. Логистическая регрессия — ROC-AUC около 0.99. Дерево — заметно ниже логрега, обычно 0.90–0.95. Вывод: простая линейная модель с масштабированием здесь лучшая, и сложность не гарантирует качества. Точные числа зависят от random_state, это нормально.</p></div></details></div>
+
+    <div class="task"><span class="tg work">Работа · sklearn</span>
+      <h3>Найди переобучение на графике</h3>
+      <p>На том же датасете построй <code>validation_curve</code> для <code>DecisionTreeClassifier</code> по <code>max_depth</code> от 1 до 15 (<code>scoring="roc_auc"</code>, <code>cv=5</code>). Нарисуй две кривые, train и validation, и подпиши зоны недообучения и переобучения.</p>
+      <p class="ok">Готово, когда на графике видно, где валидация перестаёт расти, и ты можешь объяснить это словами из тем 5 и 6.</p>
+      <details><summary>Подсказка и ожидаемый результат</summary><div class="a">
+<pre>from sklearn.model_selection import validation_curve
+depths = range(1, 16)
+tr, val = validation_curve(DecisionTreeClassifier(random_state=42), X, y,
+    param_name="max_depth", param_range=depths, cv=5, scoring="average_precision")
+plt.plot(depths, tr.mean(1), label="train"); plt.plot(depths, val.mean(1), label="val")</pre>
+        <p>Train растёт почти до 1.0. Validation растёт на малых глубинах, а потом выходит на плато или падает. Глубины слева от пика — недообучение (bias), справа — переобучение (variance).</p></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · Big O</span>
+      <h3>«Оцените сложность и ускорьте»</h3>
+<pre>def common_students(group_a, group_b):
+    result = []
+    for s in group_a:
+        if s in group_b:
+            result.append(s)
+    return result</pre>
+      <p class="ok">Готово, когда назвал сложность для двух случаев, list и set, и предложил ускорение.</p>
+      <details><summary>Ответ</summary><div class="a"><p>Если <code>group_b</code> — list: O(n·m), потому что <code>in</code> проходит весь список. Ускорение: <code>b = set(group_b)</code> перед циклом. Это O(m) на построение и O(n) на проверки, итого O(n + m) по времени и O(m) по памяти. Короткая версия: <code>[s for s in group_a if s in b]</code>. Если порядок не важен — <code>set(group_a) &amp; set(group_b)</code>.</p></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 2 минуты</span>
+      <h3>«Объясните bias–variance на примере дерева решений»</h3>
+      <p class="ok">Готово, когда в ответе есть: что такое bias и variance, какая глубина к чему ведёт, как это лечат ансамбли.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>Неглубокое дерево — высокий bias: оно не может описать сложную зависимость и ошибается систематически. Глубокое — высокая variance: подстраивается под каждую точку и сильно меняется от выборки к выборке. Глубину выбирают по валидации. Random Forest усредняет много глубоких деревьев и снижает variance. Бустинг складывает неглубокие деревья и снижает bias.</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в дереве</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда прошёл «Проверку без ИИ» по теме. Галочки — те же, что в файле недели в Obsidian и на сайте дерева.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Типы задач:</b> регрессия — число, классификация — класс, кластеризация — группы без ответов, ранжирование — порядок.</li>
+      <li><b>С учителем</b> — есть y, <b>без учителя</b> — только X, <b>самообучение</b> — ответы из самих данных.</li>
+      <li><b>Функция потерь</b> — штраф за один ответ, <b>эмпирический риск</b> — средний штраф. MSE — средняя площадь квадратов ошибок, чувствительна к выбросам.</li>
+      <li><b>Train</b> — учиться, <b>val</b> — выбирать настройки, <b>test</b> — один раз в конце. Тест в обучении — утечка.</li>
+      <li><b>Недообучение:</b> плохо везде. <b>Переобучение:</b> хорошо на train, плохо на новых.</li>
+      <li><b>Ошибка = Bias² + Variance + шум.</b> Сложнее модель — bias ниже, variance выше.</li>
+      <li><b>Big O</b> — форма роста работы с ростом n: 1, log n, n, n log n, n². Константы и младшие слагаемые отбрасываем.</li>
+      <li><b>Массив</b> — ячейки подряд: индекс O(1), вставка в начало O(n). list в Python — динамический массив.</li>
+      <li><b>Амортизация:</b> редкие дорогие переезды делятся на все append, в среднем O(1).</li>
+      <li><b>list</b> ищет по значению за O(n), <b>set и dict</b> — за O(1) в среднем.</li>
+      <li><b>Константа под MSE</b> — среднее, под MAE — медиана. Это бейзлайн, который обязана побить модель.</li>
+      <li><b>Кросс-валидация:</b> K обучений, каждый фолд раз побывал валидацией; группы — GroupKFold, время — TimeSeriesSplit. Предобработку — только в Pipeline.</li>
+      <li><b>L2</b> уменьшает все веса, <b>L1</b> зануляет часть. В LogisticRegression меньше C — сильнее регуляризация.</li>
+      <li><b>Learning curve:</b> зазор — поможет больше данных; обе кривые плохие — нужна модель сложнее.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без ИИ, 15 минут</b>
+    <p>Закрой урок. Объясни вслух все шесть тем за 5 минут, как будто рассказываешь однокурснику. Потом без подсказок напиши в Python функцию <code>mse(y_true, y_pred)</code> и разбиение на train, val и test для BRS. Где запнулся — туда и возвращаешься. Только после этого ставь галочки в неделе 1.</p>
+  </div>
+</section>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+const $=id=>document.getElementById(id);
+const f2=v=>v>=100?v.toFixed(0):v>=10?v.toFixed(1):v.toFixed(2);
+
+/* ---------- RNG ---------- */
+function rng(seed){let a=seed>>>0;return function(){a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gauss(r){let u=0;while(!u)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r())}
+
+/* ---------- plotting helpers ---------- */
+function frame(W,H,m,xr,yr){
+  const sx=x=>m.l+(x-xr[0])/(xr[1]-xr[0])*(W-m.l-m.r);
+  const sy=y=>H-m.b-(y-yr[0])/(yr[1]-yr[0])*(H-m.t-m.b);
+  return {W,H,m,xr,yr,sx,sy,x0:m.l,x1:W-m.r,y0:m.t,y1:H-m.b};
+}
+function grid(F,xt,yt,xfmt=v=>v,yfmt=v=>v,xl="",yl=""){
+  let s="";
+  yt.forEach(v=>{const y=F.sy(v);s+=`<line class="ax" x1="${F.x0}" x2="${F.x1}" y1="${y}" y2="${y}"/><text class="tk" x="${F.x0-6}" y="${y+4}" text-anchor="end">${yfmt(v)}</text>`});
+  xt.forEach(v=>{const x=F.sx(v);s+=`<text class="tk" x="${x}" y="${F.y1+16}" text-anchor="middle">${xfmt(v)}</text>`});
+  if(xl)s+=`<text class="lbl" x="${F.x1}" y="${F.y1-6}" text-anchor="end">${xl}</text>`;
+  if(yl)s+=`<text class="lbl" x="${F.x0+6}" y="${F.y0+12}">${yl}</text>`;
+  return s;
+}
+function pathOf(F,xs,fn,clampY){
+  let d="",pen=false;
+  xs.forEach(x=>{let y=fn(x);if(!isFinite(y)){pen=false;return}
+    y=Math.max(clampY[0],Math.min(clampY[1],y));
+    d+=(pen?"L":"M")+F.sx(x).toFixed(1)+","+F.sy(y).toFixed(1);pen=true});
+  return d;
+}
+
+/* ---------- topic 1 icons ---------- */
+(function icons(){
+  const r=rng(3);let s="";
+  for(let i=0;i<9;i++){const x=15+i*16,y=85-i*8+gauss(r)*6;s+=`<circle cx="${x}" cy="${y}" r="3.5" fill="var(--accent)"/>`}
+  $("ic-reg").innerHTML=`<line x1="10" y1="90" x2="150" y2="18" stroke="var(--plum)" stroke-width="2.5"/>`+s;
+  s="";for(let i=0;i<10;i++){s+=`<circle cx="${25+r()*45}" cy="${20+r()*60}" r="3.5" fill="var(--accent)"/><rect x="${92+r()*45}" y="${20+r()*60}" width="7" height="7" fill="var(--warm)"/>`}
+  $("ic-cls").innerHTML=`<line x1="82" y1="6" x2="80" y2="94" stroke="var(--plum)" stroke-width="2.5" stroke-dasharray="5 4"/>`+s;
+  s="";[[40,35],[115,30],[80,72]].forEach(([cx,cy])=>{for(let i=0;i<8;i++)s+=`<circle cx="${cx+gauss(r)*9}" cy="${cy+gauss(r)*7}" r="3.5" fill="var(--muted)"/>`;s+=`<circle cx="${cx}" cy="${cy}" r="22" fill="none" stroke="var(--teal)" stroke-dasharray="3 3"/>`});
+  $("ic-clu").innerHTML=s;
+  s="";[1,.78,.55,.35,.2].forEach((w,i)=>{s+=`<text x="8" y="${20+i*17}" class="tk">${i+1}</text><rect x="24" y="${10+i*17}" width="${w*126}" height="11" rx="3" fill="var(--accent)" fill-opacity="${1-i*.17}"/>`});
+  $("ic-rank").innerHTML=s;
+})();
+
+/* ---------- topic 3: loss lab ---------- */
+const BASE=[[1,2.1],[2,2.9],[3,4.2],[4,4.4],[5,5.8],[6,6.1],[7,7.4],[8,7.6],[9,9.1]];
+const OUT=[1.5,9.5];
+let lossMode="mse", withOut=false;
+const LF=frame(360,356,{l:34,r:12,t:12,b:30},[0,10],[0,10]);
+function pts(){return withOut?BASE.concat([OUT]):BASE}
+function drawLoss(){
+  const w=+$("sW").value,b=+$("sB").value,P=pts();
+  $("vW").textContent=w.toFixed(2);$("vB").textContent=b.toFixed(2);
+  $("lossEq").textContent=`ŷ = ${w.toFixed(2)}·x ${b<0?"−":"+"} ${Math.abs(b).toFixed(2)}`;
+  let s=`<defs><clipPath id="lc"><rect x="${LF.x0}" y="${LF.y0}" width="${LF.x1-LF.x0}" height="${LF.y1-LF.y0}"/></clipPath></defs>`;
+  s+=grid(LF,[0,2,4,6,8,10],[0,2,4,6,8,10],v=>v,v=>v,"часы подготовки","балл");
+  let se=0,ae=0,g="";
+  P.forEach(([x,y],i)=>{
+    const p=w*x+b,r=y-p;se+=r*r;ae+=Math.abs(r);
+    const X=LF.sx(x),Y=LF.sy(y),Yp=LF.sy(p),side=Math.abs(Y-Yp);
+    const isOut=withOut&&i===P.length-1;
+    if(lossMode==="mse")g+=`<rect x="${X}" y="${Math.min(Y,Yp)}" width="${side}" height="${side}" fill="${isOut?"var(--red)":"var(--plum)"}" fill-opacity=".16" stroke="${isOut?"var(--red)":"var(--plum)"}" stroke-opacity=".55"/>`;
+    g+=`<line x1="${X}" x2="${X}" y1="${Y}" y2="${Yp}" stroke="${isOut?"var(--red)":"var(--plum)"}" stroke-width="${lossMode==="mae"?2.5:1.2}"/>`;
+  });
+  s+=`<g clip-path="url(#lc)">${g}<line x1="${LF.sx(0)}" y1="${LF.sy(b)}" x2="${LF.sx(10)}" y2="${LF.sy(w*10+b)}" stroke="var(--ink)" stroke-width="2.2"/></g>`;
+  P.forEach(([x,y],i)=>{const isOut=withOut&&i===P.length-1;s+=`<circle cx="${LF.sx(x)}" cy="${LF.sy(y)}" r="5" fill="${isOut?"var(--red)":"var(--accent)"}" stroke="var(--surface)" stroke-width="1.5"/>`});
+  $("lossSvg").innerHTML=s;
+  $("rMse").textContent=f2(se/P.length);$("rMae").textContent=f2(ae/P.length);
+}
+function ols(P){const n=P.length,mx=P.reduce((a,p)=>a+p[0],0)/n,my=P.reduce((a,p)=>a+p[1],0)/n;
+  let c=0,v=0;P.forEach(([x,y])=>{c+=(x-mx)*(y-my);v+=(x-mx)**2});const w=c/v;return [w,my-w*mx]}
+["sW","sB"].forEach(id=>$(id).addEventListener("input",drawLoss));
+$("bMse").onclick=()=>{lossMode="mse";$("bMse").setAttribute("aria-pressed","true");$("bMae").setAttribute("aria-pressed","false");drawLoss()};
+$("bMae").onclick=()=>{lossMode="mae";$("bMae").setAttribute("aria-pressed","true");$("bMse").setAttribute("aria-pressed","false");drawLoss()};
+$("bBest").onclick=()=>{const [w,b]=ols(pts());$("sW").value=w.toFixed(2);$("sB").value=(Math.round(b*20)/20).toFixed(2);drawLoss()};
+$("bOut").onclick=()=>{withOut=!withOut;$("bOut").setAttribute("aria-pressed",withOut);$("bOut").textContent=withOut?"Убрать выброс":"Добавить выброс";drawLoss()};
+drawLoss();
+
+/* ---------- polynomial fitting (Chebyshev basis for stability) ---------- */
+function feats(x,d){const z=2*x-1,T=[1];if(d>=1)T.push(z);for(let k=2;k<=d;k++)T.push(2*z*T[k-1]-T[k-2]);return T}
+function fit(xs,ys,d,lam=1e-9){
+  const p=d+1,A=Array.from({length:p},()=>new Array(p+1).fill(0));
+  xs.forEach((x,i)=>{const f=feats(x,d);for(let a=0;a<p;a++){for(let b=0;b<p;b++)A[a][b]+=f[a]*f[b];A[a][p]+=f[a]*ys[i]}});
+  for(let a=0;a<p;a++)A[a][a]+=lam;
+  for(let c=0;c<p;c++){let mx=c;for(let r=c+1;r<p;r++)if(Math.abs(A[r][c])>Math.abs(A[mx][c]))mx=r;[A[c],A[mx]]=[A[mx],A[c]];
+    for(let r=0;r<p;r++){if(r===c)continue;const k=A[r][c]/A[c][c];for(let q=c;q<=p;q++)A[r][q]-=k*A[c][q]}}
+  return A.map((row,i)=>row[p]/row[i]);
+}
+const pred=(cf,x)=>{const f=feats(x,cf.length-1);return f.reduce((s,v,i)=>s+v*cf[i],0)};
+const truth=x=>Math.sin(2*Math.PI*x);
+const mse=(cf,xs,ys)=>xs.reduce((s,x,i)=>s+(pred(cf,x)-ys[i])**2,0)/xs.length;
+const XS=Array.from({length:241},(_,i)=>i/240);
+
+/* ---------- topic 5: over/underfit lab ---------- */
+const r5=rng(11), SIG=0.25;
+const trX=Array.from({length:12},(_,i)=>Math.min(.99,Math.max(.01,(i+.5)/12+(r5()-.5)*.05)));
+const trY=trX.map(x=>truth(x)+gauss(r5)*SIG);
+const teX=Array.from({length:120},()=>r5()), teY=teX.map(x=>truth(x)+gauss(r5)*SIG);
+const ERR=Array.from({length:12},(_,d)=>{const cf=fit(trX,trY,d);return {cf,tr:mse(cf,trX,trY),te:mse(cf,teX,teY)}});
+let showTest=false;
+const FF=frame(600,300,{l:40,r:14,t:14,b:28},[0,1],[-1.8,1.8]);
+const EF=frame(600,220,{l:46,r:14,t:16,b:34},[0,11],[-2.3,1.3]);
+const L10=v=>Math.log10(Math.max(v,0.005));
+function verdictFor(d){
+  if(d<=1)return "Недообучение. Прямая физически не может изогнуться как волна. Ошибка большая и на train, и на новых данных.";
+  if(d===2)return "Почти. Кривая уже гнётся, но одного изгиба мало.";
+  if(d<=5)return "Норма. Кривая повторяет закономерность и не гоняется за шумом. Ошибка на новых данных минимальная.";
+  if(d<=7)return "Начинается переобучение. Ошибка на train ещё падает, а на новых данных уже растёт.";
+  return "Переобучение. Кривая проходит почти через каждую точку, но между точками и по краям улетает. Модель выучила шум.";
+}
+function drawFit(){
+  const d=+$("sDeg").value,e=ERR[d];
+  $("vDeg").textContent=d;$("degLabel").textContent="степень "+d;
+  let s=`<defs><clipPath id="fc"><rect x="${FF.x0}" y="${FF.y0}" width="${FF.x1-FF.x0}" height="${FF.y1-FF.y0}"/></clipPath></defs>`;
+  s+=grid(FF,[0,.25,.5,.75,1],[-1.5,-1,-.5,0,.5,1,1.5],v=>v,v=>v);
+  s+=`<g clip-path="url(#fc)"><path d="${pathOf(FF,XS,truth,[-9,9])}" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="5 5"/>`;
+  s+=`<path d="${pathOf(FF,XS,x=>pred(e.cf,x),[-3,3])}" fill="none" stroke="var(--plum)" stroke-width="2.6"/></g>`;
+  if(showTest)teX.forEach((x,i)=>{s+=`<circle cx="${FF.sx(x)}" cy="${FF.sy(teY[i])}" r="3" fill="none" stroke="var(--muted)"/>`});
+  trX.forEach((x,i)=>{s+=`<circle cx="${FF.sx(x)}" cy="${FF.sy(trY[i])}" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.5"/>`});
+  $("fitSvg").innerHTML=s;
+  $("rTr").textContent=f2(e.tr);$("rTe").textContent=f2(e.te);
+  $("verdict").textContent=verdictFor(d);
+  // error curves
+  let t=grid(EF,[0,1,2,3,4,5,6,7,8,9,10,11],[-2,-1,0,1],v=>v,v=>({"-2":"0.01","-1":"0.1","0":"1","1":"10"})[v],"степень многочлена","ошибка, лог. шкала");
+  const line=(key,col)=>`<path d="${ERR.map((o,i)=>(i?"L":"M")+EF.sx(i)+","+EF.sy(Math.min(1.3,L10(o[key])))).join("")}" fill="none" stroke="${col}" stroke-width="2.4"/>`+
+    ERR.map((o,i)=>`<circle cx="${EF.sx(i)}" cy="${EF.sy(Math.min(1.3,L10(o[key])))}" r="${i===d?5.5:3}" fill="${col}"/>`).join("");
+  t+=`<line x1="${EF.sx(d)}" x2="${EF.sx(d)}" y1="${EF.y0}" y2="${EF.y1}" stroke="var(--ink)" stroke-opacity=".35" stroke-dasharray="3 3"/>`;
+  t+=line("tr","var(--accent)")+line("te","var(--plum)");
+  t+=`<text class="lbl" x="${EF.sx(0.2)}" y="${EF.y0+30}" fill="var(--accent)">— train</text><text class="lbl" x="${EF.sx(0.2)}" y="${EF.y0+46}">— новые данные</text>`;
+  $("errSvg").innerHTML=t;
+  $("errSvg").querySelectorAll(".lbl")[2].setAttribute("style","fill:var(--accent)");
+  $("errSvg").querySelectorAll(".lbl")[3].setAttribute("style","fill:var(--plum)");
+}
+$("sDeg").addEventListener("input",drawFit);
+$("bTest").onclick=()=>{showTest=!showTest;$("bTest").setAttribute("aria-pressed",showTest);$("bTest").textContent=showTest?"Скрыть новые данные":"Показать новые данные";drawFit()};
+drawFit();
+
+/* ---------- topic 6: dartboards ---------- */
+(function boards(){
+  const cfg=[["Низкий bias","низкая variance",0,0,4],["Низкий bias","высокая variance",0,0,14],["Высокий bias","низкая variance",17,-13,4],["Высокий bias","высокая variance",17,-13,14]];
+  const r=rng(5);
+  $("boards").innerHTML=cfg.map(([a,b,ox,oy,sp])=>{
+    let s=`<svg viewBox="0 0 100 100" aria-hidden="true">`;
+    [44,32,20,8].forEach((rad,i)=>s+=`<circle cx="50" cy="50" r="${rad}" fill="${i===3?"var(--warm)":"none"}" fill-opacity=".5" stroke="var(--line)" stroke-width="1.5"/>`);
+    for(let i=0;i<9;i++)s+=`<circle cx="${50+ox+gauss(r)*sp*.6}" cy="${50+oy+gauss(r)*sp*.6}" r="3.2" fill="var(--plum)"/>`;
+    return `<figure>${s}</svg><figcaption><b>${a}</b>${b}</figcaption></figure>`}).join("");
+})();
+
+/* ---------- topic 6: bias-variance lab ---------- */
+let bvDeg=3, bvSeed=101;
+const BF=frame(600,300,{l:40,r:14,t:14,b:28},[0,1],[-1.8,1.8]);
+const GX=Array.from({length:95},(_,i)=>.03+i*.94/94);
+function simulate(d,seed){
+  const r=rng(seed+d*7919),models=[];
+  for(let k=0;k<25;k++){const xs=Array.from({length:15},(_,i)=>Math.min(.995,Math.max(.005,(i+.5)/15+(r()-.5)/15))),ys=xs.map(x=>truth(x)+gauss(r)*SIG);models.push(fit(xs,ys,d,1e-6))}
+  const P=models.map(cf=>GX.map(x=>pred(cf,x))), mean=GX.map((_,j)=>P.reduce((s,p)=>s+p[j],0)/P.length);
+  const bias2=GX.reduce((s,x,j)=>s+(mean[j]-truth(x))**2,0)/GX.length;
+  const vari=GX.reduce((s,_,j)=>s+P.reduce((a,p)=>a+(p[j]-mean[j])**2,0)/P.length,0)/GX.length;
+  return {models,mean,bias2,vari};
+}
+function drawBV(){
+  const all={1:simulate(1,bvSeed),3:simulate(3,bvSeed),9:simulate(9,bvSeed)}, S=all[bvDeg];
+  let s=`<defs><clipPath id="bc"><rect x="${BF.x0}" y="${BF.y0}" width="${BF.x1-BF.x0}" height="${BF.y1-BF.y0}"/></clipPath></defs>`;
+  s+=grid(BF,[0,.25,.5,.75,1],[-1.5,-1,-.5,0,.5,1,1.5],v=>v,v=>v);
+  s+=`<g clip-path="url(#bc)">`;
+  S.models.forEach(cf=>{s+=`<path d="${pathOf(BF,GX,x=>pred(cf,x),[-3,3])}" fill="none" stroke="var(--plum)" stroke-opacity=".28" stroke-width="1.2"/>`});
+  s+=`<path d="${pathOf(BF,XS,truth,[-9,9])}" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-dasharray="6 5"/>`;
+  s+=`<path d="${GX.map((x,j)=>(j?"L":"M")+BF.sx(x).toFixed(1)+","+BF.sy(Math.max(-3,Math.min(3,S.mean[j]))).toFixed(1)).join("")}" fill="none" stroke="var(--plum)" stroke-width="3.2"/></g>`;
+  $("bvSvg").innerHTML=s;
+  const names={1:"Прямая",3:"Степень 3",9:"Степень 9"};
+  $("bvTable").innerHTML=[1,3,9].map(d=>{const o=all[d];return `<tr class="${d===bvDeg?"cur":""}"><td>${names[d]}</td><td class="n">${f2(o.bias2)}</td><td class="n">${f2(o.vari)}</td><td class="n">${f2(o.bias2+o.vari)}</td></tr>`}).join("");
+}
+document.querySelectorAll(".bvd").forEach(b=>b.onclick=()=>{bvDeg=+b.dataset.d;document.querySelectorAll(".bvd").forEach(x=>x.setAttribute("aria-pressed",x===b));drawBV()});
+$("bResample").onclick=()=>{bvSeed+=1;drawBV()};
+drawBV();
+
+/* ---------- copy to Obsidian ---------- */
+const MD=`---
+type: конспект
+tags: [ml, неделя-1]
+---
+# Фундамент ML: урок 1
+
+## Типы задач
+- Регрессия — ответ число (баллы к сессии).
+- Классификация — ответ класс, модель выдаёт вероятность, дальше порог (будет ли долг).
+- Кластеризация — ответов нет, модель группирует похожих.
+- Ранжирование — важен порядок (поиск).
+- Ловушка: логистическая регрессия — это классификация.
+
+## С учителем и без
+- С учителем: есть X и y. Без учителя: только X (кластеры, сжатие, аномалии).
+- Самообучение: ответы из самих данных (LLM угадывает следующее слово).
+- Разметка — обычно самое дорогое.
+
+## Функция потерь и эмпирический риск
+- Потеря L(y, ŷ) — штраф за один ответ. Эмпирический риск — средний штраф: R̂ = 1/n · Σ L.
+- MSE = средняя площадь квадратов ошибок; чувствительна к выбросам. MAE = средний модуль, спокойнее.
+- Log-loss = −ln(p правильного класса): дорого за уверенную ошибку.
+- Потеря оптимизируется моделью, метрика нужна людям.
+
+## Train / validation / test
+- Train — учиться, val — выбирать настройки и early stopping, test — один раз в конце.
+- stratify при редком классе; один объект — в одной части; время — делить по времени.
+- Утечка: модель видит то, чего не будет в реальной работе. В BRS: eval_set=(X_test, y_test).
+
+## Переобучение и недообучение
+- Недо: плохо и на train, и на val → сложнее модель.
+- Пере: отлично на train, плохо на val → больше данных, проще модель, регуляризация, early stopping.
+
+## Bias–variance
+- Ошибка = Bias² + Variance + шум.
+- Bias — средняя модель мимо правды (недообучение). Variance — модели гуляют от выборки к выборке (переобучение).
+- Random Forest снижает variance (усреднение), бустинг — bias (исправляет ошибки).
+
+## Big O
+- Как растёт работа при росте n: O(1) < O(log n) < O(n) < O(n log n) < O(n²).
+- Константы и младшие слагаемые отбрасываем; вложенные циклы перемножаем, последовательные складываем.
+- Память считается так же. Матрица расстояний 100 000 × 100 000 — 80 ГБ.
+
+## Массив и динамический массив
+- Ячейки подряд: адрес = начало + i·размер → индекс за O(1).
+- Вставка/удаление в начале — O(n), все сдвигаются.
+- list в Python — динамический массив: запас ёмкости, при нехватке переезд с копированием.
+
+## Амортизированная сложность
+- Копирований 1 + 2 + 4 + … < 2n → в среднем O(1) на append, хотя отдельный append бывает O(n).
+
+## Сложность list, dict, set
+- list: a[i] O(1), append O(1)*, insert(0)/pop(0) O(n), x in list O(n).
+- dict/set: добавить, удалить, x in — O(1) в среднем (хеш-таблица), худший случай O(n).
+- Много проверок «есть ли в списке» → сначала set(...).
+`;
+/* ---------- topic 7: Big O bars ---------- */
+const CLASSES=[["O(1)",n=>1,"var(--accent)"],["O(log n)",n=>Math.log2(n),"var(--teal)"],["O(n)",n=>n,"var(--warm)"],["O(n log n)",n=>n*Math.log2(n),"var(--plum)"],["O(n²)",n=>n*n,"var(--red)"]];
+const fmtN=n=>Math.round(n).toLocaleString("ru-RU");
+function human(ns){
+  if(ns<1e3)return `${Math.round(ns)} нс`;if(ns<1e6)return `${(ns/1e3).toFixed(ns<1e4?1:0)} мкс`;
+  if(ns<1e9)return `${(ns/1e6).toFixed(ns<1e7?1:0)} мс`;const s=ns/1e9;
+  if(s<60)return `${s.toFixed(s<10?1:0)} с`;if(s<3600)return `${(s/60).toFixed(0)} мин`;
+  if(s<86400)return `${(s/3600).toFixed(1)} ч`;if(s<86400*365)return `${(s/86400).toFixed(0)} дн`;return `${(s/86400/365).toFixed(0)} лет`;
+}
+function drawBO(){
+  const n=Math.round(10**+$("sN").value);$("vN").textContent=fmtN(n);$("nLabel").textContent="n = "+fmtN(n);
+  const maxLog=14;
+  $("boBars").innerHTML=CLASSES.map(([nm,f,c])=>{const ops=Math.max(1,f(n));const w=Math.max(1.5,Math.log10(ops+1)/maxLog*100);
+    return `<div class="brow"><b>${nm}</b><div class="track"><i style="width:${w}%;background:${c}"></i></div><span class="tm">${human(ops)}</span></div>`}).join("");
+}
+$("sN").addEventListener("input",drawBO);drawBO();
+
+/* ---------- topic 8–9: dynamic array ---------- */
+let da={len:0,cap:1,vals:[],costs:[],total:0,appends:0,mv:new Set()};
+function daRender(msg){
+  let s="";for(let i=0;i<da.cap;i++)s+=`<div class="cell ${i<da.len?"on":""} ${da.mv.has(i)?"mv":""}">${i<da.len?da.vals[i]:""}</div>`;
+  $("daCells").innerHTML=s;$("daCap").textContent=`длина ${da.len} · ёмкость ${da.cap}`;
+  $("daTotal").textContent=da.total;$("daAvg").textContent=da.appends?(da.costs.reduce((a,c)=>a+(c.t==="a"?c.v:0),0)/da.appends).toFixed(2):"0";
+  if(msg)$("daMsg").textContent=msg;
+  const W=600,H=150,m={l:30,r:8,t:10,b:22},n=Math.max(da.costs.length,16),bw=(W-m.l-m.r)/n,mx=Math.max(4,...da.costs.map(c=>c.v));
+  let g=`<line class="ax" x1="${m.l}" x2="${W-m.r}" y1="${H-m.b}" y2="${H-m.b}"/><text class="tk" x="${m.l-6}" y="${m.t+8}" text-anchor="end">${mx}</text><text class="tk" x="${m.l-6}" y="${H-m.b}" text-anchor="end">0</text><text class="lbl" x="${W-m.r}" y="${H-6}" text-anchor="end">стоимость каждой операции по порядку</text>`;
+  da.costs.forEach((c,i)=>{const h=c.v/mx*(H-m.t-m.b);g+=`<rect x="${m.l+i*bw+1}" y="${H-m.b-h}" width="${Math.max(1,bw-2)}" height="${h}" rx="2" fill="${c.t==="i"?"var(--red)":c.v>1?"var(--warm)":"var(--accent)"}"/>`});
+  $("daChart").innerHTML=g;
+}
+function daGrow(){const old=da.len;da.cap*=2;da.mv=new Set([...Array(old).keys()]);return old}
+function daAppend(){
+  if(da.len>=64)return daRender("Хватит: дальше ячейки не влезут на экран. Нажми «Сначала».");
+  let cost=1,copied=0;if(da.len===da.cap){copied=daGrow();cost+=copied}else da.mv=new Set();
+  da.vals.push(da.len);da.len++;da.total+=cost;da.appends++;da.costs.push({v:cost,t:"a"});
+  return copied?`Ёмкость кончилась: переезд в массив на ${da.cap} ячеек, скопировано ${copied}. Этот append стоил ${cost}.`:`Место было, запись в конец стоила 1.`;
+}
+$("daAdd").onclick=()=>daRender(daAppend());
+$("daAdd10").onclick=()=>{let m="";for(let i=0;i<10;i++)m=daAppend();daRender(`Добавлено 10 элементов. Последний: ${m.toLowerCase()}`)};
+$("daIns").onclick=()=>{
+  if(da.len>=64)return daRender("Хватит: дальше ячейки не влезут на экран. Нажми «Сначала».");
+  let copied=0;if(da.len===da.cap)copied=daGrow();
+  const shifts=da.len;da.vals.unshift("x");da.len++;const cost=1+shifts+copied;da.total+=cost;
+  da.mv=new Set([...Array(da.len).keys()].slice(1));da.costs.push({v:cost,t:"i"});
+  daRender(`insert(0, x): сдвинуто ${shifts} элементов${copied?`, плюс переезд с копированием ${copied}`:""}. Стоимость ${cost}. Красные столбики — вставки в начало.`);
+};
+$("daReset").onclick=()=>{da={len:0,cap:1,vals:[],costs:[],total:0,appends:0,mv:new Set()};daRender("Нажимай append и следи: когда ёмкость кончается, массив переезжает (жёлтые ячейки — копирование).")};
+daRender();
+
+/* ---------- topic 10: live benchmark ---------- */
+$("bBench").onclick=()=>{
+  $("bMsg").textContent="Считаю…";
+  setTimeout(()=>{
+    const N=100000,Q=2000,arr=Array.from({length:N},(_,i)=>i*2),set=new Set(arr),r=rng(Date.now()%100000);
+    const qs=Array.from({length:Q},()=>Math.floor(r()*N*2));
+    let hits=0,t0=performance.now();for(const q of qs)if(arr.includes(q))hits++;const tl=performance.now()-t0;
+    let hits2=0;t0=performance.now();for(const q of qs)if(set.has(q))hits2++;const ts=Math.max(performance.now()-t0,0.01);
+    $("bList").textContent=tl.toFixed(1)+" мс";$("bSet").textContent=ts<0.1?"< 0.1 мс":ts.toFixed(2)+" мс";
+    $("bMsg").textContent=`Множество быстрее примерно в ${Math.round(tl/ts).toLocaleString("ru-RU")} раз. Найдено одинаково: ${hits} и ${hits2}. Увеличь данные в 10 раз — массив замедлится в 10 раз, множество почти нет.`;
+  },30);
+};
+
+/* ---------- local site: nav + topic ticks ---------- */
+const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const TOPICS=[["ml.base.0","Типы задач"],["ml.base.1","Обучение с учителем и без"],["ml.base.2","Функция потерь и эмпирический риск"],["ml.base.3","Train, validation и test"],["ml.base.4","Переобучение и недообучение"],["ml.base.5","Bias–variance trade-off"],["algo.cx.0","Big O по времени и памяти"],["algo.ds.0","Массив и динамический массив"],["algo.cx.1","Амортизированная сложность"],["algo.cx.2","Сложность операций list, dict, set"]];
+function initTopics(){
+  if(LOCAL)$("topnav").hidden=false;
+  const box=$("topicList"),note=$("topicNote");
+  box.innerHTML=TOPICS.map(([id,t])=>`<li><label class="tp"><input type="checkbox" id="tp-${id}" data-id="${id}" ${LOCAL?"":"disabled"}><span class="bx" aria-hidden="true"></span><span>${t}</span></label></li>`).join("");
+  if(!LOCAL){note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";return}
+  const apply=d=>TOPICS.forEach(([id])=>{$("tp-"+id).checked=!!d[id]});
+  const day=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+  fetch("/api/tree").then(r=>r.json()).then(j=>apply(j.done||{})).catch(()=>{note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
+  box.addEventListener("change",async e=>{
+    const id=e.target.dataset.id;if(!id)return;
+    const body=e.target.checked?{set:{[id]:day()}}:{unset:[id]};
+    try{const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      if(!r.ok)throw 0;const j=await r.json();apply(j.done||{});note.textContent="Сохранено в файле недели в Obsidian";}
+    catch(err){e.target.checked=!e.target.checked;note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево»."}
+  });
+}
+initTopics();
+
+$("bCopy").onclick=()=>{
+  const ta=$("mdArea"),fb=()=>{ta.hidden=false;ta.value=MD;ta.focus();ta.select();$("copyMsg").textContent="Текст выделен, нажми Cmd+C"};
+  try{navigator.clipboard.writeText(MD).then(()=>$("copyMsg").textContent="Скопировано",fb)}catch(e){fb()}
+};
+</script>

@@ -1,0 +1,1114 @@
+<title>Хеш-таблицы и рабочее место</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lesson notebook from the same tree series. Single reading column, each topic is a "leaf" with a live lab (interactive chart) in the middle. */
+:root{
+  --bg:#F2F5F0; --surface:#FFFFFF; --ink:#16211B; --muted:#5A6A60; --line:#D9E1D9; --soft:#E8EEE7;
+  --accent:#2C7A50; --accent-soft:rgba(44,122,80,.16); --warm:#B7862A; --plum:#9A4C72; --teal:#2A7584; --red:#B4483A;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --accent-soft:rgba(93,187,135,.18); --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1411; --surface:#151D18; --ink:#E3EBE5; --muted:#93A399; --line:#27332C; --soft:#1C2620;
+  --accent:#5DBB87; --accent-soft:rgba(93,187,135,.18); --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.62;padding-inline:16px;padding-block:0 72px}
+.wrap{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.dia{color:var(--warm)}
+
+header.top{padding-block:44px 8px;display:grid;gap:12px}
+header.top h1{font-size:clamp(28px,5.4vw,44px);font-weight:700;line-height:1.1}
+header.top p{color:var(--muted);max-width:62ch}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.toc a{font-size:13.5px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.toc a:hover{border-color:var(--accent)}
+
+section.topic{padding-block:56px 8px;display:grid;gap:18px;scroll-margin-top:16px}
+section.topic>h2{font-size:clamp(22px,3.6vw,30px)}
+.tldr{font-size:18px;line-height:1.5;border-left:3px solid var(--accent);padding-left:14px}
+.prose{display:grid;gap:12px;max-width:68ch}
+.prose ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.callout{background:var(--soft);border-radius:12px;padding:14px 16px;display:grid;gap:6px;font-size:15px}
+.callout b.h{font:600 12px var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.callout.brs b.h{color:var(--teal)}
+.callout.trap b.h{color:var(--red)}
+.callout.feel b.h{color:var(--warm)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:8px;align-content:start;min-width:0}
+.card h3{font-size:15px}
+.card p{font-size:14px;color:var(--muted)}
+.card svg{width:100%;height:auto;display:block}
+.card .ex{font-size:13.5px;color:var(--ink)}
+
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:14px}
+.lab-h{display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;align-items:baseline}
+.lab-h .eyebrow{color:var(--accent)}
+.lab svg{width:100%;height:auto;display:block;touch-action:pan-y}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:18px;align-items:center}
+@media (max-width:700px){.lab-grid{grid-template-columns:1fr}}
+.ctrl{display:grid;gap:12px}
+.ctrl label{display:grid;gap:4px;font-size:14px}
+.ctrl .row{display:flex;justify-content:space-between;gap:8px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:500 13.5px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.readout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{background:var(--soft);border-radius:10px;padding:10px 12px}
+.stat .v{font:700 22px var(--f-display);font-variant-numeric:tabular-nums}
+.stat .k{font-size:12.5px;color:var(--muted)}
+.verdict{font-size:14.5px;min-height:3em}
+
+.ax{stroke:var(--line);stroke-width:1}
+.tk{fill:var(--muted);font:11px var(--f-mono)}
+.lbl{fill:var(--muted);font:12px var(--f-body)}
+
+.formula{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;overflow-x:auto}
+.fx{font:500 clamp(17px,3vw,22px) var(--f-mono);white-space:nowrap}
+.fx .c1{color:var(--accent)} .fx .c2{color:var(--plum)} .fx .c3{color:var(--warm)} .fx .c4{color:var(--teal)}
+.legend{display:grid;gap:6px;font-size:14.5px}
+.legend span.s{font-family:var(--f-mono);font-weight:500}
+
+.split{display:flex;height:46px;border-radius:10px;overflow:hidden;font:600 13px var(--f-body)}
+.split div{display:flex;align-items:center;justify-content:center;color:var(--surface)}
+.sp-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.sp-legend{grid-template-columns:1fr}}
+.sp-legend div{display:grid;gap:4px;font-size:14px}
+.sp-legend b{font-family:var(--f-display);font-weight:500;font-size:14px}
+
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+tr.cur td{background:var(--accent-soft)}
+
+pre{margin:0;background:var(--soft);border-radius:10px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--f-mono)}
+pre .cm{color:var(--muted)} pre .hl{color:var(--accent);font-weight:500} pre .bad{color:var(--red);text-decoration:line-through}
+
+details.q{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+details.q summary{cursor:pointer;padding:12px 16px;font-weight:500;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary .t{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--plum);white-space:nowrap}
+details.q summary .t.self{color:var(--teal)}
+details.q[open] summary{border-bottom:1px solid var(--line)}
+details.q .a{padding:12px 16px 14px;display:grid;gap:8px;font-size:15px}
+.qs{display:grid;gap:8px}
+
+.boards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.boards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.boards figure{margin:0;display:grid;gap:4px;text-align:center;font-size:13px}
+.boards figcaption b{display:block;font-weight:600}
+
+.end{padding-block:64px 0;display:grid;gap:16px}
+.end h2{font-size:clamp(22px,3.6vw,30px)}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;gap:10px}
+.sheet ol{margin:0;padding-left:22px;display:grid;gap:8px}
+#mdArea{width:100%;font:12px var(--f-mono);background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+body{margin:0} [hidden]{display:none!important}
+.topnav{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;padding-block:16px 0;font-size:14px}
+.topnav a{text-decoration:none;font-weight:500}
+.topnav .mid{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.part{padding-block:64px 0;display:grid;gap:8px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.part h2{font-size:clamp(24px,4vw,34px);font-weight:700}
+.part p{color:var(--muted);max-width:64ch}
+.bars{display:grid;gap:8px}
+.brow{display:grid;grid-template-columns:92px minmax(0,1fr) 120px;gap:10px;align-items:center;font-size:14px}
+.brow b{font-family:var(--f-mono);font-weight:500}
+.brow .track{height:14px;background:var(--soft);border-radius:7px;overflow:hidden}
+.brow .track i{display:block;height:100%;border-radius:7px;transition:width .25s}
+.brow .tm{font-family:var(--f-mono);font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:520px){.brow{grid-template-columns:70px minmax(0,1fr) 92px}}
+.cells{display:flex;flex-wrap:wrap;gap:4px}
+.cell{width:30px;height:30px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;font:500 12px var(--f-mono);font-variant-numeric:tabular-nums}
+.cell.on{background:var(--accent-soft);border-color:var(--accent)}
+.cell.mv{background:var(--warm);border-color:var(--warm);color:var(--surface)}
+.prac{display:grid;gap:12px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:10px;min-width:0}
+.task .tg{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.tg.int{color:var(--plum)} .tg.work{color:var(--teal)} .tg.lc{color:var(--warm)} .tg.rev{color:var(--red)}
+.task h3{font-size:16px;line-height:1.35}
+.task .ok{font-size:14px;color:var(--muted)}
+.task details{border-top:1px dashed var(--line);padding-top:8px}
+.task details summary{cursor:pointer;font-size:14px;color:var(--accent);font-weight:500}
+.task details .a{display:grid;gap:8px;padding-top:8px;font-size:15px}
+.topics{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 16px}
+.tp{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:5px 6px;border-radius:7px;cursor:pointer;font-size:14.5px}
+.tp:hover{background:var(--soft)}
+.tp input{position:absolute;opacity:0;width:1px;height:1px}
+.tp .bx{width:16px;height:16px;margin-top:2px;border:1.5px solid var(--muted);border-radius:4px}
+.tp input:checked+.bx{background:var(--accent);border-color:var(--accent)}
+.tp input:checked~span:last-child{color:var(--muted);text-decoration:line-through}
+.tp input:disabled+.bx{opacity:.5}
+.tp input:focus-visible+.bx{outline:2px solid var(--accent);outline-offset:2px}
+
+:root{--term-bg:#16211B;--term-fg:#DCE8E0;--term-acc:#7FD3A2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--term-bg:#070B09;--term-fg:#DCE8E0;--term-acc:#7FD3A2}}
+:root[data-theme="dark"]{--term-bg:#070B09;--term-fg:#DCE8E0;--term-acc:#7FD3A2}
+button:disabled{opacity:.45;cursor:default}
+.cell{position:relative}
+.buckets{display:grid;gap:4px}
+.bk{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px;align-items:center;padding:4px 6px;border-radius:8px;border:1px solid var(--line);background:var(--surface);transition:background .2s}
+.bk.hot{border-color:var(--accent);background:var(--accent-soft)}
+.bi{font:500 12px var(--f-mono);color:var(--muted);text-align:right}
+.chain{display:flex;gap:6px;flex-wrap:wrap;min-height:22px;align-items:center}
+.kchip{font:500 12.5px var(--f-mono);padding:2px 8px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
+.kchip.found{background:var(--warm);border-color:var(--warm);color:var(--surface)}
+.steps{display:grid;gap:8px}
+.steps>div{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start;font-size:15px}
+.steps>div>b{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--surface);display:grid;place-items:center;font:600 13px var(--f-mono)}
+.term{background:var(--term-bg);color:var(--term-fg);border-radius:12px;padding:12px 14px;font:13px/1.5 var(--f-mono);cursor:text}
+.tout{max-height:260px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.tres{color:var(--term-fg);opacity:.85;margin-bottom:4px}
+.tprompt{color:var(--term-acc)}
+.tin{display:flex;gap:6px;align-items:center}
+.tin input{flex:1;min-width:0;background:transparent;border:0;color:var(--term-fg);font:13px var(--f-mono);outline:none;padding:2px 0}
+.missions{display:grid;gap:5px}
+.ms{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;font-size:14px;align-items:center}
+.ms .mk{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--muted);display:grid;place-items:center;font:600 11px var(--f-mono);color:var(--muted)}
+.ms.ok{color:var(--muted)} .ms.ok .mk{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.zones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.zones{grid-template-columns:1fr}}
+.zone{background:var(--soft);border-radius:12px;padding:10px 12px;display:grid;gap:6px;align-content:start;min-height:120px}
+.zone>b{font:500 14px var(--f-display)} .zone>span{font-size:12.5px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.gchip{font:500 12.5px var(--f-mono);padding:3px 9px;border-radius:999px}
+.gchip.mod{background:var(--warm);color:var(--surface)} .gchip.stg{background:var(--accent);color:var(--surface)}
+.log{display:grid;gap:3px;font-size:12.5px}
+.cm-row code{color:var(--plum)} .cm-row.head{font-weight:600}
+#gitGraph{width:100%;height:auto;display:block}
+.dbg-code{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 0;overflow-x:auto}
+.dl{display:grid;grid-template-columns:40px minmax(0,1fr);align-items:center;font:13px/1.9 var(--f-mono)}
+.dl code{white-space:pre;font-size:13px;padding-right:10px}
+.dl.cur{background:var(--accent-soft)} .dl.err{background:rgba(180,72,58,.16)}
+.bp{font:12px var(--f-mono);color:var(--muted);background:none;border:0;cursor:pointer;text-align:right;padding:0 10px 0 0;position:relative}
+.bp.on::before{content:"";position:absolute;left:6px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--red)}
+</style>
+
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w01-2.html">← Урок 2 · Python</a><span class="mid">урок 3 из 3</span><a href="/tree#w-1">Неделя 1 на сайте дерева →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 1 · урок 3 из 3 · 12 тем · ~3–4 часа</div>
+  <h1>Хеш-таблицы и рабочее место</h1>
+  <p>Первая часть — как dict и set находят что угодно за один шаг, и главный паттерн задач с собеседований, который на этом держится. Вторая часть — инструменты, без которых не начинается ни одна стажировка: терминал, git, виртуальное окружение и отладчик. В конце — когда подаваться на стажировки.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#h1">Хеш-таблица</a><a href="#h2">Хеширование: задачи</a><a href="#h3">Как решать LeetCode</a><a href="#w1">Терминал</a><a href="#w2">Git</a><a href="#w3">venv и requirements</a><a href="#w4">Отладчик</a><a href="#w5">Сроки отборов</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+<div class="part"><span class="eyebrow">Часть 1 · 3 темы</span><h2>Найти за один шаг</h2></div>
+
+<!-- ============ hash table ============ -->
+<section class="topic" id="h1">
+  <div class="eyebrow">Тема 1 из 12 · <span class="dia">◆</span> Алгоритмы</div>
+  <h2>Хеш-таблица</h2>
+  <p class="tldr">Хеш-таблица — массив ячеек, где место для ключа вычисляется из самого ключа. Не нужно ничего перебирать: посчитал хеш — знаешь номер ячейки. Так устроены dict и set.</p>
+  <div class="prose">
+    <p>Представь гардероб, где номерок не выдают по очереди, а вычисляют из самого пальто: цвет, размер, бренд → номер 5. Пришёл забирать — снова посчитал номер из пальто и сразу идёшь к крючку 5. Неважно, сколько всего пальто висит.</p>
+    <ul>
+      <li><b>Хеш-функция</b> превращает ключ в большое число: <code>hash("Аня")</code>. Один и тот же ключ всегда даёт одно и то же число.</li>
+      <li><b>Номер ячейки</b> — остаток от деления на размер массива: <code>hash % 8</code>.</li>
+      <li><b>Коллизия</b> — два ключа попали в одну ячейку. Тогда их хранят рядом и сравнивают уже по-настоящему. Коллизий мало — поиск O(1). Если все ключи попали в одну ячейку, это вырождается в список и O(n).</li>
+      <li><b>Расширение.</b> Когда ячейки заполнены примерно на две трети, таблица увеличивается и раскладывает все ключи заново. Это редкая дорогая операция, как переезд динамического массива из урока 1: амортизированно O(1).</li>
+    </ul>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · хеш-таблица изнутри</span><span class="mono muted" id="htInfo"></span></div>
+    <div class="row" style="display:flex;gap:8px;flex-wrap:wrap">
+      <label for="htKey" class="sr" style="position:absolute;left:-9999px">Ключ</label>
+      <input id="htKey" type="text" value="Аня" maxlength="16" style="font:15px var(--f-mono);padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:160px">
+      <button class="btn" id="htAdd">Добавить ключ</button><button class="btn" id="htFind">Найти ключ</button><button class="btn" id="htMany">Добавить 6 студентов</button><button class="btn" id="htReset">Сначала</button>
+    </div>
+    <div class="buckets" id="htBuckets"></div>
+    <p class="verdict" id="htMsg">Введи имя и нажми «Добавить ключ». Хеш-функция здесь учебная, у Python своя, но принцип тот же.</p>
+    <div class="bars"><div class="brow"><b>заполнено</b><div class="track"><i id="htLoad" style="width:0%;background:var(--accent)"></i></div><span class="tm" id="htLoadT">0%</span></div></div>
+  </div>
+  <div class="callout feel"><b class="h">Связь с уроком 2</b><p>Вот почему ключ dict обязан быть неизменяемым. Если бы можно было поменять список-ключ после вставки, его хеш изменился бы, и словарь искал бы его в другой ячейке. Значение потерялось бы навсегда.</p></div>
+
+  <h3 style="font-size:17px">Хеш-функция: какой она должна быть</h3>
+  <div class="prose"><ul>
+    <li><b>Детерминированная</b>: один ключ — всегда один хеш (в пределах запуска программы).</li>
+    <li><b>Равномерная</b>: разбрасывает ключи по ячейкам равномерно, даже похожие («Аня1», «Аня2»). Иначе коллизии.</li>
+    <li><b>Быстрая</b>: считается за время, пропорциональное длине ключа.</li>
+    <li><b>Главный контракт:</b> если <code>a == b</code>, то <code>hash(a) == hash(b)</code>. Обратное неверно: разные ключи могут дать один хеш, это и есть коллизия. Поэтому после хеша ключи всё равно сравниваются через <code>==</code>.</li>
+  </ul>
+  <p>Пара деталей Python:</p>
+  <ul>
+    <li><code>hash(5) == 5</code>, и <code>hash(1) == hash(1.0) == hash(True)</code>: эти ключи равны по <code>==</code>, поэтому <code>{1: "a", True: "b"}</code> — словарь из одного ключа.</li>
+    <li>Хеш строк <b>случайный для каждого запуска</b> Python (защита от атак коллизиями). Не сохраняй <code>hash(s)</code> в файл и не используй его для разбиения данных между запусками — бери <code>hashlib</code>.</li>
+    <li>Свой класс по умолчанию хешируется по <code>id</code>: два «одинаковых» объекта — разные ключи. Чтобы сравнивались по полям, определяют <code>__eq__</code> и <code>__hash__</code> вместе или пишут <code>@dataclass(frozen=True)</code>.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Как разрешают коллизии</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Способ</th><th>Как работает</th><th>Где</th></tr></thead>
+    <tbody>
+      <tr><td>Цепочки (chaining)</td><td>в каждой ячейке — список всех ключей, попавших туда</td><td>Java HashMap, многие учебники</td></tr>
+      <tr><td>Открытая адресация</td><td>ячейка занята — ищем другую свободную по правилу (следующую или по формуле)</td><td>Python dict и set</td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <p><b>Коэффициент заполнения</b> (load factor) — доля занятых ячеек. Чем он выше, тем больше коллизий и медленнее поиск. Поэтому таблица всегда держит запас пустых ячеек и расширяется заранее. Отсюда «цена памяти» у dict и set, о которой говорили в уроке 1.</p>
+  </div>
+
+  <h3 style="font-size:17px">Хеши за пределами dict</h3>
+  <div class="prose"><ul>
+    <li><b>Криптографические хеши</b> (<code>hashlib.sha256</code>, <code>md5</code>) — длинные и стабильные между запусками и компьютерами. Ими проверяют, что файл не изменился, находят дубликаты файлов, разбивают пользователей на группы A/B-теста: <code>int(sha256(user_id)) % 100 &lt; 50</code>.</li>
+    <li><b>Feature hashing</b> в ML: миллион разных слов кладут в 2²⁰ признаков по хешу слова, без хранения словаря (<code>HashingVectorizer</code> в sklearn). Коллизии терпят ради памяти.</li>
+    <li><b>Кеш</b>: <code>@functools.lru_cache</code> запоминает результаты функции в словаре по аргументам, поэтому аргументы должны быть хешируемыми. Основа мемоизации в динамическом программировании.</li>
+    <li><b>Хеш-индексы</b> в базах данных и <code>df.set_index("id")</code> в pandas — та же идея: найти строку по ключу без перебора.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как устроен dict в Python? Почему поиск за O(1)? Когда он бывает O(n)?</summary>
+      <div class="a"><p>dict — хеш-таблица. По ключу считается хеш, из него — индекс ячейки, туда и кладётся пара ключ–значение. При поиске хеш считается заново, и мы сразу идём в нужную ячейку, поэтому в среднем O(1). При коллизии Python пробует другие ячейки по детерминированному правилу (открытая адресация) и сравнивает ключи через ==. Когда таблица заполнена примерно на 2/3, она увеличивается, и ключи раскладываются заново, это амортизированно O(1). O(n) — если много ключей дают коллизии, например из-за плохой хеш-функции или специально подобранных ключей.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Почему <code>set</code> не сохраняет порядок, а <code>list</code> сохраняет?</summary>
+      <div class="a"><p>В set место элемента определяет хеш, а не очередь добавления. В list элементы лежат подряд в порядке добавления. Обычный dict с Python 3.7 сохраняет порядок вставки: он хранит пары отдельно в массиве, а хеш-таблица держит только номера.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Могут ли два разных ключа иметь одинаковый хеш? Что тогда?</summary>
+      <div class="a"><p>Да, это коллизия: ключей бесконечно много, а ячеек конечно. Таблица хранит оба ключа (в цепочке или в соседних ячейках) и при поиске сравнивает найденный ключ с искомым через ==. Обязательное правило обратное: равные объекты обязаны иметь равные хеши.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Сколько ключей в словаре <code>{1: "a", 1.0: "b", True: "c"}</code> и какое значение?</summary>
+      <div class="a"><p>Один ключ <code>1</code> со значением <code>"c"</code>: все три равны по == и имеют одинаковый хеш. Ключ остаётся первым вставленным, значение — последним.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ hashing pattern ============ -->
+<section class="topic" id="h2">
+  <div class="eyebrow">Тема 2 из 12 · <span class="dia">◆</span> Алгоритмы</div>
+  <h2>Хеширование: Two Sum, Contains Duplicate, Valid Anagram</h2>
+  <p class="tldr">Паттерн звучит так: «запоминай увиденное в dict или set и спрашивай о нём за O(1)». Он превращает перебор всех пар за O(n²) в один проход за O(n). Это самый частый паттерн первых задач на собеседовании.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · Two Sum по шагам</span><span class="mono muted">nums = [3, 8, 1, 6, 4], target = 10</span></div>
+    <div class="cells" id="tsCells" style="gap:8px"></div>
+    <div class="lab-grid" style="align-items:start">
+      <div class="stat"><div class="k">что ищем на этом шаге</div><div class="v mono" id="tsNeed" style="font-family:var(--f-mono);font-size:18px"></div></div>
+      <div class="stat"><div class="k">seen — уже видели: число → индекс</div><div class="v mono" id="tsSeen" style="font-family:var(--f-mono);font-size:16px"></div></div>
+    </div>
+    <div class="btns"><button class="btn" id="tsPrev">← Назад</button><button class="btn" id="tsNext">Следующий шаг →</button></div>
+    <p class="verdict" id="tsMsg"></p>
+    <p class="muted" style="font-size:13.5px">Перебор всех пар для 5 чисел — до 10 сравнений, для 10 000 — до 50 миллионов. Один проход со словарём — 5 и 10 000 шагов.</p>
+  </div>
+<pre><span class="cm"># 1. Two Sum — индексы двух чисел с суммой target. O(n) время, O(n) память</span>
+def twoSum(nums, target):
+    seen = {}                          <span class="cm"># число → индекс</span>
+    for i, x in enumerate(nums):
+        if target - x in seen:         <span class="cm"># пара уже встречалась?</span>
+            return [seen[target - x], i]
+        seen[x] = i
+
+<span class="cm"># 217. Contains Duplicate — есть ли повтор. O(n) / O(n)</span>
+def containsDuplicate(nums):
+    return len(set(nums)) != len(nums)
+
+<span class="cm"># 242. Valid Anagram — одинаковые ли буквы. O(n) / O(1): алфавит ограничен</span>
+def isAnagram(s, t):
+    return Counter(s) == Counter(t)</pre>
+  <div class="callout trap"><b class="h">Ловушка в Two Sum</b><p>Проверяй <code>target - x in seen</code> до того, как добавить x в seen. Иначе при target = 8 и x = 4 найдёшь пару «4 и та же самая 4».</p></div>
+
+  <h3 style="font-size:17px">Как узнать, что задача на хеширование</h3>
+  <div class="prose"><p>Сигналы в условии:</p><ul>
+    <li>«есть ли», «встречался ли раньше», «найти дубликат» → <b>set</b>;</li>
+    <li>«сколько раз», «самый частый», «одинаковые ли наборы» → <b>Counter / dict-счётчик</b>;</li>
+    <li>«найти пару с суммой / разностью», «индекс того, что видели» → <b>dict значение → индекс</b>;</li>
+    <li>«сгруппировать по признаку» → <b>defaultdict(list)</b> с правильным ключом;</li>
+    <li>наивное решение — два вложенных цикла, а во внутреннем ты <b>ищешь</b> что-то → почти наверняка этот поиск заменяется словарём.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Разные решения одной задачи</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Задача</th><th>Решение</th><th>Время / память</th></tr></thead>
+    <tbody>
+      <tr><td>Contains Duplicate</td><td>все пары</td><td class="n">O(n²) / O(1)</td></tr>
+      <tr><td></td><td>сортировка, сравнить соседей</td><td class="n">O(n log n) / O(1)*</td></tr>
+      <tr><td></td><td>set</td><td class="n">O(n) / O(n)</td></tr>
+      <tr><td>Valid Anagram</td><td><code>sorted(s) == sorted(t)</code></td><td class="n">O(n log n) / O(n)</td></tr>
+      <tr><td></td><td>Counter или массив из 26 счётчиков</td><td class="n">O(n) / O(1)</td></tr>
+      <tr><td>Two Sum</td><td>все пары</td><td class="n">O(n²) / O(1)</td></tr>
+      <tr><td></td><td>dict «число → индекс»</td><td class="n">O(n) / O(n)</td></tr>
+      <tr><td></td><td>если массив отсортирован — два указателя (Two Sum II, 167)</td><td class="n">O(n) / O(1)</td></tr>
+    </tbody></table></div>
+  <p class="muted" style="font-size:13.5px">* если сортировать на месте и не считать память сортировки. Память O(1) у анаграммы — потому что букв ограниченное число, счётчик не растёт с длиной строки. На собеседовании хорошо назвать 2–3 решения и объяснить обмен памяти на скорость.</p>
+  <div class="prose">
+    <p><b>Следующие задачи на тот же паттерн</b> (NeetCode, раздел Arrays &amp; Hashing): 49. Group Anagrams (в практике), 347. Top K Frequent Elements (Counter + сортировка или куча), 128. Longest Consecutive Sequence (set и начинать отсчёт только с начала последовательности), 560. Subarray Sum Equals K (dict префиксных сумм — тот же Two Sum, только для сумм отрезков).</p>
+  </div>
+  <div class="callout trap"><b class="h">Частые ошибки</b><p>Вернул значения вместо индексов. Отсортировал массив в Two Sum и потерял исходные индексы. Забыл про пустой ввод. Использовал list как ключ (нужен tuple). Сказал «O(1) памяти», создав словарь на n элементов.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как решить Two Sum без дополнительной памяти?</summary>
+      <div class="a"><p>Если можно менять порядок и нужны значения, а не индексы: отсортировать и идти двумя указателями с концов. Сумма меньше target — левый вправо, больше — правый влево. O(n log n) по времени из-за сортировки, O(1) дополнительной памяти. Если нужны исходные индексы — сортировать пары (значение, индекс), тогда память O(n).</p></div></details>
+  </div>
+</section>
+
+<!-- ============ how to leetcode ============ -->
+<section class="topic" id="h3">
+  <div class="eyebrow">Тема 3 из 12 · Алгоритмы</div>
+  <h2>LeetCode 75 или NeetCode 150: как решать</h2>
+  <p class="tldr">Бери <a href="https://neetcode.io/practice" target="_blank" rel="noopener">NeetCode 150</a>: задачи сгруппированы по паттернам, ровно как ветки твоего дерева, и к каждой есть видеоразбор. 3–4 задачи в неделю по теме недели, и к январю ты пройдёшь основные паттерны.</p>
+  <div class="prose"><p><b>Как решать задачу на собеседовании.</b> Порядок важнее скорости. Интервьюер оценивает, как ты думаешь, а не только итоговый код.</p></div>
+  <div class="steps">
+    <div><b>1</b><span><b>Переспроси условие.</b> Могут ли быть отрицательные числа, повторы, пустой ввод? Что вернуть, если ответа нет?</span></div>
+    <div><b>2</b><span><b>Пример руками.</b> Возьми маленький пример и реши его на бумаге. Часто идея появляется именно тут.</span></div>
+    <div><b>3</b><span><b>Перебор вслух.</b> «Можно проверить все пары, это O(n²)». Даже наивное решение — уже результат.</span></div>
+    <div><b>4</b><span><b>Ускорение.</b> «Что я делаю много раз? Какая структура сделает это за O(1)?» Для первой недели ответ почти всегда — dict или set.</span></div>
+    <div><b>5</b><span><b>Код.</b> Понятные имена, без лишнего. Проговаривай, что пишешь.</span></div>
+    <div><b>6</b><span><b>Прогони тесты глазами.</b> Обычный случай, пустой ввод, один элемент, повторы. Назови сложность по времени и памяти.</span></div>
+  </div>
+  <div class="callout feel"><b class="h">Правило 25 минут</b><p>Не решилась за 25 минут — открывай разбор, не мучайся час. Разберись, закрой и напиши решение сам. Через 3 дня реши её ещё раз с нуля. Решённая с третьего раза задача запоминается лучше, чем решённая с первого.</p></div>
+
+  <h3 style="font-size:17px">LeetCode 75 и NeetCode 150: в чём разница</h3>
+  <div class="prose"><ul>
+    <li><b>LeetCode 75</b> — официальный список LeetCode, короче, перемешан по темам. Хорош как быстрый обзор.</li>
+    <li><b>NeetCode 150</b> — сгруппирован по паттернам и идёт от простого к сложному, у каждой задачи видеоразбор. Для учёбы по паттернам удобнее, поэтому выбран он.</li>
+    <li>Порядок разделов NeetCode: Arrays &amp; Hashing → Two Pointers → Sliding Window → Stack → Binary Search → Linked List → Trees → Heap → Backtracking → Graphs → Dynamic Programming. Для стажировки в ML важнее всего первые пять и деревья/графы на базовом уровне.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Что оценивают на алгоритмической секции</h3>
+  <div class="prose"><ul>
+    <li><b>Решение задачи</b> — пришёл ли к работающему и эффективному решению.</li>
+    <li><b>Коммуникация</b> — объяснял ли ход мыслей, задавал ли уточняющие вопросы, реагировал ли на подсказки.</li>
+    <li><b>Качество кода</b> — понятные имена, нет копипасты, разумная структура.</li>
+    <li><b>Проверка</b> — сам ли нашёл баги, прогнал крайние случаи, назвал сложность.</li>
+  </ul>
+  <p>Во многих компаниях код пишут в простом редакторе без запуска и без автодополнения. Тренируйся так же: сначала напиши решение целиком, прогони глазами, и только потом нажимай Submit. Каждая неудачная отправка на LeetCode — это баг, который на собеседовании нашёл бы интервьюер.</p></div>
+
+  <h3 style="font-size:17px">Python-набор для задач</h3>
+<pre>from collections import Counter, defaultdict, deque
+import heapq, bisect
+float("inf"), float("-inf")     <span class="cm"># начальные значения для минимума и максимума</span>
+heapq.heappush(h, x); heapq.heappop(h)   <span class="cm"># куча — минимум за O(log n)</span>
+heapq.nlargest(k, nums)          <span class="cm"># топ-k без полной сортировки</span>
+bisect.bisect_left(a, x)         <span class="cm"># бинарный поиск в отсортированном списке</span>
+divmod(17, 5)                    <span class="cm"># (3, 2) — частное и остаток</span>
+ord("a"), chr(97)                <span class="cm"># буква ↔ код: ord(c) - ord("a") — индекс буквы 0..25</span></pre>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 2 · 9 тем</span><h2>Рабочее место</h2><p>На стажировке в первый же день дают репозиторий и говорят: «склонируй, подними окружение, запусти». Эти темы — чтобы в этот день не потеряться.</p></div>
+
+<!-- ============ terminal ============ -->
+<section class="topic" id="w1">
+  <div class="eyebrow">Темы 4–5 из 12 · <span class="dia">◆</span> Навигация и файлы · <span class="dia">◆</span> Поиск</div>
+  <h2>Терминал</h2>
+  <p class="tldr">Терминал — разговор с компьютером текстом. Ты всегда «стоишь» в какой-то папке, и команды работают относительно неё. Серверы с GPU, Docker, git — всё это терминал, мышки там нет.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · тренажёр терминала</span><span class="mono muted">учебный проект ml-project</span></div>
+    <div class="term" id="term" aria-label="Учебный терминал">
+      <div id="termOut" class="tout" aria-live="polite"></div>
+      <div class="tin"><span class="tprompt" id="termPrompt"></span><input id="termIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Команда"></div>
+    </div>
+    <div class="missions" id="missions"></div>
+    <p class="muted" style="font-size:13.5px">Это учебная имитация на странице, файлы ненастоящие. Набери <code>help</code>, чтобы увидеть команды. Стрелка вверх — предыдущая команда.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Команда</th><th>Что делает</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td><code>pwd</code></td><td>где я сейчас</td><td><code>pwd</code></td></tr>
+      <tr><td><code>ls</code>, <code>ls -la</code></td><td>что в папке, со скрытыми и подробно</td><td><code>ls -la data</code></td></tr>
+      <tr><td><code>cd</code></td><td>перейти: <code>..</code> — наверх, <code>~</code> — домой</td><td><code>cd src</code></td></tr>
+      <tr><td><code>mkdir</code>, <code>touch</code></td><td>создать папку, пустой файл</td><td><code>mkdir notebooks</code></td></tr>
+      <tr><td><code>cp</code>, <code>mv</code></td><td>копировать, переместить или переименовать</td><td><code>mv old.py new.py</code></td></tr>
+      <tr><td><code>rm</code>, <code>rm -r</code></td><td>удалить <b>без корзины</b></td><td>осторожно</td></tr>
+      <tr><td><code>cat</code>, <code>head</code>, <code>less</code></td><td>посмотреть файл</td><td><code>head -5 data.csv</code></td></tr>
+      <tr><td><code>find</code></td><td>найти файлы по имени</td><td><code>find . -name "*.ipynb"</code></td></tr>
+      <tr><td><code>grep -rn</code></td><td>найти текст внутри файлов, с номерами строк</td><td><code>grep -rn "import torch" src</code></td></tr>
+      <tr><td><code>wc -l</code></td><td>посчитать строки</td><td><code>wc -l data.csv</code></td></tr>
+    </tbody></table></div>
+  <div class="prose"><p><b>Пути.</b> Абсолютный начинается от корня: <code>/Users/aplaygs/ml-project</code>. Относительный — от текущей папки: <code>data/raw</code>. <code>.</code> — текущая папка, <code>..</code> — родительская, <code>~</code> — домашняя. Tab дописывает имя за тебя, пользуйся им постоянно.</p></div>
+
+  <h3 style="font-size:17px">Флаги, маски и справка</h3>
+  <div class="prose"><ul>
+    <li><b>Флаги</b> меняют поведение команды: <code>ls -l</code> (подробно), <code>-a</code> (скрытые, они начинаются с точки), можно склеивать: <code>-la</code>. Длинные пишутся через два дефиса: <code>--help</code>.</li>
+    <li><b>Справка:</b> <code>команда --help</code> или <code>man команда</code> (выход — <code>q</code>).</li>
+    <li><b>Маски:</b> <code>*</code> — любые символы, <code>?</code> — один символ. <code>ls data/*.csv</code>, <code>rm logs/run_?.txt</code>. Маску раскрывает терминал до запуска команды.</li>
+    <li><b>Пробелы в именах</b> — в кавычки: <code>cd "My Project"</code>. Поэтому файлы проектов называют без пробелов.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Пайпы и перенаправление</h3>
+  <div class="prose"><p>Главная сила терминала — склеивать маленькие команды. <code>|</code> (пайп) передаёт вывод одной команды на вход следующей.</p></div>
+<pre>python train.py &gt; log.txt          <span class="cm"># вывод в файл (перезаписать)</span>
+python train.py &gt;&gt; log.txt         <span class="cm"># дописать в конец</span>
+python train.py &gt; log.txt 2&gt;&amp;1     <span class="cm"># и ошибки тоже: 2 — поток ошибок, 1 — обычный вывод</span>
+cut -d, -f3 data.csv | sort | uniq -c | sort -rn | head   <span class="cm"># топ значений 3-го столбца CSV</span>
+history | grep pip                 <span class="cm"># какие pip-команды я запускал</span>
+tail -f log.txt                    <span class="cm"># смотреть лог обучения вживую (Ctrl+C — выйти)</span></pre>
+
+  <h3 style="font-size:17px">grep и find подробнее</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Нужно</th><th>Команда</th></tr></thead>
+    <tbody>
+      <tr><td>Без учёта регистра</td><td><code>grep -i "error" log.txt</code></td></tr>
+      <tr><td>Строки, где НЕТ слова</td><td><code>grep -v "DEBUG" log.txt</code></td></tr>
+      <tr><td>Сколько совпадений</td><td><code>grep -c "epoch" log.txt</code></td></tr>
+      <tr><td>Только имена файлов</td><td><code>grep -rl "TODO" src</code></td></tr>
+      <tr><td>Регулярное выражение</td><td><code>grep -E "loss=0\.[0-4]" log.txt</code></td></tr>
+      <tr><td>Только файлы, не папки</td><td><code>find . -type f -name "*.py"</code></td></tr>
+      <tr><td>Файлы больше 100 МБ</td><td><code>find . -size +100M</code></td></tr>
+      <tr><td>Изменённые за последние сутки</td><td><code>find . -mtime -1</code></td></tr>
+    </tbody></table></div>
+
+  <h3 style="font-size:17px">Что ещё нужно в первый рабочий день</h3>
+  <div class="prose"><ul>
+    <li><b>Горячие клавиши:</b> Ctrl+C — прервать команду, Ctrl+R — поиск по истории, стрелка вверх — прошлая команда, Ctrl+L или <code>clear</code> — очистить экран.</li>
+    <li><b>Переменные окружения:</b> <code>echo $HOME</code>, <code>export CUDA_VISIBLE_DEVICES=0</code>. В них же хранят секреты: <code>export OPENAI_API_KEY=...</code>, а в Python читают <code>os.environ["..."]</code> — так ключи не попадают в код и git.</li>
+    <li><b>PATH</b> — список папок, где терминал ищет программы. <code>which python</code> покажет, какой Python запустится. Если там не <code>.venv</code> — окружение не активировано.</li>
+    <li><b>Права:</b> <code>chmod +x run.sh</code> — сделать скрипт запускаемым, потом <code>./run.sh</code>.</li>
+    <li><b>Удалённый сервер:</b> <code>ssh user@host</code> — зайти на сервер с GPU, <code>scp file user@host:path</code> — скопировать файл. Долгое обучение запускают в <code>tmux</code> или через <code>nohup python train.py &amp;</code>, чтобы оно не умерло, когда закроешь ноутбук.</li>
+  </ul></div>
+  <div class="callout trap"><b class="h">rm — навсегда</b><p><code>rm -rf папка</code> удаляет без корзины и без вопросов. Перед ним — <code>pwd</code> и <code>ls</code>, чтобы убедиться, где ты. Никогда не пиши <code>rm -rf</code> с переменной, которая может оказаться пустой, и с <code>/</code> или <code>~</code> в пути.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как найти все строки с ошибками в большом логе и посчитать, сколько их?</summary>
+      <div class="a"><p><code>grep -i "error" train.log</code> — показать, <code>grep -ic "error" train.log</code> — посчитать. Последние ошибки: <code>grep -i error train.log | tail -20</code>. Следить в реальном времени: <code>tail -f train.log | grep -i error</code>.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Чем <code>&gt;</code> отличается от <code>&gt;&gt;</code> и от <code>|</code>?</summary>
+      <div class="a"><p><code>&gt;</code> записывает вывод в файл, стирая старое; <code>&gt;&gt;</code> дописывает в конец; <code>|</code> передаёт вывод не в файл, а на вход другой команде.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ git ============ -->
+<section class="topic" id="w2">
+  <div class="eyebrow">Темы 6–8 из 12 · <span class="dia">◆</span> init, add, commit · <span class="dia">◆</span> Ветки · <span class="dia">◆</span> remote</div>
+  <h2>Git</h2>
+  <p class="tldr">Git — машина времени для кода. Каждый коммит — снимок проекта, к которому можно вернуться. Между «изменил файл» и «сохранил снимок» есть промежуточная зона: ты сам выбираешь, что войдёт в снимок.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · три зоны git</span></div>
+    <div class="zones">
+      <div class="zone"><b>Рабочая папка</b><span class="muted">файлы, как ты их видишь</span><div id="zWork" class="chips"></div></div>
+      <div class="zone"><b>Staging</b><span class="muted">что войдёт в коммит</span><div id="zStage" class="chips"></div></div>
+      <div class="zone"><b>Репозиторий</b><span class="muted">история коммитов</span><div id="zRepo" class="log"></div></div>
+    </div>
+    <div class="btns">
+      <button class="btn" id="gEdit1">Изменить train.py</button><button class="btn" id="gEdit2">Изменить README.md</button>
+      <button class="btn" id="gAdd1">git add train.py</button><button class="btn" id="gAddAll">git add .</button>
+      <button class="btn" id="gCommit">git commit</button><button class="btn" id="gStatus">git status</button>
+    </div>
+    <pre id="gOut" style="min-height:70px"></pre>
+  </div>
+  <div class="prose">
+    <p><b>Основной цикл</b> каждый день: <code>git status</code> → <code>git add файл</code> → <code>git commit -m "что сделано"</code> → <code>git push</code>. <code>git log --oneline</code> показывает историю, <code>git diff</code> — что изменилось и ещё не добавлено.</p>
+    <p><b>Сообщения коммитов</b> пиши в стиле Conventional Commits: <code>feat: add validation split</code>, <code>fix: use val set for early stopping</code>, <code>docs: metrics table in README</code>. По истории сразу видно, что происходило.</p>
+  </div>
+  <svg id="gitGraph" viewBox="0 0 600 170" role="img" aria-label="Ветки main и feature, слияние и связь с GitHub"></svg>
+  <div class="prose">
+    <p><b>Ветки</b> — параллельные линии истории. Новую фичу делают в своей ветке: <code>git switch -c feature/validation</code>. main в это время остаётся рабочей. Готово — сливаешь: <code>git switch main</code>, потом <code>git merge feature/validation</code>. Если обе ветки меняли одни и те же строки — будет конфликт, git покажет оба варианта, и ты выберешь.</p>
+    <p><b>Remote</b> — копия репозитория на GitHub. <code>git clone url</code> — скачать проект целиком. <code>git push</code> — отправить свои коммиты. <code>git pull</code> — забрать чужие. На работе в main напрямую не пушат: пушат ветку и открывают Pull Request, коллеги его смотрят.</p>
+  </div>
+  <div class="callout trap"><b class="h">Что не коммитят</b><p>Данные, обученные модели, папку <code>.venv</code>, <code>__pycache__</code>, <code>.ipynb_checkpoints</code> и, главное, секреты: пароли, токены, ключи API. Всё это перечисляют в <code>.gitignore</code> до первого коммита. Секрет, однажды попавший в историю, считается утёкшим, даже если потом удалить файл.</p></div>
+
+  <h3 style="font-size:17px">Как устроен коммит</h3>
+  <div class="prose"><ul>
+    <li>У каждого коммита есть <b>хеш</b> (<code>a3f9c21</code>) — его уникальное имя, посчитанное из содержимого. Тот же принцип, что в первой теме урока.</li>
+    <li>Коммит хранит снимок файлов, автора, время, сообщение и ссылку на <b>родителя</b> — предыдущий коммит. История — цепочка коммитов.</li>
+    <li><b>Ветка</b> — просто подвижный указатель на коммит. Новый коммит в ветке передвигает указатель вперёд. Поэтому ветки в git создаются мгновенно.</li>
+    <li><b>HEAD</b> — указатель «где я сейчас»: обычно на текущую ветку.</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Посмотреть и отменить</h3>
+<pre>git diff                    <span class="cm"># что изменено и ещё НЕ в staging</span>
+git diff --staged           <span class="cm"># что уже в staging и войдёт в коммит</span>
+git log --oneline --graph   <span class="cm"># история с ветками</span>
+git show a3f9c21            <span class="cm"># что было в конкретном коммите</span>
+
+git restore файл            <span class="cm"># выбросить изменения в файле (вернуть как в последнем коммите)</span>
+git restore --staged файл   <span class="cm"># убрать из staging, изменения останутся</span>
+git commit --amend          <span class="cm"># поправить ПОСЛЕДНИЙ коммит (сообщение или забытый файл)</span>
+git reset --soft HEAD~1     <span class="cm"># отменить последний коммит, изменения останутся в staging</span>
+git reset --hard HEAD~1     <span class="cm"># отменить коммит И стереть изменения — осторожно</span>
+git revert a3f9c21          <span class="cm"># новый коммит, отменяющий старый. Безопасно для уже запушенного</span>
+git stash / git stash pop   <span class="cm"># спрятать незакоммиченное, переключиться, вернуть</span></pre>
+  <div class="callout trap"><b class="h">Главное правило</b><p>Коммиты, которые уже запушены и которые могли забрать коллеги, не переписывай: никаких <code>reset</code>, <code>--amend</code> и <code>rebase</code> поверх них. Для отмены есть <code>git revert</code>. Переписывать можно только свою локальную историю.</p></div>
+
+  <h3 style="font-size:17px">Конфликт слияния по шагам</h3>
+<pre>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+test_size = 0.2
+=======
+test_size = 0.25
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/validation</pre>
+  <div class="prose"><ol style="margin:0;padding-left:22px;display:grid;gap:6px">
+    <li><code>git merge</code> сообщает о конфликте, <code>git status</code> показывает файлы «both modified».</li>
+    <li>В файле между <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> и <code>=======</code> — твоя версия, ниже до <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> — версия сливаемой ветки.</li>
+    <li>Оставляешь нужное (одну, другую или собираешь из обеих), удаляешь все три строки-маркера. VS Code показывает кнопки Accept Current / Incoming / Both.</li>
+    <li><code>git add файл</code>, затем <code>git commit</code>. Передумал — <code>git merge --abort</code> вернёт всё как было.</li>
+  </ol></div>
+
+  <h3 style="font-size:17px">merge, rebase, fetch, pull</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Команда</th><th>Что делает</th><th>Когда</th></tr></thead>
+    <tbody>
+      <tr><td><code>merge</code></td><td>соединяет ветки коммитом слияния, история сохраняется как была, с развилкой</td><td>по умолчанию; безопасно</td></tr>
+      <tr><td>fast-forward</td><td>если в main ничего нового не было, git просто передвигает указатель, без коммита слияния</td><td>происходит сам</td></tr>
+      <tr><td><code>rebase</code></td><td>переносит твои коммиты поверх свежего main, будто ты начал позже. История прямая</td><td>обновить свою ветку перед PR; только для своих незапушенных или личных веток</td></tr>
+      <tr><td><code>fetch</code></td><td>скачивает новое с GitHub, но ничего не меняет в твоих файлах</td><td>посмотреть, что нового</td></tr>
+      <tr><td><code>pull</code></td><td><code>fetch</code> + <code>merge</code> (или rebase, если настроено)</td><td>забрать и сразу влить</td></tr>
+    </tbody></table></div>
+  <div class="prose"><p><b>origin</b> — стандартное имя удалённого репозитория. <code>origin/main</code> — твоя локальная копия того, каким main был на GitHub при последнем fetch. <code>git push -u origin ветка</code> в первый раз связывает локальную ветку с удалённой, дальше хватает <code>git push</code>. <b>Fork</b> — своя копия чужого репозитория на GitHub, так вносят вклад в open source.</p></div>
+  <div class="prose"><p><b>.gitignore</b> — шаблоны, по строке: <code>data/</code> — папка целиком, <code>*.pkl</code> — по расширению, <code>!data/README.md</code> — исключение из правила. Файл, который уже закоммичен, gitignore не спрячет: сначала <code>git rm --cached файл</code>.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем merge отличается от rebase?</summary>
+      <div class="a"><p>Оба вносят изменения одной ветки в другую. merge создаёт коммит слияния и сохраняет историю как есть, с развилкой. rebase переписывает твои коммиты поверх целевой ветки — история получается прямой, но у коммитов меняются хеши. Поэтому rebase не делают с коммитами, которые уже есть у других.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Как отменить последний коммит?</summary>
+      <div class="a"><p>Если он ещё не запушен: <code>git reset --soft HEAD~1</code> (изменения останутся) или <code>--hard</code> (стереть). Если уже запушен: <code>git revert &lt;хеш&gt;</code> — новый коммит, отменяющий изменения, история не переписывается. Поправить только сообщение или добавить забытый файл — <code>git commit --amend</code> до пуша.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Чем <code>git fetch</code> отличается от <code>git pull</code>?</summary>
+      <div class="a"><p>fetch только скачивает новые коммиты в <code>origin/...</code> и ничего не трогает в рабочей папке. pull делает fetch и сразу сливает изменения в текущую ветку.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ venv ============ -->
+<section class="topic" id="w3">
+  <div class="eyebrow">Темы 9–10 из 12 · <span class="dia">◆</span> venv · <span class="dia">◆</span> requirements.txt</div>
+  <h2>Виртуальное окружение и requirements.txt</h2>
+  <p class="tldr">venv — отдельная папка с Python и библиотеками для одного проекта. requirements.txt — список этих библиотек с версиями, чтобы любой человек и любой сервер собрал точно такое же окружение.</p>
+  <div class="cards">
+    <div class="card"><h3>Без venv</h3><p>Все проекты делят одни библиотеки. Старому проекту нужен pandas 1.5, новому — 2.2. Обновил для нового — сломался старый.</p></div>
+    <div class="card"><h3>С venv</h3><p>У каждого проекта своя папка <code>.venv</code> со своими версиями. Проекты не мешают друг другу, а удалить окружение — просто удалить папку.</p></div>
+  </div>
+<pre>python3 -m venv .venv               <span class="cm"># создать окружение в папке проекта</span>
+source .venv/bin/activate           <span class="cm"># включить: в начале строки появится (.venv)</span>
+pip install pandas scikit-learn     <span class="cm"># ставится только в это окружение</span>
+pip freeze > requirements.txt       <span class="cm"># записать точные версии всего установленного</span>
+pip install -r requirements.txt     <span class="cm"># собрать окружение по списку на другом компьютере</span>
+deactivate                          <span class="cm"># выключить</span></pre>
+  <div class="prose"><p><b>Фиксируй версии через ==.</b> <code>pandas>=2.2</code> через полгода установит pandas 3.0, и код может сломаться без единого изменения с твоей стороны. <code>pandas==2.2.3</code> воспроизводит ровно то, что работало. В VS Code выбери интерпретатор из <code>.venv</code> (Cmd+Shift+P → Python: Select Interpreter), иначе редактор будет ругаться на импорты.</p></div>
+  <div class="callout brs"><b class="h">Где это у тебя</b><p>В BRS сейчас <code>>=</code> во всех строках requirements.txt. Это пункт из разбора проекта, и его легко починить после этой темы.</p></div>
+
+  <h3 style="font-size:17px">Как это работает внутри</h3>
+  <div class="prose">
+    <p>venv — это папка с ссылкой на Python и собственной <code>site-packages</code>, куда pip кладёт библиотеки. <code>activate</code> всего лишь ставит <code>.venv/bin</code> первым в <code>PATH</code> (тема «Терминал»), поэтому команды <code>python</code> и <code>pip</code> находятся там. Проверка: <code>which python</code> должен показывать путь внутри <code>.venv</code>.</p>
+    <p>Самая частая ошибка новичка — <code>ModuleNotFoundError</code>, хотя «я же ставил». Библиотеку поставили в одно окружение, а запускают из другого. Надёжная форма установки: <code>python -m pip install ...</code> — pip того же Python, которым запускаешь.</p>
+  </div>
+
+  <h3 style="font-size:17px">pip: команды на каждый день</h3>
+<pre>pip list                         <span class="cm"># что установлено</span>
+pip show pandas                  <span class="cm"># версия, где лежит, от чего зависит</span>
+pip install "pandas==2.2.3"      <span class="cm"># конкретная версия</span>
+pip install -U pandas            <span class="cm"># обновить</span>
+pip uninstall pandas</pre>
+  <div class="prose"><p><b>Почему <code>pip freeze</code> — не идеал.</b> Он записывает всё установленное, включая десятки зависимостей зависимостей. Файл раздувается, а на другой ОС часть пакетов может не встать. Хорошая практика — в requirements.txt руками перечислить то, что импортирует твой код, с версиями через ==. Для больших проектов есть инструменты с lock-файлом, о них ниже.</p></div>
+
+  <h3 style="font-size:17px">venv, conda, poetry, uv: что выбрать</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Инструмент</th><th>Что это</th><th>Когда</th></tr></thead>
+    <tbody>
+      <tr><td>venv + pip</td><td>встроено в Python, ничего ставить не надо</td><td>учёба, небольшие проекты, по умолчанию</td></tr>
+      <tr><td>conda</td><td>окружение + свой менеджер пакетов, умеет ставить и не-Python вещи (CUDA, системные библиотеки) и разные версии Python</td><td>научный стек, GPU, Windows</td></tr>
+      <tr><td>poetry, uv</td><td>зависимости в <code>pyproject.toml</code> + точный lock-файл. uv ещё и очень быстрый</td><td>командная разработка, библиотеки, прод</td></tr>
+      <tr><td>Docker</td><td>изолирует не только Python, а всю систему целиком</td><td>деплой модели, одинаковая среда на сервере (позже в плане)</td></tr>
+    </tbody></table></div>
+  <div class="prose"><ul>
+    <li><b>Версия Python</b> тоже важна: requirements.txt её не фиксирует. Её пишут в README или файл <code>.python-version</code>.</li>
+    <li><b>Jupyter и venv:</b> чтобы ноутбук видел библиотеки окружения, поставь в него <code>ipykernel</code> и выбери ядро <code>.venv</code> в VS Code или Jupyter.</li>
+    <li><b>PyTorch с GPU</b> ставят командой с сайта pytorch.org под свою версию CUDA — обычный <code>pip install torch</code> может поставить не ту сборку.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Зачем нужно виртуальное окружение?</summary>
+      <div class="a"><p>Изолировать зависимости проекта: у каждого проекта свои версии библиотек, они не конфликтуют между собой и с системным Python. Вместе с requirements.txt или lock-файлом это даёт воспроизводимость: любой участник и сервер собирают ту же среду, и «у меня работает» перестаёт быть проблемой.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ debugger ============ -->
+<section class="topic" id="w4">
+  <div class="eyebrow">Тема 11 из 12 · <span class="dia">◆</span> Отладчик в VS Code</div>
+  <h2>Отладчик</h2>
+  <p class="tldr">Отладчик останавливает программу на нужной строке и даёт посмотреть все переменные в этот момент. Это быстрее и честнее, чем расставлять print по всему коду.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · отладка по шагам</span><span class="mono muted" id="dbgState"></span></div>
+    <div class="lab-grid" style="align-items:start;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)">
+      <div class="dbg-code" id="dbgCode"></div>
+      <div style="display:grid;gap:10px">
+        <div class="stat"><div class="k">Переменные</div><pre id="dbgVars" style="background:none;padding:4px 0 0"></pre></div>
+        <div class="stat"><div class="k">Watch: <code>len(scores)</code></div><div class="mono" id="dbgWatch" style="font-family:var(--f-mono)"></div></div>
+        <div class="stat"><div class="k">Стек вызовов</div><pre id="dbgStack" style="background:none;padding:4px 0 0"></pre></div>
+      </div>
+    </div>
+    <div class="btns">
+      <button class="btn" id="dbgCont">▶ Continue (F5)</button><button class="btn" id="dbgOver">Step Over (F10)</button><button class="btn" id="dbgInto">Step Into (F11)</button><button class="btn" id="dbgOut">Step Out (⇧F11)</button><button class="btn" id="dbgRestart">Сначала</button>
+    </div>
+    <pre id="dbgTerm" style="min-height:48px"></pre>
+    <p class="muted" style="font-size:13.5px">Щёлкни по номеру строки, чтобы поставить или убрать точку останова (красная точка). Задача: найди, на каком студенте и почему программа падает.</p>
+  </div>
+  <div class="prose"><ul>
+    <li><b>Breakpoint</b> (F9 или клик слева от номера строки) — остановиться здесь.</li>
+    <li><b>Step Over</b> — выполнить строку целиком, не заходя внутрь функций. <b>Step Into</b> — зайти внутрь вызываемой функции. <b>Step Out</b> — доработать текущую функцию и выйти к месту вызова.</li>
+    <li><b>Watch</b> — выражение, которое пересчитывается на каждом шаге.</li>
+    <li><b>Условная точка останова</b> (правый клик по точке → Edit Condition): например, <code>len(scores) == 0</code>. Незаменима, когда ошибка случается на 900-й итерации из 1000.</li>
+    <li>В Jupyter отладчик тоже есть, но для скриптов привычнее VS Code: F5, конфигурация «Python File».</li>
+  </ul></div>
+
+  <h3 style="font-size:17px">Сначала прочитай traceback</h3>
+<pre>Traceback (most recent call last):
+  File "prepare.py", line 15, in &lt;module&gt;
+    X = build_features(df)
+  File "prepare.py", line 7, in build_features
+    return df[["attendance", "gpa", "labs "]]
+  ... ещё десяток строк из pandas ...
+<span class="hl">KeyError: "['labs '] not in index"</span></pre>
+  <div class="prose"><ul>
+    <li>Читай <b>снизу вверх</b>. Последняя строка — тип ошибки и сообщение. Над ней — точное место, где упало. Выше — кто это место вызвал.</li>
+    <li>Ищи первую снизу строку из <b>своего</b> файла: строки из pandas или sklearn обычно лишь следствие того, что ты передал им что-то не то.</li>
+    <li>Скопировать последнюю строку в поиск — нормальная рабочая практика.</li>
+  </ul></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Ошибка</th><th>Что обычно значит</th></tr></thead>
+    <tbody>
+      <tr><td><code>NameError</code></td><td>опечатка в имени или переменная не создана (в Jupyter — ячейку не запустил)</td></tr>
+      <tr><td><code>TypeError</code></td><td>не тот тип: <code>"5" + 5</code>, вызвал не функцию, не то число аргументов</td></tr>
+      <tr><td><code>ValueError</code></td><td>тип верный, значение нет: <code>int("abc")</code>, разные длины массивов в sklearn</td></tr>
+      <tr><td><code>KeyError</code></td><td>нет ключа в dict или столбца в DataFrame (проверь <code>df.columns</code>, пробелы в названиях)</td></tr>
+      <tr><td><code>IndexError</code></td><td>индекс за границей списка или массива</td></tr>
+      <tr><td><code>AttributeError</code></td><td>у объекта нет такого метода; часто объект оказался <code>None</code></td></tr>
+      <tr><td><code>ModuleNotFoundError</code></td><td>библиотека не в этом окружении (тема venv)</td></tr>
+      <tr><td><code>ZeroDivisionError</code></td><td>деление на ноль, например среднее по пустому списку</td></tr>
+    </tbody></table></div>
+
+  <h3 style="font-size:17px">Отладка без VS Code</h3>
+<pre>breakpoint()               <span class="cm"># вставь в код — программа остановится здесь в терминале (pdb)</span>
+<span class="cm"># команды pdb: n — следующая строка, s — зайти внутрь, c — продолжить,
+# p x — напечатать x, l — показать код вокруг, q — выйти</span>
+
+%debug                     <span class="cm"># в Jupyter сразу после ошибки: открывает отладчик в месте падения</span>
+python -m pdb train.py     <span class="cm"># запустить весь скрипт под отладчиком</span></pre>
+
+  <h3 style="font-size:17px">Отладка ML-кода</h3>
+  <div class="prose"><ul>
+    <li><b>Форма прежде всего:</b> половина ошибок — несовпадение размеров. Смотри <code>X.shape</code>, <code>y.shape</code>, <code>df.info()</code>, <code>df.isna().sum()</code>.</li>
+    <li><b>Начни с маленького:</b> 100 строк вместо миллиона, 1 эпоха вместо 50. Ошибка найдётся за секунды, а не за час.</li>
+    <li><b>Переобучись на одном батче:</b> если нейросеть не может выучить 10 примеров до нулевой ошибки, в коде баг.</li>
+    <li><b>Зафиксируй случайность</b> (<code>random_state=42</code>), иначе баг будет то появляться, то нет.</li>
+    <li><b>assert</b> для проверок по ходу: <code>assert X_train.shape[0] == len(y_train)</code>, <code>assert not set(train_ids) &amp; set(test_ids)</code>.</li>
+    <li><b>logging</b> вместо print в скриптах, которые живут долго: уровни (DEBUG, INFO, ERROR), время, запись в файл, и не надо удалять отладочные print перед коммитом.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Модель обучилась, но метрики подозрительно плохие. Как будете искать проблему?</summary>
+      <div class="a"><p>Сначала данные: формы X и y, совпадает ли порядок строк, нет ли пропусков, правильно ли закодирован таргет, нет ли перепутанных столбцов. Потом сравнить с бейзлайном (DummyClassifier): если не лучше — баг в данных или в разбиении. Проверить на маленькой выборке, что модель может переобучиться. Посмотреть на конкретные ошибочные примеры глазами. Код проверить отладчиком или assert-ами, а не догадками.</p></div></details>
+  </div>
+</section>
+
+<!-- ============ career ============ -->
+<section class="topic" id="w5">
+  <div class="eyebrow">Тема 12 из 12 · Карьера</div>
+  <h2>Сроки отборов в календаре</h2>
+  <p class="tldr">Сроки отборов на стажировки каждый год сдвигаются. Поэтому вместо дат, которые устареют, — система: где смотреть, как часто проверять и что должно быть готово к твоим датам.</p>
+  <div class="prose"><ul>
+    <li><b>Где смотреть:</b> официальные страницы <a href="https://yandex.ru/yaintern/" target="_blank" rel="noopener">Яндекс Стажировки</a>, <a href="https://education.tbank.ru/" target="_blank" rel="noopener">Т-Образование</a>, страницы стажировок Сбера, VK, Ozon, Avito. Полезно подписаться на их Telegram-каналы.</li>
+    <li><b>Как обычно бывает:</b> многие компании открывают отбор на летние стажировки зимой и весной, у Яндекса набор идёт почти круглый год. Точные даты проверяй только на официальных страницах.</li>
+    <li><b>Твой план в дереве:</b> заявки — неделя 10 (14–20 декабря), собеседования — с 25 января 2027. К заявкам нужны резюме и один доведённый проект.</li>
+  </ul></div>
+  <div class="callout feel"><b class="h">Что сделать на этой неделе</b><p>Создай в календаре повторяющееся напоминание «проверить стажировки» на 1-е число каждого месяца. В заметке Obsidian заведи список компаний: ссылка, когда открывается отбор, этапы, статус. Проект для резюме и разбор BRS — в задаче недели: прочитать «BRS — разбор и новая концепция» и решить по концепции.</p></div>
+
+  <h3 style="font-size:17px">Как обычно устроен отбор на стажировку в ML</h3>
+  <div class="prose">
+    <p>Этапы у компаний отличаются, точный порядок всегда смотри на странице стажировки. Чаще всего встречается такой набор:</p>
+    <ol style="margin:0;padding-left:22px;display:grid;gap:6px">
+      <li><b>Анкета и резюме.</b> Иногда с вопросами «почему мы» и ссылкой на GitHub.</li>
+      <li><b>Онлайн-тест или контест.</b> Алгоритмические задачи с автопроверкой, иногда вопросы по математике и ML.</li>
+      <li><b>Алгоритмическая секция</b> — 1–2 задачи вживую с интервьюером (тема 3 этого урока).</li>
+      <li><b>ML-секция</b> — теория (урок 1 и дальше по плану), разбор твоего проекта, иногда задача на дизайн ML-решения.</li>
+      <li><b>Финал или собеседование с командой</b> — знакомство, мотивация, вопросы про проект.</li>
+    </ol>
+  </div>
+  <div class="prose"><p><b>Что должно быть готово к заявкам:</b></p><ul>
+    <li><b>Резюме на одну страницу:</b> образование, навыки (Python, pandas, sklearn, git, SQL — только то, о чём сможешь ответить), 1–2 проекта с цифрами (например, «ROC-AUC 0.87 на отложенной выборке, 30 000 студентов»), ссылка на GitHub.</li>
+    <li><b>GitHub:</b> один доведённый проект лучше пяти брошенных. README: задача, данные, как запустить, результаты. Чистая история коммитов и requirements.txt — то, чему ты учишься в этом уроке.</li>
+    <li><b>История проекта на 2 минуты</b> вслух: какую задачу решал, почему такие решения, что не получилось и что бы сделал иначе.</li>
+  </ul></div>
+  <div class="callout trap"><b class="h">Частые ошибки</b><p>Ждать «пока выучу всё» и пропустить сроки — подаваться можно и нужно, даже чувствуя себя не готовым. Подаваться в одну компанию. Писать в резюме технологии, про которые не ответишь на два вопроса.</p></div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · как на собеседовании и в работе</div>
+  <h2>Практика</h2>
+  <p class="tldr">Алгоритмы — с таймером, как на секции. Инструменты — как в первый рабочий день: заводишь свой учебный репозиторий, где будет жить вся практика курса.</p>
+  <div class="prac">
+    <div class="task"><span class="tg lc">LeetCode · 4 задачи</span>
+      <h3>Три лёгкие на хеширование и одна средняя</h3>
+      <p><a href="https://leetcode.com/problems/two-sum/" target="_blank" rel="noopener">1. Two Sum</a>, <a href="https://leetcode.com/problems/contains-duplicate/" target="_blank" rel="noopener">217. Contains Duplicate</a>, <a href="https://leetcode.com/problems/valid-anagram/" target="_blank" rel="noopener">242. Valid Anagram</a> — по 15 минут, без подсказок, решения из урока не подсматривай. Потом средняя: <a href="https://leetcode.com/problems/group-anagrams/" target="_blank" rel="noopener">49. Group Anagrams</a> — 25 минут.</p>
+      <p class="ok">Готово, когда все четыре приняты и для каждой ты проговорил вслух шаги 1–6 и сложность.</p>
+      <details><summary>Разбор Group Anagrams</summary><div class="a">
+<pre>from collections import defaultdict
+def groupAnagrams(strs):
+    groups = defaultdict(list)
+    for w in strs:
+        groups[tuple(sorted(w))].append(w)   <span class="cm"># ключ — отсортированные буквы</span>
+    return list(groups.values())
+<span class="cm"># O(n · k log k), где k — длина слова. Ключ — tuple, потому что list нельзя хешировать</span></pre>
+        <p>Ускорение до O(n · k): ключом сделать кортеж из 26 счётчиков букв.</p></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 3 минуты</span>
+      <h3>«Что происходит, когда вы пишете <code>d["Аня"] = 5</code>?»</h3>
+      <p class="ok">Готово, когда в ответе есть хеш, индекс ячейки, коллизии, расширение и сложность.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>Python считает <code>hash("Аня")</code>, по нему находит ячейку внутренней таблицы. Если она свободна — кладёт ключ, хеш и значение. Если там другой ключ — коллизия, Python пробует следующие ячейки по своему правилу, пока не найдёт свободную или тот же ключ (тогда перезаписывает значение). Если таблица заполнилась примерно на 2/3, она увеличивается и ключи раскладываются заново. В среднем O(1), амортизированно с учётом расширений.</p></div></details></div>
+
+    <div class="task"><span class="tg work">Работа · первый день</span>
+      <h3>Заведи учебный репозиторий курса</h3>
+      <p>В терминале, без мышки: создай папку <code>ml-course</code>, внутри <code>.venv</code>, установи <code>numpy pandas scikit-learn matplotlib jupyter</code>. Создай <code>.gitignore</code> (.venv, __pycache__, .ipynb_checkpoints, data/), <code>requirements.txt</code> с версиями через ==, <code>README.md</code> с одной строкой о репозитории. Сделай первый коммит, создай пустой репозиторий на GitHub, привяжи и запушь.</p>
+      <p class="ok">Готово, когда репозиторий на GitHub открывается и в нём нет папки .venv. Сюда же положи ноутбуки с практики уроков 1 и 2.</p>
+      <details><summary>Команды, если застрял</summary><div class="a">
+<pre>mkdir ml-course &amp;&amp; cd ml-course
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install numpy pandas scikit-learn matplotlib jupyter
+printf ".venv/\n__pycache__/\n.ipynb_checkpoints/\ndata/\n" > .gitignore
+pip freeze > requirements.txt   <span class="cm"># или вручную только 5 нужных строк с ==</span>
+echo "# ML course practice" > README.md
+git init &amp;&amp; git add . &amp;&amp; git commit -m "chore: init course repo"
+git branch -M main
+git remote add origin https://github.com/&lt;логин&gt;/ml-course.git
+git push -u origin main</pre></div></details></div>
+
+    <div class="task"><span class="tg work">Работа · ветки</span>
+      <h3>Фича в отдельной ветке</h3>
+      <p>В <code>ml-course</code> создай ветку <code>feature/validation-curve</code>, положи туда ноутбук с validation curve из урока 1, закоммить, запушь ветку и открой Pull Request в main на GitHub. Посмотри вкладку Files changed, как это делает ревьюер, и слей PR.</p>
+      <p class="ok">Готово, когда в истории main есть merge этой ветки, а <code>git log --oneline --graph</code> показывает развилку.</p></div>
+
+    <div class="task"><span class="tg work">Работа · терминал</span>
+      <h3>Найди всё командами</h3>
+      <p>В любом своём проекте с кодом: найди все ноутбуки; найди все строки, где импортируется sklearn, с номерами; посчитай строки в самом большом CSV; посмотри первые 3 строки этого CSV.</p>
+      <details><summary>Ответ</summary><div class="a"><pre>find . -name "*.ipynb" -not -path "./.venv/*"
+grep -rn "sklearn" --include="*.py" .
+wc -l data/*.csv
+head -3 data/students.csv</pre></div></details></div>
+
+    <div class="task"><span class="tg rev">Отладка</span>
+      <h3>Найди ошибку отладчиком, а не print</h3>
+      <p>Перенеси пример из лаборатории отладчика в файл <code>debug_me.py</code> в VS Code. Поставь условную точку останова с условием <code>len(scores) == 0</code>, запусти F5, посмотри стек вызовов и переменные. Почини функцию так, чтобы для пустой группы она возвращала <code>None</code> и программа печатала «нет оценок».</p>
+      <p class="ok">Готово, когда программа отрабатывает до конца и ты можешь объяснить, чем Step Into отличается от Step Over.</p></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в дереве</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда выполнил практику по теме. Галочки — те же, что в файле недели в Obsidian и на сайте дерева.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Хеш-таблица:</b> хеш ключа → номер ячейки → O(1) в среднем. Коллизии, расширение при заполнении ~2/3. Ключи неизменяемые.</li>
+      <li><b>Паттерн хеширования:</b> запоминай увиденное в dict или set — O(n²) превращается в O(n).</li>
+      <li><b>Задача на собеседовании:</b> условие → пример → перебор → ускорение → код → тесты и сложность. 25 минут, потом разбор.</li>
+      <li><b>Терминал:</b> pwd, ls -la, cd, mkdir, cp, mv, rm (без корзины), find -name, grep -rn, wc -l.</li>
+      <li><b>Git:</b> рабочая папка → add → staging → commit → push. Ветки для фич, merge, PR. .gitignore до первого коммита, секреты не коммитят.</li>
+      <li><b>venv:</b> отдельное окружение на проект. <b>requirements.txt</b> с версиями через ==.</li>
+      <li><b>Отладчик:</b> breakpoint, Step Over / Into / Out, Watch, условные точки.</li>
+      <li><b>Стажировки:</b> даты только с официальных страниц, проверка раз в месяц, твои заявки — 14–20 декабря.</li>
+      <li><b>Хеш:</b> равные объекты → равные хеши, обратное неверно (коллизии). <code>hash()</code> строк меняется между запусками — для стабильного хеша <code>hashlib</code>.</li>
+      <li><b>Сигналы хеширования:</b> «есть ли», «сколько раз», «пара с суммой», «сгруппировать». Называй 2–3 решения и обмен памяти на скорость.</li>
+      <li><b>Терминал:</b> <code>|</code> — передать дальше, <code>&gt;</code> — в файл, <code>&gt;&gt;</code> — дописать. <code>grep -i -v -c -l</code>, <code>tail -f</code>, <code>which python</code>.</li>
+      <li><b>Git-отмена:</b> не запушено — <code>reset</code>/<code>--amend</code>, запушено — <code>revert</code>. Конфликт: убрать маркеры, <code>add</code>, <code>commit</code>. merge сохраняет историю, rebase выпрямляет.</li>
+      <li><b>ModuleNotFoundError</b> — почти всегда не то окружение: <code>python -m pip install</code>.</li>
+      <li><b>Traceback</b> читай снизу вверх, ищи первую строку своего кода. В Jupyter — <code>%debug</code>, в скрипте — <code>breakpoint()</code>.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без ИИ, 15 минут</b>
+    <p>Объясни вслух, как dict находит значение. Реши Two Sum на листке за 5 минут. Без шпаргалки напиши в терминале команды, чтобы создать проект с venv и запушить его на GitHub. Где запнулся — туда и возвращаешься.</p>
+  </div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- hash table ---------- */
+const hashStr=s=>{let h=0;for(const ch of s)h=(h*31+ch.codePointAt(0))%100003;return h};
+let ht={size:8,b:Array.from({length:8},()=>[]),n:0,hot:-1,found:null};
+function htDraw(msg){
+  $("htBuckets").innerHTML=ht.b.map((ch,i)=>`<div class="bk ${i===ht.hot?"hot":""}"><span class="bi">${i}</span><div class="chain">${ch.map(k=>`<span class="kchip ${k===ht.found?"found":""}">${esc(k)}</span>`).join("")||'<span class="muted" style="font-size:12px">пусто</span>'}</div></div>`).join("");
+  const load=ht.n/ht.size;$("htLoad").style.width=Math.min(100,load*100)+"%";$("htLoadT").textContent=Math.round(load*100)+"%";
+  $("htInfo").textContent=`ключей ${ht.n} · ячеек ${ht.size}`;
+  if(msg)$("htMsg").textContent=msg;
+}
+function htInsert(key){
+  const h=hashStr(key),i=h%ht.size;
+  if(ht.b[i].includes(key)){ht.hot=i;ht.found=key;return `«${key}» уже есть в ячейке ${i}. В dict это перезаписало бы значение.`}
+  const coll=ht.b[i].length>0;ht.b[i].push(key);ht.n++;ht.hot=i;ht.found=null;
+  let m=`hash("${key}") = ${h} → ${h} % ${ht.size} = ${i}. Кладём в ячейку ${i}.`+(coll?` Коллизия: там уже ${ht.b[i].length-1} ${ht.b[i].length-1===1?"ключ":"ключа"}, храним рядом.`:"");
+  if(ht.n/ht.size>0.75){const keys=ht.b.flat();ht.size*=2;ht.b=Array.from({length:ht.size},()=>[]);keys.forEach(k=>ht.b[hashStr(k)%ht.size].push(k));ht.hot=hashStr(key)%ht.size;
+    m+=` Заполнено больше 75% — таблица выросла до ${ht.size} ячеек, и все ключи разложены заново: остаток от деления теперь другой.`}
+  return m;
+}
+$("htAdd").onclick=()=>{const k=$("htKey").value.trim();if(!k)return htDraw("Введи ключ.");htDraw(htInsert(k))};
+$("htFind").onclick=()=>{const k=$("htKey").value.trim();if(!k)return;const h=hashStr(k),i=h%ht.size,pos=ht.b[i].indexOf(k);ht.hot=i;ht.found=pos>=0?k:null;
+  htDraw(pos>=0?`hash("${k}") % ${ht.size} = ${i}. Идём сразу в ячейку ${i}, сравнений: ${pos+1}. Остальные ${ht.size-1} ячеек даже не смотрим.`:`hash("${k}") % ${ht.size} = ${i}. В ячейке ${i} такого ключа нет — значит, его нет нигде. Проверили одну ячейку, а не всю таблицу.`)};
+$("htMany").onclick=()=>{let m="";["Боря","Вика","Гоша","Дима","Ева","Женя"].forEach(k=>{m=htInsert(k)});htDraw("Добавлено 6 ключей. Последний: "+m)};
+$("htReset").onclick=()=>{ht={size:8,b:Array.from({length:8},()=>[]),n:0,hot:-1,found:null};htDraw("Таблица пуста.")};
+$("htKey").addEventListener("keydown",e=>{if(e.key==="Enter")$("htAdd").click()});
+htDraw();
+
+/* ---------- Two Sum stepper ---------- */
+const NUMS=[3,8,1,6,4],TG=10;let ts=0;
+function tsDraw(){
+  const x=NUMS[ts],need=TG-x,seen={};NUMS.slice(0,ts).forEach((v,j)=>{seen[v]=j});const hit=need in seen;
+  $("tsCells").innerHTML=NUMS.map((v,j)=>`<div class="cell ${j<ts?"on":""} ${j===ts?"mv":""} ${hit&&j===seen[need]?"mv":""}" style="width:46px;height:46px;font-size:15px">${v}<span style="position:absolute;font-size:9px;transform:translateY(19px);color:var(--muted)">${j}</span></div>`).join("");
+  $("tsNeed").textContent=`i=${ts}, x=${x}, ищем ${TG} − ${x} = ${need}`;
+  $("tsSeen").textContent="{"+Object.entries(seen).map(([k,v])=>`${k}: ${v}`).join(", ")+"}";
+  $("tsMsg").textContent=hit?`${need} есть в seen под индексом ${seen[need]}. Ответ: [${seen[need]}, ${ts}]. Одна проверка в словаре за O(1) вместо перебора всех пар.`:`${need} в seen нет. Запоминаем seen[${x}] = ${ts} и идём дальше.`;
+  $("tsPrev").disabled=ts===0;$("tsNext").disabled=hit||ts===NUMS.length-1;
+}
+$("tsPrev").onclick=()=>{if(ts>0){ts--;tsDraw()}};$("tsNext").onclick=()=>{if(ts<NUMS.length-1){ts++;tsDraw()}};tsDraw();
+
+/* ---------- terminal simulator ---------- */
+const HOME="/Users/aplaygs",PROJ=HOME+"/ml-project";
+const F=(content,lines)=>({t:"f",content,lines});const D=c=>({t:"d",c});
+const TRAIN=`import pandas as pd
+from catboost import CatBoostClassifier
+from sklearn.model_selection import train_test_split
+
+df = pd.read_csv("data/raw/students.csv")
+X = df.drop(columns=["student_id", "is_at_risk"])
+y = df["is_at_risk"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
+model = CatBoostClassifier(iterations=250, depth=5, verbose=0)
+model.fit(X_train, y_train, eval_set=(X_test, y_test))
+model.save_model("models/model.cbm")`;
+const ROOT=D({Users:D({aplaygs:D({Documents:D({}),"ml-project":D({
+  "README.md":F("# ml-project\nУчебный проект: прогноз академического риска."),
+  "requirements.txt":F("pandas==2.2.3\nscikit-learn==1.5.2\ncatboost==1.2.7"),
+  ".gitignore":F(".venv/\ndata/\nmodels/\n__pycache__/"),
+  ".venv":D({bin:D({python:F("(бинарный файл)"),activate:F("# скрипт активации")})}),
+  data:D({raw:D({"students.csv":F("student_id,attendance_rate,labs_submitted_ratio,past_gpa,is_at_risk\nSTU_1000,0.87,0.86,3.97,0\nSTU_1001,0.76,0.56,3.9,0\nSTU_1002,0.9,0.64,3.25,0\nSTU_1003,1.0,0.85,4.57,0",1501)})}),
+  notebooks:D({"eda.ipynb":F('{"cells": [], "metadata": {}}')}),
+  src:D({"train.py":F(TRAIN),"predict.py":F("import sys\n# TODO: загрузить модель и сделать прогноз"),"utils.py":F("def mean(xs):\n    return sum(xs) / len(xs)")}),
+  models:D({})})})})});
+let cwd=PROJ,hist=[],hp=0,lastCmd="";
+const short=p=>p===HOME?"~":p.startsWith(HOME+"/")?"~"+p.slice(HOME.length):p;
+function resolve(p){
+  if(!p||p==="~")return HOME;
+  let parts=p.startsWith("/")?[]:p.startsWith("~/")?HOME.split("/").filter(Boolean):cwd.split("/").filter(Boolean);
+  if(p.startsWith("~/"))p=p.slice(2);
+  p.split("/").forEach(s=>{if(!s||s===".")return;if(s==="..")parts.pop();else parts.push(s)});
+  return "/"+parts.join("/");
+}
+function node(path){let n=ROOT;for(const s of path.split("/").filter(Boolean)){if(n.t!=="d"||!n.c[s])return null;n=n.c[s]}return n}
+function walk(path,n,cb){cb(path,n);if(n.t==="d")Object.keys(n.c).sort().forEach(k=>walk(path==="/"?"/"+k:path+"/"+k,n.c[k],cb))}
+const rel=(p,base)=>p===base?".":p.startsWith(base+"/")?"./"+p.slice(base.length+1):p;
+const unq=s=>s.replace(/^["']|["']$/g,"");
+function run(line){
+  const args=line.trim().split(/\s+/).filter(Boolean),cmd=args[0];
+  switch(cmd){
+    case "help":return "Команды тренажёра: pwd, ls [-a] [путь], cd [путь], cat файл, head [-n N] файл, mkdir имя, touch имя,\nfind . -name \"шаблон\", grep -rn слово [путь], wc -l файл, echo текст, clear";
+    case "pwd":return cwd;
+    case "ls":{const flags=args.slice(1).filter(a=>a.startsWith("-")).join(""),tgt=args.slice(1).find(a=>!a.startsWith("-")),p=resolve(tgt||"."),n=node(p);
+      if(!n)return `ls: ${tgt}: No such file or directory`;if(n.t==="f")return tgt;
+      const all=flags.includes("a"),names=Object.keys(n.c).sort().filter(k=>all||!k.startsWith("."));
+      const list=(all?[".",".."]:[]).concat(names.map(k=>n.c[k].t==="d"?k+"/":k));
+      return flags.includes("l")?list.map(k=>(k.endsWith("/")||k==="."||k===".."?"drwxr-xr-x  ":"-rw-r--r--  ")+k).join("\n"):list.join("   ")||"";}
+    case "cd":{const p=resolve(args[1]),n=node(p);if(!n)return `cd: no such file or directory: ${args[1]}`;if(n.t!=="d")return `cd: not a directory: ${args[1]}`;cwd=p;return "";}
+    case "cat":{if(!args[1])return "cat: укажи файл";const n=node(resolve(args[1]));if(!n)return `cat: ${args[1]}: No such file or directory`;if(n.t==="d")return `cat: ${args[1]}: Is a directory`;return n.content+(n.lines?"\n… (в файле "+n.lines+" строк)":"");}
+    case "head":{let k=10,f=args[1];if(args[1]==="-n"){k=+args[2];f=args[3]}else if(/^-\d+$/.test(args[1]||"")){k=+args[1].slice(1);f=args[2]}
+      const n=f&&node(resolve(f));if(!n||n.t!=="f")return `head: ${f||""}: No such file or directory`;return n.content.split("\n").slice(0,k).join("\n");}
+    case "mkdir":case "touch":{if(!args[1])return `${cmd}: укажи имя`;const p=resolve(args[1]),par=node(p.slice(0,p.lastIndexOf("/"))||"/"),nm=p.slice(p.lastIndexOf("/")+1);
+      if(!par||par.t!=="d")return `${cmd}: ${args[1]}: No such file or directory`;if(par.c[nm])return cmd==="mkdir"?`mkdir: ${args[1]}: File exists`:"";par.c[nm]=cmd==="mkdir"?D({}):F("");return "";}
+    case "find":{const base=resolve(args[1]||"."),ni=args.indexOf("-name"),pat=ni>0?unq(args.slice(ni+1).join(" ")):null,n=node(base);if(!n)return `find: ${args[1]}: No such file or directory`;
+      const re=pat?new RegExp("^"+pat.replace(/[.+^${}()|[\]\\]/g,"\\$&").replace(/\*/g,".*").replace(/\?/g,".")+"$"):null,out=[];
+      walk(base,n,(p,nn)=>{const nm=p.slice(p.lastIndexOf("/")+1);if(!re||re.test(nm))out.push(rel(p,base==="/"?"":base).replace(/^\.\/?$/,".")||".")});
+      return out.map(o=>args[1]&&args[1]!=="."?o.replace(/^\./,args[1]):o).join("\n");}
+    case "grep":{const fl=args.filter(a=>a.startsWith("-")).join(""),rest=args.slice(1).filter(a=>!a.startsWith("-"));const word=unq(rest[0]||""),target=rest[1]||".";
+      if(!word)return "grep: укажи, что искать";const base=resolve(target),n=node(base);if(!n)return `grep: ${target}: No such file or directory`;
+      if(n.t==="d"&&!fl.includes("r"))return `grep: ${target}: Is a directory (добавь -r)`;
+      const out=[];walk(base,n,(p,nn)=>{if(nn.t!=="f"||p.includes("/.venv/"))return;nn.content.split("\n").forEach((l,i)=>{if(l.includes(word))out.push(`${n.t==="d"?rel(p,base).replace(/^\.\//,""):target}${fl.includes("n")?":"+(i+1):""}: ${l.trim()}`)})});
+      return out.join("\n");}
+    case "wc":{const f=args.find((a,i)=>i>0&&!a.startsWith("-")),n=f&&node(resolve(f));if(!n||n.t!=="f")return `wc: ${f||""}: No such file or directory`;
+      return `${String(n.lines||n.content.split("\n").length).padStart(8)} ${f}`;}
+    case "echo":return args.slice(1).join(" ");
+    case "rm":return "В тренажёре rm отключён. В настоящем терминале файл удалится сразу, без корзины. Будь внимателен.";
+    case "git":return "Git — в следующей теме, там своя лаборатория.";
+    case "python":case "python3":return "Python в тренажёре не запускается. В настоящем терминале: python3 src/train.py";
+    default:return `zsh: command not found: ${cmd}. Набери help.`;
+  }
+}
+const MISSIONS=[
+  ["Узнай, в какой папке ты находишься",c=>/^pwd$/.test(c)],
+  ["Покажи все файлы проекта, включая скрытые",c=>/^ls\s+-\w*a/.test(c)&&cwd===PROJ],
+  ["Зайди в папку src и посмотри, что в ней",c=>/^ls/.test(c)&&cwd===PROJ+"/src"],
+  ["Вернись на уровень выше одной командой",c=>c==="cd .."],
+  ["Найди все .py-файлы в проекте",c=>/^find\s.*-name\s+["']?\*\.py["']?$/.test(c)],
+  ["Найди строку, где используется eval_set, с номером строки",c=>/^grep\s+-\w*n.*eval_set/.test(c)||/^grep\s+.*-n.*eval_set/.test(c)],
+  ["Посчитай строки в students.csv",c=>/^wc\s+-l\s+.*students\.csv$/.test(c)]
+];
+const doneM=new Set();
+function drawMissions(){$("missions").innerHTML=`<b style="font-size:13px">Задания</b>`+MISSIONS.map(([t],i)=>`<div class="ms ${doneM.has(i)?"ok":""}"><span class="mk">${doneM.has(i)?"✓":i+1}</span>${t}</div>`).join("")+(doneM.size===MISSIONS.length?`<div class="ms ok"><span class="mk">★</span>Все задания выполнены. Повтори то же самое в настоящем терминале.</div>`:"")}
+function prompt(){$("termPrompt").textContent=`aplaygs@mac ${short(cwd).split("/").pop()||"/"} % `}
+function termPrint(cmdline,out){const o=$("termOut");o.insertAdjacentHTML("beforeend",`<div><span class="tprompt">${esc(`aplaygs@mac ${short(cwd).split("/").pop()} %`)}</span> ${esc(cmdline)}</div>`+(out?`<div class="tres">${esc(out)}</div>`:""));o.scrollTop=o.scrollHeight}
+$("termIn").addEventListener("keydown",e=>{
+  if(e.key==="ArrowUp"){if(hp>0){hp--;e.target.value=hist[hp]}e.preventDefault();return}
+  if(e.key==="ArrowDown"){if(hp<hist.length){hp++;e.target.value=hist[hp]||""}e.preventDefault();return}
+  if(e.key!=="Enter")return;
+  const line=e.target.value.trim();e.target.value="";if(!line)return;hist.push(line);hp=hist.length;
+  if(line==="clear"){$("termOut").innerHTML="";return}
+  const before=cwd,o=$("termOut");o.insertAdjacentHTML("beforeend",`<div><span class="tprompt">${esc(`aplaygs@mac ${short(before).split("/").pop()} %`)}</span> ${esc(line)}</div>`);
+  const out=run(line);if(out)o.insertAdjacentHTML("beforeend",`<div class="tres">${esc(out)}</div>`);o.scrollTop=o.scrollHeight;
+  MISSIONS.forEach(([,t],i)=>{if(!doneM.has(i)&&t(line))doneM.add(i)});drawMissions();prompt();
+});
+$("term").addEventListener("click",()=>$("termIn").focus());
+$("termOut").innerHTML=`<div class="tres">Учебный терминал. Ты в папке проекта. Набери help.</div>`;prompt();drawMissions();
+
+/* ---------- git zones ---------- */
+const GF={"train.py":{w:0,s:0,c:0},"README.md":{w:0,s:0,c:0}};
+const commits=[["a1f3c2e","feat: initial project"]];
+const hex=()=>Math.floor(Math.random()*0xfffffff).toString(16).padStart(7,"0");
+function gDraw(out){
+  const chip=(n,cls,lbl)=>`<span class="gchip ${cls}">${lbl} ${n}</span>`;
+  $("zWork").innerHTML=Object.entries(GF).filter(([,f])=>f.w!==f.s).map(([n])=>chip(n,"mod","M")).join("")||'<span class="muted" style="font-size:12.5px">изменений нет</span>';
+  $("zStage").innerHTML=Object.entries(GF).filter(([,f])=>f.s!==f.c).map(([n])=>chip(n,"stg","+")).join("")||'<span class="muted" style="font-size:12.5px">пусто</span>';
+  $("zRepo").innerHTML=commits.slice().reverse().map(([h,m],i)=>`<div class="cm-row ${i===0?"head":""}"><code>${h}</code> ${esc(m)}</div>`).join("");
+  if(out!==undefined)$("gOut").textContent=out;
+}
+$("gEdit1").onclick=()=>{GF["train.py"].w++;gDraw("Файл train.py изменён в рабочей папке. Git видит изменение, но в коммит оно пока не попадёт.")};
+$("gEdit2").onclick=()=>{GF["README.md"].w++;gDraw("Файл README.md изменён.")};
+$("gAdd1").onclick=()=>{const f=GF["train.py"];if(f.w===f.s)return gDraw("$ git add train.py\n(нечего добавлять: train.py не менялся)");f.s=f.w;gDraw("$ git add train.py\ntrain.py перенесён в staging и войдёт в следующий коммит.")};
+$("gAddAll").onclick=()=>{let k=0;Object.values(GF).forEach(f=>{if(f.w!==f.s){f.s=f.w;k++}});gDraw(k?"$ git add .\nВсе изменённые файлы перенесены в staging.":"$ git add .\n(нечего добавлять)")};
+$("gCommit").onclick=()=>{
+  const st=Object.entries(GF).filter(([,f])=>f.s!==f.c).map(([n])=>n);
+  if(!st.length)return gDraw('$ git commit -m "..."\nnothing to commit, working tree clean\n(сначала git add)');
+  const msg=st.length===2?"feat: validation split and docs":st[0]==="train.py"?"fix: use val set for early stopping":"docs: update README";
+  st.forEach(n=>{GF[n].c=GF[n].s});const h=hex();commits.push([h,msg]);
+  gDraw(`$ git commit -m "${msg}"\n[main ${h}] ${msg}\n ${st.length} file${st.length>1?"s":""} changed`+(Object.values(GF).some(f=>f.w!==f.s)?"\nВнимание: часть изменений осталась в рабочей папке, они не вошли в коммит.":""));
+};
+$("gStatus").onclick=()=>{
+  const st=Object.entries(GF).filter(([,f])=>f.s!==f.c).map(([n])=>n),md=Object.entries(GF).filter(([,f])=>f.w!==f.s).map(([n])=>n);
+  let o="$ git status\nOn branch main\n";
+  if(!st.length&&!md.length)o+="nothing to commit, working tree clean";
+  if(st.length)o+="Changes to be committed:\n"+st.map(n=>"        modified:   "+n).join("\n")+"\n";
+  if(md.length)o+="Changes not staged for commit:\n"+md.map(n=>"        modified:   "+n).join("\n");
+  gDraw(o);
+};
+gDraw("Начни с «Изменить train.py», потом git add и git commit. Нажимай git status между шагами.");
+
+/* ---------- git graph ---------- */
+(function(){
+  const y1=50,y2=120,c=(x,y,col,lbl)=>`<circle cx="${x}" cy="${y}" r="9" fill="var(--surface)" stroke="${col}" stroke-width="3"/>`+(lbl?`<text class="tk" x="${x}" y="${y+(y===y1?-16:26)}" text-anchor="middle">${lbl}</text>`:"");
+  let s=`<text class="lbl" x="8" y="${y1+4}" style="fill:var(--accent);font-weight:600">main</text><text class="lbl" x="8" y="${y2+4}" style="fill:var(--plum);font-weight:600">feature</text>`;
+  s+=`<line x1="70" y1="${y1}" x2="410" y2="${y1}" stroke="var(--accent)" stroke-width="3"/>`;
+  s+=`<path d="M160,${y1} C190,${y1} 190,${y2} 220,${y2} L320,${y2} C350,${y2} 350,${y1} 380,${y1}" fill="none" stroke="var(--plum)" stroke-width="3"/>`;
+  s+=c(90,y1,"var(--accent)","init")+c(160,y1,"var(--accent)","")+c(250,y2,"var(--plum)","split")+c(310,y2,"var(--plum)","baseline")+c(380,y1,"var(--accent)","merge");
+  s+=`<text class="tk" x="170" y="${y2-26}">git switch -c feature</text>`;
+  s+=`<rect x="460" y="22" width="130" height="126" rx="12" fill="var(--soft)" stroke="var(--line)"/><text x="525" y="46" text-anchor="middle" style="font:600 13px var(--f-body);fill:var(--ink)">GitHub</text><text x="525" y="64" text-anchor="middle" class="tk">origin</text>`;
+  s+=`<defs><marker id="ga" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="var(--muted)"/></marker></defs>`;
+  s+=`<line x1="414" y1="88" x2="456" y2="88" stroke="var(--muted)" stroke-width="1.6" marker-end="url(#ga)"/><text class="tk" x="525" y="92" text-anchor="middle">push →</text>`;
+  s+=`<line x1="456" y1="118" x2="414" y2="118" stroke="var(--muted)" stroke-width="1.6" marker-end="url(#ga)"/><text class="tk" x="525" y="122" text-anchor="middle">← pull, clone</text>`;
+  $("gitGraph").innerHTML=s;
+})();
+
+/* ---------- debugger ---------- */
+const CODE=["def mean_score(scores):","    total = 0","    for s in scores:","        total += s","    return total / len(scores)","","groups = {\"А\": [4, 5, 3], \"Б\": []}","for name, sc in groups.items():","    print(name, mean_score(sc))"];
+const G="{'А': [4, 5, 3], 'Б': []}";
+const TR=[
+ {ln:6,d:0,v:{}},{ln:7,d:0,v:{groups:G}},{ln:8,d:0,v:{groups:G,name:"'А'",sc:"[4, 5, 3]"}},
+ {ln:1,d:1,v:{scores:"[4, 5, 3]"}},{ln:2,d:1,v:{scores:"[4, 5, 3]",total:"0"}},
+ {ln:3,d:1,v:{scores:"[4, 5, 3]",total:"0",s:"4"}},{ln:2,d:1,v:{scores:"[4, 5, 3]",total:"4",s:"4"}},
+ {ln:3,d:1,v:{scores:"[4, 5, 3]",total:"4",s:"5"}},{ln:2,d:1,v:{scores:"[4, 5, 3]",total:"9",s:"5"}},
+ {ln:3,d:1,v:{scores:"[4, 5, 3]",total:"9",s:"3"}},{ln:2,d:1,v:{scores:"[4, 5, 3]",total:"12",s:"3"}},
+ {ln:4,d:1,v:{scores:"[4, 5, 3]",total:"12",s:"3"}},
+ {ln:7,d:0,v:{groups:G,name:"'А'",sc:"[4, 5, 3]"},out:"А 4.0"},
+ {ln:8,d:0,v:{groups:G,name:"'Б'",sc:"[]"}},
+ {ln:1,d:1,v:{scores:"[]"}},{ln:2,d:1,v:{scores:"[]",total:"0"}},{ln:4,d:1,v:{scores:"[]",total:"0"}},
+ {ln:4,d:1,v:{scores:"[]",total:"0"},err:true}
+];
+let di=-1;const bps=new Set([4]);
+function dbgDraw(){
+  const T=TR[di];
+  $("dbgCode").innerHTML=CODE.map((l,i)=>`<div class="dl ${T&&T.ln===i?(T.err?"err":"cur"):""}"><button class="bp ${bps.has(i)?"on":""}" data-l="${i}" aria-label="Точка останова на строке ${i+1}" aria-pressed="${bps.has(i)}">${i+1}</button><code>${esc(l)||" "}</code></div>`).join("");
+  $("dbgVars").textContent=T?Object.entries(T.v).map(([k,v])=>`${k} = ${v}`).join("\n")||"(пока пусто)":"—";
+  $("dbgWatch").textContent=T&&T.v.scores!==undefined?String(T.v.scores==="[]"?0:T.v.scores.split(",").length):"недоступно в этой области";
+  $("dbgStack").textContent=!T?"—":T.d===1?`mean_score   строка ${T.ln+1}\n<module>     строка 9`:`<module>     строка ${T.ln+1}`;
+  const out=TR.slice(0,di+1).filter(t=>t.out).map(t=>t.out);
+  $("dbgTerm").textContent=(out.join("\n")+(T&&T.err?`\nTraceback (most recent call last):\n  File "debug_me.py", line 9, in <module>\n  File "debug_me.py", line 5, in mean_score\nZeroDivisionError: division by zero`:"")).trim()||"(вывод программы появится здесь)";
+  $("dbgState").textContent=!T?"не запущено":T.err?"упала с ошибкой":`пауза на строке ${T.ln+1}`;
+  const end=T&&T.err;["dbgOver","dbgInto","dbgOut"].forEach(id=>$(id).disabled=!T||end);$("dbgCont").disabled=end;
+}
+const nextWhere=f=>{for(let j=di+1;j<TR.length;j++)if(f(TR[j]))return j;return TR.length-1};
+$("dbgCont").onclick=()=>{di=nextWhere(t=>bps.has(t.ln)&&!t.err);if(di===TR.length-1)di=TR.length-1;dbgDraw()};
+$("dbgInto").onclick=()=>{di=Math.min(di+1,TR.length-1);dbgDraw()};
+$("dbgOver").onclick=()=>{const d=TR[di].d;di=nextWhere(t=>t.d<=d);dbgDraw()};
+$("dbgOut").onclick=()=>{const d=TR[di].d;di=d===0?TR.length-1:nextWhere(t=>t.d<d||t.err);dbgDraw()};
+$("dbgRestart").onclick=()=>{di=-1;dbgDraw()};
+$("dbgCode").addEventListener("click",e=>{const b=e.target.closest(".bp");if(!b)return;const l=+b.dataset.l;bps.has(l)?bps.delete(l):bps.add(l);dbgDraw()});
+dbgDraw();
+
+/* ---------- local site: nav + topic ticks ---------- */
+const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const TOPICS=[["algo.ds.1","Хеш-таблица"],["algo.pat.0","Хеширование: Two Sum, Contains Duplicate, Valid Anagram"],["algo.int.2","LeetCode 75 или NeetCode 150"],["tools.term.0","Навигация и файлы"],["tools.term.2","Поиск: grep, find"],["tools.git.0","init, add, commit, status, log"],["tools.git.1","Ветки: branch, switch, merge"],["tools.git.4","remote, push, pull, clone"],["tools.env.0","venv: зачем изолировать зависимости"],["tools.env.1","requirements.txt"],["tools.ide.0","Отладчик в VS Code"],["career.apply.6","Сроки отборов в календаре"]];
+function initTopics(){
+  if(LOCAL)$("topnav").hidden=false;
+  const box=$("topicList"),note=$("topicNote");
+  box.innerHTML=TOPICS.map(([id,t])=>`<li><label class="tp"><input type="checkbox" id="tp-${id}" data-id="${id}" ${LOCAL?"":"disabled"}><span class="bx" aria-hidden="true"></span><span>${t}</span></label></li>`).join("");
+  if(!LOCAL){note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";return}
+  const apply=d=>TOPICS.forEach(([id])=>{$("tp-"+id).checked=!!d[id]});
+  const day=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+  fetch("/api/tree").then(r=>r.json()).then(j=>apply(j.done||{})).catch(()=>{note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
+  box.addEventListener("change",async e=>{
+    const id=e.target.dataset.id;if(!id)return;
+    const body=e.target.checked?{set:{[id]:day()}}:{unset:[id]};
+    try{const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      if(!r.ok)throw 0;const j=await r.json();apply(j.done||{});note.textContent="Сохранено в файле недели в Obsidian";}
+    catch(err){e.target.checked=!e.target.checked;note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево»."}
+  });
+}
+initTopics();
+
+/* ---------- copy to Obsidian ---------- */
+const MD=`---
+type: конспект
+tags: [ml, неделя-1, алгоритмы, инструменты]
+---
+# Хеш-таблицы и рабочее место: урок 3
+
+## Хеш-таблица
+- hash(ключ) → число → % размер → номер ячейки. Поиск, вставка, удаление — O(1) в среднем.
+- Коллизии: несколько ключей в одной ячейке; Python использует открытую адресацию. Худший случай O(n).
+- Расширение при заполнении ~2/3, ключи раскладываются заново — амортизированно O(1).
+- Ключ должен быть неизменяемым: иначе хеш изменится и значение потеряется.
+
+## Паттерн хеширования
+- Запоминай увиденное в dict/set → O(n²) превращается в O(n).
+- Two Sum: seen = {число: индекс}, проверяй target - x до добавления x.
+- Contains Duplicate: len(set(nums)) != len(nums). Valid Anagram: Counter(s) == Counter(t).
+- Group Anagrams: ключ tuple(sorted(word)) в defaultdict(list).
+
+## Как решать задачу
+- Условие и крайние случаи → пример руками → перебор вслух → ускорение → код → тесты и сложность.
+- 25 минут, потом разбор; через 3 дня решить снова. NeetCode 150, 3–4 задачи в неделю.
+
+## Терминал
+- pwd, ls -la, cd (.. ~), mkdir, touch, cp, mv, rm (без корзины), cat, head, find . -name "*.py", grep -rn "текст" ., wc -l.
+
+## Git
+- Рабочая папка → git add → staging → git commit → git push.
+- git status, git log --oneline, git diff. Conventional Commits: feat:, fix:, docs:.
+- Ветки: git switch -c feature/x, git merge, Pull Request. clone, push, pull.
+- .gitignore до первого коммита: .venv, data, модели, секреты.
+
+## venv и requirements
+- python3 -m venv .venv; source .venv/bin/activate; pip install -r requirements.txt.
+- Версии через ==, не >=.
+
+## Отладчик
+- Breakpoint (F9), Continue (F5), Step Over (F10), Step Into (F11), Step Out (Shift+F11), Watch, условные точки.
+
+## Стажировки
+- Даты — только с официальных страниц, проверять 1-го числа каждого месяца. Заявки — 14–20 декабря, собеседования — с 25.01.2027.
+`;
+$("bCopy").onclick=()=>{
+  const ta=$("mdArea"),fb=()=>{ta.hidden=false;ta.value=MD;ta.focus();ta.select();$("copyMsg").textContent="Текст выделен, нажми Cmd+C"};
+  try{navigator.clipboard.writeText(MD).then(()=>$("copyMsg").textContent="Скопировано",fb)}catch(e){fb()}
+};
+</script>
