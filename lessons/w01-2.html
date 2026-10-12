@@ -193,6 +193,7 @@ body{margin:0} [hidden]{display:none!important}
 button:disabled{opacity:.45;cursor:default}
 </style>
 
+<script src="/assets/nav.js"></script>
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w01-1.html">← Урок 1 · Фундамент ML</a><span class="mid">урок 2 из 3</span><a href="/lessons/w01-3.html">Урок 3 · Хеши и инструменты →</a></nav>
 <header class="top">
@@ -206,7 +207,7 @@ button:disabled{opacity:.45;cursor:default}
 
 <!-- ============ 1 ============ -->
 <section class="topic" id="p1">
-  <div class="eyebrow">Темы 1–2 из 11 · Типы данных · <span class="dia">◆</span> Изменяемые и неизменяемые объекты</div>
+  <div class="eyebrow">Темы 1–2 из 11 · Типы данных · <span class="qd key" aria-hidden="true"></span> Изменяемые и неизменяемые объекты</div>
   <h2>Имена — это ярлыки на объектах</h2>
   <p class="tldr">Строка <code>a = [1, 2]</code> не кладёт список «в a». Она создаёт объект-список и приклеивает к нему ярлык a. Строка <code>b = a</code> приклеивает к тому же объекту второй ярлык. Копии не появляется.</p>
   <div class="tbl"><table>
@@ -384,7 +385,7 @@ nums = [x for x in nums if x != 2]   <span class="cm"># правильно: со
 
 <!-- ============ 4 ============ -->
 <section class="topic" id="p4">
-  <div class="eyebrow">Тема 5 из 11 · <span class="dia">◆</span> Python</div>
+  <div class="eyebrow">Тема 5 из 11 · <span class="qd key" aria-hidden="true"></span> Python</div>
   <h2>Функции: значения по умолчанию, *args, **kwargs</h2>
   <p class="tldr"><code>*args</code> собирает лишние позиционные аргументы в кортеж, <code>**kwargs</code> — лишние именованные в словарь. Звёздочки при вызове делают обратное: распаковывают.</p>
 <pre>def train(model_name, *datasets, lr=0.1, **params):
@@ -583,7 +584,7 @@ r"C:\new\data"      <span class="cm"># raw-строка: обратный слэ
 
 <!-- ============ 7 ============ -->
 <section class="topic" id="p7">
-  <div class="eyebrow">Тема 8 из 11 · <span class="dia">◆</span> Python</div>
+  <div class="eyebrow">Тема 8 из 11 · <span class="qd key" aria-hidden="true"></span> Python</div>
   <h2>list, tuple, dict, set: что когда брать</h2>
   <p class="tldr">Выбор коллекции — это выбор операций, которые должны быть быстрыми. Нужен порядок и доступ по номеру — list. Нужен поиск по ключу — dict. Нужна уникальность и быстрое «есть ли» — set. Нужна неизменяемая запись — tuple.</p>
   <div class="tbl"><table>
@@ -636,7 +637,7 @@ frozenset(a)                        <span class="cm"># неизменяемое 
 
 <!-- ============ 8 ============ -->
 <section class="topic" id="p8">
-  <div class="eyebrow">Тема 9 из 11 · <span class="dia">◆</span> Python</div>
+  <div class="eyebrow">Тема 9 из 11 · <span class="qd key" aria-hidden="true"></span> Python</div>
   <h2>Comprehensions</h2>
   <p class="tldr">Comprehension — короткая запись «пройди по коллекции, отфильтруй, преобразуй, собери результат». Читается справа налево: откуда берём, что оставляем, во что превращаем.</p>
   <div class="lab">
@@ -737,7 +738,7 @@ list(zip_longest([1, 2, 3], ["a"], fillvalue=None))  <span class="cm"># не т�
 
 <!-- ============ 10 ============ -->
 <section class="topic" id="p10">
-  <div class="eyebrow">Тема 11 из 11 · <span class="dia">◆</span> Python</div>
+  <div class="eyebrow">Тема 11 из 11 · <span class="qd key" aria-hidden="true"></span> Python</div>
   <h2>collections: Counter, defaultdict, deque</h2>
   <p class="tldr">Три готовых инструмента из стандартной библиотеки, которые заменяют десяток строк ручного кода. Counter считает, defaultdict группирует, deque — быстрая очередь с двух концов.</p>
   <div class="lab">

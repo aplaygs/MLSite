@@ -1,4 +1,10 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+/* Две страницы из одного файла */
+.page-plan header.top,.page-plan .hero,.page-plan .routewrap{display:none}
+.page-tree #plan,.page-tree #brs,.page-tree #obsidian{display:none}
+.page-plan #plan{padding-top:28px}
+.qd.key.has{display:inline-grid}
+</style></head><body>
 <title>Дерево ML-инженера</title>
 <link rel="icon" href="/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -72,7 +78,7 @@ header.top p{max-width:64ch;margin:0;color:var(--muted)}
 .sync{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
 
 /* Toolbar */
-.tools{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding-block:10px;margin-bottom:8px}
+.tools{position:sticky;top:calc(var(--navh,0px) + env(safe-area-inset-top,0px));z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding-block:10px;margin-bottom:8px}
 .tools .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-left:auto}
 @media (max-width:640px){.tools .legend{display:none}}
 .btn{font:500 13px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer}
@@ -88,7 +94,7 @@ header.top p{max-width:64ch;margin:0;color:var(--muted)}
 .tag{font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;padding:1px 5px;border-radius:4px;border:1px solid var(--s4);color:var(--s4);white-space:nowrap;vertical-align:1px}
 
 /* Tiers & modules */
-.tier{padding-block:36px 4px;display:grid;gap:6px;scroll-margin-top:56px}
+.tier{padding-block:36px 4px;display:grid;gap:6px;scroll-margin-top:calc(var(--navh,0px) + 56px)}
 details.card>summary{list-style:none;display:flex;gap:10px;align-items:baseline}
 details.card>summary::-webkit-details-marker{display:none}
 details.card>summary::before{content:"›";color:var(--muted);transition:transform .2s;display:inline-block}
@@ -97,7 +103,7 @@ details.card[open]>summary{margin-bottom:12px}
 .tier .eyebrow{color:var(--tc)}
 .tier h2{font-size:clamp(22px,3vw,28px)}
 .tier p{margin:0;max-width:70ch;color:var(--muted)}
-.mod{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;scroll-margin-top:72px}
+.mod{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;scroll-margin-top:calc(var(--navh,0px) + 72px)}
 .mod.flash{animation:flash 1.4s ease}
 @keyframes flash{0%{box-shadow:0 0 0 3px var(--mc)}100%{box-shadow:0 0 0 0 transparent}}
 .mod>details>summary{list-style:none;cursor:pointer;padding:18px 20px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 16px;align-items:center}
@@ -131,7 +137,7 @@ details[open] .chev{transform:rotate(90deg)}
 .tx .d{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);margin-left:4px}
 .res{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;border-top:1px dashed var(--line);padding-top:12px}
 .res b{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-body.focus .it:not(.key){display:none}
+body.focus .it:not(.key):not(.asked){display:none}
 body.focus .mod.later{opacity:.55}
 
 /* Plan, BRS, Obsidian */
@@ -201,7 +207,7 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 .miles b{color:var(--ink);font-weight:600}
 .legend2{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}
 .legend2 i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--wc);margin-right:6px;vertical-align:-1px}
-.wk{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;scroll-margin-top:72px}
+.wk{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;scroll-margin-top:calc(var(--navh,0px) + 16px)}
 .wk.now{border-color:var(--wc);box-shadow:0 0 0 1px var(--wc)}
 .wk.flash{animation:flash2 1.4s ease}
 @keyframes flash2{0%{box-shadow:0 0 0 3px var(--wc)}100%{box-shadow:0 0 0 0 transparent}}
@@ -241,11 +247,17 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 
 </style>
 
+<script>
+/* Один файл — две страницы: /tree (дерево) и /plan (план по неделям, проекты, связка с Obsidian). */
+const PAGE=location.pathname.replace(/\/$/,"")==="/plan"?"plan":"tree";
+document.body.classList.add("page-"+PAGE);
+if(PAGE==="plan")document.title="План по неделям · ML";
+if(PAGE==="tree"&&/^#(w-\d+|plan|brs|obsidian)$/.test(location.hash))location.replace("/plan"+(location.hash==="#plan"?"":location.hash));
+</script>
+<script src="/assets/nav.js"></script>
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow">Roadmap · ML-инженер · стажировка</div>
     <h1>Дерево ML-инженера</h1>
-    <p>Пятнадцать веток на шести ярусах, от корней до плодов. Нажми на лепесток, чтобы перейти к ветке, и отмечай пройденные темы. Ниже — план по неделям до собеседований. Галочки — те же, что в файлах недель в Obsidian: отметил здесь — появилось там, и наоборот.</p>
   </header>
 
   <div class="hero">
@@ -258,17 +270,17 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
         <div class="wnav" id="kWeekNav"></div>
       </div>
       <div class="kpi">
-        <span class="eyebrow">Ключевое к стажировке</span>
+        <span class="eyebrow">Спрашивают на отборах</span>
         <div class="big" id="kKey">0<small> / 0</small></div>
         <div class="bar"><i id="kKeyBar" style="width:0%"></i></div>
-        <span class="note">Темы с ромбом <span class="diamond">◆</span>. Их спрашивают на отборах в первую очередь. Метка <span class="ask-dot">◎</span> — тему уже спрашивали в разборах собеседований и условиях стажировок: <a href="/hire">открыть «Отборы» →</a></span>
+        <span class="note">Темы с кружком <span class="qd key"></span>проверяют на отборах в первую очередь. Цифра в кружке <span class="qd key has">2</span>— сколько раз тема уже встретилась в разборах собеседований и условиях стажировок. <a href="/hire">Открыть «Отборы» →</a></span>
       </div>
       <div class="stages">
         <div class="stages-h"><span class="eyebrow">Всё дерево по ярусам</span><span class="note">Сколько тем пройдено в каждом ярусе — от основ к продакшену и карьере.</span></div>
         <div class="stages" id="stageBars"></div>
       </div>
       <div class="next">
-        <span class="eyebrow" id="nextTitle">Следующие ключевые темы</span>
+        <span class="eyebrow" id="nextTitle">Дальше: темы, которые спрашивают</span>
         <ol id="nextList"></ol>
       </div>
       <div class="sync" id="sync" role="status">Загружаю галочки из Obsidian…</div>
@@ -277,11 +289,11 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 
   <div class="routewrap">
   <div class="tools">
-    <button class="btn" id="bFocus" aria-pressed="false">Только ключевое</button>
+    <button class="btn" id="bFocus" aria-pressed="false">Только то, что спрашивают</button>
     <button class="btn" id="bFold">Свернуть все</button>
     <div class="legend">
-      <span><span class="diamond">◆</span> ключевая к отбору</span>
-      <a class="ask-leg" href="/hire"><span class="ask-dot">◎</span> спрашивали на собеседованиях →</a>
+      <span><span class="qd key"></span>спрашивают на отборах · цифра — сколько раз встретилось</span>
+      <a class="ask-leg" href="/hire">Отборы →</a>
     </div>
   </div>
 
@@ -359,7 +371,7 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
         <ul>
           <li>На компьютере — эта страница: удобно смотреть всё дерево и отмечать.</li>
           <li>С телефона — файл недели в Obsidian: те же темы и галочки.</li>
-          <li>Неделя тяжёлая в вузе — не догоняй всё сразу: ◆ ключевые первыми, остальное уйдёт в хвосты.</li>
+          <li>Неделя тяжёлая в вузе — не догоняй всё сразу: темы с кружком — первыми, остальное уйдёт в хвосты.</li>
           <li>В воскресенье агент собирает план недели и смотрит хвосты.</li>
         </ul>
       </div>
@@ -512,7 +524,7 @@ const MODULES=[
  groups:[
   {id:"port",t:"Портфолио",items:["!BRS-проект доведён до рабочего состояния","!README: задача, данные, метрики, как запустить","Второй проект на реальных данных","Третий проект: NLP или сервис в Docker","Профиль на Kaggle","Пост или статья о проекте"]},
   {id:"cv",t:"Резюме",items:["!Одна страница, стек сверху","!Проекты с цифрами::метрика, объём данных","!Опыт описан как есть::что сделано, для кого, на каких данных","Ссылки на GitHub и Telegram"]},
-  {id:"apply",t:"Куда подаваться",items:["Яндекс: стажировка и ШАД","Т-Банк: стажировки и Т-Образование","Сбер: SberSeasons","VK: VK Education","Ozon: Route 256","Avito, МТС, Лаборатория Касперского","Сроки отборов в календаре::обычно осень–зима на лето"]},
+  {id:"apply",t:"Куда подаваться",items:["Яндекс: стажировка и ШАД","Т-Банк: стажировки и Т-Образование","Сбер: SberSeasons","VK: VK Education","Ozon: Route 256","Avito, МТС, Лаборатория Касперского","Сроки отборов в календаре::обычно осень–зима на лето","Wildberries (RWB): стажировки и junior","X5 Tech: стажировки","Magnit Tech и Самокат: стажировки","2ГИС и Контур: стажировки","Junior ML на hh.ru: что требуют::выписать требования 10 вакансий в «Отборы»"]},
   {id:"int",t:"Собеседования",items:["!Алгоритмическая секция: live coding","!ML-теория: 50 типовых вопросов","Python-секция","SQL-секция","Облегчённый ML system design","!Рассказ о проекте за 3 минуты","Поведенческие вопросы::метод STAR","Mock-интервью с другом"]},
   {id:"comm",t:"Сообщество",items:["ODS (Open Data Science)","Хакатоны и конкурсы","Telegram-каналы по ML"]}
  ],res:[["Tech Interview Handbook","https://www.techinterviewhandbook.org/"],["ODS.ai","https://ods.ai/"],["Яндекс: стажировки","https://yandex.ru/yaintern/"],["Т-Образование","https://education.tbank.ru/"]]}
@@ -595,7 +607,7 @@ function buildRoute(){
         <div class="mbody"><div class="groups">`+
         m.groups.map(g=>`<div class="grp"><h4>${esc(g.t)}</h4><ul>`+g.parsed.map(it=>`<li><label class="it${it.key?" key":""}" title="${it.key?"Спрашивают на отборе":""}">
           <input type="checkbox" id="c-${it.id}" data-id="${it.id}"><span class="box" aria-hidden="true"></span>
-          <span class="tx"><span class="t">${it.key?'<span class="diamond" aria-label="ключевое">◆</span> ':""}${esc(it.t)}<span class="d" data-d="${it.id}"></span></span>${it.h?`<span class="h">${esc(it.h)}</span>`:""}</span></label></li>`).join("")+`</ul></div>`).join("")+
+          <span class="tx"><span class="t"><span class="qd${it.key?" key":""}" data-q="${it.id}"></span>${esc(it.t)}<span class="d" data-d="${it.id}"></span></span>${it.h?`<span class="h">${esc(it.h)}</span>`:""}</span></label></li>`).join("")+`</ul></div>`).join("")+
         `</div><div class="res"><b>Материалы</b>${m.res.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join("")}${m.books?`<span class="muted">${esc(m.books)}</span>`:""}</div></div></details></section>`;
     });
   });
@@ -708,7 +720,7 @@ const weekIds=n=>ORDER.filter(id=>(PLAN.assign[id]||[0])[0]===n);
 const curWeek=()=>{const t=today();return PLAN.weeks.find(w=>w.start<=t&&t<=w.end)};
 function itemHTML(it){
   return `<li><label class="it${it.key?" key":""}"><input type="checkbox" data-id="${it.id}"><span class="box" aria-hidden="true"></span>
-    <span class="tx"><span class="t">${it.key?'<span class="diamond" aria-label="ключевое">◆</span> ':""}${esc(it.t)}<span class="mtag" style="--mc:var(${STAGES[it.m.stage-1].c})">${esc(it.m.short)}</span><span class="d" data-d="${it.id}"></span></span>${it.h?`<span class="h">${esc(it.h)}</span>`:""}</span></label></li>`;
+    <span class="tx"><span class="t"><span class="qd${it.key?" key":""}" data-q="${it.id}"></span>${esc(it.t)}<span class="mtag" style="--mc:var(${STAGES[it.m.stage-1].c})">${esc(it.m.short)}</span><span class="d" data-d="${it.id}"></span></span>${it.h?`<span class="h">${esc(it.h)}</span>`:""}</span></label></li>`;
 }
 const weekLessons=n=>(PLAN.lessons||[]).filter(l=>l.week===n);
 function lessonsHTML(w){
@@ -770,6 +782,7 @@ function buildPlan(){
     const jump=()=>goWeek(n,true); setTimeout(jump,120); if(document.fonts)document.fonts.ready.then(()=>setTimeout(jump,60))}
 }
 function goWeek(n,instant){
+  if(PAGE==="tree"){location.href="/plan#w-"+n;return}
   const sec=document.getElementById("w-"+n); if(!sec)return;
   sec.querySelector("details").open=true;
   sec.scrollIntoView({behavior:instant||matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
@@ -782,7 +795,7 @@ function updatePlan(){
     const ids=weekIds(w.n), k=ids.filter(id=>done[id]).length, n=ids.length, pct=n?k/n*100:0;
     const keys=ids.filter(id=>ITEMS[id].key), kd=keys.filter(id=>done[id]).length;
     const ne=document.getElementById("wn-"+w.n), be=document.getElementById("wb-"+w.n);
-    if(ne)ne.textContent=n?`${k} / ${n}${keys.length?` · ◆ ${kd}/${keys.length}`:""}`:"без новых тем";
+    if(ne)ne.textContent=n?`${k} / ${n}${keys.length?` · ◎ ${kd}/${keys.length}`:""}`:"без новых тем";
     if(be)be.style.width=pct+"%";
     if(!w.n)return;
     const tl=document.getElementById("tl-"+w.n); if(tl){tl.style.height=(n?pct:(w.end<t?100:0))+"%";tl.parentElement.classList.toggle("now",cur&&cur.n===w.n);tl.parentElement.classList.toggle("full",n>0&&k===n)}
@@ -810,7 +823,7 @@ function updatePlan(){
         return `<a href="#w-${w.n}" data-gw="${w.n}" class="${w.n===cur.n?"now":""}${w.end<t?" past":""}" style="--wc:var(${KIND[w.kind][1]})" title="Неделя ${w.n} · ${esc(w.span)} — ${esc(w.focus)}"><i style="height:${pc}%"></i><span>${w.n}</span></a>`}).join("")}</div></div>`;
     const open=ids.filter(id=>!done[id]).sort((a,b)=>ITEMS[b].key-ITEMS[a].key).slice(0,5);
     document.getElementById("nextTitle").textContent="Дальше на этой неделе";
-    document.getElementById("nextList").innerHTML=open.length?open.map(id=>`<li><a href="#w-${cur.n}" data-gw="${cur.n}">${ITEMS[id].key?'<span class="diamond">◆</span> ':""}${esc(ITEMS[id].t)}</a> <span class="muted">· ${esc(ITEMS[id].m.short)}</span></li>`).join(""):"<li>Неделя закрыта — красота.</li>";
+    document.getElementById("nextList").innerHTML=open.length?open.map(id=>`<li><a href="#w-${cur.n}" data-gw="${cur.n}"><span class="qd${ITEMS[id].key?" key":""}" data-q="${id}"></span>${esc(ITEMS[id].t)}</a> <span class="muted">· ${esc(ITEMS[id].m.short)}</span></li>`).join(""):"<li>Неделя закрыта — красота.</li>";
   }
 }
 document.getElementById("kWeekNav").addEventListener("click",e=>{const a=e.target.closest("[data-gw]");if(a){e.preventDefault();goWeek(+a.dataset.gw)}});
@@ -826,6 +839,7 @@ async function loadPlan(){
 
 /* ---------- boot ---------- */
 buildFlower(); buildRoute(); updateProgress(); loadPlan();
+addEventListener("hashchange",()=>{const m=location.hash.match(/^#w-(\d+)$/);if(m)goWeek(+m[1])});  /* на /tree goWeek сам уводит на /plan */
 try{if(localStorage.getItem("mlroad.focus")==="1")setFocus(true)}catch(e){}
 initStore();
 

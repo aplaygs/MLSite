@@ -102,10 +102,21 @@ a.chip:hover{border-color:var(--accent);transform:translateY(-1px)}
 .co .links a{text-decoration:none;font-weight:500}
 
 .srcs{display:grid;gap:8px}
-.sr{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center}
+.sr{background:var(--surface);border:1px solid var(--line);border-radius:14px;transition:border-color .2s}
+.sr:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
+.sr>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:14px 16px}
+.sr>summary::-webkit-details-marker{display:none}
+.sr[open] .chev{transform:rotate(90deg)}
 .sr .m{font-size:13px;color:var(--muted)}
-.sr .links{display:flex;gap:12px;font-size:13.5px}
+.sr .body{padding:0 16px 16px;display:grid;gap:12px}
+.sr .tl2{display:flex;flex-wrap:wrap;gap:6px}
+.sr .tl2 a{font:500 12.5px var(--f-body);text-decoration:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 10px;transition:border-color .15s,transform .15s}
+.sr .tl2 a:hover{border-color:var(--warm);transform:translateY(-1px)}
+.sr .tl2 a b{font:700 11px var(--f-mono);color:var(--warm);margin-left:4px}
+.sr .tl2 span.gapc{font-size:12.5px;border:1px dashed color-mix(in srgb,var(--warm) 55%,var(--line));border-radius:999px;padding:4px 10px;color:var(--muted)}
+.sr .links{display:flex;flex-wrap:wrap;gap:14px;font-size:13.5px}
 .sr .links a{text-decoration:none;font-weight:500}
+.sr .lbl{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 
 .how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media (max-width:760px){.how{grid-template-columns:1fr}}
@@ -118,12 +129,12 @@ a.chip:hover{border-color:var(--accent);transform:translateY(-1px)}
 footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style></head><body>
+<script src="/assets/nav.js"></script>
 <div class="wrap">
-  <nav class="topnav" aria-label="Навигация"><a href="/tree">← Дерево ML-инженера</a><span class="mid">отборы</span><a href="/tree#plan">План по неделям →</a></nav>
   <header class="top">
     <div class="eyebrow">Отборы · стажировки в ML</div>
     <h1>Что спрашивают на отборах</h1>
-    <p>Каждый вопрос с собеседований и каждое требование стажировок привязано к теме дерева. Чем чаще тему спрашивают, тем выше она в списке. Справа — неделя плана, где она стоит. Метки ◎ с числом источников видны и у тем на сайте дерева, в уроках и в файлах недель Obsidian.</p>
+    <p>Каждый вопрос с собеседований и каждое требование стажировок привязано к теме дерева. Чем чаще тему спрашивают, тем выше она в списке, справа — неделя плана, где она стоит. В дереве, плане и уроках у таких тем кружок с цифрой — сколько раз тема встретилась здесь.</p>
     <div class="kpis" id="kpis"></div>
   </header>
 
@@ -132,6 +143,13 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
     <h2>Чаще всего спрашивают</h2>
     <div class="seg" role="group" aria-label="Фильтр тем" id="seg"></div>
     <div class="topics" id="topics"><p class="muted">Загружаю…</p></div>
+  </section>
+
+  <section class="block" id="move-block" hidden>
+    <div class="eyebrow">Предложение</div>
+    <h2>Поставить в план</h2>
+    <p id="moveP"></p>
+    <div class="gaps" id="move"></div>
   </section>
 
   <section class="block" id="gaps-block" hidden>
@@ -160,11 +178,12 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
     <div class="how">
       <div><b class="n">1</b><b>Кинь во входящие</b><p>Ссылку на стажировку, видео с YouTube, расшифровку или свои заметки после собеседования — в заметку «Входящие отборов».</p></div>
       <div><b class="n">2</b><b>«Разбери отборы»</b><p>Агент заведёт заметку компании или разбор собеседования и привяжет каждый вопрос к теме дерева.</p></div>
-      <div><b class="n">3</b><b>Метка в плане</b><p>У темы появится ◎ на сайте, в уроке и в неделе. Если темы нет в плане — агент предложит неделю.</p></div>
+      <div><b class="n">3</b><b>Метка в плане</b><p>У темы в дереве, плане и уроке появится кружок с цифрой — сколько раз её спрашивали. Если темы нет в плане — агент предложит неделю.</p></div>
     </div>
     <a class="btn" id="inboxLink" href="#">Открыть «Входящие отборов» в Obsidian</a>
   </section>
 
+  <script src="/assets/asks.js" defer></script>
   <footer>Данные — заметки «Отборы/Компании» и «Собеседования» в Obsidian и .agents/data/ml_hiring.json. Сборка страницы в Obsidian: <code>hire.py build</code>.</footer>
 </div>
 <script>
@@ -179,7 +198,7 @@ function weekChip(t){
   if(t.done)return `<span class="chip done">✓ пройдено</span>`;
   if(!t.week)return `<span class="chip late" title="Тема стоит в «После января», а её уже спрашивают">после января</span>`;
   const w=(P&&P.weeks||[]).find(x=>x.n===t.week), past=w&&w.end<today();
-  return `<a class="chip${past?" late":""}" href="/tree#w-${t.week}" title="${w?esc(w.focus):""}">неделя ${t.week}${past?" · хвост":""} →</a>`;
+  return `<a class="chip${past?" late":""}" href="/plan#w-${t.week}" title="${w?esc(w.focus):""}">неделя ${t.week}${past?" · хвост":""} →</a>`;
 }
 function srcLink(name){
   const s=[...H.sources,...H.companies].find(x=>x.name===name);
@@ -205,13 +224,16 @@ function renderTopics(){
   if(!T.length){$("topics").innerHTML=`<div class="empty">В этом фильтре тем нет.</div>`;return}
   $("topics").innerHTML=T.map(t=>`<details class="tr" id="t-${t.id}">
     <summary><span class="cnt" title="В скольких источниках спрашивают"><b>${t.count}</b><span>${plural(t.count,"раз","раза","раз")}</span></span>
-      <div><h3>${esc(t.title)}</h3><div class="meta"><span>${esc(t.module)}</span>${t.key?'<span class="key">◆ ключевая</span>':""}<span>${t.asks.length} ${plural(t.asks.length,"вопрос","вопроса","вопросов")}</span></div></div>
+      <div><h3>${esc(t.title)}</h3><div class="meta"><span>${esc(t.module)}</span><span>${t.asks.length} ${plural(t.asks.length,"вопрос","вопроса","вопросов")}</span></div></div>
       <span class="side">${weekChip(t)}<span class="chev" aria-hidden="true">›</span></span></summary>
     <ul class="asks">${t.asks.map(a=>`<li><span>${esc(a.what)}</span><span class="src">${srcLink(a.source)}${a.where?` · ${esc(a.where)}`:""}</span></li>`).join("")}</ul>
   </details>`).join("");
 }
 function renderRest(){
   $("gaps-block").hidden=!H.gaps.length;
+  $("move-block").hidden=!H.move.length;
+  $("moveP").textContent=`Эти темы спросили в ${H.move_at} и больше источниках, а в плане до января их нет. Агент предложит ближайшую подходящую неделю и поставит тему после твоего «да» — скажи ему «поставь в план».`;
+  $("move").innerHTML=H.move.map(m=>`<div class="gap"><b>${esc(m.title)}</b><span class="s">спрашивали ${m.count} ${plural(m.count,"раз","раза","раз")} · ${m.kind==="gap"?"темы нет в дереве":"сейчас стоит «после января»"}</span>${m.id?`<a class="chip" href="#t-${m.id}">к вопросам →</a>`:""}</div>`).join("");
   $("gaps").innerHTML=H.gaps.map(g=>`<div class="gap"><b>${esc(g.what)}</b><span class="s">${srcLink(g.source)}${g.where?` · ${esc(g.where)}`:""}</span>${g.suggest?`<span class="s">Куда: ${esc(g.suggest)}</span>`:""}</div>`).join("");
   const cls=s=>["оффер","собеседование","тест","подал"].includes(s)?"go":["подаюсь","изучаю"].includes(s)?"wait":["отказ","не подхожу"].includes(s)?"no":"";
   $("cos").innerHTML=H.companies.length?H.companies.map(c=>`<div class="co"><h3>${esc(c.name)}</h3><span class="prog">${esc(c.program||c.company)}</span>
@@ -219,8 +241,13 @@ function renderRest(){
     <div class="links">${c.url?`<a href="${esc(c.url)}" target="_blank" rel="noopener">Страница ↗</a>`:""}<a href="${obs(c.file)}">Заметка в Obsidian</a></div></div>`).join("")
     :`<div class="empty">Заметок о стажировках пока нет.</div>`;
   $("srcs").innerHTML=H.sources.length?H.sources.map(s=>{const d=s.date&&/^\d{4}-\d{2}-\d{2}$/.test(s.date)?`${+s.date.slice(8)} ${MON[+s.date.slice(5,7)-1]} ${s.date.slice(0,4)}`:"";
-    return `<div class="sr"><div><b>${esc(s.name)}</b><div class="m">${[s.track,s.level,d,`${s.asks} ${plural(s.asks,"вопрос","вопроса","вопросов")} к темам`].filter(Boolean).map(esc).join(" · ")}</div></div>
-    <div class="links"><a href="${obs(s.file)}">Разбор</a>${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">Видео ↗</a>`:""}</div></div>`}).join("")
+    const where=[s.company?`компания: ${s.company}`:"",s.channel].filter(Boolean).join(" · ");
+    return `<details class="sr"><summary><div><b>${esc(s.name)}</b><div class="m">${[s.track,s.level,d,`${s.asks} ${plural(s.asks,"вопрос","вопроса","вопросов")}`,`${s.topics.length} ${plural(s.topics.length,"тема","темы","тем")}`].filter(Boolean).map(esc).join(" · ")}</div></div>
+      <span class="chev" aria-hidden="true">›</span></summary>
+    <div class="body">${where?`<div class="m">${esc(where)}</div>`:""}
+      <span class="lbl">Какие темы поднимались</span>
+      <div class="tl2">${s.topics.map(t=>`<a href="#t-${t.id}" title="${t.week?`неделя ${t.week}`:"после января"}">${esc(t.title)}<b>${t.n}</b></a>`).join("")}${s.gaps.map(g=>`<span class="gapc" title="нет в дереве">${esc(g)}</span>`).join("")}</div>
+      <div class="links">${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">Видео ↗</a>`:""}<a href="${obs(s.file)}" title="Откроется приложение Obsidian">Конспект в Obsidian</a></div></div></details>`}).join("")
     :`<div class="empty">Разборов пока нет.</div>`;
   $("inboxLink").href=obs("60_Машинное обучение/Отборы/Входящие отборов.md");
 }

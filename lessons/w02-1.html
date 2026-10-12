@@ -29,8 +29,9 @@
 .knob:active{cursor:grabbing}
 </style>
 
+<script src="/assets/nav.js"></script>
 <div class="wrap">
-<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/tree#w-2">← Неделя 2 на сайте дерева</a><span class="mid">урок 1 из 3</span><a href="/tree#w-2">Урок 2 · скоро</a></nav>
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/plan#w-2">← Неделя 2 в плане</a><span class="mid">урок 1 из 3</span><a href="/plan#w-2">Урок 2 · скоро</a></nav>
 <header class="top">
   <div class="eyebrow">Неделя 2 · урок 1 из 3 · 8 тем · ~4 часа</div>
   <h1>Как модель учится</h1>
@@ -44,7 +45,7 @@
 
 <!-- ============ 1 ============ -->
 <section class="topic" id="t1">
-  <div class="eyebrow">Тема 1 из 8 · <span class="dia">◆</span> Математика</div>
+  <div class="eyebrow">Тема 1 из 8 · <span class="qd key" aria-hidden="true"></span> Математика</div>
   <h2>Векторы, скалярное произведение, норма</h2>
   <p class="tldr">Вектор — это упорядоченный список чисел. Студент с тремя признаками (часы подготовки, посещаемость, средний балл) — это вектор из трёх чисел. Скалярное произведение двух векторов показывает, насколько они «смотрят в одну сторону», а норма — длину вектора.</p>
   <div class="prose">
@@ -130,7 +131,7 @@ cos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))</pre>
 
 <!-- ============ 2 ============ -->
 <section class="topic" id="t2">
-  <div class="eyebrow">Тема 2 из 8 · <span class="dia">◆</span> Математика</div>
+  <div class="eyebrow">Тема 2 из 8 · <span class="qd key" aria-hidden="true"></span> Математика</div>
   <h2>Матрицы и матричное умножение</h2>
   <p class="tldr">Матрица — таблица чисел. Весь датасет — матрица X: строки — объекты, столбцы — признаки. Матричное умножение одной операцией делает много скалярных произведений сразу: так модель предсказывает ответ для тысячи объектов одной строкой кода.</p>
   <div class="prose">
@@ -256,7 +257,7 @@ X @ np.random.rand(5)           <span class="cm"># ValueError: matmul: ... size 
 
 <!-- ============ 4 ============ -->
 <section class="topic" id="t4">
-  <div class="eyebrow">Тема 4 из 8 · <span class="dia">◆</span> Математика</div>
+  <div class="eyebrow">Тема 4 из 8 · <span class="qd key" aria-hidden="true"></span> Математика</div>
   <h2>Частные производные и градиент</h2>
   <p class="tldr">У модели не один параметр, а много: функция потерь зависит от всех весов сразу. Частная производная — наклон по одному параметру, когда остальные заморожены. Градиент — вектор из всех частных производных. Он показывает направление самого крутого подъёма, а минус градиент — самого крутого спуска.</p>
   <div class="prose">
@@ -319,7 +320,7 @@ X @ np.random.rand(5)           <span class="cm"># ValueError: matmul: ... size 
 
 <!-- ============ 5 ============ -->
 <section class="topic" id="t5">
-  <div class="eyebrow">Тема 5 из 8 · <span class="dia">◆</span> Математика</div>
+  <div class="eyebrow">Тема 5 из 8 · <span class="qd key" aria-hidden="true"></span> Математика</div>
   <h2>Градиентный спуск и learning rate</h2>
   <p class="tldr">Градиентный спуск: посчитай градиент, сделай маленький шаг против него, повтори. Размер шага задаёт learning rate. Маленький — спуск идёт вечность, слишком большой — модель перепрыгивает яму и улетает.</p>
   <div class="formula">
@@ -394,7 +395,7 @@ X @ np.random.rand(5)           <span class="cm"># ValueError: matmul: ... size 
 
 <!-- ============ 6 ============ -->
 <section class="topic" id="t6">
-  <div class="eyebrow">Тема 6 из 8 · <span class="dia">◆</span> Классический ML</div>
+  <div class="eyebrow">Тема 6 из 8 · <span class="qd key" aria-hidden="true"></span> Классический ML</div>
   <h2>Линейная регрессия и МНК</h2>
   <p class="tldr">Линейная регрессия предсказывает число как взвешенную сумму признаков плюс сдвиг: <code>ŷ = w₁x₁ + w₂x₂ + … + b</code>. Метод наименьших квадратов (МНК) подбирает веса, при которых MSE минимальна, — и для этой модели минимум находится одной формулой.</p>
   <div class="formula">
@@ -468,7 +469,7 @@ w = np.linalg.lstsq(Xb, y_train, rcond=None)[0]</pre>
 
 <!-- ============ 7 ============ -->
 <section class="topic" id="t7">
-  <div class="eyebrow">Тема 7 из 8 · <span class="dia">◆</span> Классический ML</div>
+  <div class="eyebrow">Тема 7 из 8 · <span class="qd key" aria-hidden="true"></span> Классический ML</div>
   <h2>Градиентный спуск для регрессии</h2>
   <p class="tldr">Вместо формулы веса можно найти спуском: начать с нулей и много раз сдвинуть их против градиента MSE. Ответ тот же, но метод работает и на миллионах признаков, и на данных, которые не влезают в память.</p>
   <div class="formula">
@@ -526,7 +527,7 @@ model.fit(X_train, y_train)      <span class="cm"># без StandardScaler SGD н
 
 <!-- ============ 8 ============ -->
 <section class="topic" id="t8">
-  <div class="eyebrow">Тема 8 из 8 · <span class="dia">◆</span> Классический ML</div>
+  <div class="eyebrow">Тема 8 из 8 · <span class="qd key" aria-hidden="true"></span> Классический ML</div>
   <h2>Масштабирование признаков</h2>
   <p class="tldr">Признаки живут в разных масштабах: часы — от 0 до 10, минуты в приложении — от 0 до 600. Для градиентного спуска это вытянутая яма и зигзаги, для регуляризации и расстояний — нечестное сравнение. Масштабирование приводит признаки к одному порядку.</p>
 

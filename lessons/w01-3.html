@@ -221,8 +221,9 @@ button:disabled{opacity:.45;cursor:default}
 .bp.on::before{content:"";position:absolute;left:6px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--red)}
 </style>
 
+<script src="/assets/nav.js"></script>
 <div class="wrap">
-<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w01-2.html">← Урок 2 · Python</a><span class="mid">урок 3 из 3</span><a href="/tree#w-1">Неделя 1 на сайте дерева →</a></nav>
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w01-2.html">← Урок 2 · Python</a><span class="mid">урок 3 из 3</span><a href="/plan#w-1">Неделя 1 в плане →</a></nav>
 <header class="top">
   <div class="eyebrow">Неделя 1 · урок 3 из 3 · 12 тем · ~3–4 часа</div>
   <h1>Хеш-таблицы и рабочее место</h1>
@@ -235,7 +236,7 @@ button:disabled{opacity:.45;cursor:default}
 
 <!-- ============ hash table ============ -->
 <section class="topic" id="h1">
-  <div class="eyebrow">Тема 1 из 12 · <span class="dia">◆</span> Алгоритмы</div>
+  <div class="eyebrow">Тема 1 из 12 · <span class="qd key" aria-hidden="true"></span> Алгоритмы</div>
   <h2>Хеш-таблица</h2>
   <p class="tldr">Хеш-таблица — массив ячеек, где место для ключа вычисляется из самого ключа. Не нужно ничего перебирать: посчитал хеш — знаешь номер ячейки. Так устроены dict и set.</p>
   <div class="prose">
@@ -310,7 +311,7 @@ button:disabled{opacity:.45;cursor:default}
 
 <!-- ============ hashing pattern ============ -->
 <section class="topic" id="h2">
-  <div class="eyebrow">Тема 2 из 12 · <span class="dia">◆</span> Алгоритмы</div>
+  <div class="eyebrow">Тема 2 из 12 · <span class="qd key" aria-hidden="true"></span> Алгоритмы</div>
   <h2>Хеширование: Two Sum, Contains Duplicate, Valid Anagram</h2>
   <p class="tldr">Паттерн звучит так: «запоминай увиденное в dict или set и спрашивай о нём за O(1)». Он превращает перебор всех пар за O(n²) в один проход за O(n). Это самый частый паттерн первых задач на собеседовании.</p>
   <div class="lab">
@@ -429,7 +430,7 @@ ord("a"), chr(97)                <span class="cm"># буква ↔ код: ord(c
 
 <!-- ============ terminal ============ -->
 <section class="topic" id="w1">
-  <div class="eyebrow">Темы 4–5 из 12 · <span class="dia">◆</span> Навигация и файлы · <span class="dia">◆</span> Поиск</div>
+  <div class="eyebrow">Темы 4–5 из 12 · <span class="qd key" aria-hidden="true"></span> Навигация и файлы · <span class="qd key" aria-hidden="true"></span> Поиск</div>
   <h2>Терминал</h2>
   <p class="tldr">Терминал — разговор с компьютером текстом. Ты всегда «стоишь» в какой-то папке, и команды работают относительно неё. Серверы с GPU, Docker, git — всё это терминал, мышки там нет.</p>
   <div class="lab">
@@ -517,7 +518,7 @@ tail -f log.txt                    <span class="cm"># смотреть лог о
 
 <!-- ============ git ============ -->
 <section class="topic" id="w2">
-  <div class="eyebrow">Темы 6–8 из 12 · <span class="dia">◆</span> init, add, commit · <span class="dia">◆</span> Ветки · <span class="dia">◆</span> remote</div>
+  <div class="eyebrow">Темы 6–8 из 12 · <span class="qd key" aria-hidden="true"></span> init, add, commit · <span class="qd key" aria-hidden="true"></span> Ветки · <span class="qd key" aria-hidden="true"></span> remote</div>
   <h2>Git</h2>
   <p class="tldr">Git — машина времени для кода. Каждый коммит — снимок проекта, к которому можно вернуться. Между «изменил файл» и «сохранил снимок» есть промежуточная зона: ты сам выбираешь, что войдёт в снимок.</p>
   <div class="lab">
@@ -616,7 +617,7 @@ test_size = 0.25
 
 <!-- ============ venv ============ -->
 <section class="topic" id="w3">
-  <div class="eyebrow">Темы 9–10 из 12 · <span class="dia">◆</span> venv · <span class="dia">◆</span> requirements.txt</div>
+  <div class="eyebrow">Темы 9–10 из 12 · <span class="qd key" aria-hidden="true"></span> venv · <span class="qd key" aria-hidden="true"></span> requirements.txt</div>
   <h2>Виртуальное окружение и requirements.txt</h2>
   <p class="tldr">venv — отдельная папка с Python и библиотеками для одного проекта. requirements.txt — список этих библиотек с версиями, чтобы любой человек и любой сервер собрал точно такое же окружение.</p>
   <div class="cards">
@@ -678,7 +679,7 @@ pip uninstall pandas</pre>
 
 <!-- ============ debugger ============ -->
 <section class="topic" id="w4">
-  <div class="eyebrow">Тема 11 из 12 · <span class="dia">◆</span> Отладчик в VS Code</div>
+  <div class="eyebrow">Тема 11 из 12 · <span class="qd key" aria-hidden="true"></span> Отладчик в VS Code</div>
   <h2>Отладчик</h2>
   <p class="tldr">Отладчик останавливает программу на нужной строке и даёт посмотреть все переменные в этот момент. Это быстрее и честнее, чем расставлять print по всему коду.</p>
   <div class="lab">

@@ -179,8 +179,9 @@ body{margin:0} [hidden]{display:none!important}
 .topic-check.is-done .note{color:var(--accent)}
 </style>
 
+<script src="/assets/nav.js"></script>
 <div class="wrap">
-<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/tree#w-1">← Неделя 1 на сайте дерева</a><span class="mid">урок 1 из 3</span><a href="/lessons/w01-2.html">Урок 2 · Python →</a></nav>
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/plan#w-1">← Неделя 1 в плане</a><span class="mid">урок 1 из 3</span><a href="/lessons/w01-2.html">Урок 2 · Python →</a></nav>
 <header class="top">
   <div class="eyebrow">Неделя 1 · урок 1 из 3 · 10 тем · ~3–4 часа</div>
   <h1>Фундамент машинного обучения</h1>
@@ -193,7 +194,7 @@ body{margin:0} [hidden]{display:none!important}
 
 <!-- ============ 1 ============ -->
 <section class="topic" id="t1">
-  <div class="eyebrow">Тема 1 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <div class="eyebrow">Тема 1 из 10 · <span class="qd key" aria-hidden="true"></span> Классический ML</div>
   <h2>Типы задач</h2>
   <p class="tldr">Любая ML-модель — это функция «вход → ответ». Тип задачи определяется тем, какой нужен ответ. От этого зависит всё остальное: модель, функция потерь, метрика.</p>
   <div class="cards">
@@ -260,7 +261,7 @@ body{margin:0} [hidden]{display:none!important}
 
 <!-- ============ 2 ============ -->
 <section class="topic" id="t2">
-  <div class="eyebrow">Тема 2 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <div class="eyebrow">Тема 2 из 10 · <span class="qd key" aria-hidden="true"></span> Классический ML</div>
   <h2>Обучение с учителем и без</h2>
   <p class="tldr">Вся разница в одном вопросе: есть ли в данных правильные ответы.</p>
   <div class="cards">
@@ -297,7 +298,7 @@ body{margin:0} [hidden]{display:none!important}
 
 <!-- ============ 3 ============ -->
 <section class="topic" id="t3">
-  <div class="eyebrow">Тема 3 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <div class="eyebrow">Тема 3 из 10 · <span class="qd key" aria-hidden="true"></span> Классический ML</div>
   <h2>Функция потерь и эмпирический риск</h2>
   <p class="tldr">Функция потерь — штраф за один ответ модели. Эмпирический риск — средний штраф по всем примерам. Обучить модель значит подобрать параметры, при которых средний штраф минимален.</p>
 
@@ -422,7 +423,7 @@ body{margin:0} [hidden]{display:none!important}
 
 <!-- ============ 4 ============ -->
 <section class="topic" id="t4">
-  <div class="eyebrow">Тема 4 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <div class="eyebrow">Тема 4 из 10 · <span class="qd key" aria-hidden="true"></span> Классический ML</div>
   <h2>Train, validation и test</h2>
   <p class="tldr">Данные делят на три части, чтобы честно узнать, как модель поведёт себя на данных, которых она никогда не видела.</p>
   <div class="split" role="img" aria-label="Train 60 процентов, validation 20, test 20">
@@ -525,7 +526,7 @@ cross_val_score(model, X_train, y_train, cv=5)  <span class="cm"># и в CV то
 
 <!-- ============ 5 ============ -->
 <section class="topic" id="t5">
-  <div class="eyebrow">Тема 5 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <div class="eyebrow">Тема 5 из 10 · <span class="qd key" aria-hidden="true"></span> Классический ML</div>
   <h2>Переобучение и недообучение</h2>
   <p class="tldr">Недообучение: модель слишком простая и не видит закономерность. Переобучение: модель зазубрила обучающие данные вместе с шумом и плохо работает на новых.</p>
   <div class="prose"><p>Недообучение — пришёл на экзамен, прочитав только оглавление. Переобучение — вызубрил 30 билетов слово в слово, а на экзамене вопрос сформулировали по-другому.</p></div>
@@ -616,7 +617,7 @@ cross_val_score(model, X_train, y_train, cv=5)  <span class="cm"># и в CV то
 
 <!-- ============ 6 ============ -->
 <section class="topic" id="t6">
-  <div class="eyebrow">Тема 6 из 10 · <span class="dia">◆</span> Классический ML</div>
+  <div class="eyebrow">Тема 6 из 10 · <span class="qd key" aria-hidden="true"></span> Классический ML</div>
   <h2>Bias–variance trade-off</h2>
   <p class="tldr">Ошибка модели складывается из трёх частей. Смещение (bias): модель систематически бьёт не туда. Разброс (variance): модель сильно меняется от конкретной выборки. Шум: его не убрать ничем.</p>
   <div class="boards" id="boards"></div>
@@ -679,7 +680,7 @@ cross_val_score(model, X_train, y_train, cv=5)  <span class="cm"># и в CV то
 
 <!-- ============ 7 ============ -->
 <section class="topic" id="t7">
-  <div class="eyebrow">Тема 7 из 10 · <span class="dia">◆</span> Алгоритмы</div>
+  <div class="eyebrow">Тема 7 из 10 · <span class="qd key" aria-hidden="true"></span> Алгоритмы</div>
   <h2>Big O по времени и памяти</h2>
   <p class="tldr">Big O отвечает на один вопрос: во сколько раз дольше будет работать код, если данных станет в 10 раз больше. Это не секунды, а форма роста.</p>
   <div class="prose"><p>Ищешь друга в аудитории на 300 человек:</p>
@@ -849,7 +850,7 @@ def binary_search(a, target):
 
 <!-- ============ 10 ============ -->
 <section class="topic" id="t10">
-  <div class="eyebrow">Тема 10 из 10 · <span class="dia">◆</span> Алгоритмы</div>
+  <div class="eyebrow">Тема 10 из 10 · <span class="qd key" aria-hidden="true"></span> Алгоритмы</div>
   <h2>Сложность операций list, dict, set</h2>
   <p class="tldr">list быстро берёт по номеру, но медленно ищет по значению. dict и set быстро ищут по значению, потому что внутри у них хеш-таблица (урок 3).</p>
   <div class="tbl"><table>
