@@ -1,0 +1,185 @@
+<!doctype html><html lang=ru><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>English · обзор</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Раздел English: обзор. Те же токены, что у ML; синий акцент ставит nav.js (data-section="en"). */
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --ink:#151B2B; --muted:#5B6478; --line:#D9DEE8; --soft:#E8ECF4;
+  --accent:#2F5FD0; --accent-soft:rgba(47,95,208,.15); --warm:#B7862A; --plum:#9A4C72; --teal:#2A7584; --red:#B4483A;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D111B; --surface:#141A28; --ink:#E4E8F2; --muted:#949CB0; --line:#262E40; --soft:#1B2232;
+  --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D111B; --surface:#141A28; --ink:#E4E8F2; --muted:#949CB0; --line:#262E40; --soft:#1B2232;
+  --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.55;padding-inline:16px;padding-block:0 72px}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;letter-spacing:-.01em;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+header.top{padding-block:36px 8px;display:grid;gap:12px}
+header.top h1{font-size:clamp(30px,5.6vw,48px);font-weight:700;line-height:1.05}
+header.top p{color:var(--muted);max-width:68ch}
+.draft{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--warm) 14%,transparent);border:1px dashed color-mix(in srgb,var(--warm) 60%,var(--line));border-radius:14px;padding:12px 16px;font-size:14.5px}
+.draft b{color:var(--warm)}
+section.block{padding-block:44px 0;display:grid;gap:14px;scroll-margin-top:70px}
+section.block>h2{font-size:clamp(21px,3.2vw,28px)}
+section.block>p{color:var(--muted);max-width:72ch}
+
+/* Этапы A2 → B1 → B2 */
+.road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;position:relative}
+@media (max-width:760px){.road{grid-template-columns:1fr}}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:10px;align-content:start;position:relative;overflow:hidden}
+.stage.now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.stage .lv{font:700 34px/1 var(--f-display);color:var(--accent)}
+.stage.next .lv{color:var(--muted)}
+.stage .when{font:500 12.5px var(--f-mono);color:var(--muted)}
+.stage ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px}
+.stage .tag{justify-self:start;font:500 11px var(--f-mono);padding:3px 9px;border-radius:999px;border:1px solid var(--accent);color:var(--accent)}
+.stage.next .tag{border-color:var(--line);color:var(--muted)}
+
+/* Ритм недели */
+.rhythm{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:860px){.rhythm{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:6px;align-content:start}
+.rc .n{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.rc b{font:500 15px var(--f-display)}
+.rc p{font-size:13.5px;color:var(--muted)}
+.rc.t .n{color:var(--warm)} .rc.d .n{color:var(--teal)}
+
+/* Недели плана A2 */
+.weeks{display:grid;gap:8px}
+.wk{background:var(--surface);border:1px solid var(--line);border-radius:14px;transition:border-color .15s}
+.wk:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
+.wk>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:12px 16px}
+.wk>summary::-webkit-details-marker{display:none}
+.wnum{font:700 14px var(--f-display);width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--accent);color:var(--surface)}
+.wk.rev .wnum{background:var(--warm)}
+.wk h3{font-size:15.5px}
+.wk .sub{font-size:13px;color:var(--muted)}
+.wk .dt{font:500 12px var(--f-mono);color:var(--muted);white-space:nowrap}
+.wk .chev{color:var(--muted);transition:transform .2s;margin-left:8px}
+.wk[open] .chev{transform:rotate(90deg)}
+.wk .body{padding:0 16px 16px 74px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.wk .body{padding-left:16px;grid-template-columns:1fr 1fr}}
+.ls{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:4px;align-content:start;font-size:13.5px}
+.ls .k{font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.ls.t .k{color:var(--warm)}
+.ls b{font-weight:600}
+.ls span{color:var(--muted)}
+
+/* Инструменты и решения */
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.tool{display:grid;gap:6px;padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--ink);text-decoration:none;transition:border-color .15s,transform .15s}
+a.tool:hover{border-color:var(--accent);transform:translateY(-1px)}
+.tool b{font:500 15px var(--f-display)}
+.tool span{font-size:13.5px;color:var(--muted)}
+.tool.soon{border-style:dashed;opacity:.75}
+.q{display:grid;gap:8px}
+.q li{margin-left:18px}
+footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">English · с A2 до B2</div>
+    <h1>Английский для жизни и работы</h1>
+    <p>Свой план вместо привязки к занятиям: грамматика по порядку уровней, слова каждый день, живая речь и аудирование. Цель — уверенный A2, затем B1 для работы и путешествий и B2, чтобы смотреть фильмы и проходить собеседования на английском. Основа уровня A2 — учебник Cambridge Empower A2.</p>
+    <div class="draft"><span>✎</span><span><b>Черновик на согласовании.</b> Ниже — предложенный план. Пока ты его не одобришь, ничего не записано в Obsidian и в данные: после «да» появятся файлы недель с галочками, уроки и тесты, как в ML.</span></div>
+  </header>
+
+  <section class="block" id="road">
+    <div class="eyebrow">Дорога</div>
+    <h2>Три этапа</h2>
+    <p>Сроки — ориентир, не дедлайн. Ориентир Cambridge — порядка 150–200 часов занятий на переход между соседними уровнями. При 4–5 часах в неделю это 8–12 месяцев на уровень; быстрее — если добавлять фильмы, сериалы и разговор.</p>
+    <div class="road">
+      <div class="stage now"><span class="tag">сейчас</span><span class="lv">A2</span><span class="when">19.10.2026 → конец января 2027 · 15 недель</span>
+        <ul><li>Вся базовая грамматика: be, present simple и continuous, past simple, present perfect, going to, can, have to, should, сравнения</li><li>Около 800–1000 частых слов</li><li>Простые разговоры: о себе, работе, еде, городе, поездке</li><li>Основа: Empower A2, юнит в неделю</li></ul></div>
+      <div class="stage next"><span class="tag">потом</span><span class="lv">B1</span><span class="when">февраль 2027 → осень 2027</span>
+        <ul><li>Past continuous и past perfect, будущее время, условные предложения 0–2, пассив, косвенная речь, used to</li><li>Английский для IT: рассказ о себе и проекте, чтение документации</li><li>Сериалы с английскими субтитрами</li><li>Основа: Empower B1 или Murphy «English Grammar in Use» — решим к февралю</li></ul></div>
+      <div class="stage next"><span class="tag">дальше</span><span class="lv">B2</span><span class="when">2028</span>
+        <ul><li>Третье и смешанные условные, модальные в прошедшем, wish, сложные времена</li><li>Собеседование на английском, техническое письмо</li><li>Фильмы и книги без перевода</li></ul></div>
+    </div>
+  </section>
+
+  <section class="block" id="week">
+    <div class="eyebrow">Ритм</div>
+    <h2>Неделя: три урока, тест и слова каждый день</h2>
+    <p>Как в ML, но с поправкой на язык: грамматику понимаешь, а слова и формы надо повторять. Поэтому — ежедневные 10–15 минут в тренажёре и повторение прошлых недель внутри каждого теста.</p>
+    <div class="rhythm">
+      <div class="rc"><span class="n">Урок 1 · ~60 мин</span><b>Грамматика A</b><p>Первое правило юнита: живая шкала времён, конструктор предложений, «найди ошибку». Слова темы с озвучкой.</p></div>
+      <div class="rc"><span class="n">Урок 2 · ~60 мин</span><b>Грамматика B</b><p>Второе правило и слова. Произношение: послушай и повтори, ударение, звуки.</p></div>
+      <div class="rc"><span class="n">Урок 3 · ~60 мин</span><b>Живой английский</b><p>Фразы на каждый день (раздел C), письмо (раздел D), Wordpower, короткое чтение и аудирование.</p></div>
+      <div class="rc t"><span class="n">Тест · ~25 мин</span><b>Тест недели</b><p>Вставь слово, выбери форму, найди ошибку, переведи. Около 20% вопросов — из прошлых недель.</p></div>
+      <div class="rc d"><span class="n">Каждый день · 10–15 мин</span><b>Слова</b><p>Тренажёр с интервальным повторением: слова уроков попадают туда сами (после твоего «да»).</p></div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Итого около 4–4,5 часа в неделю рядом с ML. Тяжёлая неделя — уроки 2 и 3 можно сдвинуть, слова не пропускать.</p>
+  </section>
+
+  <section class="block" id="a2">
+    <div class="eyebrow">План уровня A2 · черновик</div>
+    <h2>15 недель по Empower A2</h2>
+    <p>Юнит учебника — неделя. Две недели повторения: после шестого юнита и на Новый год. Нажми на неделю — увидишь, что в каждом уроке.</p>
+    <div class="weeks" id="weeks"></div>
+  </section>
+
+  <section class="block" id="tools">
+    <div class="eyebrow">Инструменты раздела</div>
+    <h2>Что уже есть и что появится</h2>
+    <div class="tools">
+      <a class="tool" href="/words"><b>Тренажёр слов</b><span>Карточки с интервальным повторением. Сейчас — слова из словаря Obsidian.</span></a>
+      <div class="tool soon"><b>План по неделям</b><span>Как в ML: недели с галочками, синхронно с Obsidian (65_Английский/План). После согласования.</span></div>
+      <div class="tool soon"><b>Уроки и тесты</b><span>Шкала времён, конструктор предложений, озвучка фраз в браузере. Первый урок — после согласования плана.</span></div>
+      <div class="tool soon"><b>Дерево тем</b><span>Грамматика, слова, произношение, чтение и аудирование, говорение, письмо, английский для IT — с уровнями A2, B1, B2.</span></div>
+    </div>
+  </section>
+
+  <footer>Раздел English на той же платформе, что и ML: одна навигация, один дизайн и правила (GUIDE.md), общий код уроков и тестов. Данные и файлы Obsidian — свои.</footer>
+</div>
+<script>
+/* Черновик плана A2: юниты Empower A2 (оглавление учебника), по неделе на юнит. После согласования переедет в .agents/data/en_plan.json. */
+const MON=["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
+const W=[
+ {u:1,t:"People — о себе и знакомых",a:"be: утверждение и отрицание · страны и национальности",b:"be: вопросы и короткие ответы · прилагательные",c:"Спросить и дать информацию · онлайн-профиль"},
+ {u:2,t:"Work and study — работа и учёба",a:"Present simple: утверждение и отрицание · профессии",b:"Present simple: вопросы и короткие ответы · учёба, время",c:"Попросить и ответить · заполнить анкету"},
+ {u:3,t:"Daily life — распорядок дня",a:"Наречия частоты: где ставить · выражения времени",b:"have got · технологии",c:"Договориться о встрече · неформальное приглашение"},
+ {u:4,t:"Food — еда",a:"Исчисляемые и неисчисляемые · a/an, some, any",b:"much, many, a lot of · разговор о еде",c:"В ресторане: прийти и заказать · пост в блог"},
+ {u:5,t:"Places — город и дом",a:"there is / there are · места в городе",b:"Притяжательные местоимения и 's · мебель",c:"Спросить и объяснить дорогу · описание района"},
+ {u:6,t:"Family — семья и прошлое",a:"Past simple: be · семья, годы и даты",b:"Past simple: правильные и неправильные глаголы",c:"Голосовое сообщение, звонок · история жизни"},
+ {rev:true,t:"Повторение юнитов 1–6",a:"Все времена и формы первой половины",b:"Ошибки из тестов недель 1–6",c:"Большой тест половины A2"},
+ {u:7,t:"Journeys — поездки",a:"Past simple: отрицание и вопросы · транспорт",b:"love, like, don't mind, hate + -ing",c:"Извиниться и обратиться: excuse me, sorry · письмо о себе"},
+ {u:8,t:"Fit and healthy — спорт и здоровье",a:"can, can't, could, couldn't — умения",b:"have to, don't have to · тело, внешность",c:"Как ты себя чувствуешь · статья"},
+ {u:9,t:"Clothes and shopping — покупки",a:"Present continuous · деньги и цены",b:"Present simple или continuous · одежда",c:"В магазине одежды · письмо-благодарность"},
+ {rev:true,t:"Новогодняя неделя: лёгкое повторение",a:"Слова всех юнитов в тренажёре",b:"Серия или фильм с английскими субтитрами",c:"Тест недели — только повторение"},
+ {u:10,t:"Communication — техника и языки",a:"Сравнительная степень · сочетания про IT",b:"Превосходная степень · большие числа",c:"Попросить о помощи · пост с мнением"},
+ {u:11,t:"Entertainment — впечатления",a:"Present perfect · третья форма глаголов",b:"Present perfect или past simple · музыка",c:"Спросить и высказать мнение · отзыв"},
+ {u:12,t:"Travel — путешествия",a:"going to — планы · география",b:"should, shouldn't — советы · сочетания про поездки",c:"Отель и туристическая информация · письмо с советами"},
+ {rev:true,t:"Итог A2",a:"Вся грамматика A2 на одной шкале времён",b:"Тест уровня A2",c:"План B1 и выбор учебника"}
+];
+const start=new Date(2026,9,19);
+const span=i=>{const a=new Date(start);a.setDate(a.getDate()+7*i);const b=new Date(a);b.setDate(b.getDate()+6);
+  return a.getMonth()===b.getMonth()?`${a.getDate()}–${b.getDate()} ${MON[b.getMonth()]}`:`${a.getDate()} ${MON[a.getMonth()]} – ${b.getDate()} ${MON[b.getMonth()]}`};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+document.getElementById("weeks").innerHTML=W.map((w,i)=>`<details class="wk${w.rev?" rev":""}"${i===0?" open":""}>
+  <summary><span class="wnum">${i+1}</span><div><h3>${esc(w.t)}</h3><div class="sub">${w.rev?"повторение":"Empower A2 · юнит "+w.u}</div></div><span class="dt">${span(i)}<span class="chev" aria-hidden="true">›</span></span></summary>
+  <div class="body">
+    <div class="ls"><span class="k">Урок 1</span><b>${esc(w.a)}</b></div>
+    <div class="ls"><span class="k">Урок 2</span><b>${esc(w.b)}</b></div>
+    <div class="ls"><span class="k">Урок 3</span><b>${esc(w.c)}</b></div>
+    <div class="ls t"><span class="k">Тест</span><b>${w.rev?"Сводный тест":"Тест недели"}</b><span>+ повторение прошлых недель</span></div>
+  </div></details>`).join("");
+</script>
+</body></html>
