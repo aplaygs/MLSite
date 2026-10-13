@@ -56,10 +56,10 @@ html{scroll-padding-top:calc(var(--navh) + 8px)}
   const mount = () => { document.body.prepend(nav); fit(); };
   if (document.body) { mount(); if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fit); }
   else document.addEventListener("DOMContentLoaded", mount);
-  if (!EN) fetch("/api/plan").then(r => r.json()).then(p => {
+  fetch(EN ? "/api/en/plan" : "/api/plan").then(r => r.json()).then(p => {
     const d = new Date(), t = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const w = (p.weeks || []).find(x => x.start <= t && t <= x.end); if (!w) return;
-    const a = document.getElementById("navWeek"); a.hidden = false; a.href = `/plan#w-${w.n}`; a.textContent = `Неделя ${w.n} →`;
-    a.title = w.focus || "";
+    const a = document.getElementById("navWeek"); a.hidden = false; a.href = `${EN ? "/en" : "/plan"}#w-${w.n}`; a.textContent = `Неделя ${w.n} →`;
+    a.title = EN ? w.title : (w.focus || "");
   }).catch(() => {});
 })();

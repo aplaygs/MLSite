@@ -32,8 +32,6 @@ a{color:var(--accent)}
 header.top{padding-block:36px 8px;display:grid;gap:12px}
 header.top h1{font-size:clamp(30px,5.6vw,48px);font-weight:700;line-height:1.05}
 header.top p{color:var(--muted);max-width:68ch}
-.draft{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--warm) 14%,transparent);border:1px dashed color-mix(in srgb,var(--warm) 60%,var(--line));border-radius:14px;padding:12px 16px;font-size:14.5px}
-.draft b{color:var(--warm)}
 section.block{padding-block:44px 0;display:grid;gap:14px;scroll-margin-top:70px}
 section.block>h2{font-size:clamp(21px,3.2vw,28px)}
 section.block>p{color:var(--muted);max-width:72ch}
@@ -72,8 +70,6 @@ section.block>p{color:var(--muted);max-width:72ch}
 .wk .dt{font:500 12px var(--f-mono);color:var(--muted);white-space:nowrap}
 .wk .chev{color:var(--muted);transition:transform .2s;margin-left:8px}
 .wk[open] .chev{transform:rotate(90deg)}
-.wk .body{padding:0 16px 16px 74px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-@media (max-width:760px){.wk .body{padding-left:16px;grid-template-columns:1fr 1fr}}
 .ls{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:4px;align-content:start;font-size:13.5px}
 .ls .k{font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
 .ls.t .k{color:var(--warm)}
@@ -89,6 +85,47 @@ a.tool:hover{border-color:var(--accent);transform:translateY(-1px)}
 .tool.soon{border-style:dashed;opacity:.75}
 .q{display:grid;gap:8px}
 .q li{margin-left:18px}
+
+/* Показатели, карточки уроков, темы с галочками */
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:6px}
+@media (max-width:700px){.kpis{grid-template-columns:1fr}}
+.kp{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:4px;align-content:start;color:var(--ink);text-decoration:none}
+.kp .k{font-size:12.5px;color:var(--muted)}
+.kp .v{font:700 28px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.kp .v small{font-size:15px;color:var(--muted);font-weight:500}
+.kp .bar{height:5px;border-radius:3px;background:var(--soft);overflow:hidden;margin-top:6px}
+.kp .bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .4s ease}
+.kp .go{font-size:13px;text-decoration:none;font-weight:500}
+.kpl{transition:border-color .15s,transform .15s}.kpl:hover{border-color:var(--accent);transform:translateY(-1px)}
+.wk.now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.wk h3 .ru{font:400 13.5px var(--f-body);color:var(--muted)}
+.chip{font:500 11px var(--f-mono);padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-left:6px}
+.chip.now{border-color:var(--accent);color:var(--accent)} .chip.ok{border-color:var(--teal);color:var(--teal)} .chip.late{border-color:var(--red);color:var(--red)}
+.wbody{padding:2px 16px 16px;display:grid;gap:14px}
+.lcs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:760px){.lcs{grid-template-columns:1fr 1fr}}
+.lc{display:grid;gap:3px;align-content:start;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-decoration:none;transition:border-color .15s,transform .15s}
+a.lc:hover{border-color:var(--accent);transform:translateY(-1px)}
+.lc .k{font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.lc b{font:500 14px var(--f-display);line-height:1.3}
+.lc .m{font-size:12px;color:var(--muted)}
+.lc.soon{border-style:dashed;opacity:.75}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 22px}
+@media (max-width:760px){.cols{grid-template-columns:1fr}}
+.col h4{margin:0 0 6px;font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.col ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.it{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:4px 6px;margin-inline:-6px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1.4}
+.it:hover{background:var(--soft)}
+.it input{position:absolute;opacity:0;width:1px;height:1px}
+.box{width:16px;height:16px;margin-top:1px;border:1.5px solid var(--muted);border-radius:4px;display:grid;place-items:center}
+.it input:checked+.box{background:var(--accent);border-color:var(--accent)}
+.it input:checked+.box::after{content:"";width:8px;height:4px;border:2px solid var(--surface);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.it input:checked~.tx .t{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.it input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
+.kd{font:500 10.5px var(--f-mono);color:var(--kc);margin-left:6px;white-space:nowrap}
+.tx .d{font:10.5px var(--f-mono);color:var(--muted);margin-left:4px}
+.wfoot{font-size:13px;border-top:1px dashed var(--line);padding-top:10px}
+.wfoot a{text-decoration:none}
 footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body>
@@ -98,7 +135,7 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
     <div class="eyebrow">English · с A2 до B2</div>
     <h1>Английский для жизни и работы</h1>
     <p>Свой план вместо привязки к занятиям: грамматика по порядку уровней, слова каждый день, живая речь и аудирование. Цель — уверенный A2, затем B1 для работы и путешествий и B2, чтобы смотреть фильмы и проходить собеседования на английском. Основа уровня A2 — учебник Cambridge Empower A2.</p>
-    <div class="draft"><span>✎</span><span><b>Черновик на согласовании.</b> Ниже — предложенный план. Пока ты его не одобришь, ничего не записано в Obsidian и в данные: после «да» появятся файлы недель с галочками, уроки и тесты, как в ML.</span></div>
+    <div class="kpis" id="kpis"></div>
   </header>
 
   <section class="block" id="road">
@@ -106,7 +143,7 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
     <h2>Три этапа</h2>
     <p>Сроки — ориентир, не дедлайн. Ориентир Cambridge — порядка 150–200 часов занятий на переход между соседними уровнями. При 4–5 часах в неделю это 8–12 месяцев на уровень; быстрее — если добавлять фильмы, сериалы и разговор.</p>
     <div class="road">
-      <div class="stage now"><span class="tag">сейчас</span><span class="lv">A2</span><span class="when">19.10.2026 → конец января 2027 · 15 недель</span>
+      <div class="stage now"><span class="tag">сейчас</span><span class="lv">A2</span><span class="when">12.10.2026 → 24.01.2027 · 15 недель</span>
         <ul><li>Вся базовая грамматика: be, present simple и continuous, past simple, present perfect, going to, can, have to, should, сравнения</li><li>Около 800–1000 частых слов</li><li>Простые разговоры: о себе, работе, еде, городе, поездке</li><li>Основа: Empower A2, юнит в неделю</li></ul></div>
       <div class="stage next"><span class="tag">потом</span><span class="lv">B1</span><span class="when">февраль 2027 → осень 2027</span>
         <ul><li>Past continuous и past perfect, будущее время, условные предложения 0–2, пассив, косвенная речь, used to</li><li>Английский для IT: рассказ о себе и проекте, чтение документации</li><li>Сериалы с английскими субтитрами</li><li>Основа: Empower B1 или Murphy «English Grammar in Use» — решим к февралю</li></ul></div>
@@ -120,9 +157,9 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
     <h2>Неделя: три урока, тест и слова каждый день</h2>
     <p>Как в ML, но с поправкой на язык: грамматику понимаешь, а слова и формы надо повторять. Поэтому — ежедневные 10–15 минут в тренажёре и повторение прошлых недель внутри каждого теста.</p>
     <div class="rhythm">
-      <div class="rc"><span class="n">Урок 1 · ~60 мин</span><b>Грамматика A</b><p>Первое правило юнита: живая шкала времён, конструктор предложений, «найди ошибку». Слова темы с озвучкой.</p></div>
-      <div class="rc"><span class="n">Урок 2 · ~60 мин</span><b>Грамматика B</b><p>Второе правило и слова. Произношение: послушай и повтори, ударение, звуки.</p></div>
-      <div class="rc"><span class="n">Урок 3 · ~60 мин</span><b>Живой английский</b><p>Фразы на каждый день (раздел C), письмо (раздел D), Wordpower, короткое чтение и аудирование.</p></div>
+      <div class="rc"><span class="n">Урок 1 · ~60 мин</span><b>Грамматика A</b><p>Главное правило юнита глубоко: живая шкала времён, конструктор предложений, «найди ошибку», ошибки русскоговорящих. Слова темы с озвучкой.</p></div>
+      <div class="rc"><span class="n">Урок 2 · ~60 мин</span><b>Грамматика B, слова и звук</b><p>Второе правило, слова юнита, произношение: послушай и повтори, ударение, звуки.</p></div>
+      <div class="rc"><span class="n">Урок 3 · ~60 мин</span><b>Живой английский</b><p>Фразы на каждый день, письмо, Wordpower, чтение и аудирование — и повторение грамматики прошлых недель.</p></div>
       <div class="rc t"><span class="n">Тест · ~25 мин</span><b>Тест недели</b><p>Вставь слово, выбери форму, найди ошибку, переведи. Около 20% вопросов — из прошлых недель.</p></div>
       <div class="rc d"><span class="n">Каждый день · 10–15 мин</span><b>Слова</b><p>Тренажёр с интервальным повторением: слова уроков попадают туда сами (после твоего «да»).</p></div>
     </div>
@@ -130,10 +167,11 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
   </section>
 
   <section class="block" id="a2">
-    <div class="eyebrow">План уровня A2 · черновик</div>
+    <div class="eyebrow">План уровня A2</div>
     <h2>15 недель по Empower A2</h2>
-    <p>Юнит учебника — неделя. Две недели повторения: после шестого юнита и на Новый год. Нажми на неделю — увидишь, что в каждом уроке.</p>
-    <div class="weeks" id="weeks"></div>
+    <p>Юнит учебника — неделя, плюс три недели повторения: после шестого юнита, на Новый год и итог уровня. Галочки — те же, что в файлах недель в Obsidian (<code>65_Английский/План</code>): отметил здесь — появилось там, и наоборот.</p>
+    <div class="weeks" id="weeks"><p class="muted">Загружаю план…</p></div>
+    <p class="muted" id="sync" role="status" style="font-size:13px"></p>
   </section>
 
   <section class="block" id="tools">
@@ -141,8 +179,8 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
     <h2>Что уже есть и что появится</h2>
     <div class="tools">
       <a class="tool" href="/words"><b>Тренажёр слов</b><span>Карточки с интервальным повторением. Сейчас — слова из словаря Obsidian.</span></a>
-      <div class="tool soon"><b>План по неделям</b><span>Как в ML: недели с галочками, синхронно с Obsidian (65_Английский/План). После согласования.</span></div>
-      <div class="tool soon"><b>Уроки и тесты</b><span>Шкала времён, конструктор предложений, озвучка фраз в браузере. Первый урок — после согласования плана.</span></div>
+      <a class="tool" href="#a2"><b>План по неделям</b><span>15 недель уровня A2 с галочками, синхронно с файлами недель в Obsidian.</span></a>
+      <div class="tool soon"><b>Уроки и тесты</b><span>Шкала времён, конструктор предложений, озвучка фраз в браузере. Уроки появляются на карточках недель по мере готовности.</span></div>
       <div class="tool soon"><b>Дерево тем</b><span>Грамматика, слова, произношение, чтение и аудирование, говорение, письмо, английский для IT — с уровнями A2, B1, B2.</span></div>
     </div>
   </section>
@@ -150,36 +188,51 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
   <footer>Раздел English на той же платформе, что и ML: одна навигация, один дизайн и правила (GUIDE.md), общий код уроков и тестов. Данные и файлы Obsidian — свои.</footer>
 </div>
 <script>
-/* Черновик плана A2: юниты Empower A2 (оглавление учебника), по неделе на юнит. После согласования переедет в .agents/data/en_plan.json. */
-const MON=["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
-const W=[
- {u:1,t:"People — о себе и знакомых",a:"be: утверждение и отрицание · страны и национальности",b:"be: вопросы и короткие ответы · прилагательные",c:"Спросить и дать информацию · онлайн-профиль"},
- {u:2,t:"Work and study — работа и учёба",a:"Present simple: утверждение и отрицание · профессии",b:"Present simple: вопросы и короткие ответы · учёба, время",c:"Попросить и ответить · заполнить анкету"},
- {u:3,t:"Daily life — распорядок дня",a:"Наречия частоты: где ставить · выражения времени",b:"have got · технологии",c:"Договориться о встрече · неформальное приглашение"},
- {u:4,t:"Food — еда",a:"Исчисляемые и неисчисляемые · a/an, some, any",b:"much, many, a lot of · разговор о еде",c:"В ресторане: прийти и заказать · пост в блог"},
- {u:5,t:"Places — город и дом",a:"there is / there are · места в городе",b:"Притяжательные местоимения и 's · мебель",c:"Спросить и объяснить дорогу · описание района"},
- {u:6,t:"Family — семья и прошлое",a:"Past simple: be · семья, годы и даты",b:"Past simple: правильные и неправильные глаголы",c:"Голосовое сообщение, звонок · история жизни"},
- {rev:true,t:"Повторение юнитов 1–6",a:"Все времена и формы первой половины",b:"Ошибки из тестов недель 1–6",c:"Большой тест половины A2"},
- {u:7,t:"Journeys — поездки",a:"Past simple: отрицание и вопросы · транспорт",b:"love, like, don't mind, hate + -ing",c:"Извиниться и обратиться: excuse me, sorry · письмо о себе"},
- {u:8,t:"Fit and healthy — спорт и здоровье",a:"can, can't, could, couldn't — умения",b:"have to, don't have to · тело, внешность",c:"Как ты себя чувствуешь · статья"},
- {u:9,t:"Clothes and shopping — покупки",a:"Present continuous · деньги и цены",b:"Present simple или continuous · одежда",c:"В магазине одежды · письмо-благодарность"},
- {rev:true,t:"Новогодняя неделя: лёгкое повторение",a:"Слова всех юнитов в тренажёре",b:"Серия или фильм с английскими субтитрами",c:"Тест недели — только повторение"},
- {u:10,t:"Communication — техника и языки",a:"Сравнительная степень · сочетания про IT",b:"Превосходная степень · большие числа",c:"Попросить о помощи · пост с мнением"},
- {u:11,t:"Entertainment — впечатления",a:"Present perfect · третья форма глаголов",b:"Present perfect или past simple · музыка",c:"Спросить и высказать мнение · отзыв"},
- {u:12,t:"Travel — путешествия",a:"going to — планы · география",b:"should, shouldn't — советы · сочетания про поездки",c:"Отель и туристическая информация · письмо с советами"},
- {rev:true,t:"Итог A2",a:"Вся грамматика A2 на одной шкале времён",b:"Тест уровня A2",c:"План B1 и выбор учебника"}
-];
-const start=new Date(2026,9,19);
-const span=i=>{const a=new Date(start);a.setDate(a.getDate()+7*i);const b=new Date(a);b.setDate(b.getDate()+6);
-  return a.getMonth()===b.getMonth()?`${a.getDate()}–${b.getDate()} ${MON[b.getMonth()]}`:`${a.getDate()} ${MON[a.getMonth()]} – ${b.getDate()} ${MON[b.getMonth()]}`};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-document.getElementById("weeks").innerHTML=W.map((w,i)=>`<details class="wk${w.rev?" rev":""}"${i===0?" open":""}>
-  <summary><span class="wnum">${i+1}</span><div><h3>${esc(w.t)}</h3><div class="sub">${w.rev?"повторение":"Empower A2 · юнит "+w.u}</div></div><span class="dt">${span(i)}<span class="chev" aria-hidden="true">›</span></span></summary>
-  <div class="body">
-    <div class="ls"><span class="k">Урок 1</span><b>${esc(w.a)}</b></div>
-    <div class="ls"><span class="k">Урок 2</span><b>${esc(w.b)}</b></div>
-    <div class="ls"><span class="k">Урок 3</span><b>${esc(w.c)}</b></div>
-    <div class="ls t"><span class="k">Тест</span><b>${w.rev?"Сводный тест":"Тест недели"}</b><span>+ повторение прошлых недель</span></div>
-  </div></details>`).join("");
+/* План английского из /api/en/plan: недели → 3 урока → темы с галочками (синхронно с 65_Английский/План). */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KIND={"Грамматика":"var(--accent)","Слова":"var(--teal)","Произношение":"var(--plum)","Речь":"var(--warm)","Письмо":"var(--warm)","Повторение":"var(--muted)"};
+let P=null,done={};
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+const tops=w=>w.lessons.flatMap(l=>l.topics);
+function kpis(){
+  const all=P.weeks.flatMap(tops), k=all.filter(t=>done[t.id]).length, t=today(), cur=P.weeks.find(w=>w.start<=t&&t<=w.end);
+  const ck=cur?tops(cur).filter(x=>done[x.id]).length:0, cn=cur?tops(cur).length:0;
+  $("kpis").innerHTML=`<div class="kp"><span class="k">${cur?`Неделя ${cur.n} · ${esc(cur.span)}`:"Неделя"}</span><span class="v">${ck}<small> / ${cn}</small></span><div class="bar"><i style="width:${cn?ck/cn*100:0}%"></i></div>${cur?`<a class="go" href="#w-${cur.n}">к неделе →</a>`:""}</div>
+    <div class="kp"><span class="k">Уровень ${esc(P.level)} целиком</span><span class="v">${k}<small> / ${all.length}</small></span><div class="bar"><i style="width:${k/all.length*100}%"></i></div><span class="k">${esc(P.book)}</span></div>
+    <a class="kp kpl" href="/words"><span class="k">Каждый день</span><span class="v" style="font-size:20px">Слова →</span><span class="k">10–15 минут в тренажёре</span></a>`;
+}
+function weekHTML(w){
+  const ts=tops(w), k=ts.filter(t=>done[t.id]).length, t=today(), now=w.start<=t&&t<=w.end, past=w.end<t;
+  const L=(P.lessons||[]).filter(l=>l.week===w.n);
+  const chip=now?'<span class="chip now">сейчас</span>':past?(k===ts.length?'<span class="chip ok">пройдена</span>':`<span class="chip late">хвосты: ${ts.length-k}</span>`):'<span class="chip">впереди</span>';
+  const card=(n,title)=>{const l=L.find(x=>x.n===n);return l&&l.ready?`<a class="lc" href="/lessons/${encodeURIComponent(l.file)}"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc(l.title||title)}</b><span class="m">открыть →</span></a>`
+    :`<div class="lc soon"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc(title)}</b><span class="m">скоро</span></div>`};
+  return `<details class="wk${w.kind==="review"?" rev":""}${now?" now":""}" id="w-${w.n}"${now?" open":""}>
+    <summary><span class="wnum">${w.n}</span><div><h3>${esc(w.title)} <span class="ru">— ${esc(w.ru)}</span></h3><div class="sub">${w.unit?"Empower A2 · юнит "+w.unit:"повторение"} · ${k} / ${ts.length} ${chip}</div></div><span class="dt">${esc(w.span)}<span class="chev" aria-hidden="true">›</span></span></summary>
+    <div class="wbody">
+      <div class="lcs">${w.lessons.map(l=>card(l.n,l.title)).join("")}${card(4,"Тест после трёх уроков")}</div>
+      <div class="cols">${w.lessons.map(l=>`<div class="col"><h4>Урок ${l.n} · ${esc(l.title)}</h4><ul>${l.topics.map(t=>`<li><label class="it"><input type="checkbox" data-id="${t.id}"${done[t.id]?" checked":""}><span class="box" aria-hidden="true"></span><span class="tx"><span class="t">${esc(t.title)}</span><span class="kd" style="--kc:${KIND[t.kind]||"var(--muted)"}">${esc(t.kind)}</span>${done[t.id]?`<span class="d">${done[t.id].slice(8)}.${done[t.id].slice(5,7)}</span>`:""}</span></label></li>`).join("")}</ul></div>`).join("")}</div>
+      <div class="wfoot"><a href="obsidian://open?vault=${encodeURIComponent(P.vault)}&file=${encodeURIComponent(w.file.replace(/\.md$/,""))}">открыть неделю в Obsidian</a></div>
+    </div></details>`;
+}
+function render(){kpis();$("weeks").innerHTML=P.weeks.map(weekHTML).join("")}
+function jump(){const m=location.hash.match(/^#w-(\d+)$/);if(!m)return;const el=$("w-"+m[1]);if(!el)return;el.open=true;
+  el.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})}
+async function load(){
+  try{P=await (await fetch("/api/en/plan")).json();done=P.done||{};render();$("sync").textContent="Связь с Obsidian есть";
+    (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(jump,80))}
+  catch(e){$("weeks").innerHTML='<p class="muted">Сервер не отвечает: открой сайт ссылкой из Obsidian.</p>'}
+}
+$("weeks").addEventListener("change",async e=>{
+  const cb=e.target; if(!cb.matches("input[data-id]"))return;
+  const id=cb.dataset.id, body=cb.checked?{set:{[id]:today()}}:{unset:[id]};
+  try{const r=await fetch("/api/en/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(!r.ok)throw 0; done=(await r.json()).done||{}; const open=[...document.querySelectorAll(".wk[open]")].map(x=>x.id);
+    render(); open.forEach(i=>{const el=$(i);if(el)el.open=true}); $("sync").textContent="Сохранено в файле недели в Obsidian";}
+  catch(err){cb.checked=!cb.checked;$("sync").textContent="Не сохранилось: сервер не отвечает"}
+});
+addEventListener("hashchange",jump);
+load();
 </script>
 </body></html>
