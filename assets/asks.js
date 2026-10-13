@@ -64,13 +64,13 @@
   }
   function decorate() {
     document.querySelectorAll("input[data-id]").forEach(cb => {
-      const lab = cb.closest("label"); if (!lab || lab.querySelector("[data-q]") || !BY[cb.dataset.id]) return;
+      const lab = cb.closest("label"); if (!lab || lab.querySelector(".qd[data-q]") || !BY[cb.dataset.id]) return;
       const host = lab.querySelector(".tx .t") || [...lab.children].filter(x => x.tagName === "SPAN" && !x.classList.contains("bx") && !x.classList.contains("box")).pop();
       if (!host) return;
       const q = document.createElement("span"); q.className = "qd"; q.dataset.q = cb.dataset.id;
       host.prepend(q);
     });
-    document.querySelectorAll("[data-q]").forEach(paint);
+    document.querySelectorAll(".qd[data-q]").forEach(paint);
   }
 
   const start = () => {

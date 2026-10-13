@@ -1,0 +1,985 @@
+<title>Урок 2.2 · Сортировки и надёжный Python</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<style>
+/* Только для этого урока: таблица с анимацией перестановки, строки кода в лаборатории try, панели логов, разбор JSON. */
+.srt{position:relative;border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden}
+.srt .hd,.srt .rw{display:grid;grid-template-columns:42px minmax(0,1.3fr) minmax(0,1fr) 64px 64px;gap:8px;align-items:center;padding:0 12px;height:38px;font-size:14px}
+.srt .hd{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line)}
+.srt .body{position:relative}
+.srt .rw{position:absolute;left:0;right:0;transition:top .3s ease,background-color .3s;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.srt .rw .ix{font:500 11.5px var(--f-mono);color:var(--muted)}
+.srt .rw .n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.srt .rw.top{background:color-mix(in srgb,var(--warm) 14%,transparent)}
+.srt .rw.tie .sc{color:var(--plum);font-weight:600}
+@media (prefers-reduced-motion:reduce){.srt .rw{transition:none}}
+.codeline{font:500 14px var(--f-mono);background:var(--soft);border-radius:8px;padding:8px 12px;overflow-x:auto;white-space:nowrap}
+.cl{display:grid;font:13.5px/1.6 var(--f-mono);background:var(--soft);border-radius:10px;padding:8px 0;overflow-x:auto}
+.cl span{display:block;padding:0 14px;white-space:pre;transition:background-color .2s,opacity .2s}
+.cl span.run{background:var(--accent-soft)}
+.cl span.err{background:color-mix(in srgb,var(--red) 22%,transparent)}
+.cl span.skip{opacity:.38}
+.logs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.logs{grid-template-columns:1fr}}
+.logp{background:var(--soft);border-radius:10px;padding:10px 12px;display:grid;gap:4px;align-content:start;min-height:120px}
+.logp b{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.logp code{display:block;font-size:12.5px;white-space:pre-wrap;word-break:break-word}
+.lv-DEBUG{color:var(--muted)} .lv-INFO{color:var(--teal)} .lv-WARNING{color:var(--warm)} .lv-ERROR{color:var(--red)} .lv-CRITICAL{color:var(--red);font-weight:700}
+.js{width:100%;min-height:150px;font:13.5px/1.5 var(--f-mono);padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.jsout{font:13px/1.55 var(--f-mono);background:var(--soft);border-radius:10px;padding:10px 12px;white-space:pre-wrap;word-break:break-word;min-height:60px}
+.jsout.bad{background:color-mix(in srgb,var(--red) 14%,transparent)}
+.ptr{font:600 12px var(--f-mono)}
+</style>
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-1.html">← Урок 1 · Как модель учится</a><span class="mid">урок 2 из 3</span><a href="/plan#w-2">Урок 3 · скоро</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · урок 2 из 3 · 9 тем · ~3,5 часа</div>
+  <h1>Сортировки и надёжный Python</h1>
+  <p>Два больших вопроса, которые задают на каждом собеседовании и в первую неделю стажировки. Первый — как упорядочить данные и что из этого следует: сортировка с ключом, два классических алгоритма сортировки и приём «два указателя», который работает именно на отсортированных данных. Второй — как писать код, который не падает молча и не теряет данные: исключения, контекстные менеджеры, логирование, работа с файлами, JSON и CSV, и копии, без которых конфиги и модели портятся незаметно. Основы <code>sort</code>, <code>sorted</code> и <code>copy</code> были в уроке 1.2 — здесь следующий уровень.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">sorted и key</a><a href="#t2">Merge и quick sort</a><a href="#t3">Два указателя</a><a href="#t4">try / except</a><a href="#t5">with</a><a href="#t6">logging</a><a href="#t7">Файлы и pathlib</a><a href="#t8">json и csv</a><a href="#t9">copy и deepcopy</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<div class="part"><span class="eyebrow">Часть 1 · 3 темы</span><h2>Порядок в данных</h2><p>Отсортировать — не только «расставить по возрастанию». Это выбор ключа, понимание цены (n log n), и инструмент: на отсортированных данных многие задачи решаются за один проход двумя указателями.</p></div>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 9 · Python</div>
+  <h2>sorted с key=, lambda</h2>
+  <p class="tldr">Ключ (<code>key</code>) — функция, которая для каждого элемента говорит, по какому значению его сравнивать. Python вызывает её один раз на элемент, сортирует по результатам и сохраняет исходный порядок равных. Почти любую «хитрую» сортировку можно записать одним правильным ключом.</p>
+  <div class="prose"><p>Что такое <code>sort</code> и <code>sorted</code>, <code>reverse</code> и кортеж из нескольких полей — в уроке 1.2. Здесь — как выбирать ключ и на чём ловят.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · один список, разные ключи</span><span class="muted mono" id="ssState"></span></div>
+    <div class="btns" role="group" aria-label="Ключ сортировки">
+      <button class="btn sk" data-k="raw">По имени как есть</button>
+      <button class="btn sk" data-k="lower">По имени без регистра</button>
+      <button class="btn sk" data-k="score">По баллу ↓</button>
+      <button class="btn sk" data-k="multi">Группа ↑, балл ↓</button>
+      <button class="btn sk" data-k="top">Топ-3 по часам</button>
+      <button class="btn" id="ssReset">Исходный порядок</button>
+    </div>
+    <div class="codeline" id="ssCode"></div>
+    <div class="srt"><div class="hd"><span>#</span><span>имя</span><span>группа</span><span style="text-align:right">балл</span><span style="text-align:right">часы</span></div><div class="body" id="ssBody"></div></div>
+    <p class="verdict" id="ssMsg"></p>
+    <p class="muted" style="font-size:13.5px">Слева в строке — номер студента в исходном списке. По нему видно стабильность: при равных ключах порядок не меняется.</p>
+  </div>
+
+  <h3 style="font-size:17px">Ключи, которые встречаются постоянно</h3>
+<pre>from operator import itemgetter, attrgetter
+sorted(rows, key=itemgetter("score"))              <span class="cm"># то же, что lambda r: r["score"], но быстрее и короче</span>
+sorted(pairs, key=itemgetter(1, 0))                <span class="cm"># по второму полю, потом по первому</span>
+sorted(students, key=attrgetter("group", "name"))  <span class="cm"># для объектов и dataclass</span>
+sorted(d.items(), key=lambda kv: kv[1], reverse=True)  <span class="cm"># словарь по значениям</span>
+sorted(words, key=len)                             <span class="cm"># любая функция одного аргумента</span>
+sorted(names, key=str.casefold)                    <span class="cm"># без учёта регистра (лучше lower для разных языков)</span>
+max(models, key=lambda m: m["roc_auc"])            <span class="cm"># min, max, heapq тоже принимают key</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Задача</th><th>Ключ</th><th>Почему так</th></tr></thead>
+    <tbody>
+      <tr><td>Числа хранятся строками: "10", "9", "100"</td><td><code>key=int</code></td><td>строки сравниваются посимвольно: "10" &lt; "9"</td></tr>
+      <tr><td>Одно поле по возрастанию, числовое — по убыванию</td><td><code>key=lambda s: (s.group, -s.score)</code></td><td>минус переворачивает число внутри кортежа</td></tr>
+      <tr><td>Два текстовых поля в разные стороны</td><td>два прохода: сначала по второму, потом по первому</td><td>у строки нет «минуса», а стабильность сохраняет порядок первого прохода</td></tr>
+      <tr><td>Пропуски <code>None</code> в данных</td><td><code>key=lambda x: (x is None, x)</code></td><td>сравнить None с числом нельзя (TypeError); так None уходят в конец</td></tr>
+      <tr><td>Только топ-k из большого списка</td><td><code>heapq.nlargest(k, a, key=...)</code></td><td>O(n log k) вместо O(n log n) на полную сортировку</td></tr>
+      <tr><td>Своё правило сравнения «a лучше b»</td><td><code>functools.cmp_to_key(cmp)</code></td><td>редко, но спрашивают: LeetCode 179 «Largest Number»</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Ловушка с буквой «ё»</b><p>Сортировка строк идёт по кодам символов, а «ё» в Юникоде стоит после «я»: <code>sorted(["ёж", "яблоко", "ель"])</code> → <code>['ель', 'яблоко', 'ёж']</code>. Для русского текста — <code>key=lambda s: s.lower().replace("ё", "е")</code> или настоящая локаль через <code>locale.strxfrm</code>. Та же история с заглавными: «аня» с маленькой окажется после «Яна».</p></div>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Отсортировать модели по метрике, признаки по важности (<code>sorted(zip(names, model.feature_importances_), key=itemgetter(1), reverse=True)</code>), объекты по предсказанной вероятности для порога и PR-кривой. В pandas то же самое — <code>df.sort_values(["group", "score"], ascending=[True, False])</code>, и у него есть параметр <code>key=</code>, работающий со столбцом целиком.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как отсортировать список словарей по двум полям: группа по возрастанию, балл по убыванию?</summary>
+      <div class="a"><p><code>sorted(rows, key=lambda r: (r["group"], -r["score"]))</code>: кортежи сравниваются слева направо, минус переворачивает порядок числа. Если оба поля текстовые, делают два стабильных прохода: сначала <code>sort(key=второе, reverse=True)</code>, потом <code>sort(key=первое)</code> — стабильность сохранит порядок первого прохода внутри равных групп.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Сколько раз вызывается функция key при сортировке n элементов?</summary>
+      <div class="a"><p>Ровно n раз: Python сначала вычисляет ключ для каждого элемента (декорирует), потом сортирует по готовым ключам. Поэтому тяжёлый ключ не умножается на n log n сравнений. С cmp-функцией наоборот: она вызывается на каждое сравнение.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что вернёт <code>sorted(["10", "9", "100", "2"])</code>? А с <code>key=int</code>?</summary>
+      <div class="a"><p><code>['10', '100', '2', '9']</code> — строки сравниваются по первому символу. С <code>key=int</code> — <code>['2', '9', '10', '100']</code>, и элементы остаются строками.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.coll.3">
+    <label class="tp"><input type="checkbox" data-id="python.coll.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>sorted с key=, lambda</b></span></label>
+    <span class="note" data-d="python.coll.3">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 9 · <span class="qd key" aria-hidden="true"></span>Алгоритмы</div>
+  <h2>Merge sort и quick sort</h2>
+  <p class="tldr">Оба алгоритма работают по принципу «разделяй и властвуй». Merge sort делит массив пополам, сортирует половины и аккуратно сливает их — всегда O(n log n), стабильно, но нужна дополнительная память. Quick sort выбирает опорный элемент, раскидывает меньшие налево, большие направо и повторяет — в среднем быстрее всех, на месте, но в худшем случае O(n²).</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · смотри, как сортируют</span><span class="muted mono" id="vsState"></span></div>
+    <div class="btns" role="group" aria-label="Алгоритм"><button class="btn va" data-a="merge" aria-pressed="true">Merge sort</button><button class="btn va" data-a="quick" aria-pressed="false">Quick sort</button></div>
+    <div class="btns" role="group" aria-label="Входные данные"><button class="btn vi" data-i="rand" aria-pressed="true">Случайный</button><button class="btn vi" data-i="sorted" aria-pressed="false">Уже отсортирован</button><button class="btn vi" data-i="rev" aria-pressed="false">Обратный</button><button class="btn vi" data-i="few" aria-pressed="false">Много повторов</button></div>
+    <div class="btns" role="group" aria-label="Опорный элемент" id="vsPivotBox"><button class="btn vp" data-p="last" aria-pressed="true">Опорный — последний</button><button class="btn vp" data-p="rand" aria-pressed="false">Опорный — случайный</button></div>
+    <svg id="vsSvg" viewBox="0 0 600 230" role="img" aria-label="Столбики массива во время сортировки"></svg>
+    <div class="btns"><button class="btn" id="vsPlay">▶ Пуск</button><button class="btn" id="vsStep">Шаг</button><button class="btn" id="vsEnd">В конец</button><button class="btn" id="vsReset">Сначала</button></div>
+    <div class="readout">
+      <div class="stat"><div class="v" id="vsC">0</div><div class="k">сравнений сделано</div></div>
+      <div class="stat"><div class="v" id="vsRef">0</div><div class="k">для сравнения: n·log₂n и n²/2</div></div>
+    </div>
+    <p class="verdict" id="vsMsg"></p>
+    <p class="muted" style="font-size:13.5px">16 столбиков. Жёлтый — элемент, который сейчас сравнивают или записывают. Сиреневый — опорный элемент quick sort. Подсветка снизу — кусок массива, с которым алгоритм работает сейчас. Сравни число сравнений на отсортированном входе у quick sort с последним опорным и со случайным.</p>
+  </div>
+
+  <h3 style="font-size:17px">Как устроены</h3>
+<pre><span class="cm"># Merge sort: разделить, отсортировать половины, слить</span>
+def merge_sort(a):
+    if len(a) &lt;= 1:
+        return a
+    mid = len(a) // 2
+    left, right = merge_sort(a[:mid]), merge_sort(a[mid:])
+    out, i, j = [], 0, 0
+    while i &lt; len(left) and j &lt; len(right):     <span class="cm"># два указателя по двум отсортированным кускам</span>
+        if left[i] &lt;= right[j]:                    <span class="cm"># &lt;= — равные берём слева: так сохраняется стабильность</span>
+            out.append(left[i]); i += 1
+        else:
+            out.append(right[j]); j += 1
+    return out + left[i:] + right[j:]
+
+<span class="cm"># Quick sort: опорный, разбиение, рекурсия (понятная версия, не на месте)</span>
+import random
+def quick_sort(a):
+    if len(a) &lt;= 1:
+        return a
+    p = random.choice(a)
+    return quick_sort([x for x in a if x &lt; p]) + [x for x in a if x == p] + quick_sort([x for x in a if x &gt; p])</pre>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>Merge sort</th><th>Quick sort</th></tr></thead>
+    <tbody>
+      <tr><td>Время в среднем</td><td class="n">O(n log n)</td><td class="n">O(n log n), на практике быстрее</td></tr>
+      <tr><td>Худший случай</td><td class="n">O(n log n) — всегда</td><td class="n">O(n²): опорный каждый раз крайний (отсортированный вход + последний опорный)</td></tr>
+      <tr><td>Доп. память</td><td class="n">O(n) — массив для слияния</td><td class="n">O(log n) — стек рекурсии, сортирует на месте</td></tr>
+      <tr><td>Стабильность</td><td>да</td><td>нет (в обычной реализации)</td></tr>
+      <tr><td>Где хорош</td><td>связные списки, внешняя сортировка огромных файлов, нужна стабильность</td><td>массивы в памяти, кэш-дружелюбность</td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <p><b>Откуда log n.</b> Merge sort делит массив пополам, пока куски не станут по одному элементу: это log₂n уровней (как в бинарном поиске из урока 1). На каждом уровне слияние проходит по всем n элементам. Итого n · log n. У quick sort то же самое, если опорный элемент делит кусок примерно пополам. Если опорный каждый раз оказывается самым маленьким, уровней не log n, а n — отсюда n².</p>
+    <p><b>Как спасают quick sort:</b> случайный опорный элемент, «медиана из трёх» (первый, средний, последний), а в библиотеках — introsort: начинают quick sort, а если рекурсия ушла слишком глубоко, переключаются на heap sort.</p>
+    <p><b>Что внутри Python.</b> <code>sorted</code> и <code>list.sort</code> — это Timsort: гибрид merge sort и сортировки вставками. Он находит уже упорядоченные куски («раны») и сливает их, поэтому на почти отсортированных данных работает почти за O(n), всегда стабилен и в худшем случае O(n log n). <code>np.sort</code> по умолчанию — quicksort-подобный (introsort), не стабилен; нужна стабильность — <code>kind="stable"</code>.</p>
+    <p><b>Нижняя граница.</b> Любая сортировка, которая только сравнивает элементы, в худшем случае делает не меньше порядка n log n сравнений. Быстрее можно, только если пользоваться значениями: сортировка подсчётом за O(n + k) для небольших целых чисел (оценки 2–5, возраст).</p>
+  </div>
+  <div class="callout feel"><b class="h">Где это в ML и на собеседованиях</b><p>Писать сортировку руками на работе не придётся, а на алгоритмической секции — бывает: «реализуйте merge sort», «слейте два отсортированных массива» (это кусок merge sort), «найдите k-й по величине элемент» — quickselect, тот же partition из quick sort, но рекурсия только в одну сторону, O(n) в среднем (LeetCode 215).</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем merge sort отличается от quick sort и почему в Python не quick sort?</summary>
+      <div class="a"><p>Merge sort всегда O(n log n), стабилен, но требует O(n) дополнительной памяти. Quick sort в среднем быстрее и сортирует на месте, но в худшем случае O(n²) и не стабилен. Python использует Timsort — гибрид merge sort и вставок: он стабилен (это важно для сортировки по нескольким ключам в несколько проходов), гарантирует O(n log n) и очень быстр на реальных данных, где часто есть уже упорядоченные куски.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Что значит «стабильная сортировка» и когда это важно?</summary>
+      <div class="a"><p>Стабильная сортировка сохраняет исходный порядок элементов с равными ключами. Важно, когда сортируют по нескольким признакам в несколько проходов, и когда исходный порядок что-то значит — например, время поступления заявок с одинаковым приоритетом.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Почему quick sort с последним опорным элементом на уже отсортированном массиве делает n²/2 сравнений?</summary>
+      <div class="a"><p>Последний элемент — максимум куска, все остальные уходят влево. Каждый вызов отщепляет всего один элемент, и уровней рекурсии получается n, а не log n: (n−1) + (n−2) + … ≈ n²/2. В лаборатории: 120 сравнений для 16 элементов.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="algo.sort.0">
+    <label class="tp"><input type="checkbox" data-id="algo.sort.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Merge sort и quick sort</b></span></label>
+    <span class="note" data-d="algo.sort.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 9 · <span class="qd key" aria-hidden="true"></span>Алгоритмы</div>
+  <h2>Два указателя</h2>
+  <p class="tldr">Два индекса идут по массиву, и на каждом шаге по простому правилу двигается один из них. Вместо перебора всех пар за O(n²) — один проход за O(n) и O(1) памяти. Работает, когда у данных есть порядок: массив отсортирован, или ответ зависит от концов.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · указатели шагают</span><span class="muted mono" id="tpState"></span></div>
+    <div class="btns" role="group" aria-label="Задача"><button class="btn tq" data-task="sum" aria-pressed="true">Two Sum II: сумма = target</button><button class="btn tq" data-task="water" aria-pressed="false">Container With Most Water</button></div>
+    <div class="btns" id="tpTargets"></div>
+    <svg id="tpSvg" viewBox="0 0 600 230" role="img" aria-label="Массив, левый и правый указатели"></svg>
+    <div class="btns"><button class="btn" id="tpPrev">← Назад</button><button class="btn" id="tpNext">Следующий шаг →</button><button class="btn" id="tpReset">Сначала</button></div>
+    <p class="verdict" id="tpMsg"></p>
+  </div>
+
+  <h3 style="font-size:17px">Почему это правильно, а не везение</h3>
+  <div class="prose">
+    <p>Two Sum II, массив отсортирован. Сумма крайних меньше target? Тогда левый элемент не подойдёт <b>ни с одним</b> правым: справа от правого указателя никого не осталось, а все остальные ещё меньше. Его можно выбросить — сдвигаем левый. Сумма больше — по той же логике выбрасываем правый. Каждый шаг отбрасывает целую строку возможных пар, поэтому шагов не больше n.</p>
+    <p>Container With Most Water: площадь ограничивает более низкая стенка. Если сдвинуть высокую, ширина уменьшится, а высота не вырастет — хуже быть не может только с низкой. Поэтому двигаем низкую стенку.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Схема</th><th>Как идут указатели</th><th>Задачи LeetCode</th></tr></thead>
+    <tbody>
+      <tr><td>Навстречу</td><td>с двух концов к середине</td><td>167 Two Sum II, 125 Valid Palindrome, 11 Container With Most Water, 15 3Sum (сортировка + навстречу)</td></tr>
+      <tr><td>В одну сторону (быстрый и медленный)</td><td>быстрый читает, медленный пишет «хорошие» элементы</td><td>26 Remove Duplicates, 283 Move Zeroes, 27 Remove Element</td></tr>
+      <tr><td>По двум массивам</td><td>по указателю на каждый отсортированный массив</td><td>88 Merge Sorted Array, 349 Intersection — и слияние в merge sort</td></tr>
+    </tbody></table></div>
+<pre><span class="cm"># Шаблон «навстречу» — Two Sum II</span>
+def two_sum_sorted(a, target):
+    l, r = 0, len(a) - 1
+    while l &lt; r:
+        s = a[l] + a[r]
+        if s == target:
+            return l, r
+        if s &lt; target:
+            l += 1          <span class="cm"># a[l] слишком мал для любого партнёра</span>
+        else:
+            r -= 1          <span class="cm"># a[r] слишком велик для любого партнёра</span>
+    return None
+
+<span class="cm"># Шаблон «быстрый и медленный» — Move Zeroes на месте</span>
+def move_zeroes(a):
+    slow = 0
+    for fast in range(len(a)):
+        if a[fast] != 0:
+            a[slow], a[fast] = a[fast], a[slow]
+            slow += 1</pre>
+  <div class="callout trap"><b class="h">Два указателя или хеш-таблица</b><p>Two Sum из урока 1.3 на неотсортированном массиве — словарь: O(n) времени и O(n) памяти. Если массив уже отсортирован — два указателя: O(n) времени и O(1) памяти. Сортировать специально ради указателей — это O(n log n) и потеря исходных индексов. На собеседовании назови оба варианта и выбери по условию.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как решить 3Sum (тройки с суммой 0) быстрее, чем O(n³)?</summary>
+      <div class="a"><p>Отсортировать массив за O(n log n). Для каждого i запустить два указателя на отрезке справа от i и искать пары с суммой −a[i]. Это O(n²) всего. Дубликаты пропускать: если a[i] равен предыдущему — следующий i, и после найденной тройки сдвигать указатели мимо одинаковых значений.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>a = [2, 7, 11, 15], target = 18. Пройди указателями руками.</summary>
+      <div class="a"><p>2 + 15 = 17 &lt; 18 → l вправо. 7 + 15 = 22 &gt; 18 → r влево. 7 + 11 = 18 — индексы 1 и 2.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="algo.pat.1">
+    <label class="tp"><input type="checkbox" data-id="algo.pat.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Два указателя</b></span></label>
+    <span class="note" data-d="algo.pat.1">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 2 · 3 темы</span><h2>Код, который не падает молча</h2><p>Ошибки будут всегда: битая строка в CSV, нет файла, сеть отвалилась посреди запроса к API. Хороший код не тот, где ошибок нет, а тот, где понятно, что случилось, ресурсы закрыты, а данные не потеряны.</p></div>
+
+<!-- ============ 4 ============ -->
+<section class="topic" id="t4">
+  <div class="eyebrow">Тема 4 из 9 · <span class="qd key" aria-hidden="true"></span>Python</div>
+  <h2>try / except / else / finally</h2>
+  <p class="tldr"><code>try</code> — код, который может упасть. <code>except</code> — что делать, если упал с конкретной ошибкой. <code>else</code> — что делать, если не упал. <code>finally</code> — что выполнить в любом случае: была ошибка или нет, поймали её или нет.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · какие строки выполнятся</span><span class="muted mono" id="tfState"></span></div>
+    <div class="btns" role="group" aria-label="Входная строка"><button class="btn tf" data-s="ok" aria-pressed="true">row = {"score": "87"}</button><button class="btn tf" data-s="bad" aria-pressed="false">row = {"score": "восемьдесят"}</button><button class="btn tf" data-s="miss" aria-pressed="false">row = {}</button></div>
+    <div class="lab-grid" style="align-items:start">
+      <div class="cl" id="tfCode"></div>
+      <div style="display:grid;gap:10px">
+        <div class="logp"><b>Вывод и результат</b><div id="tfOut"></div></div>
+        <p class="verdict" id="tfMsg"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Зелёный фон — строка выполнилась, красный — здесь возникла ошибка, бледные строки пропущены.</p>
+  </div>
+
+  <h3 style="font-size:17px">Иерархия ошибок: что ловить</h3>
+  <div class="prose">
+    <p>Исключения — это классы, и они наследуются друг от друга. <code>except LookupError</code> поймает и <code>KeyError</code>, и <code>IndexError</code>. Верх иерархии: <code>BaseException</code> → <code>Exception</code> → всё, что обычно ловят. <code>KeyboardInterrupt</code> (Ctrl+C) и <code>SystemExit</code> лежат вне <code>Exception</code> — именно поэтому <code>except Exception</code> не мешает остановить программу, а голый <code>except:</code> мешает.</p>
+    <ul>
+      <li><b>Лови узко.</b> <code>except ValueError</code>, а не <code>except Exception</code>: так ты обрабатываешь ожидаемую ситуацию, а опечатку в имени переменной (<code>NameError</code>) увидишь сразу.</li>
+      <li><b>Голый <code>except:</code> и <code>except: pass</code> — никогда.</b> Это «проглотить всё молча»: код вроде работает, а половина данных потерялась.</li>
+      <li><b>Несколько типов:</b> <code>except (ValueError, TypeError) as e:</code>. Порядок блоков — от частного к общему.</li>
+      <li><b>Свои исключения:</b> <code>class DataError(Exception): pass</code> — понятное имя для ошибки твоей предметной области.</li>
+      <li><b>Пробросить дальше:</b> <code>raise</code> без аргументов внутри <code>except</code> — та же ошибка с исходным traceback. <code>raise DataError("битый CSV") from e</code> — новая ошибка с указанием причины.</li>
+    </ul>
+  </div>
+<pre>class DataError(Exception):
+    """Данные не прошли проверку."""
+
+def read_scores(path):
+    try:
+        f = open(path, encoding="utf-8")
+    except FileNotFoundError as e:
+        raise DataError(f"нет файла {path}") from e   <span class="cm"># причина сохранится в traceback</span>
+    else:
+        with f:                                       <span class="cm"># файл открылся — работаем с ним</span>
+            return [int(x) for x in f]
+    finally:
+        log.debug("read_scores: %s", path)            <span class="cm"># выполнится в любом случае</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Подход</th><th>Пример</th><th>Когда</th></tr></thead>
+    <tbody>
+      <tr><td>EAFP — «проще попросить прощения»</td><td><code>try: x = d[k]</code> <code>except KeyError: …</code></td><td>стиль Python: ошибка редка, проверка дорогая или с гонками (файл могут удалить между проверкой и открытием)</td></tr>
+      <tr><td>LBYL — «посмотри, прежде чем прыгать»</td><td><code>if k in d:</code> или <code>d.get(k, 0)</code></td><td>отсутствие — нормальная, частая ситуация</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Ловушка: return в finally</b><p><code>return</code> внутри <code>finally</code> перекрывает и результат из <code>try</code>, и даже вылетевшее исключение — оно молча исчезнет. В <code>finally</code> только освобождают ресурсы и пишут логи, ничего не возвращают.</p></div>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Чтение грязных данных: плохую строку пропускаем, но <b>считаем и логируем</b>, сколько пропущено, — иначе модель тихо учится на половине датасета. Запросы к API (LLM, загрузка датасета): ловим сетевые ошибки и повторяем с паузой, растущей вдвое (exponential backoff). Долгое обучение: <code>KeyboardInterrupt</code> ловят, чтобы сохранить чекпоинт перед выходом. А <code>assert</code> — для проверок своего кода, не для данных пользователя: при запуске с <code>python -O</code> они выключаются.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Зачем нужен else в try, если можно написать код в конце try?</summary>
+      <div class="a"><p>Чтобы <code>except</code> ловил ошибки только из той строки, которую мы действительно ожидаем упасть. Код в <code>else</code> выполняется, если <code>try</code> прошёл без ошибок, и его исключения уже не попадут в наш <code>except</code> — не замаскируются под «ожидаемую» ошибку.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Почему <code>except:</code> без типа — плохая практика?</summary>
+      <div class="a"><p>Он ловит всё, включая KeyboardInterrupt, SystemExit и ошибки в собственном коде (NameError из-за опечатки). Программа перестаёт останавливаться по Ctrl+C, а баги прячутся. Ловить нужно конкретные ожидаемые исключения; если уж широко — <code>except Exception</code> с логированием и обычно повторным <code>raise</code>.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>В лаборатории выбери <code>row = {}</code>. Почему finally выполнился, а return — нет?</summary>
+      <div class="a"><p>KeyError не подходит под <code>except ValueError</code>, поэтому не пойман. <code>finally</code> выполняется всегда, даже при непойманной ошибке, а потом исключение летит дальше, к вызывающему коду, и до <code>return</code> дело не доходит.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.err.0">
+    <label class="tp"><input type="checkbox" data-id="python.err.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>try / except / else / finally</b></span></label>
+    <span class="note" data-d="python.err.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="topic" id="t5">
+  <div class="eyebrow">Тема 5 из 9 · <span class="qd key" aria-hidden="true"></span>Python</div>
+  <h2>Контекстные менеджеры и with</h2>
+  <p class="tldr"><code>with</code> гарантирует, что после блока ресурс будет освобождён: файл закрыт, блокировка снята, соединение отпущено — даже если внутри блока вылетела ошибка. По сути это готовый <code>try / finally</code>, упакованный в объект.</p>
+<pre><span class="cm"># вручную</span>
+f = open("log.txt", "w", encoding="utf-8")
+try:
+    f.write("старт\n")
+finally:
+    f.close()
+
+<span class="cm"># то же самое через with</span>
+with open("log.txt", "w", encoding="utf-8") as f:
+    f.write("старт\n")
+<span class="cm"># здесь файл уже закрыт, даже если write упал</span></pre>
+  <div class="prose">
+    <p><b>Как это устроено.</b> Объект в <code>with</code> — контекстный менеджер: у него есть методы <code>__enter__</code> (вызывается в начале, его результат попадает в <code>as</code>) и <code>__exit__(exc_type, exc, tb)</code> (вызывается в конце, получает ошибку, если она была). Если <code>__exit__</code> вернёт <code>True</code>, ошибка считается обработанной и подавляется — так работает <code>contextlib.suppress</code>.</p>
+    <p><b>Свой менеджер за пять строк</b> — через декоратор <code>contextmanager</code>: всё до <code>yield</code> — вход, после — выход.</p>
+  </div>
+<pre>import time
+from contextlib import contextmanager, suppress
+
+@contextmanager
+def timer(name):
+    start = time.perf_counter()
+    try:
+        yield                                  <span class="cm"># здесь выполняется тело with</span>
+    finally:
+        log.info("%s: %.2f с", name, time.perf_counter() - start)
+
+with timer("обучение"):
+    model.fit(X_train, y_train)
+
+with suppress(FileNotFoundError):              <span class="cm"># «удали, если есть» — без try/except</span>
+    Path("cache.pkl").unlink()
+
+with open("in.csv", encoding="utf-8") as src, open("out.csv", "w", encoding="utf-8") as dst:
+    ...                                         <span class="cm"># несколько ресурсов в одном with</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Менеджер</th><th>Что делает</th></tr></thead>
+    <tbody>
+      <tr><td><code>open(...)</code></td><td>закрывает файл</td></tr>
+      <tr><td><code>torch.no_grad()</code></td><td>выключает подсчёт градиентов на время предсказаний — меньше памяти и быстрее</td></tr>
+      <tr><td><code>pd.option_context("display.max_rows", 100)</code></td><td>меняет настройку pandas только внутри блока</td></tr>
+      <tr><td><code>np.errstate(divide="ignore")</code></td><td>временно глушит предупреждения о делении на ноль</td></tr>
+      <tr><td><code>threading.Lock()</code></td><td>захватывает и гарантированно отпускает блокировку</td></tr>
+      <tr><td><code>tempfile.TemporaryDirectory()</code></td><td>создаёт папку и удаляет её после блока — удобно в тестах</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Ловушка</b><p><code>json.dump(data, open("out.json", "w"))</code> — файл открыт без <code>with</code> и закроется, когда сборщик мусора до него доберётся. Часть данных может остаться в буфере и не записаться на диск. Всегда <code>with open(...)</code>.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Что такое контекстный менеджер и как написать свой?</summary>
+      <div class="a"><p>Объект, который управляет ресурсом в блоке <code>with</code>: <code>__enter__</code> получает ресурс, <code>__exit__</code> освобождает его в любом случае, даже при исключении. Свой пишут классом с этими двумя методами или функцией-генератором с декоратором <code>@contextlib.contextmanager</code>: код до <code>yield</code> — вход, после — выход, обычно в <code>try/finally</code>. Примеры: таймер, временная смена настроек, транзакция БД.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что будет с файлом, если внутри <code>with open(...) as f:</code> вылетит ValueError?</summary>
+      <div class="a"><p>Файл закроется (сработает <code>__exit__</code>), а ValueError полетит дальше: <code>open</code> ошибки не подавляет.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.err.2">
+    <label class="tp"><input type="checkbox" data-id="python.err.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Контекстные менеджеры и with</b></span></label>
+    <span class="note" data-d="python.err.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="topic" id="t6">
+  <div class="eyebrow">Тема 6 из 9 · Python</div>
+  <h2>logging вместо print</h2>
+  <p class="tldr"><code>print</code> пишет всё одинаково и только в консоль. <code>logging</code> пишет с уровнем важности, временем и источником, умеет одновременно в консоль и в файл, а лишнее отключается одной настройкой, без удаления строк из кода.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · уровни и обработчики</span><span class="muted mono" id="lgState"></span></div>
+    <div class="ctrl" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));display:grid">
+      <label for="lgCon"><span class="row"><span>Уровень консоли</span><span class="mono" id="lgConV"></span></span><input type="range" id="lgCon" min="0" max="4" step="1" value="1"></label>
+      <label for="lgFile"><span class="row"><span>Уровень файла train.log</span><span class="mono" id="lgFileV"></span></span><input type="range" id="lgFile" min="0" max="4" step="1" value="0"></label>
+    </div>
+    <div class="logs"><div class="logp"><b>Консоль</b><div id="lgOutC"></div></div><div class="logp"><b>Файл train.log</b><div id="lgOutF"></div></div></div>
+    <p class="verdict" id="lgMsg"></p>
+    <p class="muted" style="font-size:13.5px">Код вызывает одни и те же семь строк логов. Уровень обработчика решает, что из них попадёт в его вывод. Двигай ползунки.</p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Уровень</th><th>Число</th><th>Для чего</th></tr></thead>
+    <tbody>
+      <tr><td><span class="lv-DEBUG">DEBUG</span></td><td class="n">10</td><td>подробности для отладки: значения, размеры, каждый батч</td></tr>
+      <tr><td><span class="lv-INFO">INFO</span></td><td class="n">20</td><td>нормальный ход работы: загрузили, обучили, сохранили</td></tr>
+      <tr><td><span class="lv-WARNING">WARNING</span></td><td class="n">30</td><td>странно, но работаем дальше: пропустили строки, мало данных</td></tr>
+      <tr><td><span class="lv-ERROR">ERROR</span></td><td class="n">40</td><td>операция не удалась</td></tr>
+      <tr><td><span class="lv-CRITICAL">CRITICAL</span></td><td class="n">50</td><td>продолжать нельзя</td></tr>
+    </tbody></table></div>
+<pre>import logging
+log = logging.getLogger(__name__)                 <span class="cm"># свой логгер в каждом модуле</span>
+
+def main():
+    logging.basicConfig(                          <span class="cm"># настройка один раз — в точке входа, не в библиотечном коде</span>
+        level=logging.INFO,
+        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+        handlers=[logging.StreamHandler(), logging.FileHandler("train.log", encoding="utf-8")],
+    )
+    log.info("Загружено %d строк из %s", len(df), path)   <span class="cm"># %-подстановка: строка соберётся, только если уровень включён</span>
+    try:
+        save(model)
+    except OSError:
+        log.exception("Не удалось сохранить модель")       <span class="cm"># ERROR + полный traceback</span></pre>
+  <div class="prose"><ul>
+    <li><b>Логгер</b> (<code>getLogger(__name__)</code>) — кто пишет. <b>Обработчик</b> (handler) — куда: консоль, файл, сеть. <b>Формат</b> — как выглядит строка. У логгера и у каждого обработчика свой уровень.</li>
+    <li><b><code>log.exception</code></b> внутри <code>except</code> — сообщение уровня ERROR плюс traceback. Это вместо <code>print(e)</code>, который теряет, где именно упало.</li>
+    <li><b>Не f-строки в логах:</b> <code>log.debug("loss=%s", loss)</code>, а не <code>log.debug(f"loss={loss}")</code> — f-строка соберётся, даже когда DEBUG выключен.</li>
+    <li><b>Ротация:</b> <code>RotatingFileHandler(maxBytes=…, backupCount=…)</code>, чтобы лог долгого обучения не съел диск.</li>
+  </ul></div>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Скрипт обучения на сервере идёт часами, а ты закрыл ноутбук. Утром открываешь <code>train.log</code> и видишь, сколько строк пропущено, какая была ошибка на валидации на каждой эпохе и где упало. С <code>print</code> всего этого просто нет. Для метрик экспериментов есть отдельные инструменты (MLflow, Weights &amp; Biases — неделя MLOps), но базовый лог нужен всегда.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему logging лучше print?</summary>
+      <div class="a"><p>Уровни важности: подробности отключаются настройкой, а не удалением кода. Время, модуль и уровень в каждой строке. Несколько выводов сразу — консоль и файл, у каждого свой уровень. <code>log.exception</code> сохраняет traceback. Библиотеки пишут в свои логгеры, и приложение решает, что из этого показывать.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Логгер на уровне INFO. Попадёт ли в вывод <code>log.debug("x")</code>? А <code>log.warning("y")</code>?</summary>
+      <div class="a"><p>DEBUG (10) ниже порога INFO (20) — нет. WARNING (30) выше — да.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.err.5">
+    <label class="tp"><input type="checkbox" data-id="python.err.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>logging вместо print</b></span></label>
+    <span class="note" data-d="python.err.5">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 3 · 3 темы</span><h2>Данные на диске и в памяти</h2><p>Прочитать файл так, чтобы скрипт работал из любой папки и с кириллицей; сохранить в формате, который поймёт другая программа; не испортить загруженное, когда меняешь копию.</p></div>
+
+<!-- ============ 7 ============ -->
+<section class="topic" id="t7">
+  <div class="eyebrow">Тема 7 из 9 · Python</div>
+  <h2>Файлы и pathlib</h2>
+  <p class="tldr"><code>pathlib.Path</code> — путь как объект: склеивается через <code>/</code>, знает имя, расширение и родителя, умеет проверять, создавать и искать файлы. Это современная замена строкам и <code>os.path</code>.</p>
+<pre>from pathlib import Path
+ROOT = Path(__file__).resolve().parent.parent   <span class="cm"># корень проекта: от файла скрипта, а не от текущей папки</span>
+DATA = ROOT / "data" / "raw"                    <span class="cm"># склейка путей, работает и на Windows</span>
+p = DATA / "students.csv"
+p.name, p.stem, p.suffix, p.parent              <span class="cm"># 'students.csv', 'students', '.csv', .../data/raw</span>
+p.exists(), p.is_file(), p.stat().st_size        <span class="cm"># проверки и размер в байтах</span>
+(ROOT / "models").mkdir(parents=True, exist_ok=True)   <span class="cm"># создать со всеми родителями, без ошибки, если есть</span>
+sorted(DATA.glob("*.csv"))                       <span class="cm"># файлы по маске в папке</span>
+list(ROOT.rglob("*.ipynb"))                      <span class="cm"># рекурсивно во всех подпапках</span>
+text = p.read_text(encoding="utf-8")             <span class="cm"># весь файл строкой</span>
+(ROOT / "README.md").write_text("# Проект\n", encoding="utf-8")
+p.with_suffix(".parquet")                        <span class="cm"># тот же путь с другим расширением</span></pre>
+  <div class="callout trap"><b class="h">Главная ловушка — относительные пути</b><p><code>open("data/students.csv")</code> ищет файл относительно <b>текущей папки терминала</b>, а не папки скрипта. Запустил из корня проекта — работает, из <code>src/</code> или из Jupyter в другой папке — <code>FileNotFoundError</code>. Лекарство — пути от <code>Path(__file__)</code> (как <code>ROOT</code> выше) или от одного конфига. Это ровно тот пункт «пути относительные» из разбора первой версии BRS.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Режим open</th><th>Что делает</th></tr></thead>
+    <tbody>
+      <tr><td><code>"r"</code></td><td>чтение текста (по умолчанию)</td></tr>
+      <tr><td><code>"w"</code></td><td>запись: файл создаётся или <b>стирается</b></td></tr>
+      <tr><td><code>"a"</code></td><td>дописать в конец</td></tr>
+      <tr><td><code>"x"</code></td><td>создать новый; если уже есть — ошибка (не затрёт чужое)</td></tr>
+      <tr><td><code>"rb"</code>, <code>"wb"</code></td><td>бинарный режим: картинки, pickle, модели — байты без кодировки</td></tr>
+    </tbody></table></div>
+  <div class="prose"><ul>
+    <li><b>Кодировка — всегда явно:</b> <code>encoding="utf-8"</code>. Без неё Python берёт кодировку системы, и на Windows кириллица превращается в кракозябры.</li>
+    <li><b>Большой файл — построчно:</b> <code>for line in f:</code> читает по строке и не грузит гигабайт в память. Для таблиц — <code>pd.read_csv(path, chunksize=100_000)</code>.</li>
+    <li><b>Атомарная запись:</b> важное пишут во временный файл рядом и потом переименовывают (<code>tmp.replace(target)</code>) — если скрипт упадёт посреди записи, старый файл останется целым.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Скрипт работает у вас, а у коллеги падает с FileNotFoundError. Что проверите в первую очередь?</summary>
+      <div class="a"><p>Относительные пути: скрипт запускают из другой папки, и <code>open("data/x.csv")</code> ищет файл не там. Исправление — строить пути от <code>Path(__file__).resolve()</code> или передавать путь аргументом. Дальше — регистр в имени файла (Linux различает <code>Data</code> и <code>data</code>), разделители путей и то, есть ли файл в репозитории вообще (данные часто в <code>.gitignore</code>).</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что вернёт <code>Path("runs/exp1/model.pkl").stem</code> и <code>.parent.name</code>?</summary>
+      <div class="a"><p><code>'model'</code> и <code>'exp1'</code>.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.err.3">
+    <label class="tp"><input type="checkbox" data-id="python.err.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Файлы и pathlib</b></span></label>
+    <span class="note" data-d="python.err.3">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="topic" id="t8">
+  <div class="eyebrow">Тема 8 из 9 · Python</div>
+  <h2>json и csv</h2>
+  <p class="tldr">JSON — текстовый формат для вложенных данных: конфиги, ответы API, разметка. CSV — плоская таблица текстом: строки и столбцы через разделитель. Оба читаются стандартной библиотекой, но у каждого свои ловушки с типами и кодировкой.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · json.loads в браузере</span><span class="muted mono" id="jsState"></span></div>
+    <div class="btns" role="group" aria-label="Примеры"><button class="btn jx" data-x="ok">Правильный</button><button class="btn jx" data-x="quotes">Одинарные кавычки</button><button class="btn jx" data-x="comma">Запятая в конце</button><button class="btn jx" data-x="py">True и None</button><button class="btn jx" data-x="comment">Комментарий</button></div>
+    <textarea class="js" id="jsIn" spellcheck="false" aria-label="Текст JSON"></textarea>
+    <div class="jsout" id="jsOut" aria-live="polite"></div>
+    <p class="muted" style="font-size:13.5px">Правь текст — разбор пересчитывается сразу. Справа налево: что получится в Python после <code>json.loads</code>. Браузерный JSON.parse следует тем же правилам, что и Python.</p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>JSON</th><th>Python</th><th>Подвох</th></tr></thead>
+    <tbody>
+      <tr><td><code>{"k": 1}</code> объект</td><td><code>dict</code></td><td>ключи — только строки: <code>{1: "a"}</code> сохранится как <code>{"1": "a"}</code></td></tr>
+      <tr><td><code>[1, 2]</code> массив</td><td><code>list</code></td><td>tuple превратится в list</td></tr>
+      <tr><td><code>"текст"</code></td><td><code>str</code></td><td>только двойные кавычки</td></tr>
+      <tr><td><code>3</code>, <code>3.5</code></td><td><code>int</code>, <code>float</code></td><td>NaN и Infinity не по стандарту: Python пишет их, но другие программы не прочтут</td></tr>
+      <tr><td><code>true</code>, <code>false</code>, <code>null</code></td><td><code>True</code>, <code>False</code>, <code>None</code></td><td>с маленькой буквы</td></tr>
+      <tr><td>нет</td><td><code>datetime</code>, <code>set</code>, <code>np.int64</code>, объекты</td><td><code>TypeError: not JSON serializable</code> — приводи к str / list / int или <code>default=str</code></td></tr>
+    </tbody></table></div>
+<pre>import json
+cfg = json.loads(Path("config.json").read_text(encoding="utf-8"))   <span class="cm"># строка → объект (load — из файла)</span>
+with open("metrics.json", "w", encoding="utf-8") as f:
+    json.dump(metrics, f, ensure_ascii=False, indent=2)              <span class="cm"># кириллица как есть, с отступами</span>
+json.dumps({"auc": np.float64(0.87)})            <span class="cm"># numpy float64 подкласс float — запишется; np.int64 — нет</span>
+json.dumps(row, default=str)                      <span class="cm"># всё непонятное — строкой (даты)</span>
+
+<span class="cm"># JSON Lines: одна запись — одна строка; удобно дописывать и читать потоком</span>
+with open("preds.jsonl", "a", encoding="utf-8") as f:
+    f.write(json.dumps({"id": 7, "p": 0.91}) + "\n")</pre>
+<pre>import csv
+with open("students.csv", newline="", encoding="utf-8") as f:     <span class="cm"># newline="" — требование модуля csv</span>
+    for row in csv.DictReader(f):                <span class="cm"># строка → словарь по заголовку</span>
+        score = int(row["score"])                <span class="cm"># всё из CSV — строки! Привести тип — твоя задача</span>
+with open("out.csv", "w", newline="", encoding="utf-8") as f:
+    w = csv.DictWriter(f, fieldnames=["name", "score"])
+    w.writeheader(); w.writerows(rows)</pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Ловушка CSV</th><th>Решение</th></tr></thead>
+    <tbody>
+      <tr><td>Русский Excel сохраняет через <code>;</code> и запятую в дробях</td><td><code>delimiter=";"</code>; в pandas <code>sep=";", decimal=","</code></td></tr>
+      <tr><td>Файл из Excel начинается с невидимого BOM — первый заголовок «ломается»</td><td><code>encoding="utf-8-sig"</code></td></tr>
+      <tr><td>Старый файл в Windows-1251</td><td><code>encoding="cp1251"</code></td></tr>
+      <tr><td>Запятая или перенос внутри значения</td><td>модуль csv сам ставит кавычки; не склеивай строки через <code>",".join</code></td></tr>
+      <tr><td>Пустые строки между записями на Windows</td><td><code>newline=""</code> при открытии</td></tr>
+    </tbody></table></div>
+  <div class="callout feel"><b class="h">csv или pandas</b><p>Для анализа почти всегда <code>pd.read_csv</code>: сам угадывает типы, умеет даты, пропуски и большие файлы кусками. Модуль <code>csv</code> — для лёгких скриптов без pandas, потоковой обработки и когда нужен полный контроль. Для больших таблиц между своими скриптами лучше Parquet: он хранит типы и сжимается в разы (неделя про pandas).</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>json.dump упал с «Object of type int64 is not JSON serializable». Почему и как исправить?</summary>
+      <div class="a"><p>В словаре лежит <code>numpy.int64</code> (например, после <code>df["x"].sum()</code>), а стандартный json умеет только встроенные типы Python. Исправить — привести явно: <code>int(x)</code>, <code>.item()</code>, <code>.tolist()</code> для массивов, или передать <code>default=</code> с функцией конвертации.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что будет после <code>json.loads(json.dumps({1: (2, 3)}))</code>?</summary>
+      <div class="a"><p><code>{'1': [2, 3]}</code>: ключ стал строкой, кортеж — списком.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.err.4">
+    <label class="tp"><input type="checkbox" data-id="python.err.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>json и csv</b></span></label>
+    <span class="note" data-d="python.err.4">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="topic" id="t9">
+  <div class="eyebrow">Тема 9 из 9 · Python</div>
+  <h2>copy и deepcopy</h2>
+  <p class="tldr">Что такое поверхностная и глубокая копия и почему <code>b = a</code> — не копия, разобрано в уроке 1.2 с лабораторией памяти. Здесь — где копии решают на практике: конфиги из JSON, таблицы pandas, массивы numpy и лучшая модель во время обучения.</p>
+
+  <h3 style="font-size:17px">Конфиг по умолчанию и настройки эксперимента</h3>
+<pre>DEFAULTS = {"model": {"depth": 6, "lr": 0.05}, "features": ["attendance", "gpa"]}
+
+def make_config(overrides):
+    cfg = DEFAULTS.copy()                  <span class="cm"># поверхностная: внутренний словарь "model" — тот же объект</span>
+    cfg["model"]["lr"] = overrides["lr"]   <span class="cm"># испортили DEFAULTS для всех следующих экспериментов</span>
+    return cfg
+
+def make_config(overrides):
+    cfg = copy.deepcopy(DEFAULTS)          <span class="cm"># правильно: вложенные словари и списки тоже новые</span>
+    cfg["model"].update(overrides)
+    return cfg</pre>
+  <div class="prose"><p>Это классический баг серии экспериментов: второй запуск неожиданно получает параметры первого, потому что «дефолты» молча поменялись. Признак — результат зависит от порядка запусков.</p></div>
+
+  <h3 style="font-size:17px">numpy: вид и копия</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Операция</th><th>Результат</th><th>Изменения видны в исходном?</th></tr></thead>
+    <tbody>
+      <tr><td><code>a[2:5]</code>, <code>a.T</code>, <code>a.reshape(...)</code></td><td>вид (view) — окно в те же данные</td><td><b>да</b></td></tr>
+      <tr><td><code>a[[0, 3]]</code>, <code>a[a &gt; 0]</code></td><td>копия (fancy и булева индексация)</td><td>нет</td></tr>
+      <tr><td><code>a.copy()</code>, <code>np.array(a)</code></td><td>копия</td><td>нет</td></tr>
+    </tbody></table></div>
+<pre>x = np.zeros(5)
+part = x[1:3]; part[:] = 7     <span class="cm"># x стал [0, 7, 7, 0, 0] — срез numpy это вид</span>
+np.shares_memory(x, part)      <span class="cm"># True — так проверить, общая ли память</span></pre>
+
+  <h3 style="font-size:17px">pandas: SettingWithCopyWarning</h3>
+<pre>good = df[df.score &gt; 60]
+good["passed"] = True           <span class="cm"># SettingWithCopyWarning: это вид или копия? Изменение может не дойти</span>
+good = df[df.score &gt; 60].copy() <span class="cm"># правильно: явная копия, дальше меняй сколько угодно</span>
+df.loc[df.score &gt; 60, "passed"] = True   <span class="cm"># или меняй исходную таблицу одной операцией .loc</span></pre>
+  <div class="prose"><p>В новых версиях pandas включают режим Copy-on-Write, при котором такие ситуации ведут себя предсказуемо. Но привычка писать <code>.copy()</code>, когда собираешься менять выборку, и <code>.loc</code> для изменения исходника — защищает в любой версии.</p></div>
+
+  <h3 style="font-size:17px">Копия модели</h3>
+<pre>best_auc, best_model = 0, None
+for epoch in range(50):
+    train_one_epoch(model)
+    auc = evaluate(model, val)
+    if auc &gt; best_auc:
+        best_auc, best_model = auc, copy.deepcopy(model)   <span class="cm"># без deepcopy best_model = model — та же модель, учится дальше</span>
+
+from sklearn.base import clone
+fresh = clone(model)            <span class="cm"># те же гиперпараметры, но НЕобученная — для кросс-валидации</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Способ</th><th>Глубина</th><th>Когда</th></tr></thead>
+    <tbody>
+      <tr><td><code>list(a)</code>, <code>a[:]</code>, <code>dict(d)</code>, <code>{**d}</code>, <code>.copy()</code></td><td>поверхностная</td><td>плоские списки и словари чисел и строк</td></tr>
+      <tr><td><code>copy.deepcopy(x)</code></td><td>глубокая, понимает циклы</td><td>вложенные конфиги, модели, объекты</td></tr>
+      <tr><td><code>json.loads(json.dumps(x))</code></td><td>глубокая, только JSON-типы</td><td>трюк для конфигов; медленно и теряет кортежи, set, даты</td></tr>
+      <tr><td><code>sklearn.base.clone</code></td><td>параметры без обученных весов</td><td>свежая модель с теми же настройками</td></tr>
+      <tr><td><code>tensor.clone()</code> (PyTorch)</td><td>копия данных тензора</td><td>сохранить значения, которые потом изменятся на месте</td></tr>
+    </tbody></table></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>В цикле обучения сохраняли лучшую модель как <code>best = model</code>. В конце best оказалась хуже, чем на лучшей эпохе. Почему?</summary>
+      <div class="a"><p><code>best = model</code> — это второй ярлык на тот же объект, а не копия. Модель продолжила обучаться, и «лучшая» менялась вместе с ней. Нужно <code>copy.deepcopy(model)</code> или сохранять веса: в PyTorch — копию <code>state_dict</code> или <code>torch.save</code> в файл.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span><code>a = np.arange(5); b = a[a &gt; 2]; b[0] = 100</code>. Изменился ли <code>a</code>?</summary>
+      <div class="a"><p>Нет: булева индексация создаёт копию. А со срезом <code>b = a[3:]</code> — изменился бы.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.coll.5">
+    <label class="tp"><input type="checkbox" data-id="python.coll.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>copy и deepcopy</b></span></label>
+    <span class="note" data-d="python.coll.5">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · как на собеседовании и в работе</div>
+  <h2>Практика</h2>
+  <p class="tldr">Пять задач. LeetCode — с таймером и без запуска до первой отправки. Рабочая — в репозитории <code>ml-course</code>, отдельной веткой.</p>
+  <div class="prac">
+    <div class="task"><span class="tg lc">LeetCode · 4 задачи</span>
+      <h3>Два указателя: две лёгкие и две средние</h3>
+      <p><a href="https://leetcode.com/problems/merge-sorted-array/" target="_blank" rel="noopener">88. Merge Sorted Array</a> и <a href="https://leetcode.com/problems/move-zeroes/" target="_blank" rel="noopener">283. Move Zeroes</a> — по 15 минут. <a href="https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/" target="_blank" rel="noopener">167. Two Sum II</a> и <a href="https://leetcode.com/problems/3sum/" target="_blank" rel="noopener">15. 3Sum</a> — по 25 минут.</p>
+      <p class="ok">Готово, когда все четыре приняты, и для каждой ты назвал схему указателей, время и память.</p>
+      <details><summary>Подсказки к 88 и 3Sum</summary><div class="a">
+        <p><b>88:</b> заполняй <code>nums1</code> с конца: три указателя — конец значимой части nums1, конец nums2 и позиция записи. Большее из двух — в позицию записи. Так не затираешь ещё не прочитанное. O(m + n), O(1).</p>
+        <p><b>3Sum:</b> сортировка, внешний цикл по i, внутри — указатели навстречу на отрезке справа. Пропускай одинаковые a[i] и одинаковые значения после найденной тройки. O(n²).</p></div></details></div>
+
+    <div class="task"><span class="tg rev">Код-ревью · найди ошибки</span>
+      <h3>Загрузчик данных от коллеги. Найди шесть проблем.</h3>
+<pre>import json, csv
+
+def load(path="data/students.csv", cfg={}):
+    f = open(path)
+    rows = []
+    for r in csv.DictReader(f):
+        try:
+            r["score"] = int(r["score"])
+            rows.append(r)
+        except:
+            pass
+    print("загружено", len(rows))
+    cfg["n"] = len(rows)
+    rows.sort(key=lambda r: r["score"], reverse=True)
+    json.dump(rows, open("out.json", "w"))
+    return rows</pre>
+      <p class="ok">Готово, когда нашёл шесть и для каждой написал исправление.</p>
+      <details><summary>Ответ</summary><div class="a"><ul style="margin:0;padding-left:20px;display:grid;gap:6px">
+        <li><b>Изменяемое значение по умолчанию <code>cfg={}</code>:</b> один словарь на все вызовы, копит «n» из прошлых запусков. <code>cfg=None</code> и внутри <code>cfg = {} if cfg is None else cfg</code>.</li>
+        <li><b>Файлы без with:</b> ни входной, ни <code>out.json</code> не закрываются; JSON может записаться не до конца. <code>with open(...)</code>.</li>
+        <li><b>Нет <code>encoding</code> и <code>newline=""</code>:</b> на Windows кириллица сломается, а модуль csv требует <code>newline=""</code>. На запись — <code>ensure_ascii=False</code>.</li>
+        <li><b>Относительный путь по умолчанию:</b> зависит от папки запуска. Путь от <code>Path(__file__)</code> или аргументом.</li>
+        <li><b>Голый <code>except: pass</code>:</b> глотает и KeyError из-за опечатки в заголовке, и всё остальное, а пропущенные строки не посчитаны. <code>except ValueError</code> + счётчик + <code>log.warning</code> с номером строки.</li>
+        <li><b>print вместо logging:</b> ни уровня, ни времени, в файл не попадёт. <code>log.info("загружено %d, пропущено %d", ...)</code>.</li></ul></div></details></div>
+
+    <div class="task"><span class="tg work">Работа · ветка, 45 минут</span>
+      <h3>Надёжный загрузчик для учебного репозитория</h3>
+      <p>В <code>ml-course</code> создай ветку <code>feature/loader</code>. Положи в <code>data/</code> маленький <code>students.csv</code> на 10–15 строк (имя, группа, балл, часы), специально испорти две строки (пустой балл и «восемьдесят»). Напиши <code>src/load_students.py</code>: пути от <code>Path(__file__)</code>; чтение через <code>csv.DictReader</code> с кодировкой; плохие строки — пропуск с <code>log.warning</code> и номером строки; итог в <code>log.info</code>; сортировка: группа по возрастанию, балл по убыванию; запись в <code>data/clean.json</code> с <code>ensure_ascii=False</code>; логи в консоль (INFO) и в <code>logs/load.log</code> (DEBUG).</p>
+      <p class="ok">Готово, когда скрипт одинаково работает при запуске из корня и из <code>src/</code>, в логе две строки WARNING, <code>logs/</code> и <code>data/clean.json</code> добавлены в <code>.gitignore</code>, а ветка слита через Pull Request.</p>
+      <details><summary>Каркас, если застрял</summary><div class="a">
+<pre>import csv, json, logging
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+log = logging.getLogger("loader")
+
+def load(path: Path) -&gt; list[dict]:
+    rows, bad = [], 0
+    with open(path, newline="", encoding="utf-8") as f:
+        for n, r in enumerate(csv.DictReader(f), start=2):   <span class="cm"># 1-я строка — заголовок</span>
+            try:
+                r["score"] = int(r["score"])
+            except ValueError:
+                bad += 1
+                log.warning("строка %d: плохой балл %r", n, r["score"])
+                continue
+            rows.append(r)
+    log.info("загружено %d, пропущено %d", len(rows), bad)
+    return sorted(rows, key=lambda r: (r["group"], -r["score"]))</pre></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 3 минуты</span>
+      <h3>«Merge sort или quick sort? И что использует Python?»</h3>
+      <p class="ok">Готово, когда назвал сложность в среднем и в худшем случае, память, стабильность и Timsort.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>Оба O(n log n) в среднем. Merge sort гарантирует O(n log n), стабилен, но O(n) доп. памяти. Quick sort в среднем быстрее, на месте, но O(n²) при плохом опорном (лечится случайным опорным или медианой из трёх) и не стабилен. В Python — Timsort: гибрид слияния и вставок, стабилен, O(n log n) в худшем случае и почти O(n) на почти отсортированных данных. Плюс к ответу: для top-k — <code>heapq.nlargest</code>, для k-й статистики — quickselect за O(n) в среднем.</p></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 2 минуты</span>
+      <h3>«Зачем with, если можно вызвать close()?»</h3>
+      <p class="ok">Готово, когда объяснил исключения, __enter__/__exit__ и привёл пример своего менеджера.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>Если между открытием и <code>close()</code> вылетит исключение, до <code>close()</code> дело не дойдёт — файл, соединение или блокировка останутся висеть. <code>with</code> вызывает <code>__exit__</code> в любом случае — это <code>try/finally</code>, спрятанный в объект. Свой менеджер — класс с <code>__enter__</code> и <code>__exit__</code> или <code>@contextmanager</code> с <code>yield</code>, например таймер этапа обучения или временная смена настроек.</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в дереве</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда прошёл «Проверку без ИИ» по теме. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>key</b> вызывается n раз; <code>itemgetter</code>, <code>attrgetter</code>, <code>key=int</code> для чисел-строк, <code>(поле, -число)</code> для разных направлений, два прохода для двух строк.</li>
+      <li><b>Ловушки сортировки:</b> «ё» после «я», заглавные раньше строчных, None нельзя сравнить с числом. Топ-k — <code>heapq.nlargest</code>.</li>
+      <li><b>Merge sort:</b> всегда O(n log n), стабилен, O(n) памяти. <b>Quick sort:</b> в среднем быстрее, на месте, худший O(n²), не стабилен. В Python — Timsort.</li>
+      <li><b>Два указателя:</b> навстречу (167, 11, 15, 125), быстрый/медленный (26, 283), по двум массивам (88). O(n), O(1). Неотсортированный — словарь.</li>
+      <li><b>try/except/else/finally:</b> лови узко, никогда <code>except: pass</code>; else — если не упало; finally — всегда, без return.</li>
+      <li><b>raise X from e</b> — новая ошибка с причиной; <code>raise</code> без аргументов — пробросить ту же. EAFP — стиль Python.</li>
+      <li><b>with</b> = try/finally в объекте: <code>__enter__</code>/<code>__exit__</code>, <code>@contextmanager</code>, <code>suppress</code>, <code>torch.no_grad</code>.</li>
+      <li><b>logging:</b> getLogger(__name__), basicConfig один раз, уровни 10–50, обработчики консоль + файл, <code>log.exception</code>, %-подстановка.</li>
+      <li><b>pathlib:</b> пути от <code>Path(__file__)</code>, <code>/</code>, <code>mkdir(parents=True, exist_ok=True)</code>, <code>glob</code>, всегда <code>encoding="utf-8"</code>.</li>
+      <li><b>json:</b> ключи-строки, tuple→list, <code>ensure_ascii=False</code>, numpy-типы привести. <b>csv:</b> всё строки, <code>newline=""</code>, Excel — <code>;</code> и <code>utf-8-sig</code>.</li>
+      <li><b>Копии:</b> конфиг — deepcopy; numpy срез — вид, fancy — копия; pandas — <code>.copy()</code> или <code>.loc</code>; лучшая модель — deepcopy, свежая — <code>clone</code>.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без ИИ, 20 минут</b>
+    <p>Закрой урок. На бумаге: напиши merge sort и слияние двух отсортированных массивов, прогони quick sort с последним опорным на [1, 2, 3, 4] и посчитай сравнения. Вслух: порядок выполнения try/except/else/finally в трёх случаях, зачем with и logging. Без подсказок напиши загрузчик CSV → JSON из практики. Где запнулся — туда и возвращаешься.</p>
+  </div>
+</section>
+</div>
+
+<script src="/assets/lesson.js"></script>
+<script>
+const nounSteps=n=>{const a=n%10,b=n%100;return a===1&&b!==11?"шаг":a>=2&&a<=4&&(b<12||b>14)?"шага":"шагов"};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- тема 1: ключи сортировки ---------- */
+(function sortKeys(){
+  const S=[{name:"Боря",group:"Б-21",score:87,hours:6},{name:"аня",group:"А-12",score:92,hours:8},{name:"Вика",group:"А-12",score:87,hours:4},
+           {name:"Глеб",group:"Б-21",score:74,hours:9},{name:"Дима",group:"А-12",score:65,hours:2},{name:"Ева",group:"Б-21",score:92,hours:7},{name:"Яна",group:"Б-21",score:70,hours:5}];
+  S.forEach((s,i)=>s.ix=i);
+  const H=38, body=$("ssBody"); body.style.height=S.length*H+"px";
+  body.innerHTML=S.map(s=>`<div class="rw" id="ss-${s.ix}"><span class="ix">#${s.ix}</span><span>${s.name}</span><span>${s.group}</span><span class="n sc">${s.score}</span><span class="n">${s.hours}</span></div>`).join("");
+  const raw=(a,b)=>a<b?-1:a>b?1:0;
+  const K={
+    raw:{code:'sorted(students, key=lambda s: s["name"])',f:a=>a.slice().sort((x,y)=>raw(x.name,y.name)),
+      msg:"«аня» с маленькой буквы оказалась в самом конце, после «Яна»: строчные буквы в Юникоде идут после всех заглавных. Сравнение строк — по кодам символов, а не «по алфавиту»."},
+    lower:{code:'sorted(students, key=lambda s: s["name"].lower())',f:a=>a.slice().sort((x,y)=>raw(x.name.toLowerCase(),y.name.toLowerCase())),
+      msg:"С ключом lower() регистр не мешает: «аня» на своём месте. Ключ посчитан один раз на каждого студента."},
+    score:{code:'sorted(students, key=lambda s: s["score"], reverse=True)',f:a=>a.slice().sort((x,y)=>y.score-x.score),
+      msg:"У Ани и Евы по 92, у Бори и Вики по 87. Внутри равных порядок исходный (#1 перед #5, #0 перед #2) — это стабильность: reverse не переставляет равные."},
+    multi:{code:'sorted(students, key=lambda s: (s["group"], -s["score"]))',f:a=>a.slice().sort((x,y)=>raw(x.group,y.group)||(y.score-x.score)),
+      msg:"Кортеж сравнивается слева направо: сначала группа по возрастанию, при равной группе — балл. Минус перед числом переворачивает его порядок."},
+    top:{code:'heapq.nlargest(3, students, key=lambda s: s["hours"])',f:a=>a.slice().sort((x,y)=>y.hours-x.hours),top:3,
+      msg:"Нужны только трое лучших — не обязательно сортировать всех: heapq.nlargest держит кучу из k элементов, O(n log k). Здесь подсвечены первые три."},
+    init:{code:"students  # исходный порядок",f:a=>a.slice(),msg:"Исходный список. Номер слева будет ехать вместе со студентом — по нему видно, что делает каждый ключ."}
+  };
+  let cur="init";
+  function draw(){
+    const k=K[cur], order=k.f(S);
+    order.forEach((s,i)=>{const el=$("ss-"+s.ix); el.style.top=i*H+"px"; el.classList.toggle("top",!!k.top&&i<k.top);
+      el.classList.toggle("tie",cur==="score"&&S.filter(t=>t.score===s.score).length>1)});
+    $("ssCode").textContent=k.code; $("ssMsg").textContent=k.msg; $("ssState").textContent=cur==="init"?"":"ключ вызван 7 раз";
+    document.querySelectorAll(".sk").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===cur));
+  }
+  document.querySelectorAll(".sk").forEach(b=>b.onclick=()=>{cur=b.dataset.k;draw()});
+  $("ssReset").onclick=()=>{cur="init";draw()};
+  draw();
+})();
+
+/* ---------- тема 2: визуализатор сортировок ---------- */
+(function sortViz(){
+  const N=16; let algo="merge", input="rand", pivot="last", frames=[], idx=0, timer=null;
+  function makeInput(){
+    const r=rng(11), a=Array.from({length:N},(_,i)=>i+1);
+    if(input==="rand"){for(let i=N-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
+    else if(input==="rev")a.reverse();
+    else if(input==="few"){for(let i=0;i<N;i++)a[i]=1+Math.floor(r()*4)*5}
+    return a;
+  }
+  function framesMerge(a0){
+    const a=a0.slice(),F=[],c={n:0};
+    F.push({a:a.slice(),c:0,note:"Merge sort: делим массив пополам, пока куски не станут по одному элементу, потом сливаем отсортированные куски."});
+    (function ms(l,r){if(r-l<=1)return;const m=(l+r)>>1;ms(l,m);ms(m,r);
+      const L=a.slice(l,m),R=a.slice(m,r);let i=0,j=0,k=l;
+      while(i<L.length&&j<R.length){c.n++;a[k++]=L[i]<=R[j]?L[i++]:R[j++];F.push({a:a.slice(),hi:[k-1],range:[l,r],c:c.n,note:`Сливаем две отсортированные половины [${l}..${m-1}] и [${m}..${r-1}]: берём меньшую из двух «голов».`})}
+      while(i<L.length){a[k++]=L[i++];F.push({a:a.slice(),hi:[k-1],range:[l,r],c:c.n,note:"Правая половина кончилась — хвост левой дописываем без сравнений."})}
+      while(j<R.length){a[k++]=R[j++];F.push({a:a.slice(),hi:[k-1],range:[l,r],c:c.n,note:"Левая половина кончилась — хвост правой дописываем без сравнений."})}
+    })(0,N);
+    F.push({a:a.slice(),c:c.n,done:true});return F;
+  }
+  function framesQuick(a0){
+    const a=a0.slice(),F=[],c={n:0},r=rng(5);
+    F.push({a:a.slice(),c:0,note:`Quick sort: выбираем опорный элемент (${pivot==="last"?"последний в куске":"случайный"}), раскидываем меньшие налево, остальные направо, повторяем для каждой стороны.`});
+    (function qs(lo,hi){if(lo>=hi){if(lo===hi)F.push({a:a.slice(),fixed:[lo],range:[lo,lo+1],c:c.n,note:"Кусок из одного элемента уже на месте."});return}
+      if(pivot==="rand"){const p=lo+Math.floor(r()*(hi-lo+1));[a[p],a[hi]]=[a[hi],a[p]]}
+      const pv=a[hi];let i=lo;
+      F.push({a:a.slice(),pv:hi,range:[lo,hi+1],c:c.n,note:`Опорный — ${pv}. Всё меньше него соберём в начале куска.`});
+      for(let j=lo;j<hi;j++){c.n++;const v=a[j],less=v<pv;if(less){[a[i],a[j]]=[a[j],a[i]];i++}F.push({a:a.slice(),pv:hi,hi:[j],mark:i,range:[lo,hi+1],c:c.n,note:`${v} ${less?"<":"≥"} ${pv}: ${less?"переносим налево, граница сдвигается":"оставляем справа"}. Пунктир — граница «меньше опорного».`})}
+      [a[i],a[hi]]=[a[hi],a[i]];
+      F.push({a:a.slice(),fixed:[i],range:[lo,hi+1],c:c.n,note:`Опорный ${pv} встал на своё окончательное место ${i}: слева меньше, справа не меньше.`});
+      qs(lo,i-1);qs(i+1,hi)})(0,N-1);
+    F.push({a:a.slice(),c:c.n,done:true});return F;
+  }
+  function build(){frames=(algo==="merge"?framesMerge:framesQuick)(makeInput());idx=0;draw()}
+  const Fm=frame(600,230,{l:10,r:10,t:10,b:28},[0,N],[0,22]);
+  function draw(){
+    const fr=frames[idx], mx=Math.max(...fr.a), bw=(Fm.x1-Fm.x0)/N;
+    let s="";
+    if(fr.range)s+=`<rect x="${Fm.sx(fr.range[0])}" y="${Fm.y1+4}" width="${(fr.range[1]-fr.range[0])*bw}" height="6" rx="3" fill="var(--teal)" fill-opacity=".55"/>`;
+    fr.a.forEach((v,i)=>{const h=(v/mx)*(Fm.y1-Fm.y0-6), x=Fm.sx(i)+2, col=fr.done?"var(--accent)":fr.pv===i?"var(--plum)":(fr.hi||[]).includes(i)?"var(--warm)":(fr.fixed||[]).includes(i)?"var(--accent)":"var(--muted)";
+      s+=`<rect x="${x}" y="${Fm.y1-h}" width="${bw-4}" height="${h}" rx="3" fill="${col}" fill-opacity="${fr.done||col!=="var(--muted)"?0.9:0.45}"/>`;
+      s+=`<text class="tk" x="${x+(bw-4)/2}" y="${Fm.y1+22}" text-anchor="middle">${v}</text>`});
+    if(fr.mark!==undefined)s+=`<line x1="${Fm.sx(fr.mark)}" x2="${Fm.sx(fr.mark)}" y1="${Fm.y0}" y2="${Fm.y1}" stroke="var(--plum)" stroke-dasharray="4 4"/>`;
+    $("vsSvg").innerHTML=s;
+    const last=frames[frames.length-1].c, nlog=Math.round(N*Math.log2(N)), half=N*(N-1)/2;
+    $("vsC").textContent=fr.c; $("vsRef").textContent=`${nlog} и ${half}`;
+    $("vsState").textContent=`шаг ${idx} из ${frames.length-1}`;
+    $("vsMsg").textContent=fr.done?(algo==="quick"&&last>=half*0.9?`Готово за ${last} сравнений — это n²/2: опорный каждый раз был крайним, и рекурсия отщепляла по одному элементу. Выбери случайный опорный — станет около n·log n.`
+        :`Готово за ${last} сравнений. Ориентир n·log₂n = ${nlog}, худший случай n²/2 = ${half}.`+(algo==="merge"?" Merge sort на любом входе держится около n·log n.":""))
+      :fr.note;
+    $("vsPivotBox").hidden=algo!=="quick";
+  }
+  function stop(){clearInterval(timer);timer=null;$("vsPlay").textContent="▶ Пуск"}
+  $("vsPlay").onclick=()=>{if(timer)return stop();if(idx>=frames.length-1)idx=0;$("vsPlay").textContent="❚❚ Пауза";timer=setInterval(()=>{if(idx<frames.length-1){idx++;draw()}else stop()},90)};
+  $("vsStep").onclick=()=>{stop();if(idx<frames.length-1){idx++;draw()}};
+  $("vsEnd").onclick=()=>{stop();idx=frames.length-1;draw()};
+  $("vsReset").onclick=()=>{stop();idx=0;draw()};
+  const group=(sel,set)=>document.querySelectorAll(sel).forEach(b=>b.onclick=()=>{stop();set(b);document.querySelectorAll(sel).forEach(x=>x.setAttribute("aria-pressed",x===b));build()});
+  group(".va",b=>algo=b.dataset.a); group(".vi",b=>input=b.dataset.i); group(".vp",b=>pivot=b.dataset.p);
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)$("vsPlay").hidden=true;
+  build();
+})();
+
+/* ---------- тема 3: два указателя ---------- */
+(function twoPointers(){
+  const SUM=[1,3,4,6,8,11,13,15], WATER=[1,8,6,2,5,4,8,3,7];
+  let q="sum", target=19, frames=[], idx=0;
+  function build(){
+    frames=[];
+    if(q==="sum"){let l=0,r=SUM.length-1;
+      while(l<r){const s=SUM[l]+SUM[r];
+        if(s===target){frames.push({l,r,found:true,note:`${SUM[l]} + ${SUM[r]} = ${s} — нашли! Индексы ${l} и ${r}. Шагов: ${frames.length+1}, а пар всего ${SUM.length*(SUM.length-1)/2}.`});break}
+        frames.push({l,r,note:s<target?`${SUM[l]} + ${SUM[r]} = ${s} < ${target}: левый элемент слишком мал даже с самым большим партнёром — сдвигаем левый.`:`${SUM[l]} + ${SUM[r]} = ${s} > ${target}: правый слишком велик даже с самым маленьким — сдвигаем правый.`});
+        s<target?l++:r--}
+      if(!frames.length||!frames[frames.length-1].found)frames.push({l,r,none:true,note:`Указатели встретились: пары с суммой ${target} нет. Проверили за ${frames.length} ${nounSteps(frames.length)}, а не перебором всех пар.`});
+    }else{let l=0,r=WATER.length-1,best=0,bl=0,br=0;
+      while(l<r){const a=Math.min(WATER[l],WATER[r])*(r-l);if(a>best){best=a;bl=l;br=r}
+        frames.push({l,r,area:a,best,bl,br,note:`Площадь = min(${WATER[l]}, ${WATER[r]}) × ${r-l} = ${a}. Лучшая пока ${best}. Двигаем ${WATER[l]<=WATER[r]?"левую":"правую"} стенку — она ниже, а именно она ограничивает воду.`});
+        WATER[l]<=WATER[r]?l++:r--}
+      frames.push({l,r,area:best,best,bl,br,done:true,note:`Указатели встретились. Ответ — ${best} (стенки ${bl} и ${br}). ${frames.length} ${nounSteps(frames.length)} вместо ${WATER.length*(WATER.length-1)/2} пар.`});
+    }
+    idx=0;draw();
+  }
+  function draw(){
+    const A=q==="sum"?SUM:WATER, fr=frames[idx], F=frame(600,230,{l:16,r:16,t:20,b:40},[0,A.length],[0,q==="sum"?16:9]), bw=(F.x1-F.x0)/A.length;
+    let s="";
+    if(q==="water"){const L=fr.done?fr.bl:fr.l,R=fr.done?fr.br:fr.r,h=Math.min(A[L],A[R]);
+      s+=`<rect x="${F.sx(L)+bw/2}" y="${F.sy(h)}" width="${(R-L)*bw}" height="${F.y1-F.sy(h)}" fill="var(--teal)" fill-opacity=".22"/>`}
+    A.forEach((v,i)=>{const on=i===fr.l||i===fr.r, x=F.sx(i)+bw*0.18, w=bw*0.64;
+      s+=`<rect x="${x}" y="${F.sy(v)}" width="${w}" height="${F.y1-F.sy(v)}" rx="3" fill="${fr.found&&on?"var(--accent)":on?"var(--warm)":"var(--muted)"}" fill-opacity="${on?0.9:0.4}"/>`;
+      s+=`<text class="tk" x="${x+w/2}" y="${F.sy(v)-5}" text-anchor="middle">${v}</text>`;
+      s+=`<text class="tk" x="${x+w/2}" y="${F.y1+14}" text-anchor="middle" style="opacity:.6">${i}</text>`});
+    [["L",fr.l],["R",fr.r]].forEach(([t,i])=>{if(i===undefined)return;const x=F.sx(i)+bw/2;s+=`<text class="ptr" x="${x}" y="${F.y1+32}" text-anchor="middle" fill="var(--warm)">${t}</text>`});
+    $("tpSvg").innerHTML=s; $("tpMsg").textContent=fr.note;
+    $("tpState").textContent=`шаг ${idx+1} из ${frames.length}`;
+    $("tpPrev").disabled=idx===0; $("tpNext").disabled=idx===frames.length-1;
+    $("tpTargets").innerHTML=q==="sum"?[19,17,30].map(t=>`<button class="btn tt" data-t="${t}" aria-pressed="${t===target}">target = ${t}</button>`).join(""):"";
+    document.querySelectorAll(".tt").forEach(b=>b.onclick=()=>{target=+b.dataset.t;build()});
+  }
+  $("tpNext").onclick=()=>{if(idx<frames.length-1){idx++;draw()}};
+  $("tpPrev").onclick=()=>{if(idx>0){idx--;draw()}};
+  $("tpReset").onclick=()=>{idx=0;draw()};
+  document.querySelectorAll(".tq").forEach(b=>b.onclick=()=>{q=b.dataset.task;document.querySelectorAll(".tq").forEach(x=>x.setAttribute("aria-pressed",x===b));build()});
+  build();
+})();
+
+/* ---------- тема 4: порядок try / except / else / finally ---------- */
+(function tryFlow(){
+  const CODE=['def load_score(row):','    try:','        score = int(row["score"])','    except ValueError:','        log.warning("плохой балл: %r", row["score"])','        score = None','    else:','        log.info("балл прочитан: %s", score)','    finally:','        log.debug("строка обработана")','    return score'];
+  const SC={
+    ok:{run:[0,1,2,6,7,8,9,10],out:['<span class="lv-INFO">INFO</span> балл прочитан: 87','<span class="lv-DEBUG">DEBUG</span> строка обработана','→ функция вернула <b>87</b>'],
+      msg:"Ошибки нет: except пропущен, выполнился else, потом finally, потом return."},
+    bad:{run:[0,1,3,4,5,8,9,10],err:2,out:['<span class="lv-WARNING">WARNING</span> плохой балл: \'восемьдесят\'','<span class="lv-DEBUG">DEBUG</span> строка обработана','→ функция вернула <b>None</b>'],
+      msg:"int() упал с ValueError — его ловит наш except. else пропущен (он только для случая без ошибки), finally выполнился, функция вернула None."},
+    miss:{run:[0,1,8,9],err:2,out:['<span class="lv-DEBUG">DEBUG</span> строка обработана','<span class="lv-ERROR">KeyError: \'score\'</span> — летит выше, return не выполнен'],
+      msg:"Ключа нет — KeyError. Наш except ловит только ValueError, поэтому ошибка не поймана. finally всё равно выполнился, а потом исключение ушло к вызывающему коду."}
+  };
+  let cur="ok";
+  function draw(){
+    const s=SC[cur];
+    $("tfCode").innerHTML=CODE.map((l,i)=>`<span class="${i===s.err?"err":s.run.includes(i)?"run":"skip"}">${esc(l)}</span>`).join("");
+    $("tfOut").innerHTML=s.out.map(x=>`<code>${x}</code>`).join(""); $("tfMsg").textContent=s.msg;
+    $("tfState").textContent=`выполнено строк: ${s.run.length+(s.err!==undefined?1:0)} из ${CODE.length}`;
+    document.querySelectorAll(".tf").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===cur));
+  }
+  document.querySelectorAll(".tf").forEach(b=>b.onclick=()=>{cur=b.dataset.s;draw()});
+  draw();
+})();
+
+/* ---------- тема 6: уровни логов ---------- */
+(function logs(){
+  const LV=["DEBUG","INFO","WARNING","ERROR","CRITICAL"];
+  const MSG=[[0,"признаки: attendance, gpa, labs"],[1,"Загружено 1500 строк из students.csv"],[2,"Пропущено 12 строк: пустой балл"],[0,"эпоха 1/20: loss=0.693"],[1,"Модель обучена за 3.2 с, ROC-AUC 0.87"],[3,"Не удалось сохранить модель: нет места на диске"],[4,"Нет файла конфигурации — останавливаюсь"]];
+  const t0=[14,3,10];
+  const line=(m,i)=>{const ss=String(10+i*7).padStart(2,"0");return `<code>${t0[0]}:0${t0[1]}:${ss} | <span class="lv-${LV[m[0]]}">${LV[m[0]].padEnd(8," ")}</span>| loader | ${esc(m[1])}</code>`};
+  function draw(){
+    const c=+$("lgCon").value, f=+$("lgFile").value;
+    const outC=MSG.map((m,i)=>m[0]>=c?line(m,i):"").join(""), outF=MSG.map((m,i)=>m[0]>=f?line(m,i):"").join("");
+    $("lgOutC").innerHTML=outC||'<code class="muted">пусто</code>'; $("lgOutF").innerHTML=outF||'<code class="muted">пусто</code>';
+    $("lgConV").textContent=LV[c]; $("lgFileV").textContent=LV[f];
+    const nc=MSG.filter(m=>m[0]>=c).length, nf=MSG.filter(m=>m[0]>=f).length;
+    $("lgState").textContent=`консоль ${nc} из 7 · файл ${nf} из 7`;
+    $("lgMsg").textContent=c===1&&f===0?"Типичная настройка: в консоли только важное (INFO и выше), в файле — всё, включая DEBUG, чтобы потом разобраться."
+      :c>=3?"В консоли остались только ошибки. Предупреждение о 12 пропущенных строках ты бы не увидел — а оно важное. WARNING обычно не выключают."
+      :c===0?"В консоли всё подряд, включая каждую эпоху. На долгом обучении это тысячи строк — важное утонет.":
+      `Каждый обработчик фильтрует сам: сообщение выводится, если его уровень не ниже уровня обработчика.`;
+  }
+  $("lgCon").oninput=draw; $("lgFile").oninput=draw; draw();
+})();
+
+/* ---------- тема 8: json.loads ---------- */
+(function jsonLab(){
+  const EX={
+    ok:'{\n  "name": "Аня",\n  "score": 87,\n  "gpa": 4.6,\n  "passed": true,\n  "tags": ["ml", "python"],\n  "mentor": null\n}',
+    quotes:"{\n  'name': 'Аня',\n  'score': 87\n}",
+    comma:'{\n  "name": "Аня",\n  "score": 87,\n}',
+    py:'{\n  "name": "Аня",\n  "passed": True,\n  "mentor": None\n}',
+    comment:'{\n  // балл за экзамен\n  "score": 87\n}'
+  };
+  const pyRepr=v=>v===null?"None":v===true?"True":v===false?"False":typeof v==="string"?"'"+v.replace(/\\/g,"\\\\").replace(/'/g,"\\'")+"'":typeof v==="number"?String(v):Array.isArray(v)?"["+v.map(pyRepr).join(", ")+"]":"{"+Object.entries(v).map(([k,x])=>pyRepr(k)+": "+pyRepr(x)).join(", ")+"}";
+  const pyType=v=>v===null?"NoneType":typeof v==="boolean"?"bool":typeof v==="string"?"str":typeof v==="number"?(Number.isInteger(v)?"int":"float"):Array.isArray(v)?"list":"dict";
+  function hint(t){
+    if(/\/\/|\/\*/.test(t))return "В JSON нет комментариев. Убери строку с // или храни пояснения в отдельном поле.";
+    if(/,\s*[}\]]/.test(t))return "Запятая после последнего элемента. Python-словарь её прощает, JSON — нет.";
+    if(/\b(True|False|None)\b/.test(t))return "True, False и None — это Python. В JSON пишут true, false и null с маленькой буквы.";
+    if(/'/.test(t))return "Одинарные кавычки. В JSON строки и ключи — только в двойных. Частая ошибка, если взять str(dict) вместо json.dumps.";
+    return "Синтаксическая ошибка JSON. Проверь кавычки, запятые и скобки.";
+  }
+  function run(){
+    const t=$("jsIn").value, out=$("jsOut");
+    try{const v=JSON.parse(t);out.classList.remove("bad");
+      const types=v&&typeof v==="object"&&!Array.isArray(v)?Object.entries(v).map(([k,x])=>`  ${k}: ${pyType(x)}`).join("\n"):"  "+pyType(v);
+      out.textContent=`json.loads(...) → ${pyType(v)}\n${pyRepr(v)}\n\nтипы:\n${types}`;
+      $("jsState").textContent="разобрано";
+    }catch(e){out.classList.add("bad");out.textContent=`json.decoder.JSONDecodeError\n${hint(t)}`;$("jsState").textContent="ошибка"}
+  }
+  document.querySelectorAll(".jx").forEach(b=>b.onclick=()=>{$("jsIn").value=EX[b.dataset.x];document.querySelectorAll(".jx").forEach(x=>x.setAttribute("aria-pressed",x===b));run()});
+  $("jsIn").oninput=run; $("jsIn").value=EX.ok; document.querySelector('.jx[data-x="ok"]').setAttribute("aria-pressed","true"); run();
+})();
+
+/* ---------- конспект для Obsidian и галочки ---------- */
+const MD=`---
+type: конспект
+tags: [ml, python, алгоритмы, неделя-2]
+---
+# Сортировки и надёжный Python: урок 2.2
+
+## sorted и key
+- key вызывается n раз; itemgetter / attrgetter; key=int для чисел-строк; (поле, -число) для разных направлений; две строки — два стабильных прохода.
+- Ловушки: «ё» после «я», заглавные раньше строчных, None не сравнить с числом. Топ-k — heapq.nlargest, O(n log k).
+
+## Merge sort и quick sort
+- Merge: всегда O(n log n), стабилен, O(n) памяти. Quick: в среднем быстрее, на месте, худший O(n²) (крайний опорный), не стабилен; лечат случайным опорным, медианой из трёх, introsort.
+- Python: Timsort (merge + вставки), стабилен, почти O(n) на почти отсортированном. Нижняя граница сравнительных сортировок — n log n.
+
+## Два указателя
+- Навстречу: 167, 11, 125, 15 (сортировка + указатели). Быстрый/медленный: 26, 283. По двум массивам: 88. O(n), O(1).
+- Почему работает: каждый шаг отбрасывает элемент, у которого точно нет пары.
+
+## try / except / else / finally
+- Лови узко, никогда except: pass. else — если не упало, finally — всегда, без return.
+- raise X from e — новая ошибка с причиной. EAFP — стиль Python. assert — не для проверки данных.
+
+## with
+- try/finally в объекте: __enter__ / __exit__. Свой — @contextmanager с yield. suppress, torch.no_grad, pd.option_context.
+
+## logging
+- getLogger(__name__), basicConfig один раз в точке входа, уровни DEBUG 10 … CRITICAL 50, обработчики консоль + файл, log.exception, %-подстановка вместо f-строк.
+
+## pathlib и файлы
+- Пути от Path(__file__), склейка через /, mkdir(parents=True, exist_ok=True), glob/rglob, всегда encoding="utf-8". Режимы r, w (стирает), a, x, rb/wb.
+
+## json и csv
+- JSON: ключи — строки, tuple → list, ensure_ascii=False, numpy-типы привести, JSON Lines для потоков.
+- CSV: всё строки, newline="", Excel — ; и utf-8-sig, cp1251 для старых файлов.
+
+## copy и deepcopy на практике
+- Конфиги — deepcopy. numpy: срез — вид, fancy и булева индексация — копия. pandas: .copy() или .loc. Лучшая модель — deepcopy, свежая — sklearn.base.clone.
+`;
+initLesson({topics:[["python.coll.3","sorted с key=, lambda"],["algo.sort.0","Merge sort и quick sort"],["algo.pat.1","Два указателя"],["python.err.0","try / except / else / finally"],["python.err.2","Контекстные менеджеры и with"],["python.err.5","logging вместо print"],["python.err.3","Файлы и pathlib"],["python.err.4","json и csv"],["python.coll.5","copy и deepcopy"]],md:MD});
+</script>
+<script src="/assets/asks.js" defer></script>
