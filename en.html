@@ -208,7 +208,7 @@ function weekHTML(w){
   const chip=now?'<span class="chip now">сейчас</span>':past?(k===ts.length?'<span class="chip ok">пройдена</span>':`<span class="chip late">хвосты: ${ts.length-k}</span>`):'<span class="chip">впереди</span>';
   const T=(P.tests||{})[String(w.n)];
   const card=(n,title)=>{const l=L.find(x=>x.n===n);return l&&l.ready?`<a class="lc" href="/lessons/${encodeURIComponent(l.file)}"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc(l.title||title)}</b><span class="m">${n===4&&T?`лучший результат ${T.best}% · попыток ${T.attempts}`:n===4?"пройти →":"открыть →"}</span></a>`
-    :`<div class="lc soon"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc(title)}</b><span class="m">скоро</span></div>`};
+    :`<div class="lc soon"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc((l&&l.title)||title)}</b><span class="m">${l&&l.focus?esc(l.focus):"скоро"}</span></div>`};
   return `<details class="wk${w.kind==="review"?" rev":""}${now?" now":""}" id="w-${w.n}"${now?" open":""}>
     <summary><span class="wnum">${w.n}</span><div><h3>${esc(w.title)} <span class="ru">— ${esc(w.ru)}</span></h3><div class="sub">${w.unit?"Empower A2 · юнит "+w.unit:"повторение"} · ${k} / ${ts.length} ${chip}</div></div><span class="dt">${esc(w.span)}<span class="chev" aria-hidden="true">›</span></span></summary>
     <div class="wbody">
