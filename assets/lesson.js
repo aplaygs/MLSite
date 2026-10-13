@@ -1,11 +1,14 @@
 /* Общий код уроков. Подключать обычным <script src="/assets/lesson.js"></script> ДО скрипта урока.
    Даёт: $, NS, f2, rng, gauss — мелочи; frame, grid, pathOf — графики в SVG;
-   initLesson({topics, md}) — верхняя навигация на localhost, галочки тем (карточки .topic-check и список #topics,
+   initLesson({topics, md}) (md можно не передавать, если в уроке есть <script type="text/markdown" id="md">) — верхняя навигация на localhost, галочки тем (карточки .topic-check и список #topics,
    синхронно с Obsidian через /api/tree) и кнопка «Скопировать конспект» (#bCopy). */
 const NS="http://www.w3.org/2000/svg";
 const $=id=>document.getElementById(id);
 const f2=v=>Math.abs(v)>=100?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
 const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+/* Уроки английского (/lessons/eNN-…) отмечают темы в плане английского, уроки ML — в дереве. */
+const TREE_API=/^\/lessons\/e\d/.test(location.pathname)?"/api/en/tree":"/api/tree";
+const MARK_HINT=TREE_API==="/api/tree"?"отметка в дереве":"отметка в плане";
 
 /* ---------- случайность с зерном: картинка одинаковая при каждом открытии ---------- */
 function rng(seed){let a=seed>>>0;return function(){a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -48,6 +51,7 @@ function draggable(svg,hit,onMove){
 /* ---------- галочки тем и конспект ---------- */
 function initLesson({topics,md}){
   const TOPICS=topics;
+  if(md===undefined&&$("md"))md=$("md").textContent.trim()+"\n";
   if(LOCAL&&$("topnav"))$("topnav").hidden=false;
   const box=$("topicList"),note=$("topicNote");
   if(box)box.innerHTML=TOPICS.map(([id,t])=>`<li><label class="tp"><input type="checkbox" id="tp-${id}" data-id="${id}" ${LOCAL?"":"disabled"}><span class="bx" aria-hidden="true"></span><span>${t}</span></label></li>`).join("");
@@ -68,7 +72,7 @@ function initLesson({topics,md}){
       const on=!!d[id];
       document.querySelectorAll(`input[data-id="${id}"]`).forEach(cb=>{cb.checked=on});
       const dt=on?fmt(d[id]):"";
-      document.querySelectorAll(`[data-d="${id}"]`).forEach(el=>{el.textContent=on?(dt?`✓ ${dt} в Obsidian`:"✓ в Obsidian"):"отметка в дереве"});
+      document.querySelectorAll(`[data-d="${id}"]`).forEach(el=>{el.textContent=on?(dt?`✓ ${dt} в Obsidian`:"✓ в Obsidian"):MARK_HINT});
     });
     document.querySelectorAll(".topic-check").forEach(card=>{
       const ids=(card.dataset.for||"").split(",").map(s=>s.trim()).filter(Boolean);
@@ -78,14 +82,14 @@ function initLesson({topics,md}){
       if(h)h.textContent=all?"✓ все темы пройдены":(cnt?`${cnt} из ${ids.length} пройдено`:"");
     });
   }
-  fetch("/api/tree").then(r=>r.json()).then(j=>apply(j.done||{})).catch(()=>{if(note)note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
+  fetch(TREE_API).then(r=>r.json()).then(j=>apply(j.done||{})).catch(()=>{if(note)note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
   document.addEventListener("change",async e=>{
     const cb=e.target;
     if(!cb||!cb.matches("input[data-id]"))return;
     const id=cb.dataset.id, checked=cb.checked;
     document.querySelectorAll(`input[data-id="${id}"]`).forEach(c=>{c.checked=checked});
     try{
-      const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(checked?{set:{[id]:day()}}:{unset:[id]})});
+      const r=await fetch(TREE_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(checked?{set:{[id]:day()}}:{unset:[id]})});
       if(!r.ok)throw 0;
       apply((await r.json()).done||{});
       if(note)note.textContent="Сохранено в файле недели в Obsidian";

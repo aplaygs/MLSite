@@ -4,11 +4,19 @@
      type "one"  — один ответ, ans — индекс верного варианта;
           "many" — несколько, ans — массив индексов (засчитывается полностью только точный набор, частично — доля);
           "num"  — число, ans — число, tol — допуск;
-          "open" — ответ своими словами: после ответа показывается эталон (model) и пункты (points), их отмечаешь сам.
+          "open" — ответ своими словами: после ответа показывается эталон (model) и пункты (points), их отмечаешь сам;
+          "text" — впечатать слово или фразу (английский): ans — массив верных вариантов, регистр, ’ и точка в конце не важны.
+   say: "фраза" — у вопроса кнопка 🔊, фразу читает голос браузера (аудирование в английском).
+   section: "en" — тест раздела English: свой ключ в браузере и свои результаты (/api/en/tests). howto — свой текст «Как проходить».
    Порядок вариантов перемешивается на каждой попытке. Прогресс хранится в браузере, итог — на сервере (/api/tests). */
 function initQuiz(cfg) {
   const root = document.getElementById("qz"), Q = cfg.questions, N = Q.length;
-  const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname), KEY = "quiz-w" + cfg.week;
+  const LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname), EN = cfg.section === "en";
+  const KEY = (EN ? "quiz-en-w" : "quiz-w") + cfg.week, API = EN ? "/api/en/tests" : "/api/tests";
+  const norm = s => String(s).toLowerCase().replace(/[’‘`´]/g, "'").replace(/[.!?,;:]+$/g, "").replace(/\s+/g, " ").trim();
+  const speak = t => { if (typeof say === "function") return say(t); /* en.js подключён — его голос */ try { const u = new SpeechSynthesisUtterance(t), v = speechSynthesis.getVoices();
+    u.voice = v.find(x => x.lang === "en-GB") || v.find(x => /Samantha|Karen|Daniel/.test(x.name)) || null; u.lang = "en-GB"; u.rate = 0.92;
+    speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
   const LET = "ABCDEFGH";
   let S = null;  /* {list: [индексы вопросов], i, res: {qi: {score, pick}}, order: {qi: [перестановка]}, retry} */
@@ -41,12 +49,12 @@ function initQuiz(cfg) {
       <p class="muted" style="max-width:66ch">${cfg.intro}</p>
       <div class="qz-meta"><span>${N} ${plural(N, "вопрос", "вопроса", "вопросов")}</span><span>~${cfg.minutes} минут</span><span>без подсказок и без ИИ</span></div>
       <div class="qz-lessons">${cfg.lessons.map(l => `<a href="/lessons/${l.file}"><span class="n">Урок ${cfg.week}.${l.n} · ${Q.filter(q => q.lesson === l.n).length} ${plural(Q.filter(q => q.lesson === l.n).length, "вопрос", "вопроса", "вопросов")}</span><b>${esc(l.title)}</b><span class="c">${esc(l.cover)}</span></a>`).join("")}</div>
-      <div class="callout feel"><b class="h">Как проходить</b><p>Отвечай по памяти, как на собеседовании: не открывай уроки, пока не увидишь итог. В открытых вопросах сначала напиши или проговори свой ответ, потом сверяйся с эталоном и честно отмечай, что назвал. После каждого ответа — короткий разбор и ссылка на место в уроке. Клавиши: <code>1</code>–<code>5</code> — выбрать вариант, <code>Enter</code> — проверить и дальше.</p></div>
+      <div class="callout feel"><b class="h">Как проходить</b><p>${cfg.howto || `Отвечай по памяти, как на собеседовании: не открывай уроки, пока не увидишь итог. В открытых вопросах сначала напиши или проговори свой ответ, потом сверяйся с эталоном и честно отмечай, что назвал. После каждого ответа — короткий разбор и ссылка на место в уроке. Клавиши: <code>1</code>–<code>5</code> — выбрать вариант, <code>Enter</code> — проверить и дальше.`}</p></div>
       <div class="qz-start"><button class="qz-btn" id="qzGo">${can ? "Начать заново" : "Начать тест"}</button>${can ? `<button class="qz-btn ghost" id="qzCont">Продолжить с вопроса ${Object.keys(saved.res).length + 1}</button>` : ""}<span class="qz-hist" id="qzHist"></span></div>
     </div>`;
     document.getElementById("qzGo").onclick = () => start([...Array(N).keys()]);
     if (can) document.getElementById("qzCont").onclick = () => { S = saved; S.i = Object.keys(S.res).length; renderQ(); top(); };
-    if (LOCAL) fetch("/api/tests").then(r => r.json()).then(j => {
+    if (LOCAL) fetch(API).then(r => r.json()).then(j => {
       const h = (j.history || []).filter(r => r.week === cfg.week);
       if (h.length) document.getElementById("qzHist").textContent = `Попыток: ${h.length} · лучший результат ${Math.max(...h.map(r => r.score))}% · последний ${h[h.length - 1].score}%`;
     }).catch(() => {});
@@ -63,13 +71,16 @@ function initQuiz(cfg) {
         ${q.type === "many" ? `<p class="qz-hint">Верных вариантов может быть несколько.</p>` : ""}`;
     } else if (q.type === "num") {
       body = `<div class="qz-num"><input id="qzNum" type="text" inputmode="decimal" autocomplete="off" aria-label="Ответ числом" placeholder="число">${q.unit ? `<span class="muted">${esc(q.unit)}</span>` : ""}</div>`;
+    } else if (q.type === "text") {
+      body = `<div class="qz-num qz-text"><input id="qzNum" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="впиши ответ"></div>`;
     } else if (q.type === "open") {
       body = `<div class="qz-open"><textarea id="qzOpen" placeholder="Ответь своими словами — можно коротко, по пунктам. Или проговори вслух и нажми «Сверить»."></textarea></div><div id="qzPoints"></div>`;
     }
     root.innerHTML = `<div class="qz-top"><div class="qz-row"><span>Вопрос ${S.i + 1} из ${S.list.length}${S.retry ? " · работа над ошибками" : ""}</span><span>${Object.keys(S.res).length} ${plural(Object.keys(S.res).length, "ответ", "ответа", "ответов")}</span></div><div class="qz-dots" style="--n:${S.list.length}">${dots}</div></div>
       <div class="qz-card">
-        <div class="qz-tag"><span>Урок ${cfg.week}.${l.n}</span><span class="k">${esc(q.refTitle)}</span><span>${{one: "один ответ", many: "несколько ответов", num: "числом", open: "своими словами"}[q.type]}</span></div>
+        <div class="qz-tag"><span>Урок ${cfg.week}.${l.n}</span><span class="k">${esc(q.refTitle)}</span><span>${{one: "один ответ", many: "несколько ответов", num: "числом", open: "своими словами", text: "впиши ответ"}[q.type]}</span></div>
         <div class="qz-q">${q.q}</div>
+        ${q.say ? `<button class="qz-say" id="qzSay" type="button">🔊 Послушать</button>` : ""}
         ${q.code ? `<pre>${esc(q.code)}</pre>` : ""}
         ${body}
         <div id="qzRes"></div>
@@ -83,6 +94,7 @@ function initQuiz(cfg) {
       act.disabled = !root.querySelector('.qz-opt[aria-pressed="true"]');
     });
     act.onclick = () => (S.res[qi] ? next() : check());
+    if (q.say) { document.getElementById("qzSay").onclick = () => speak(q.say); if (!done) setTimeout(() => speak(q.say), 250); }
     if (done) showResult(true);
     const inp = document.getElementById("qzNum"); if (inp && !done) inp.focus();
   }
@@ -99,6 +111,10 @@ function initQuiz(cfg) {
       const v = parseFloat(String(document.getElementById("qzNum").value).replace(",", ".").replace(/\s/g, ""));
       if (!isFinite(v)) { document.getElementById("qzNum").focus(); return; }
       pick = v; score = Math.abs(v - q.ans) <= (q.tol || 1e-9) ? 1 : 0;
+    } else if (q.type === "text") {
+      const v = document.getElementById("qzNum").value;
+      if (!v.trim()) { document.getElementById("qzNum").focus(); return; }
+      pick = v; score = [].concat(q.ans).some(a => norm(a) === norm(v)) ? 1 : 0;
     } else if (q.type === "open") {
       pick = document.getElementById("qzOpen").value;
       S.res[qi] = {score: 0, pick, pending: true}; showResult(false); return;
@@ -117,7 +133,7 @@ function initQuiz(cfg) {
         b.disabled = true; b.setAttribute("aria-pressed", picked);
         if (ans.includes(o)) b.classList.add(picked ? "right" : "missed"); else if (picked) b.classList.add("wrong"); });
     }
-    if (q.type === "num") { const i = document.getElementById("qzNum"); i.value = r.pick; i.disabled = true; i.classList.add(r.score ? "right" : "wrong"); }
+    if (q.type === "num" || q.type === "text") { const i = document.getElementById("qzNum"); i.value = r.pick; i.disabled = true; i.classList.add(r.score ? "right" : "wrong"); }
     if (q.type === "open") {
       const t = document.getElementById("qzOpen"); t.value = r.pick || ""; t.disabled = true;
       const pts = document.getElementById("qzPoints");
@@ -137,7 +153,7 @@ function initQuiz(cfg) {
     }
     const sc = r.score, cls = sc >= 0.999 ? "ok" : sc > 0 ? "half" : "bad";
     const head = q.type === "open" ? `Засчитано ${Math.round(sc * 100)}%` : sc >= 0.999 ? "Верно" : sc > 0 ? "Частично" : "Неверно";
-    const right = q.type === "num" ? ` Правильный ответ: <b>${q.ans}</b>${q.unit ? " " + esc(q.unit) : ""}.` : "";
+    const right = q.type === "text" && sc < 0.999 ? ` Правильно: <b>${esc([].concat(q.ans)[0])}</b>.` : q.type === "num" ? ` Правильный ответ: <b>${q.ans}</b>${q.unit ? " " + esc(q.unit) : ""}.` : "";
     box.innerHTML = `<div class="qz-res ${cls}"><b class="h">${head}</b><p>${q.explain || ""}${right}</p>${sc < 0.999 ? link : ""}</div>`;
     act.disabled = false; act.textContent = S.i < S.list.length - 1 ? "Дальше →" : "К итогам →";
     act.onclick = next;
@@ -185,7 +201,7 @@ function initQuiz(cfg) {
     };
     if (!S.retry) {
       store.del();
-      if (LOCAL) fetch("/api/tests", {method: "POST", headers: {"Content-Type": "application/json"},
+      if (LOCAL) fetch(API, {method: "POST", headers: {"Content-Type": "application/json"},
         body: JSON.stringify({week: cfg.week, score: pct, right: Math.round(total * 10) / 10, total: list.length, weak: weakTopics,
           by_lesson: Object.fromEntries(byL.map(x => [x.l.n, x.pct]))})})
         .then(r => r.json()).then(j => { document.getElementById("qzSaved").textContent = `Сохранено · лучший результат недели ${j.summary.best}%`; })

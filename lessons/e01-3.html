@@ -1,0 +1,428 @@
+<title>Урок 1.3 · Живой английский</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/en.css">
+<style>
+/* Только для этого урока: алфавит по звукам, правка заглавных, проверка профиля. */
+.abc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.abc div{background:var(--bg);border-radius:12px;padding:10px 12px;display:grid;gap:6px}
+.abc b{font:500 12px var(--f-mono);color:var(--muted)}
+.abc .ls{display:flex;flex-wrap:wrap;gap:4px}
+.abc .ls button{font:600 17px var(--f-display);width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.abc .ls button:hover{border-color:var(--accent);background:var(--accent-soft)}
+.abc .ls button.trap{background:var(--sun-soft);border-color:var(--sun)}
+.cap{line-height:2.1;font-size:17px;background:var(--bg);border-radius:12px;padding:12px 14px}
+.cap button{font:inherit;color:var(--ink);background:none;border:0;padding:0 2px;border-radius:5px;cursor:pointer}
+.cap button:hover{background:var(--accent-soft)}
+.cap button.ch{color:var(--accent);font-weight:600}
+.cap button.ok{background:var(--accent-soft)}
+.cap button.miss{background:var(--sun);color:var(--sun-ink)}
+.cap button.bad{background:color-mix(in srgb,var(--red) 18%,transparent);text-decoration:line-through}
+.pf{display:grid;gap:10px}
+.pf textarea{width:100%;min-height:150px;font:16px/1.55 var(--f-body);padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.pf textarea:focus{outline:none;border-color:var(--accent)}
+.pf ul{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14.5px}
+.pf li.good{color:var(--accent)} .pf li.warn{color:var(--sun-ink)}
+</style>
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e01-2.html">← Урок 2 · Вопросы, люди и звуки</a><span class="mid">урок 3 из 3</span><a href="/lessons/e01-test.html">Тест недели 1 →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 1 · People · урок 3 из 3 · 3 темы · ~60 минут</div>
+  <h1>Живой английский</h1>
+  <p>То, что нужно в первый же день в другой стране или на созвоне: продиктовать фамилию и почту, записать телефон, переспросить, если не понял. Потом — профиль о себе без ошибок в заглавных буквах. И повторение be во всех формах: эту неделю он должен «щёлкать» сам.</p>
+  <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Алфавит и «повторите»</a><a href="#t2">Профиль</a><a href="#t3">be: всё вместе</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 3 · Речь</div>
+  <h2>Спросить и дать информацию, переспросить</h2>
+  <p class="tldr">Имена, почту и адреса в английском диктуют <b>по буквам</b> — это нормально и вежливо. Для этого нужен алфавит «на слух» и пять фраз, чтобы переспросить. Без них ты либо молчишь, либо записываешь неправильно.</p>
+
+  <h3 style="font-size:17px">Алфавит по звукам</h3>
+  <p class="prose">Буквы удобно учить группами — внутри группы одинаковый гласный звук. Нажми на букву, чтобы послушать. Подсвеченные — те, что русскоговорящие путают.</p>
+  <div class="abc" id="abc"></div>
+  <div class="callout ru"><b class="h">Пары, которые путают</b><p><b>E</b> «ии» и <b>I</b> «ай» · <b>G</b> «джи» и <b>J</b> «джей» · <b>A</b> «эй» и <b>R</b> «аа» · <b>H</b> «эйч», а не «аш» · <b>W</b> «дабл ю» · <b>Y</b> «уай» · <b>Z</b> «зед» в Британии и «зи» в Америке.</p></div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Знак или случай</th><th>Как сказать</th></tr></thead>
+    <tbody>
+      <tr><td>@</td><td><span class="say">at</span> — <span class="say">vlad at gmail dot com</span></td></tr>
+      <tr><td>.</td><td><span class="say">dot</span></td></tr>
+      <tr><td>- и _</td><td><span class="say">dash</span> (или <span class="say">hyphen</span>), <span class="say">underscore</span></td></tr>
+      <tr><td>две одинаковые буквы</td><td><span class="say">double L</span>, <span class="say">double S</span></td></tr>
+      <tr><td>0 в телефоне</td><td><span class="say">oh</span> (в Британии) или <span class="say">zero</span></td></tr>
+      <tr><td>две одинаковые цифры</td><td><span class="say">double seven</span> — 77</td></tr>
+    </tbody></table></div>
+  <div class="prose"><p>Телефон диктуют <b>по одной цифре</b>, делая паузы между группами: <span class="say">oh seven nine, double four, six one, two eight</span>. Число «семьдесят семь» в номере не говорят.</p></div>
+
+  <h3 style="font-size:17px">Фразы, чтобы спросить и переспросить</h3>
+  <div class="dlg">
+    <div class="dl"><span class="who">?</span><span class="tx"><span class="say">What's your surname?</span><span class="ru">Какая у тебя фамилия?</span></span></div>
+    <div class="dl"><span class="who">?</span><span class="tx"><span class="say">How do you spell that?</span><span class="ru">Как это пишется (по буквам)?</span></span></div>
+    <div class="dl"><span class="who">?</span><span class="tx"><span class="say">Can you spell that, please?</span><span class="ru">Продиктуй по буквам, пожалуйста.</span></span></div>
+    <div class="dl"><span class="who">?</span><span class="tx"><span class="say">Sorry, can you say that again?</span><span class="ru">Извини, можешь повторить?</span></span></div>
+    <div class="dl"><span class="who">?</span><span class="tx"><span class="say">Could you speak more slowly, please?</span><span class="ru">Можно помедленнее?</span></span></div>
+    <div class="dl"><span class="who">?</span><span class="tx"><span class="say">Is that with one L or two?</span><span class="ru">Это с одной L или с двумя?</span></span></div>
+    <div class="dl"><span class="who">?</span><span class="tx"><span class="say">What's your email address?</span> <span class="say">What's your phone number?</span><span class="ru">Какая у тебя почта? Какой номер телефона?</span></span></div>
+  </div>
+  <div class="callout trap"><b class="h">Вежливость</b><p>Короткое <span class="say">What?</span> в ответ звучит грубо. Говори <span class="say">Sorry?</span> с интонацией вверх или <span class="say">Sorry, can you say that again?</span> Слово <span class="say">please</span> в просьбе — обязательно: без него английская просьба звучит как приказ.</p></div>
+
+  <div class="ex" id="ex1a"><div class="ex-h"><span class="eyebrow">Упражнение 1 · какая группа</span><p>Буква прозвучит. Выбери её звук.</p></div></div>
+  <div class="ex" id="ex1b"><div class="ex-h"><span class="eyebrow">Упражнение 2 · диктант</span><p>Нажми 🔊 и запиши, что продиктовали. Телефон — цифрами без пробелов. Не успел — нажми ещё раз сразу: прозвучит медленнее.</p></div></div>
+  <div class="ex" id="ex1c"><div class="ex-h"><span class="eyebrow">Упражнение 3 · что сказать</span><p>Выбери фразу для ситуации.</p></div></div>
+
+  <div class="topic-check" data-for="en.01.3.1">
+    <label class="tp"><input type="checkbox" data-id="en.01.3.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>спросить и дать информацию, переспросить</b></span></label>
+    <span class="note" data-d="en.01.3.1">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 3 · Письмо</div>
+  <h2>Онлайн-профиль: заглавные буквы и пунктуация</h2>
+  <p class="tldr">В английском заглавных букв больше, чем в русском: <b>I</b> («я»), национальности, языки, дни недели и месяцы — всегда с большой. Ошибка в них сразу выдаёт новичка — в профиле, в резюме, в письме.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>С большой буквы</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td><b>I</b> — «я», в любом месте</td><td><span class="say">My friend and I are students.</span></td></tr>
+      <tr><td>Имена, города, страны</td><td><span class="say">Vlad, Moscow, Russia</span></td></tr>
+      <tr><td>Национальности и языки</td><td><span class="say">I'm Russian. I speak English.</span></td></tr>
+      <tr><td>Дни и месяцы</td><td><span class="say">on Monday, in June</span></td></tr>
+      <tr><td>Компании, университеты</td><td><span class="say">Moscow State University, Google</span></td></tr>
+      <tr><td>Первое слово предложения</td><td><span class="say">Hi! My name is Vlad.</span></td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <p><b>С маленькой:</b> профессии (<span class="say">I'm a student</span>), времена года (<span class="say">in summer</span>), предметы кроме языков (<span class="say">maths</span>, но <span class="say">English</span>).</p>
+    <p><b>Пунктуация:</b> точка в конце, вопросительный знак у вопроса, апостроф в <span class="say">I'm</span> и <span class="say">Vlad's</span>. В перечислении запятые, перед последним <b>and</b> запятую в британском обычно не ставят: <span class="say">music, books and travel</span>. Соединяй мысли словами <b>and</b> (и) и <b>but</b> (но): <span class="say">I'm from Russia, but I live in Kazakhstan.</span></p>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · исправь заглавные</span><span class="muted mono" id="capState"></span></div>
+    <p class="muted" style="font-size:14px">Профиль написан без заглавных. Нажимай на слова, которые должны начинаться с большой буквы, — нажатие меняет регистр. Потом «Проверить».</p>
+    <div class="cap" id="cap"></div>
+    <div class="btns"><button class="btn" type="button" id="capCheck">Проверить</button><button class="btn" type="button" id="capReset">Заново</button><span class="muted" id="capMsg" style="font-size:14px"></span></div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Твой профиль · проверка на лету</span><span class="muted mono" id="pfState"></span></div>
+    <div class="pf">
+      <p class="muted" style="font-size:14px">Напиши о себе 5–7 предложений, как в профиле на сайте или в чате курса: имя, откуда, национальность, языки, кто ты, что любишь. Проверка подскажет ошибки в заглавных и пунктуации — но не в грамматике, её проверь сам по шпаргалке.</p>
+      <textarea id="pfIn" spellcheck="false" placeholder="Hi! My name is …"></textarea>
+      <ul id="pfOut"></ul>
+      <div class="btns"><button class="btn" type="button" id="pfCopy">Скопировать в Obsidian</button><span class="muted" id="pfMsg" style="font-size:13.5px"></span></div>
+    </div>
+  </div>
+
+  <div class="ex" id="ex2a"><div class="ex-h"><span class="eyebrow">Упражнение 4 · большая или маленькая</span><p>Впиши слово так, как его пишут в предложении.</p></div></div>
+
+  <div class="topic-check" data-for="en.01.3.2">
+    <label class="tp"><input type="checkbox" data-id="en.01.3.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>онлайн-профиль: заглавные буквы и пунктуация</b></span></label>
+    <span class="note" data-d="en.01.3.2">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 3 · Повторение</div>
+  <h2>Повторение: be во всех формах</h2>
+  <p class="tldr">Вся неделя в одной таблице. Если можешь заполнить её по памяти и быстро сказать любую клетку вслух — be усвоен.</p>
+  <div class="tbl"><table class="forms">
+    <thead><tr><th>Кто</th><th>+</th><th>−</th><th>?</th></tr></thead>
+    <tbody>
+      <tr><td><b>I</b></td><td><span class="say">I'm</span></td><td><span class="say">I'm not</span></td><td><span class="say">Am I…?</span></td></tr>
+      <tr><td><b>you / we / they</b></td><td><span class="say">you're</span></td><td><span class="say">you aren't</span></td><td><span class="say">Are you…?</span></td></tr>
+      <tr><td><b>he / she / it</b></td><td><span class="say">she's</span></td><td><span class="say">she isn't</span></td><td><span class="say">Is she…?</span></td></tr>
+      <tr><td><b>вопрос со словом</b></td><td colspan="3"><span class="say">Where are you from?</span> <span class="say">How old is he?</span> <span class="say">What's your name?</span></td></tr>
+    </tbody></table></div>
+
+  <div class="ex" id="ex3a"><div class="ex-h"><span class="eyebrow">Упражнение 5 · смешанное</span><p>Впиши форму be: утверждение, отрицание или вопрос — по смыслу. Enter — дальше.</p></div></div>
+  <div class="ex" id="ex3b"><div class="ex-h"><span class="eyebrow">Упражнение 6 · диалог</span><p>Знакомство на курсе. Выбери реплику.</p></div></div>
+  <div class="ex" id="ex3c"><div class="ex-h"><span class="eyebrow">Упражнение 7 · переведи</span><p>Собери фразу.</p></div></div>
+  <div class="ex" id="ex3d"><div class="ex-h"><span class="eyebrow">Упражнение 8 · ошибки недели</span><p>Самые частые ошибки недели 1. Нажми на неправильное слово.</p></div></div>
+
+  <div class="topic-check" data-for="en.01.3.3">
+    <label class="tp"><input type="checkbox" data-id="en.01.3.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>повторение: be во всех формах</b></span></label>
+    <span class="note" data-d="en.01.3.3">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · ролевая игра</div>
+  <h2>Практика</h2>
+  <p class="tldr">Сцена: регистрация на курс по телефону. Сначала послушай диалог целиком, потом закрой реплики B и говори их сам.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Диалог · регистрация</span><span class="btns"><button class="btn" type="button" id="dlgPlay">▶ Весь диалог</button><button class="btn" type="button" id="dlgHide" aria-pressed="false">Скрыть реплики B</button></span></div>
+    <div class="dlg" id="dlg"></div>
+  </div>
+  <div class="prac">
+    <div class="task"><span class="tg work">Говорить · 5 минут</span>
+      <h3>Продиктуй свои данные</h3>
+      <p>Вслух, по буквам: имя, фамилию, почту и телефон — как в диалоге. Запиши себя на диктофон и послушай: понятно ли, где кончается одна группа цифр и начинается другая.</p>
+    </div>
+    <div class="task"><span class="tg rev">Писать · 10 минут</span>
+      <h3>Профиль в Obsidian</h3>
+      <p>Допиши профиль в лаборатории выше до 6–7 предложений, чтобы проверка не нашла ошибок. Скопируй его в свою заметку — через месяц перепишешь на уровне выше и сравнишь.</p>
+    </div>
+  </div>
+  <div class="callout mem"><b class="h">Дальше</b><p>После урока — <a href="/lessons/e01-test.html">тест недели 1</a>: 24 вопроса по трём урокам, с аудированием. А слова недели — в <a href="/words">тренажёр</a>, 10–15 минут в день.</p></div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в плане</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда сделал упражнения темы без ошибок или с одной. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Алфавит группами:</b> A H J K · B C D E G P T V · F L M N S X Z · I Y · O · Q U W · R. Путают: E/I, G/J, A/R.</li>
+      <li><b>Почта:</b> @ — <span class="say">at</span>, . — <span class="say">dot</span>, - — <span class="say">dash</span>, _ — <span class="say">underscore</span>. Двойные буквы — <span class="say">double L</span>.</li>
+      <li><b>Телефон</b> — по одной цифре, 0 — <span class="say">oh</span>, 77 — <span class="say">double seven</span>.</li>
+      <li><b>Переспросить:</b> <span class="say">Sorry, can you say that again?</span> <span class="say">How do you spell that?</span> <span class="say">Could you speak more slowly, please?</span></li>
+      <li><b>С большой:</b> I, имена, страны, национальности и языки, дни и месяцы. С маленькой — профессии, времена года.</li>
+      <li><b>and</b> — и, <b>but</b> — но; перед последним and в списке запятую обычно не ставят.</li>
+      <li><b>be:</b> I'm / I'm not / Am I? · you're / aren't / Are you? · she's / isn't / Is she?</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+    <p class="muted" style="font-size:13.5px">Конспект этого урока уже лежит в Obsidian: <code>65_Английский/Уроки</code>.</p>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b>
+    <p>Закрой урок. Продиктуй вслух по буквам имя, фамилию, почту и телефон. Напиши по памяти таблицу be (+, −, ?) и пять фраз, чтобы переспросить. Перепиши с правильными заглавными: «my friend and i are from kazan. we speak russian and tatar.»</p>
+  </div>
+  <p><a class="btn" href="/lessons/e01-test.html" style="text-decoration:none">Дальше: тест недели 1 →</a></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+# 🇬🇧 Урок 1.3 · Живой английский
+
+## Спросить и дать информацию, переспросить
+Алфавит по звукам (в группе — один гласный):
+- /eɪ/ «эй»: A H J K
+- /iː/ «ии»: B C D E G P T V
+- /e/ «э»: F L M N S X Z («зед»)
+- /aɪ/ «ай»: I Y
+- /əʊ/ «оу»: O
+- /uː/ «юу»: Q U W
+- /ɑː/ «аа»: R
+
+Путают: E «ии» и I «ай», G «джи» и J «джей», A «эй» и R «аа», H «эйч», W «дабл ю», Y «уай».
+
+- Почта: @ — *at*, . — *dot*, - — *dash*, _ — *underscore*. Две буквы — *double L*.
+- Телефон — по одной цифре, 0 — *oh* или *zero*, 77 — *double seven*.
+
+Фразы:
+- *What's your surname? How do you spell that? Can you spell that, please?*
+- *Sorry, can you say that again? Could you speak more slowly, please?*
+- *Is that with one L or two? What's your email address? What's your phone number?*
+- Не говори просто *What?* — лучше *Sorry?* Просьба — с *please*.
+
+## Онлайн-профиль: заглавные и пунктуация
+С большой буквы: **I** (в любом месте), имена, города, страны, национальности и языки, дни и месяцы, компании и университеты, первое слово.
+С маленькой: профессии (*a student*), времена года (*summer*), предметы кроме языков (*maths*, но *English*).
+- В списке перед последним *and* запятую обычно не ставят: *music, books and travel*.
+- Связки: *and* — и, *but* — но.
+
+## be во всех формах
+| Кто | + | − | ? |
+| :--- | :--- | :--- | :--- |
+| I | I'm | I'm not | Am I…? |
+| you / we / they | you're | you aren't | Are you…? |
+| he / she / it | she's | she isn't | Is she…? |
+
+Вопрос со словом: *Where are you from? How old is he? What's your name?*
+
+## Проверь себя
+> [!question]- Продиктуй по-английски: anna.lee@mail.ru
+> *anna dot lee at mail dot ru*
+
+> [!question]- Как попросить повторить и продиктовать по буквам?
+> *Sorry, can you say that again? Can you spell that, please?*
+
+> [!question]- Исправь: «my friend and i are from kazan. we speak russian and tatar.»
+> *My friend and I are from Kazan. We speak Russian and Tatar.*
+
+> [!question]- Сделай отрицание и вопрос: «They're British»
+> *They aren't British. Are they British?*
+</script>
+
+<script src="/assets/lesson.js"></script>
+<script src="/assets/en.js"></script>
+<script>
+/* ---------- тема 1: алфавит по группам ---------- */
+(function abc(){
+  const G=[["/eɪ/ «эй»","AHJK"],["/iː/ «ии»","BCDEGPTV"],["/e/ «э»","FLMNSXZ"],["/aɪ/ «ай»","IY"],["/əʊ/ «оу»","O"],["/uː/ «юу»","QUW"],["/ɑː/ «аа»","R"]];
+  const TRAP="EIGJARHWYZ";
+  $("abc").innerHTML=G.map(([k,ls])=>`<div><b>${k}</b><span class="ls">${[...ls].map(l=>`<button type="button" class="${TRAP.includes(l)?"trap":""}" data-say="${l}." aria-label="Буква ${l}">${l}</button>`).join("")}</span></div>`).join("");
+})();
+
+/* ---------- тема 2: заглавные буквы ---------- */
+(function capLab(){
+  const TEXT="Hi! My name is Vlad and I'm from Moscow in Russia. I'm Russian and I speak Russian and a little English. I'm a student at a university in Moscow. I love machine learning, music and travelling. My birthday is in June. I'm free on Saturdays and Sundays.";
+  const W=TEXT.split(" ");
+  let cur;
+  const low=w=>w.toLowerCase();
+  const isCap=w=>/^[A-Z]/.test(w);
+  function draw(){cur=W.map(low);paint();$("capMsg").textContent="";$("capState").textContent=`нужно исправить ${W.filter(isCap).length}`}
+  function paint(res){
+    $("cap").innerHTML=cur.map((w,i)=>`<button type="button" data-i="${i}" class="${w!==low(W[i])?"ch":""} ${res?res[i]:""}">${w}</button>`).join(" ");
+  }
+  $("cap").onclick=e=>{const b=e.target.closest("button");if(!b)return;const i=+b.dataset.i,w=cur[i];
+    cur[i]=isCap(w)?low(w):w.replace(/^([^a-z]*)([a-z])/,(m,p,c)=>p+c.toUpperCase());paint()};
+  $("capCheck").onclick=()=>{
+    const res=W.map((w,i)=>cur[i]===w?(isCap(w)?"ok":""):(isCap(w)?"miss":"bad"));
+    paint(res);
+    const need=W.filter(isCap).length, got=W.filter((w,i)=>isCap(w)&&cur[i]===w).length, extra=W.filter((w,i)=>!isCap(w)&&cur[i]!==low(w)).length;
+    $("capMsg").textContent=got===need&&!extra?"✓ Всё верно!":`Исправлено ${got} из ${need}${extra?`, лишних заглавных: ${extra}`:""}. Жёлтые — пропущены, красные — лишние.`;
+  };
+  $("capReset").onclick=draw;
+  draw();
+})();
+
+/* ---------- тема 2: проверка профиля ---------- */
+(function profile(){
+  const PROPER=["russia","russian","moscow","english","england","britain","british","spain","spanish","italy","italian","germany","german","france","french","china","chinese","japan","japanese","kazan","tatar","america","american","usa","uk","london",
+    "monday","tuesday","wednesday","thursday","friday","saturday","sunday","january","february","march","april","may","june","july","august","september","october","november","december","vlad","google","yandex"];
+  const MAY_LOW=["may","march"];  /* may — «могу», march — «марш»: подсказываем мягко */
+  function check(){
+    const t=$("pfIn").value, out=[];
+    const words=(t.match(/[A-Za-z']+/g)||[]);
+    if(!t.trim()){$("pfOut").innerHTML="";$("pfState").textContent="";return}
+    if(/(^|[^A-Za-z'])i('m|'ve|'ll|'d)?(?![A-Za-z])/.test(t))out.push(["bad","«i» с маленькой — «я» всегда пишется I (и I'm)."]);
+    const low=[...new Set(words.filter(w=>PROPER.includes(w.toLowerCase())&&/^[a-z]/.test(w)).map(w=>w.toLowerCase()))];
+    const soft=low.filter(w=>MAY_LOW.includes(w)), hard=low.filter(w=>!MAY_LOW.includes(w));
+    if(hard.length)out.push(["bad",`С большой буквы: ${hard.map(w=>w[0].toUpperCase()+w.slice(1)).join(", ")}.`]);
+    if(soft.length)out.push(["warn",`Если это месяц — ${soft.map(w=>w[0].toUpperCase()+w.slice(1)).join(", ")} с большой.`]);
+    const sents=t.split(/(?<=[.!?])\s+/).filter(s=>s.trim());
+    const lowStart=sents.filter(s=>/^[a-z]/.test(s.trim()));
+    if(lowStart.length)out.push(["bad",`Предложение с маленькой буквы: «${lowStart[0].trim().slice(0,30)}…»`]);
+    if(!/[.!?]\s*$/.test(t))out.push(["warn","В конце нет точки."]);
+    if(/\s[,.!?]/.test(t))out.push(["warn","Пробел перед знаком препинания — в английском его нет."]);
+    if(/\b(a|an) (student|engineer|developer|doctor)s\b/i.test(t))out.push(["bad","a/an с множественным числом — убери артикль."]);
+    if(/\bI from\b/.test(t))out.push(["bad","«I from» — нужен be: I'm from."]);
+    if(/\bI'm (agree|work|live|study|like|love)\b/.test(t))out.push(["bad","I'm + глагол — be не нужен: I work, I like."]);
+    if(!out.length)out.push(["good","Ошибок в заглавных и пунктуации не нашёл. Перечитай грамматику по шпаргалке."]);
+    $("pfOut").innerHTML=out.map(([c,m])=>`<li class="${c}">${m}</li>`).join("");
+    $("pfState").textContent=`${words.length} слов · ${sents.length} предл.`;
+  }
+  $("pfIn").addEventListener("input",check);
+  try{const d=localStorage.getItem("en-profile");if(d){$("pfIn").value=d;check()}}catch(e){}
+  $("pfIn").addEventListener("input",()=>{try{localStorage.setItem("en-profile",$("pfIn").value)}catch(e){}});
+  $("pfCopy").onclick=()=>{const d=new Date(),md=`### Профиль · ${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}\n\n${$("pfIn").value.trim()}\n`;
+    try{navigator.clipboard.writeText(md).then(()=>$("pfMsg").textContent="Скопировано — вставь в заметку",()=>prompt("Скопируй:",md))}catch(e){prompt("Скопируй:",md)}};
+})();
+
+/* ---------- практика: диалог ---------- */
+(function dialog(){
+  const D=[["A","Good morning, City Language School. How can I help?","Доброе утро, языковая школа. Чем могу помочь?"],
+    ["B","Hi, I'd like to book an English course, please.","Здравствуйте, я хотел бы записаться на курс английского."],
+    ["A","Sure. What's your name?","Конечно. Как вас зовут?"],["B","Vlad Sokolov.","Влад Соколов."],
+    ["A","Sorry, can you spell your surname, please?","Простите, продиктуйте фамилию по буквам."],["B","S-O-K-O-L-O-V.","С-О-К-О-Л-О-В."],
+    ["A","Thanks. Where are you from, Vlad?","Спасибо. Откуда вы, Влад?"],["B","I'm from Russia. I'm in London for three months.","Я из России. Я в Лондоне на три месяца."],
+    ["A","OK. And what's your phone number?","Хорошо. А какой у вас номер телефона?"],["B","It's oh seven nine, double four, six one, two eight.","07944 6128."],
+    ["A","Sorry, can you say that again?","Простите, можно ещё раз?"],["B","Oh seven nine, double four, six one, two eight.","07944 6128."],
+    ["A","Great. And your email address?","Отлично. И ваша почта?"],["B","It's vlad dot sokolov at gmail dot com.","vlad.sokolov@gmail.com"],
+    ["A","Thank you. See you on Monday!","Спасибо. До встречи в понедельник!"]];
+  const sayText=t=>t.replace("S-O-K-O-L-O-V","S, O, K, O, L, O, V");
+  $("dlg").innerHTML=D.map(([w,en,ru],i)=>`<div class="dl ${w==="B"?"b":""}" data-i="${i}"><span class="who">${w}</span><span class="tx"><span class="say" data-say="${sayText(en)}">${en}</span><span class="ru">${ru}</span></span></div>`).join("");
+  $("dlgHide").onclick=()=>{const on=$("dlgHide").getAttribute("aria-pressed")!=="true";$("dlgHide").setAttribute("aria-pressed",on);
+    document.querySelectorAll("#dlg .dl.b .say").forEach(s=>{s.style.filter=on?"blur(7px)":"";s.title=on?"Скажи сам, потом нажми — откроется":""})};
+  document.getElementById("dlg").addEventListener("click",e=>{const s=e.target.closest(".dl.b .say");if(s)s.style.filter=""});
+  let playing=false;
+  $("dlgPlay").onclick=()=>{
+    if(!("speechSynthesis" in window))return;
+    if(playing){speechSynthesis.cancel();playing=false;$("dlgPlay").textContent="▶ Весь диалог";return}
+    playing=true;$("dlgPlay").textContent="■ Стоп";
+    speechSynthesis.cancel();
+    D.forEach(([w,en],i)=>{const u=new SpeechSynthesisUtterance(sayText(en));if(EN_VOICE)u.voice=EN_VOICE;u.lang="en-GB";u.rate=w==="A"?0.95:0.85;u.pitch=w==="A"?1.1:0.9;
+      u.onstart=()=>document.querySelectorAll("#dlg .dl").forEach((d,k)=>d.querySelector(".tx").style.outline=k===i?"2px solid var(--accent)":"");
+      if(i===D.length-1)u.onend=()=>{playing=false;$("dlgPlay").textContent="▶ Весь диалог";document.querySelectorAll("#dlg .tx").forEach(t=>t.style.outline="")};
+      speechSynthesis.speak(u)});
+  };
+})();
+
+/* ---------- упражнения ---------- */
+exSort($("ex1a"),{groups:[{label:"«эй» A"},{label:"«ии» E"},{label:"«э» F"},{label:"«ай» I"},{label:"«юу» U"}],items:[
+  {w:"G",say:"G.",g:1},{w:"J",say:"J.",g:0},{w:"E",say:"E.",g:1},{w:"I",say:"I.",g:3},{w:"H",say:"H.",g:0},{w:"Y",say:"Y.",g:3},
+  {w:"W",say:"W.",g:4},{w:"K",say:"K.",g:0},{w:"V",say:"V.",g:1},{w:"X",say:"X.",g:2},{w:"Q",say:"Q.",g:4},{w:"M",say:"M.",g:2}
+]});
+exGap($("ex1b"),[
+  {s:"Фамилия: ___",say:"Smith. S, M, I, T, H.",a:"Smith"},
+  {s:"Фамилия: ___",say:"Jenkins. J, E, N, K, I, N, S.",a:"Jenkins"},
+  {s:"Имя: ___",say:"Phillip. P, H, I, double L, I, P.",a:"Phillip"},
+  {s:"Почта: ___",say:"anna dot lee at mail dot ru",a:["anna.lee@mail.ru"]},
+  {s:"Почта: ___",say:"k, underscore, white, at, gmail, dot, com",a:["k_white@gmail.com"]},
+  {s:"Телефон: ___",say:"oh, seven, nine, double four, six, one, two, eight",a:["079446128","07944 6128"]}
+]);
+exGap($("ex1c"),[
+  {s:"Ты не расслышал фамилию. — ___",opts:["Sorry, can you say that again?","What?","Repeat!"],a:"Sorry, can you say that again?"},
+  {s:"Нужно записать незнакомое имя. — ___",opts:["How do you spell that?","How do you write?","What is it letters?"],a:"How do you spell that?"},
+  {s:"Говорят слишком быстро. — ___",opts:["Could you speak more slowly, please?","Speak slow!","You speak fast."],a:"Could you speak more slowly, please?"},
+  {s:"Не уверен, одна L или две. — ___",opts:["Is that with one L or two?","How many L?","Is it one or two L's letters?"],a:"Is that with one L or two?"},
+  {s:"Попросить номер телефона. — ___",opts:["What's your phone number?","What is your phone?","How is your number?"],a:"What's your phone number?"}
+]);
+exGap($("ex2a"),[
+  {s:"I speak ___. (english)",a:"English",full:"I speak English.",exact:1},{s:"See you on ___. (monday)",a:"Monday",full:"See you on Monday.",exact:1},
+  {s:"She's an ___. (engineer)",a:"engineer",full:"She's an engineer.",why:"профессии — с маленькой",exact:1},{s:"My friend and ___ are students. (i)",a:"I",full:"My friend and I are students.",exact:1},
+  {s:"It's cold in ___. (winter)",a:"winter",full:"It's cold in winter.",why:"времена года — с маленькой",exact:1},{s:"He's ___. (italian)",a:"Italian",full:"He's Italian.",exact:1},
+  {s:"My birthday is in ___. (july)",a:"July",full:"My birthday is in July.",exact:1}
+]);
+exGap($("ex3a"),[
+  {s:"My name ___ Vlad. (+)",a:["is","'s"],full:"My name is Vlad."},
+  {s:"I ___ from London. (−)",a:["'m not","am not"],full:"I'm not from London."},
+  {s:"___ you a student? (?)",a:"Are",full:"Are you a student?"},
+  {s:"Where ___ your parents from?",a:"are",full:"Where are your parents from?"},
+  {s:"___ she married? — No, she isn't.",a:"Is",full:"Is she married? No, she isn't."},
+  {s:"They ___ at home. They're at work. (−)",a:["aren't","are not","'re not"],full:"They aren't at home. They're at work."},
+  {s:"How old ___ your brother?",a:"is",full:"How old is your brother?"},
+  {s:"Are you tired? — Yes, I ___.",a:"am",full:"Are you tired? Yes, I am."},
+  {s:"It ___ my phone. It's Anna's. (−)",a:["isn't","is not","'s not"],full:"It isn't my phone. It's Anna's."},
+  {s:"We ___ Russian. (+)",a:["are","'re"],full:"We are Russian."}
+]);
+exGap($("ex3b"),[
+  {s:"A: Hi! I'm Kate. — B: ___",opts:["Hi, Kate. I'm Vlad.","Hi, Kate. My name Vlad.","Hello, I Vlad."],a:"Hi, Kate. I'm Vlad."},
+  {s:"A: Nice to meet you. — B: ___",opts:["Nice to meet you too.","Me too nice.","Yes, I am."],a:"Nice to meet you too."},
+  {s:"A: ___ — B: I'm from Russia. And you?",opts:["Where are you from?","Where you from?","From where are you?"],a:"Where are you from?"},
+  {s:"A: I'm from Canada. Are you a student? — B: ___",opts:["Yes, I am.","Yes, I'm.","Yes, I student."],a:"Yes, I am."},
+  {s:"A: Is your English teacher British? — B: ___",opts:["No, she isn't. She's American.","No, she not. She American.","No, is not."],a:"No, she isn't. She's American."}
+]);
+exBuild($("ex3c"),[
+  {ru:"Мы не британцы, мы русские.",w:"We aren't British , we're Russian .",alt:["We're not British , we're Russian .","We are not British , we are Russian ."],extra:["british"]},
+  {ru:"Как зовут твою сестру?",w:"What's your sister's name ?",alt:["What is your sister's name ?"],extra:["How","sister"]},
+  {ru:"Сколько лет твоим друзьям?",w:"How old are your friends ?",extra:["is","many"]},
+  {ru:"Он инженер? — Нет.",w:"Is he an engineer ? No , he isn't .",alt:["Is he an engineer ? No , he's not ."],extra:["a"]}
+]);
+exSpot($("ex3d"),[
+  {s:"I from Russia.",bad:0,fix:"I'm",why:"нужен be"},
+  {s:"How many years are you?",bad:0,n:3,also:[1,2],fix:"How old",why:"возраст спрашивают через How old"},
+  {s:"She is engineer.",bad:2,fix:"an engineer.",why:"профессия — с a/an"},
+  {s:"Yes, I'm.",bad:1,fix:"I am.",why:"в «да» без сокращения"},
+  {s:"Where you are from?",bad:1,n:2,also:[2],fix:"are you",why:"после вопросительного слова — сразу be"},
+  {s:"My friends is from Kazan.",bad:2,fix:"are",why:"friends — много"},
+  {s:"i'm russian.",bad:0,n:2,also:[1],fix:"I'm Russian.",why:"I и национальность — с большой"},
+  {s:"Anna loves his job.",bad:2,fix:"her",why:"владелец — Анна"}
+]);
+
+initLesson({topics:[["en.01.3.1","Спросить и дать информацию, переспросить"],["en.01.3.2","Онлайн-профиль: заглавные буквы и пунктуация"],["en.01.3.3","Повторение: be во всех формах"]]});
+</script>

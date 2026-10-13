@@ -1,0 +1,109 @@
+<title>Тест недели 1 · English</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/en.css">
+<link rel="stylesheet" href="/assets/quiz.css">
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация"><a href="/lessons/e01-3.html">← Урок 1.3 · Живой английский</a><span class="mid">тест недели 1</span><a href="/en#w-1">Неделя 1 в плане →</a></nav>
+<main class="qz" id="qz" aria-live="polite"></main>
+</div>
+
+<script src="/assets/en.js"></script>
+<script src="/assets/quiz.js"></script>
+<script>
+initQuiz({
+  week: 1, minutes: 25, section: "en",
+  title: "Тест недели 1 · People",
+  intro: "24 вопроса по трём урокам: глагол be во всех формах, my / his / her, a / an и множественное число, страны и национальности, вопросы со словами, прилагательные, ударение и звуки, алфавит и заглавные буквы. Есть задания на слух — включи звук.",
+  howto: "Отвечай по памяти, не открывая уроки. Где надо впечатать — пиши как в обычном тексте: регистр, ’ и точка в конце не важны. В заданиях с 🔊 фраза прозвучит сама, кнопкой её можно повторить. После каждого ответа — разбор и ссылка в урок. Клавиши: <code>1</code>–<code>4</code> — выбрать вариант, <code>Enter</code> — проверить и дальше.",
+  lessons: [
+    {n: 1, file: "e01-1.html", title: "Глагол be и страны", cover: "be + и −, my/his/her, a/an, множественное, национальности"},
+    {n: 2, file: "e01-2.html", title: "Вопросы, люди и звуки", cover: "вопросы с be, where/what/how old, прилагательные, ударение, звук o"},
+    {n: 3, file: "e01-3.html", title: "Живой английский", cover: "алфавит, переспросить, заглавные буквы, be целиком"}
+  ],
+  questions: [
+    /* ---------- урок 1.1 ---------- */
+    {lesson: 1, topic: "en.01.1.1", ref: "#t1", refTitle: "be: + и −", type: "one",
+     q: "My parents ___ at home now.", opts: ["are", "is", "am", "be"], ans: 0,
+     explain: "parents — много, значит <b>are</b>: <i>My parents are at home now.</i>"},
+    {lesson: 1, topic: "en.01.1.1", ref: "#t1", refTitle: "be: + и −", type: "many",
+     q: "Какие предложения <b>правильные</b>?",
+     opts: ["I'm agree with you.", "I'm twenty.", "He is work in a bank.", "I'm cold."], ans: [1, 3],
+     explain: "Возраст и состояние — через be: <i>I'm twenty. I'm cold.</i> А agree и work — глаголы, be с ними не ставят: <i>I agree. He works in a bank.</i>"},
+    {lesson: 1, topic: "en.01.1.1", ref: "#t1", refTitle: "be: + и −", type: "text",
+     q: "Переведи: «Я не женат».", ans: ["I'm not married", "I am not married"],
+     explain: "<i>I'm not married.</i> Для I отрицание одно — <b>I'm not</b>."},
+    {lesson: 1, topic: "en.01.1.1", ref: "#t1", refTitle: "be: + и −", type: "one",
+     q: "Какой вариант <b>не существует</b>?", opts: ["I amn't", "he's not", "they aren't", "you're not"], ans: 0,
+     explain: "Формы <i>I amn't</i> нет — только <b>I'm not</b>. Остальные — правильные отрицания."},
+    {lesson: 1, topic: "en.01.1.2", ref: "#t2", refTitle: "my, his, her", type: "one",
+     q: "Anna lives with ___ parents. («со своими родителями»)", opts: ["her", "his", "their", "she"], ans: 0,
+     explain: "«Свой» — по владельцу. Владелец — Анна, значит <b>her</b>."},
+    {lesson: 1, topic: "en.01.1.2", ref: "#t2", refTitle: "a / an", type: "many",
+     q: "Где нужен <b>an</b>?", opts: ["___ hour", "___ university", "___ engineer", "___ European city"], ans: [0, 2],
+     explain: "Выбор по звуку: <i>an hour</i> (h не читается), <i>an engineer</i>. <i>a university</i> и <i>a European</i> начинаются со звука [й]."},
+    {lesson: 1, topic: "en.01.1.2", ref: "#t2", refTitle: "Множественное число", type: "text",
+     q: "Множественное число: one woman → two ___", ans: ["women"],
+     explain: "<b>women</b> — неправильное множественное, читается «уимин»."},
+    {lesson: 1, topic: "en.01.1.2", ref: "#t2", refTitle: "Множественное число", type: "one",
+     q: "Выбери правильное:", opts: ["People are friendly here.", "People is friendly here.", "Peoples are friendly here.", "The peoples is friendly here."], ans: 0,
+     explain: "<b>people</b> — уже множественное число, с ним <b>are</b>."},
+    {lesson: 1, topic: "en.01.1.3", ref: "#t3", refTitle: "Страны и национальности", type: "text",
+     q: "She's from Japan. She's ___.", ans: ["Japanese"],
+     explain: "<b>Japanese</b> — ударение на последний слог, как у всех слов на -ese."},
+    {lesson: 1, topic: "en.01.1.3", ref: "#t3", refTitle: "Страны и национальности", type: "one",
+     q: "Как правильно?", opts: ["I'm from Russia. I'm Russian.", "I'm from Russian. I'm Russia.", "I'm from the Russia. I'm russian.", "I from Russia. I Russian."], ans: 0,
+     explain: "<b>from</b> + страна, национальность без from. Оба слова с большой буквы, Russia — без the."},
+    /* ---------- урок 1.2 ---------- */
+    {lesson: 2, topic: "en.01.2.1", ref: "#t1", refTitle: "Вопросы с be", type: "one",
+     q: "Are you a student? — (да)", opts: ["Yes, I am.", "Yes, I'm.", "Yes, you are.", "Yes, I student."], ans: 0,
+     explain: "В кратком «да» сокращать нельзя: <b>Yes, I am.</b>"},
+    {lesson: 2, topic: "en.01.2.1", ref: "#t1", refTitle: "Вопросы с be", type: "text",
+     q: "Сделай вопрос: <i>He is married.</i> → ?", ans: ["Is he married?", "Is he married"],
+     explain: "be встаёт перед подлежащим: <b>Is he married?</b>"},
+    {lesson: 2, topic: "en.01.2.1", ref: "#t1", refTitle: "Вопросы с be", type: "one",
+     q: "Is Anna your sister? — (нет)", opts: ["No, she isn't.", "No, Anna isn't.", "No, she aren't.", "No, she not."], ans: 0,
+     explain: "В коротком ответе — местоимение: <b>No, she isn't.</b>"},
+    {lesson: 2, topic: "en.01.2.2", ref: "#t2", refTitle: "Вопросительные слова", type: "one",
+     q: "Как спросить «Сколько тебе лет?»", opts: ["How old are you?", "How many years you have?", "How old you are?", "What age you have?"], ans: 0,
+     explain: "<b>How old are you?</b> — вопросительное слово + be + подлежащее."},
+    {lesson: 2, topic: "en.01.2.2", ref: "#t2", refTitle: "Вопросительные слова", type: "text", say: "Where are you from?",
+     q: "🔊 Послушай вопрос и впиши его.", ans: ["Where are you from?", "Where are you from"],
+     explain: "<b>Where are you from?</b> — предлог from в конце."},
+    {lesson: 2, topic: "en.01.2.3", ref: "#t3", refTitle: "Прилагательные", type: "one",
+     q: "Выбери правильное:", opts: ["She's a very kind person.", "She's a person very kind.", "She's very a kind person.", "She's a kind."], ans: 0,
+     explain: "Порядок: <b>a + very + прилагательное + существительное</b>. Без существительного — без a: <i>She's kind.</i>"},
+    {lesson: 2, topic: "en.01.2.3", ref: "#t3", refTitle: "Прилагательные", type: "one",
+     q: "Как вежливо сказать, что человек не очень дружелюбный?", opts: ["He isn't very friendly.", "He's a bit friendly.", "He's very unfriendly.", "He's friendlys not."], ans: 0,
+     explain: "<b>not very</b> — мягкий способ сказать плохое. a bit — с плохими словами (<i>a bit lazy</i>), с friendly не ставят."},
+    {lesson: 2, topic: "en.01.2.4", ref: "#t4", refTitle: "Ударение", type: "one", say: "photographer",
+     q: "🔊 Где ударение в слове <b>photographer</b>?", opts: ["PHO-to-gra-pher", "pho-TO-gra-pher", "pho-to-GRA-pher", "pho-to-gra-PHER"], ans: 1,
+     explain: "<b>phoTOgrapher</b>. А в photograph — на первый: <i>PHOtograph</i>. Ударение переезжает."},
+    {lesson: 2, topic: "en.01.2.4", ref: "#t4", refTitle: "Звук o", type: "many",
+     q: "В каких словах o читается как «а» (/ʌ/)?", opts: ["Monday", "phone", "London", "job"], ans: [0, 2],
+     explain: "<i>Monday, London</i> — /ʌ/. <i>phone</i> — /əʊ/, <i>job</i> — /ɒ/."},
+    /* ---------- урок 1.3 ---------- */
+    {lesson: 3, topic: "en.01.3.1", ref: "#t1", refTitle: "Алфавит и диктовка", type: "text", say: "Jenkins. J, E, N, K, I, N, S.",
+     q: "🔊 Тебе диктуют фамилию по буквам. Впиши её.", ans: ["Jenkins"],
+     explain: "<b>J-E-N-K-I-N-S</b>. J — «джей», E — «ии», I — «ай»."},
+    {lesson: 3, topic: "en.01.3.1", ref: "#t1", refTitle: "Алфавит и диктовка", type: "text", say: "anna dot lee at mail dot ru",
+     q: "🔊 Запиши почту.", ans: ["anna.lee@mail.ru"],
+     explain: "<b>dot</b> — точка, <b>at</b> — @: <i>anna.lee@mail.ru</i>."},
+    {lesson: 3, topic: "en.01.3.1", ref: "#t1", refTitle: "Переспросить", type: "one",
+     q: "Ты не расслышал номер телефона. Что сказать?", opts: ["Sorry, can you say that again?", "What?", "Repeat!", "Say again number."], ans: 0,
+     explain: "<b>Sorry, can you say that again?</b> — вежливо. <i>What?</i> звучит грубо."},
+    {lesson: 3, topic: "en.01.3.2", ref: "#t2", refTitle: "Заглавные буквы", type: "many",
+     q: "Какие слова в английском пишутся <b>с большой</b> буквы?", opts: ["English (язык)", "monday", "engineer", "i («я»)"], ans: [0, 1, 3],
+     explain: "С большой: языки (<i>English</i>), дни (<i>Monday</i>), <i>I</i>. Профессии — с маленькой: <i>engineer</i>."},
+    {lesson: 3, topic: "en.01.3.3", ref: "#t3", refTitle: "be целиком", type: "text",
+     q: "Переведи: «Где твои родители?»", ans: ["Where are your parents?", "Where are your parents"],
+     explain: "parents — много: <b>Where are your parents?</b>"}
+  ]
+});
+</script>

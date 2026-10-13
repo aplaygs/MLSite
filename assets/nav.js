@@ -8,6 +8,15 @@
   st0.textContent = `@keyframes pagein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .wrap{animation:pagein .18s ease-out both}
 @media (prefers-reduced-motion:reduce){.wrap{animation:none}}`;
+  /* Раздел English: пастельная тема — голубая основа и бледно-абрикосовый акцент (--sun: подсветки, --warm: ключевое).
+     Все страницы берут цвета из токенов, поэтому перекрашиваются сами — и уроки, и тренажёр слов. */
+  const path = location.pathname;
+  const EN = path === "/en" || path.startsWith("/en/") || path === "/words" || /^\/lessons\/e\d/.test(path);
+  document.documentElement.dataset.section = EN ? "en" : "ml";
+  st0.textContent += `
+:root[data-section="en"]{--bg:#EEF3FA;--surface:#FFFFFF;--ink:#1A2335;--muted:#5D6982;--line:#D7E0EE;--soft:#E3EBF7;--accent:#3A6AD4;--accent-soft:rgba(58,106,212,.13);--accent-ink:#FFFFFF;--warm:#C9802A;--sun:#FBE6C4;--sun-soft:#FDF3E3;--sun-ink:#8A520E;--miss:#C9802A;--miss-soft:#FBE6C4}
+@media (prefers-color-scheme:dark){:root[data-section="en"]:not([data-theme="light"]){--bg:#0F1522;--surface:#161E2E;--ink:#E4EAF5;--muted:#98A3BA;--line:#283349;--soft:#1D2739;--accent:#8EB0F7;--accent-soft:rgba(142,176,247,.16);--accent-ink:#0C1528;--warm:#F2BE78;--sun:rgba(242,190,120,.2);--sun-soft:rgba(242,190,120,.09);--sun-ink:#F5CF97;--miss:#F2BE78;--miss-soft:rgba(242,190,120,.2)}}
+:root[data-section="en"][data-theme="dark"]{--bg:#0F1522;--surface:#161E2E;--ink:#E4EAF5;--muted:#98A3BA;--line:#283349;--soft:#1D2739;--accent:#8EB0F7;--accent-soft:rgba(142,176,247,.16);--accent-ink:#0C1528;--warm:#F2BE78;--sun:rgba(242,190,120,.2);--sun-soft:rgba(242,190,120,.09);--sun-ink:#F5CF97;--miss:#F2BE78;--miss-soft:rgba(242,190,120,.2)}`;
   document.head.appendChild(st0);
   window.siteReady = () => {};
 })();
@@ -24,10 +33,6 @@ html{scroll-padding-top:calc(var(--navh) + 8px)}
 .sitenav .sw a{font:600 12.5px var(--f-body,system-ui);color:var(--muted);text-decoration:none;padding:5px 12px;border-radius:999px;transition:background-color .18s,color .18s}
 .sitenav .sw a:hover{color:var(--ink)}
 .sitenav .sw a[aria-current="true"]{background:var(--accent);color:var(--surface,#fff)}
-/* Английский — синий акцент вместо зелёного: всё, что берёт var(--accent), перекрашивается само */
-:root[data-section="en"]{--accent:#2F5FD0;--accent-soft:rgba(47,95,208,.15);--accent-ink:#FFFFFF}
-@media (prefers-color-scheme:dark){:root[data-section="en"]:not([data-theme="light"]){--accent:#7EA6F8;--accent-soft:rgba(126,166,248,.18);--accent-ink:#0B1530}}
-:root[data-section="en"][data-theme="dark"]{--accent:#7EA6F8;--accent-soft:rgba(126,166,248,.18);--accent-ink:#0B1530}
 .sitenav .brand{display:flex;align-items:center;gap:8px;margin-right:10px;text-decoration:none;color:var(--ink);font:700 14px var(--f-display,system-ui);letter-spacing:-.01em;white-space:nowrap}
 .sitenav .brand i{width:12px;height:12px;border-radius:50% 0;background:var(--accent);transform:rotate(-45deg)}
 .sitenav .lk{position:relative;text-decoration:none;color:var(--muted);font:500 14px var(--f-body,system-ui);padding:7px 12px;border-radius:999px;transition:color .15s,background-color .15s}
@@ -41,8 +46,7 @@ html{scroll-padding-top:calc(var(--navh) + 8px)}
   const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
   const path = location.pathname.replace(/\/$/, "");
   /* Раздел: ML или English. Английский — /en…, тренажёр /words и уроки английского /lessons/e… */
-  const EN = path === "/en" || path.startsWith("/en/") || path === "/words" || /^\/lessons\/e\d/.test(path);
-  document.documentElement.dataset.section = EN ? "en" : "ml";
+  const EN = document.documentElement.dataset.section === "en";
   const LINKS = EN ? [["/en", "Обзор"], ["/words", "Слова"]] : [["/tree", "Дерево"], ["/plan", "План"], ["/hire", "Отборы"]];
   const cur = EN ? (path === "/words" ? "/words" : "/en")
     : path === "/plan" || path.startsWith("/lessons/") ? "/plan" : path === "/hire" ? "/hire" : path === "/tree" ? "/tree" : "";

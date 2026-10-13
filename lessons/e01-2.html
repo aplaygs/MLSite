@@ -1,0 +1,462 @@
+<title>Урок 1.2 · Вопросы, люди и звуки</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/en.css">
+<style>
+/* Только для этого урока: «перевёртыш» утверждение → вопрос, интервью. */
+.flip{display:grid;gap:14px}
+.flip-line{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;min-height:64px;padding:14px;background:var(--bg);border-radius:14px}
+.flip-line .w{font:600 clamp(20px,4.2vw,28px) var(--f-display);padding:4px 10px;border-radius:10px;will-change:transform}
+.flip-line .w.v{background:var(--sun);color:var(--sun-ink)}
+.flip-line .w.s{color:var(--accent)}
+.flip-line .w.p{color:var(--muted);padding:4px 0}
+.flip-ans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.flip-ans{grid-template-columns:1fr}}
+.flip-ans div{background:var(--bg);border-radius:12px;padding:10px 12px;font-size:15.5px;display:grid;gap:2px}
+.flip-ans div b{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.flip-ans .no-c{font-size:13px;color:var(--red)}
+.iv{display:grid;gap:10px}
+.iv-q{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--bg);border-radius:12px;padding:12px 14px}
+.iv-q .n{font:500 12px var(--f-mono);color:var(--muted)}
+.iv-q .q{font:600 18px var(--f-body);flex:1;min-width:180px}
+.iv-q details{flex-basis:100%;font-size:14.5px}
+.iv-q details summary{cursor:pointer;color:var(--accent);font-size:13.5px}
+</style>
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e01-1.html">← Урок 1 · Глагол be и страны</a><span class="mid">урок 2 из 3</span><a href="/lessons/e01-3.html">Урок 3 · Живой английский →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 1 · People · урок 2 из 3 · 4 темы · ~60 минут</div>
+  <h1>Вопросы, люди и звуки</h1>
+  <p>Как спросить и ответить с <b>be</b>: <span class="say">Are you married?</span> — <span class="say">No, I'm not.</span> Вопросы с <b>where, what, who, how old</b> — порядок слов в них ломает русская привычка. Прилагательные, чтобы описать людей. И звук: ударение в словах и три разных «о», которые русское ухо слышит как одно.</p>
+  <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Вопросы с be</a><a href="#t2">where, what, who</a><a href="#t3">Какой человек</a><a href="#t4">Ударение и «о»</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 4 · Грамматика</div>
+  <h2>be: вопросы и короткие ответы</h2>
+  <p class="tldr">Чтобы задать вопрос, <b>be</b> встаёт перед подлежащим: <span class="say">You are from Spain.</span> → <span class="say">Are you from Spain?</span> По-русски вопрос делают голосом, по-английски — порядком слов.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · перевёртыш</span><span class="muted mono" id="flState"></span></div>
+    <div class="btns" role="group" aria-label="Фраза" id="flPick"></div>
+    <div class="flip">
+      <div class="flip-line" id="flLine" title="Нажми, чтобы послушать"></div>
+      <div class="btns" style="justify-content:center"><button class="btn" type="button" id="flGo" aria-pressed="false">Сделать вопрос ⇄</button></div>
+      <div class="flip-ans" id="flAns"></div>
+    </div>
+  </div>
+
+  <div class="tbl"><table class="forms">
+    <thead><tr><th>Вопрос</th><th>Да</th><th>Нет</th></tr></thead>
+    <tbody>
+      <tr><td><span class="say">Am I late?</span></td><td><span class="say">Yes, you are.</span></td><td><span class="say">No, you aren't.</span></td></tr>
+      <tr><td><span class="say">Are you a student?</span></td><td><span class="say">Yes, I am.</span></td><td><span class="say">No, I'm not.</span></td></tr>
+      <tr><td><span class="say">Is he married?</span></td><td><span class="say">Yes, he is.</span></td><td><span class="say">No, he isn't.</span></td></tr>
+      <tr><td><span class="say">Is it your phone?</span></td><td><span class="say">Yes, it is.</span></td><td><span class="say">No, it isn't.</span></td></tr>
+      <tr><td><span class="say">Are they British?</span></td><td><span class="say">Yes, they are.</span></td><td><span class="say">No, they aren't.</span></td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <ul>
+      <li><b>В «да» сокращать нельзя:</b> <span class="say">Yes, I am.</span> — а не «Yes, I'm». <span class="say">Yes, he is.</span> — а не «Yes, he's». Сокращённая форма не стоит в конце фразы. В «нет» — можно и нужно: <span class="say">No, I'm not.</span></li>
+      <li><b>В ответе — местоимение, а не имя:</b> <span class="say">Is Anna your sister?</span> — <span class="say">Yes, she is.</span> <span class="say">Are your parents at home?</span> — <span class="say">No, they aren't.</span></li>
+      <li><b>you → I или we:</b> на <span class="say">Are you…?</span> отвечаешь от себя: <span class="say">Yes, I am.</span> Если спросили про вас двоих — <span class="say">Yes, we are.</span></li>
+      <li><b>Голос в конце вопроса идёт вверх ↗:</b> <span class="say">Are you OK?</span> Просто <span class="say">Yes.</span> или <span class="say">No.</span> звучит резко — короткий ответ вежливее.</li>
+    </ul>
+  </div>
+  <div class="callout ru"><b class="h">Ошибки русскоговорящих</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">You are from Russia?</span><span class="yes"><span class="say">Are you from Russia?</span></span><span class="n">Так («You are…?» с вопросительной интонацией) говорят только переспрашивая с удивлением. Обычный вопрос — с перестановкой.</span></div>
+      <div class="pair"><span class="no">Yes, I'm.</span><span class="yes"><span class="say">Yes, I am.</span></span></div>
+      <div class="pair"><span class="no">Is she student?</span><span class="yes"><span class="say">Is she a student?</span></span><span class="n">a/an перед профессией нужен и в вопросе.</span></div>
+      <div class="pair"><span class="no">Are you agree?</span><span class="yes"><span class="say">Do you agree?</span></span><span class="n">agree — глагол, с ним вопрос через do. Это неделя 2; пока запомни: be — только когда нет другого глагола.</span></div>
+    </div>
+  </div>
+
+  <div class="ex" id="ex1a"><div class="ex-h"><span class="eyebrow">Упражнение 1 · собери вопрос</span><p>Нажимай на слова по порядку.</p></div></div>
+  <div class="ex" id="ex1b"><div class="ex-h"><span class="eyebrow">Упражнение 2 · короткий ответ</span><p>Выбери ответ. Смотри на подсказку в скобках.</p></div></div>
+  <div class="ex" id="ex1c"><div class="ex-h"><span class="eyebrow">Упражнение 3 · найди ошибку</span><p>Нажми на неправильное слово. В одном предложении ошибки нет.</p></div></div>
+
+  <div class="topic-check" data-for="en.01.2.1">
+    <label class="tp"><input type="checkbox" data-id="en.01.2.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>be: вопросы и короткие ответы</b></span></label>
+    <span class="note" data-d="en.01.2.1">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 4 · Грамматика</div>
+  <h2>Вопросительные слова: what, where, who, how old</h2>
+  <p class="tldr">Формула одна: <b>вопросительное слово + am / is / are + подлежащее + остальное</b>. <span class="say">Where are you from?</span> <span class="say">How old is your brother?</span> Предлог — в самом конце.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Слово</th><th>Значит</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td><b>What</b></td><td>что, какой</td><td><span class="say">What's your name?</span> <span class="say">What's your job?</span></td></tr>
+      <tr><td><b>Where</b></td><td>где, откуда</td><td><span class="say">Where are you from?</span> <span class="say">Where's the station?</span></td></tr>
+      <tr><td><b>Who</b></td><td>кто</td><td><span class="say">Who's that?</span> <span class="say">Who is your teacher?</span></td></tr>
+      <tr><td><b>How old</b></td><td>сколько лет</td><td><span class="say">How old are you?</span> — <span class="say">I'm twenty.</span></td></tr>
+      <tr><td><b>How</b></td><td>как</td><td><span class="say">How are you?</span> — <span class="say">I'm fine, thanks. And you?</span></td></tr>
+      <tr><td><b>When</b></td><td>когда</td><td><span class="say">When is your birthday?</span></td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <ul>
+      <li><span class="say">What's</span> = what is, <span class="say">Where's</span> = where is, <span class="say">Who's</span> = who is. С <b>are</b> так не сокращают на письме: <span class="say">Where are you?</span></li>
+      <li>Ответ — полной фразой или коротко: <span class="say">Where are you from?</span> — <span class="say">I'm from Russia.</span> или просто <span class="say">Russia.</span> Оба нормальные.</li>
+      <li><b>What's your job?</b> = <span class="say">What do you do?</span> — второй вариант живее, его разберём на неделе 2.</li>
+    </ul>
+  </div>
+  <div class="callout ru"><b class="h">Ошибки русскоговорящих</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">How many years you have?</span><span class="yes"><span class="say">How old are you?</span></span><span class="n">Возраст в английском — «насколько ты старый».</span></div>
+      <div class="pair"><span class="no">Where you are from?</span><span class="yes"><span class="say">Where are you from?</span></span><span class="n">После вопросительного слова — сразу be.</span></div>
+      <div class="pair"><span class="no">From where are you?</span><span class="yes"><span class="say">Where are you from?</span></span><span class="n">Предлог уходит в конец.</span></div>
+      <div class="pair"><span class="no">How is your name?</span><span class="yes"><span class="say">What's your name?</span></span><span class="n">«Как тебя зовут» — дословно «Что твоё имя».</span></div>
+    </div>
+  </div>
+
+  <div class="ex" id="ex2a"><div class="ex-h"><span class="eyebrow">Упражнение 4 · какое слово</span><p>Посмотри на ответ и выбери вопросительное слово.</p></div></div>
+  <div class="ex" id="ex2b"><div class="ex-h"><span class="eyebrow">Упражнение 5 · собери вопрос</span><p>Переведи с русского.</p></div></div>
+  <div class="ex" id="ex2c"><div class="ex-h"><span class="eyebrow">Упражнение 6 · впиши вопрос целиком</span><p>Впиши вопрос по ответу. Сокращения (What's) и полные формы (What is) засчитываются одинаково.</p></div></div>
+
+  <div class="topic-check" data-for="en.01.2.2">
+    <label class="tp"><input type="checkbox" data-id="en.01.2.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>вопросительные слова</b></span></label>
+    <span class="note" data-d="en.01.2.2">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 4 · Слова</div>
+  <h2>Прилагательные: какой человек</h2>
+  <p class="tldr">Прилагательное стоит <b>перед существительным</b> (<span class="say">a kind man</span>) или <b>после be</b> (<span class="say">He's kind.</span>). Оно никогда не меняется: ни по числу, ни по роду.</p>
+
+  <div class="ex" id="ex3cards"><div class="ex-h"><span class="eyebrow">Слова темы</span><p>Послушай и проверь себя в режиме «Вспомни перевод».</p></div></div>
+
+  <div class="prose">
+    <ul>
+      <li><b>Не меняется:</b> <span class="say">kind people</span>, <span class="say">a kind woman</span>, <span class="say">kind children</span> — всегда kind.</li>
+      <li><b>Без существительного — без a:</b> <span class="say">She's friendly.</span> С существительным — с a: <span class="say">She's a friendly person.</span></li>
+      <li><b>Насколько:</b> <span class="say">very</span> (очень), <span class="say">really</span> (по-настоящему), <span class="say">quite</span> (довольно), <span class="say">a bit</span> (немного — обычно про плохое: <span class="say">a bit lazy</span>, <span class="say">a bit shy</span>).</li>
+      <li><b>Вежливо про плохое</b> — через <b>not very</b>: <span class="say">He isn't very friendly.</span> звучит мягче, чем <span class="say">He's unfriendly.</span></li>
+    </ul>
+  </div>
+  <div class="callout ru"><b class="h">Ошибки русскоговорящих</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">They are kinds.</span><span class="yes"><span class="say">They're kind.</span></span><span class="n">У прилагательных нет множественного числа.</span></div>
+      <div class="pair"><span class="no">She is a kind.</span><span class="yes"><span class="say">She's kind.</span></span></div>
+      <div class="pair"><span class="no">He is man very clever.</span><span class="yes"><span class="say">He's a very clever man.</span></span><span class="n">Порядок: a + very + прилагательное + существительное.</span></div>
+      <div class="pair"><span class="no">She is a bit kind.</span><span class="yes"><span class="say">She's quite kind.</span></span><span class="n">a bit — с плохим. С хорошим — quite, very, really.</span></div>
+    </div>
+  </div>
+  <div class="ex" id="ex3a"><div class="ex-h"><span class="eyebrow">Упражнение 7 · насколько</span><p>Выбери very, quite, a bit или not very.</p></div></div>
+  <div class="ex" id="ex3b"><div class="ex-h"><span class="eyebrow">Упражнение 8 · собери описание</span><p>Порядок слов в описании человека.</p></div></div>
+
+  <div class="topic-check" data-for="en.01.2.3">
+    <label class="tp"><input type="checkbox" data-id="en.01.2.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>прилагательные для описания людей</b></span></label>
+    <span class="note" data-d="en.01.2.3">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="topic" id="t4">
+  <div class="eyebrow">Тема 4 из 4 · Произношение</div>
+  <h2>Ударение в словах; «о» — три разных звука</h2>
+  <p class="tldr">В английском, как и в русском, у слова один ударный слог — он длиннее, громче и выше. Безударные гласные «съедаются» до короткого звука <b>/ə/</b>: <span class="say">doctor</span> — «ДОК-тэ». Ошибка в ударении мешает понять слово сильнее, чем неправильный звук.</p>
+  <div class="prose">
+    <ul>
+      <li>В словаре ударный слог отмечен штрихом <b>ˈ</b> перед ним: /ˈdɒk.tə/, /ˌdʒæp.əˈniːz/.</li>
+      <li>Двусложные существительные и прилагательные чаще ударные на первом слоге: <span class="say">TEAcher</span>, <span class="say">SISter</span>, <span class="say">FUNny</span>, <span class="say">QUIet</span>. Исключения запоминай: <span class="say">hotel</span> (хо-ТЕЛ), <span class="say">police</span>, <span class="say">Japan</span>, <span class="say">July</span>.</li>
+      <li><b>Ударение переезжает</b> в однокоренных словах: <span class="say">PHOtograph</span> → <span class="say">phoTOgrapher</span>, <span class="say">CAnada</span> → <span class="say">caNAdian</span>, <span class="say">Italy</span> → <span class="say">iTAlian</span>.</li>
+    </ul>
+  </div>
+  <div class="ex" id="ex4a"><div class="ex-h"><span class="eyebrow">Упражнение 9 · где ударение</span><p>Нажми на ударный слог. 🔊 — послушать до ответа.</p></div></div>
+
+  <h3 style="font-size:17px">Буква o: три звука</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Звук</th><th>Как звучит</th><th>Слова</th></tr></thead>
+    <tbody>
+      <tr><td><b>/ɒ/</b> короткий</td><td>короткое открытое «о», рот округлён</td><td><span class="say">hot</span>, <span class="say">not</span>, <span class="say">job</span>, <span class="say">doctor</span>, <span class="say">John</span>, <span class="say">sorry</span>, <span class="say">shop</span></td></tr>
+      <tr><td><b>/əʊ/</b> «оу»</td><td>скольжение: «эу» → почти «оу»</td><td><span class="say">no</span>, <span class="say">go</span>, <span class="say">phone</span>, <span class="say">home</span>, <span class="say">old</span>, <span class="say">photo</span>, <span class="say">Poland</span></td></tr>
+      <tr><td><b>/ʌ/</b> ловушка</td><td>короткое «а», хотя пишется o</td><td><span class="say">mother</span>, <span class="say">brother</span>, <span class="say">son</span>, <span class="say">Monday</span>, <span class="say">London</span>, <span class="say">come</span>, <span class="say">one</span></td></tr>
+    </tbody></table></div>
+  <div class="callout mem"><b class="h">Подсказки по написанию</b><p><b>o + согласная + e</b> (home, phone, close) и <b>o в конце</b> (no, go, photo) — обычно /əʊ/. <b>o + согласная в конце</b> (hot, job, shop) — обычно /ɒ/. <b>-old</b> (old, cold, told) — /əʊ/. Исключения: do, to, who — /uː/ («у»); mother, son, love, come — /ʌ/. Сомневаешься — послушай слово здесь или в словаре.</p></div>
+  <div class="ex" id="ex4b"><div class="ex-h"><span class="eyebrow">Упражнение 10 · какой звук</span><p>Слово прозвучит. Выбери звук.</p></div></div>
+
+  <div class="topic-check" data-for="en.01.2.4">
+    <label class="tp"><input type="checkbox" data-id="en.01.2.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>ударение в словах; долгий и краткий o</b></span></label>
+    <span class="note" data-d="en.01.2.4">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · слушай и отвечай</div>
+  <h2>Практика</h2>
+  <p class="tldr">Интервью: вопрос прозвучит, ты отвечаешь вслух полной фразой, потом сверяешься с образцом. Это то, что спрашивают при знакомстве — на собеседовании, в поездке, в чате.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Интервью · 8 вопросов</span><span class="muted mono" id="ivState">1 / 8</span></div>
+    <div class="iv" id="iv"></div>
+    <div class="btns"><button class="btn" type="button" id="ivPrev">← Назад</button><button class="btn" type="button" id="ivNext">Следующий вопрос →</button></div>
+  </div>
+  <div class="prac">
+    <div class="task"><span class="tg work">Говорить · 5 минут</span>
+      <h3>Опиши двух людей</h3>
+      <p>Друг и коллега или преподаватель. Для каждого: кто это, откуда, сколько лет и два-три прилагательных с very, quite или a bit. Хотя бы одно — вежливо через not very.</p>
+      <details><summary>Образец</summary><div class="a"><p><span class="say">This is my friend Ilya. He's from Kazan. He's twenty-one. He's very funny and quite clever, but he's a bit lazy.</span></p></div></details>
+    </div>
+    <div class="task"><span class="tg rev">Писать · 5 минут</span>
+      <h3>Шесть вопросов новому знакомому</h3>
+      <p>Напиши на бумаге шесть вопросов: три с where / what / how old и три «да-нет» с be. Проверь порядок слов по формуле.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в плане</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда сделал упражнения темы без ошибок или с одной. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Вопрос — be вперёд:</b> <span class="say">Are you from Spain?</span> <span class="say">Is he married?</span></li>
+      <li><b>Короткий ответ:</b> <span class="say">Yes, I am.</span> / <span class="say">No, I'm not.</span> В «да» без сокращения. В ответе — местоимение.</li>
+      <li><b>Вопросительное слово + be + подлежащее:</b> <span class="say">Where are you from?</span> <span class="say">How old is she?</span> Предлог — в конце.</li>
+      <li><b>Возраст:</b> <span class="say">How old are you?</span> — <span class="say">I'm twenty.</span> Имя: <span class="say">What's your name?</span></li>
+      <li><b>Прилагательное</b> — перед существительным или после be, не меняется: <span class="say">kind people</span>. Без существительного — без a: <span class="say">She's kind.</span></li>
+      <li><b>very / quite / a bit / not very</b>; a bit — с плохим.</li>
+      <li><b>Ударение</b> — один слог длиннее и громче, остальные — /ə/. Переезжает: <span class="say">photograph</span> → <span class="say">photographer</span>.</li>
+      <li><b>o:</b> /ɒ/ hot, job · /əʊ/ no, phone, old · /ʌ/ mother, son, Monday.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+    <p class="muted" style="font-size:13.5px">Конспект этого урока уже лежит в Obsidian: <code>65_Английский/Уроки</code>.</p>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b>
+    <p>Закрой урок. Вслух: задай себе восемь вопросов из интервью и ответь. Сделай из пяти утверждений вопросы и дай короткие ответы «да» и «нет». Произнеси: photographer, Japanese, hotel, London, phone, doctor. Где запнулся — туда и возвращаешься.</p>
+  </div>
+  <p><a class="btn" href="/lessons/e01-3.html" style="text-decoration:none">Дальше: урок 3 · Живой английский →</a></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+# 🇬🇧 Урок 1.2 · Вопросы, люди и звуки
+
+## be: вопросы и короткие ответы
+Вопрос — be встаёт перед подлежащим: *You are from Spain.* → *Are you from Spain?*
+
+| Вопрос | Да | Нет |
+| :--- | :--- | :--- |
+| Are you a student? | Yes, I am. | No, I'm not. |
+| Is he married? | Yes, he is. | No, he isn't. |
+| Is it your phone? | Yes, it is. | No, it isn't. |
+| Are they British? | Yes, they are. | No, they aren't. |
+
+- В «да» не сокращай: ~~Yes, I'm~~ → *Yes, I am.*
+- В ответе — местоимение: *Is Anna your sister? — Yes, she is.*
+- В конце вопроса голос вверх ↗. Просто «Yes» звучит резко.
+
+> [!warning] Ошибки
+> - ~~You are from Russia?~~ → *Are you from Russia?*
+> - ~~Is she student?~~ → *Is she a student?*
+
+## Вопросительные слова
+Формула: **вопросительное слово + am / is / are + подлежащее + остальное**. Предлог — в конце.
+- What — *What's your name? What's your job?*
+- Where — *Where are you from?*
+- Who — *Who's that?*
+- How old — *How old are you? — I'm twenty.*
+- How — *How are you? — I'm fine, thanks. And you?*
+- When — *When is your birthday?*
+
+> [!warning] Ошибки
+> - ~~How many years you have?~~ → *How old are you?*
+> - ~~Where you are from?~~ / ~~From where are you?~~ → *Where are you from?*
+> - ~~How is your name?~~ → *What's your name?*
+
+## Прилагательные: какой человек
+- Перед существительным или после be: *a kind man, He's kind.* Не меняются: *kind people.*
+- Без существительного — без a: *She's friendly. She's a friendly person.*
+- very, really, quite, a bit (с плохим: *a bit lazy*), not very (вежливо: *He isn't very friendly*).
+- Слова: kind, friendly, funny, quiet, shy, clever, lazy, rude, warm, pleasant, famous, well-known.
+
+## Ударение и «о»
+- Один ударный слог; безударные гласные → /ə/: *doctor* «ДОК-тэ».
+- Двусложные чаще на первый: TEAcher, SISter. Исключения: hoTEL, poLICE, jaPAN, JuLY.
+- Переезжает: PHOtograph → phoTOgrapher, CAnada → caNAdian, Italy → iTAlian.
+- /ɒ/ — hot, not, job, doctor, sorry
+- /əʊ/ — no, go, phone, home, old, photo
+- /ʌ/ — mother, brother, son, Monday, London, come, one
+
+## Проверь себя
+> [!question]- Сделай вопрос и два коротких ответа: «They are at home»
+> *Are they at home? — Yes, they are. / No, they aren't.*
+
+> [!question]- Почему нельзя «Yes, I'm»?
+> Краткая форма не стоит в конце фразы. *Yes, I am.*
+
+> [!question]- Исправь: «Where you are from?», «How many years you have?»
+> *Where are you from? How old are you?*
+
+> [!question]- Где ударение: photographer, Japanese, hotel, Canadian
+> *phoTOgrapher, JapaNESE, hoTEL, caNAdian*
+
+> [!question]- Какой звук o: phone, job, Monday, old, London
+> *phone /əʊ/, job /ɒ/, Monday /ʌ/, old /əʊ/, London /ʌ/*
+</script>
+
+<script src="/assets/lesson.js"></script>
+<script src="/assets/en.js"></script>
+<script>
+/* ---------- тема 1: перевёртыш (FLIP-анимация перестановки слов) ---------- */
+(function flipLab(){
+  const P=[
+    {w:["You","are","from Spain"],ru:"Ты из Испании.",y:"Yes, I am.",n:"No, I'm not.",bad:"Yes, I'm."},
+    {w:["He","is","married"],ru:"Он женат.",y:"Yes, he is.",n:"No, he isn't.",bad:"Yes, he's."},
+    {w:["Anna","is","your sister"],ru:"Анна — твоя сестра.",y:"Yes, she is.",n:"No, she isn't.",bad:"Yes, Anna's."},
+    {w:["They","are","British"],ru:"Они британцы.",y:"Yes, they are.",n:"No, they aren't.",bad:"Yes, they're."},
+    {w:["It","is","your phone"],ru:"Это твой телефон.",y:"Yes, it is.",n:"No, it isn't.",bad:"Yes, it's."},
+    {w:["I","am","late"],ru:"Я опоздал.",y:"Yes, you are.",n:"No, you aren't.",bad:"Yes, I am. — нет: отвечают тебе, значит you"}
+  ];
+  let k=0,q=false;
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function render(anim){
+    const p=P[k], line=$("flLine"), [s,v,c]=p.w;
+    const first=anim?new Map([...line.querySelectorAll(".w")].map(el=>[el.dataset.r,el.getBoundingClientRect()])):null;
+    const sub=q&&["You","He","They","It"].includes(s)?s.toLowerCase():s, vb=q?v[0].toUpperCase()+v.slice(1):v;
+    const order=q?[["v",vb],["s",sub],["c",c],["p","?"]]:[["s",s],["v",v],["c",c],["p","."]];
+    line.innerHTML=order.map(([r,t])=>`<span class="w ${r}" data-r="${r}">${t}</span>`).join("");
+    line.dataset.say=order.map(o=>o[1]).join(" ").replace(/ ([?.])$/,"$1");
+    if(first&&!reduce)line.querySelectorAll(".w").forEach(el=>{const a=first.get(el.dataset.r);if(!a)return;const b=el.getBoundingClientRect();
+      el.animate([{transform:`translate(${a.left-b.left}px,${a.top-b.top}px)`},{transform:"none"}],{duration:420,easing:"cubic-bezier(.2,.8,.2,1)"})});
+    $("flGo").textContent=q?"Обратно в утверждение ⇄":"Сделать вопрос ⇄"; $("flGo").setAttribute("aria-pressed",q);
+    $("flAns").innerHTML=q?`<div><b>Да</b><span class="say">${p.y}</span></div><div><b>Нет</b><span class="say">${p.n}</span></div>${k===5?"":`<div style="grid-column:1/-1"><span class="no-c">✗ ${p.bad} — так нельзя: в «да» без сокращения${k===2?", и вместо имени — she":""}.</span></div>`}`
+      :`<div style="grid-column:1/-1"><b>По-русски</b>${p.ru} → «${p.ru.replace(/\.$/,"")}?» — тот же порядок, вопрос только голосом.</div>`;
+    $("flState").textContent=q?"вопрос":"утверждение";
+    document.querySelectorAll("#flPick .btn").forEach((b,i)=>b.setAttribute("aria-pressed",i===k));
+  }
+  $("flPick").innerHTML=P.map((p,i)=>`<button class="btn" type="button" data-k="${i}">${p.w[0]} ${p.w[1]}…</button>`).join("");
+  $("flPick").onclick=e=>{const b=e.target.closest(".btn");if(b){k=+b.dataset.k;q=false;render(false)}};
+  $("flGo").onclick=()=>{q=!q;render(true);if(q)say($("flLine").dataset.say)};
+  render(false);
+})();
+
+/* ---------- практика: интервью ---------- */
+(function interview(){
+  const Q=[["What's your name?","My name's Vlad. / I'm Vlad."],["Where are you from?","I'm from Russia. I'm from Moscow."],["How old are you?","I'm twenty."],
+    ["Are you a student?","Yes, I am. I'm a student. / No, I'm not. I'm a developer."],["What's your job?","I'm a student. I'm into machine learning."],
+    ["Are you married?","No, I'm not."],["Who is your best friend?","My best friend is Ilya. He's very funny."],["How are you today?","I'm fine, thanks. A bit tired. And you?"]];
+  let i=0;
+  function draw(sayIt){
+    $("iv").innerHTML=`<div class="iv-q"><span class="n">${i+1}</span><span class="q say" data-say="${Q[i][0]}">${Q[i][0]}</span><button class="btn" type="button" data-say="${Q[i][0]}">🔊 ещё раз</button>
+      <details><summary>Ответил вслух? Посмотри образец</summary><p><span class="say">${Q[i][1]}</span></p></details></div>`;
+    $("ivState").textContent=`${i+1} / ${Q.length}`; $("ivPrev").disabled=i===0; $("ivNext").textContent=i===Q.length-1?"Сначала ↺":"Следующий вопрос →";
+    if(sayIt)say(Q[i][0]);
+  }
+  $("ivNext").onclick=()=>{i=(i+1)%Q.length;draw(true)}; $("ivPrev").onclick=()=>{if(i>0){i--;draw(true)}};
+  draw(false);
+})();
+
+/* ---------- упражнения ---------- */
+exBuild($("ex1a"),[
+  {ru:"Ты из Испании?",w:"Are you from Spain ?",extra:["Do"]},
+  {ru:"Он женат?",w:"Is he married ?",extra:["Are"]},
+  {ru:"Твои родители дома?",w:"Are your parents at home ?",extra:["Is"]},
+  {ru:"Это твой телефон?",w:"Is it your phone ?",alt:["Is this your phone ?"],extra:["it's"]},
+  {ru:"Она студентка?",w:"Is she a student ?",extra:["an"]}
+]);
+exGap($("ex1b"),[
+  {s:"Are you a student? (да) — ___",opts:["Yes, I am.","Yes, I'm.","Yes, you are."],a:"Yes, I am.",full:"Are you a student? Yes, I am."},
+  {s:"Is your brother married? (нет) — ___",opts:["No, he isn't.","No, he not.","No, brother isn't."],a:"No, he isn't.",full:"Is your brother married? No, he isn't."},
+  {s:"Are they from Italy? (да) — ___",opts:["Yes, they are.","Yes, they're.","Yes, they is."],a:"Yes, they are.",full:"Are they from Italy? Yes, they are."},
+  {s:"Is Anna at work? (нет) — ___",opts:["No, she isn't.","No, Anna isn't.","No, she aren't."],a:"No, she isn't.",full:"Is Anna at work? No, she isn't.",why:"в ответе — местоимение"},
+  {s:"Is it cold today? (да) — ___",opts:["Yes, it is.","Yes, it's.","Yes, is it."],a:"Yes, it is.",full:"Is it cold today? Yes, it is."},
+  {s:"Are you and Ilya friends? (да) — ___",opts:["Yes, we are.","Yes, I am.","Yes, they are."],a:"Yes, we are.",full:"Are you and Ilya friends? Yes, we are.",why:"ты и Илья — мы"},
+  {s:"Am I late? (нет) — ___",opts:["No, you aren't.","No, I'm not.","No, I amn't."],a:"No, you aren't.",full:"Am I late? No, you aren't."}
+]);
+exSpot($("ex1c"),[
+  {s:"You are from Russia?",bad:0,n:2,also:[1],fix:"Are you",why:"в вопросе be встаёт перед подлежащим"},
+  {s:"Is she student?",bad:2,fix:"a student?",why:"профессия — с a"},
+  {s:"Are your sister at home?",bad:0,fix:"Is",why:"sister — одна"},
+  {s:"Yes, I'm.",bad:1,fix:"I am.",why:"в «да» без сокращения"},
+  {s:"Is your phone new?",bad:-1},
+  {s:"Is Tom your brother? Yes, Tom is.",bad:5,fix:"he",why:"в ответе — местоимение"}
+]);
+exGap($("ex2a"),[
+  {s:"___ are you from? — Russia.",opts:["Where","What","Who"],a:"Where"},
+  {s:"___ is your name? — Vlad.",opts:["What","How","Who"],a:"What"},
+  {s:"___ old is your sister? — She's sixteen.",opts:["How","What","Where"],a:"How"},
+  {s:"___ is that man? — He's my teacher.",opts:["Who","What","Where"],a:"Who"},
+  {s:"___ are you? — I'm fine, thanks.",opts:["How","What","Who"],a:"How"},
+  {s:"___ is your birthday? — In May.",opts:["When","Where","What"],a:"When"},
+  {s:"___'s your job? — I'm a student.",opts:["What","Who","How"],a:"What"}
+]);
+exBuild($("ex2b"),[
+  {ru:"Откуда ты?",w:"Where are you from ?",extra:["you're","From"]},
+  {ru:"Сколько лет твоему брату?",w:"How old is your brother ?",extra:["many","years"]},
+  {ru:"Как тебя зовут?",w:"What's your name ?",alt:["What is your name ?"],extra:["How"]},
+  {ru:"Кто твой учитель?",w:"Who is your teacher ?",alt:["Who's your teacher ?"],extra:["are"]},
+  {ru:"Где твои друзья?",w:"Where are your friends ?",extra:["is"]}
+]);
+exGap($("ex2c"),[
+  {s:"___ — I'm from Spain.",a:["Where are you from?","Where are you from"],full:"Where are you from? — I'm from Spain."},
+  {s:"___ — I'm 25.",a:["How old are you?","How old are you"],full:"How old are you? — I'm 25."},
+  {s:"___ — My name's Anna.",a:["What's your name?","What is your name?"],full:"What's your name? — My name's Anna."},
+  {s:"___ — I'm fine, thanks.",a:["How are you?"],full:"How are you? — I'm fine, thanks."}
+]);
+wordCards($("ex3cards"),[
+  {en:"kind",ipa:"kaɪnd",ru:"добрый",ex:"She's very kind.",exRu:"Она очень добрая."},
+  {en:"friendly",ipa:"ˈfrend.li",ru:"дружелюбный",ex:"People here are friendly."},
+  {en:"funny",ipa:"ˈfʌn.i",ru:"смешной, весёлый",ex:"My brother is really funny."},
+  {en:"quiet",ipa:"ˈkwaɪ.ət",ru:"тихий, спокойный",ex:"He's a quiet person."},
+  {en:"shy",ipa:"ʃaɪ",ru:"застенчивый",ex:"I'm a bit shy."},
+  {en:"clever",ipa:"ˈklev.ə",ru:"умный, сообразительный",ex:"She's a clever student."},
+  {en:"lazy",ipa:"ˈleɪ.zi",ru:"ленивый",ex:"I'm a bit lazy on Sundays."},
+  {en:"rude",ipa:"ruːd",ru:"грубый, невежливый",ex:"Don't be rude."},
+  {en:"warm",ipa:"wɔːm",ru:"тёплый, душевный",ex:"She's a warm person."},
+  {en:"pleasant",ipa:"ˈplez.ənt",ru:"приятный",ex:"He's very pleasant."},
+  {en:"famous",ipa:"ˈfeɪ.məs",ru:"знаменитый",ex:"She's a famous singer."},
+  {en:"well-known",ipa:"ˌwelˈnəʊn",ru:"известный",ex:"It's a well-known company."}
+]);
+exGap($("ex3a"),[
+  {s:"He's ___ clever — he's top of the class.",opts:["very","a bit","not very"],a:"very"},
+  {s:"I'm ___ shy with new people.",opts:["a bit","very much","quite a"],a:"a bit"},
+  {s:"She isn't ___ friendly. (вежливо: недружелюбная)",opts:["very","a bit","quite"],a:"very"},
+  {s:"The film is ___ good — not great, but OK.",opts:["quite","a bit","not"],a:"quite"},
+  {s:"My cat is ___ lazy, it sleeps all day.",opts:["really","a","quite a"],a:"really"}
+]);
+exBuild($("ex3b"),[
+  {ru:"Она очень добрый человек.",w:"She's a very kind person .",alt:["She is a very kind person ."],extra:["kinds"]},
+  {ru:"Мои друзья весёлые.",w:"My friends are funny .",extra:["funnys","is"]},
+  {ru:"Он немного застенчивый.",w:"He's a bit shy .",alt:["He is a bit shy ."],extra:["a"]},
+  {ru:"Это известная компания.",w:"It's a well-known company .",alt:["It is a well-known company ."],extra:["company's"]}
+]);
+exStress($("ex4a"),[
+  {w:"teacher",syl:["tea","cher"],s:0},{w:"hotel",syl:["ho","tel"],s:1},{w:"Japanese",syl:["Ja","pa","nese"],s:2},{w:"Italian",syl:["I","ta","li","an"],s:1},
+  {w:"photograph",syl:["pho","to","graph"],s:0},{w:"photographer",syl:["pho","to","gra","pher"],s:1},{w:"engineer",syl:["en","gi","neer"],s:2},{w:"police",syl:["po","lice"],s:1},
+  {w:"Canada",syl:["Ca","na","da"],s:0},{w:"Canadian",syl:["Ca","na","di","an"],s:1},{w:"married",syl:["mar","ried"],s:0},{w:"July",syl:["Ju","ly"],s:1}
+]);
+exSort($("ex4b"),{groups:[{label:"/ɒ/ hot"},{label:"/əʊ/ phone"},{label:"/ʌ/ mother"}],items:[
+  {w:"job",g:0},{w:"sorry",g:0},{w:"doctor",g:0},{w:"shop",g:0},{w:"go",g:1},{w:"home",g:1},{w:"old",g:1},{w:"photo",g:1},{w:"Poland",g:1},
+  {w:"son",g:2},{w:"Monday",g:2},{w:"London",g:2},{w:"brother",g:2},{w:"come",g:2}
+]});
+
+initLesson({topics:[["en.01.2.1","be: вопросы и короткие ответы"],["en.01.2.2","Вопросительные слова: what, where, who, how old"],["en.01.2.3","Прилагательные для описания людей"],["en.01.2.4","Ударение в словах; долгий и краткий o"]]});
+</script>
