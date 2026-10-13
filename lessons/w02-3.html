@@ -1,0 +1,934 @@
+<title>Урок 2.3 · Проект как на работе</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<style>
+/* Только для этого урока: дерево проекта, проверка .gitignore, трёхстороннее слияние, конвейер команд, калькулятор chmod, ячейки ноутбука, карточки компаний. */
+.ftree{font:13.5px/1.75 var(--f-mono);background:var(--soft);border-radius:10px;padding:10px 6px;overflow-x:auto}
+.ftree button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:0 8px;font:inherit;color:var(--ink);cursor:pointer;white-space:pre;transition:background-color .15s}
+.ftree button:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.ftree button[aria-pressed="true"]{background:var(--accent-soft)}
+.ftree .ig{color:var(--muted)}
+.finfo{display:grid;gap:8px;align-content:start}
+.finfo h3{font-size:16px}
+.tag2{font:500 11px var(--f-mono);padding:2px 8px;border-radius:999px;border:1px solid var(--line);justify-self:start}
+.tag2.yes{border-color:var(--accent);color:var(--accent)} .tag2.no{border-color:var(--red);color:var(--red)}
+.gi{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:14px}
+@media (max-width:700px){.gi{grid-template-columns:1fr}}
+.ta{width:100%;min-height:210px;font:13.5px/1.55 var(--f-mono);padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.flist{font:13px/1.7 var(--f-mono);background:var(--soft);border-radius:10px;padding:8px 12px;overflow-x:auto}
+.flist div{display:grid;padding:3px 0;border-bottom:1px solid color-mix(in srgb,var(--line) 50%,transparent)}
+.flist div>span:first-child{white-space:nowrap}
+.flist .out{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.flist .why{color:var(--muted);font-size:11.5px;line-height:1.4}
+.flist .keep .why{color:var(--accent)}
+.mrg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:700px){.mrg{grid-template-columns:1fr}}
+.mcol b{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mcol pre{margin-top:4px;min-height:100px}
+.mres{font:13.5px/1.6 var(--f-mono);background:var(--soft);border-radius:10px;padding:10px 0;overflow-x:auto}
+.mres span{display:block;padding:0 14px;white-space:pre}
+.mres .cm1{background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.mres .cm2{background:color-mix(in srgb,var(--plum) 20%,transparent)}
+.mres .mk{color:var(--red);font-weight:600}
+.pipe{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:13px var(--f-mono)}
+.pipe .st{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:5px 9px;cursor:pointer;font:inherit;transition:border-color .15s,opacity .15s,background-color .15s}
+.pipe .st[aria-pressed="false"]{opacity:.45;text-decoration:line-through}
+.pipe .st[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pipe .bar{color:var(--muted)}
+.term2{font:13px/1.6 var(--f-mono);background:var(--ink);color:var(--bg);border-radius:10px;padding:10px 14px;white-space:pre;overflow-x:auto;min-height:110px}
+.perm{display:grid;grid-template-columns:110px repeat(3,minmax(0,1fr));gap:6px;align-items:center;font-size:14px}
+.perm .h{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center}
+.perm label{display:flex;justify-content:center}
+.perm input{width:18px;height:18px;accent-color:var(--accent)}
+.big2{font:700 28px var(--f-mono);letter-spacing:.04em}
+.nb{display:grid;gap:8px}
+.cell2{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:start;background:var(--soft);border-radius:10px;padding:8px 10px;border-left:3px solid transparent;transition:border-color .2s}
+.cell2.last{border-left-color:var(--accent)}
+.cell2.err{border-left-color:var(--red)}
+.cell2 .cnt{font:12px var(--f-mono);color:var(--muted);padding-top:3px}
+.cell2 code{font-size:13px;white-space:pre-wrap}
+.cell2 .o{grid-column:2/4;font:12.5px var(--f-mono);color:var(--muted);white-space:pre-wrap}
+.cell2 .o.e{color:var(--red)}
+.kern{font:12.5px var(--f-mono);background:var(--soft);border-radius:10px;padding:8px 12px}
+.cos2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.co2{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:8px;align-content:start}
+.co2 h3{font-size:15.5px}
+.co2 ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:14px}
+.co2 .src{font-size:12.5px;color:var(--muted)}
+.co2 .src a{color:var(--muted)}
+.co2 .lk{display:flex;flex-wrap:wrap;gap:12px;font-size:13.5px}
+.co2 .lk a{text-decoration:none;font-weight:500}
+.co2.hot{border-color:var(--warm);box-shadow:0 0 0 1px var(--warm) inset}
+</style>
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-2.html">← Урок 2 · Сортировки и Python</a><span class="mid">урок 3 из 3</span><a href="/plan#w-2">Неделя 2 в плане →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · урок 3 из 3 · 17 тем · ~3,5 часа</div>
+  <h1>Проект как на работе</h1>
+  <p>Задача этой недели — завести репозиторий проекта А так, как его заводят в команде: понятная структура, README, по которому проект запускается без вопросов, ничего лишнего и ничего секретного в git, зафиксированные версии и аккуратная история коммитов. Терминал, git и Jupyter ты уже видел в уроке 1.3 — здесь их рабочая сторона: конфликты, права, переменные окружения, ловушки ноутбуков. В конце — куда подаваться: Яндекс, Т-Банк, Сбер, VK и госсектор, где один набор закрывается уже 21 октября.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Структура</a><a href="#t2">README</a><a href="#t3">.gitignore</a><a href="#t4">Секреты</a><a href="#t5">Версии</a><a href="#t6">Коммиты</a><a href="#t7">Конфликты</a><a href="#t8">Просмотр файлов</a><a href="#t9">Пайпы</a><a href="#t10">Права</a><a href="#t11">PATH и .zshrc</a><a href="#t12">Jupyter</a><a href="#t13">Куда подаваться</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<div class="part"><span class="eyebrow">Часть 1 · 5 тем</span><h2>Проект А с нуля</h2><p>Репозиторий — первое, что откроет человек, который будет решать, звать ли тебя на собеседование. По нему за минуту видно, умеешь ли ты работать как инженер или только в одном ноутбуке.</p></div>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 13 · <span class="qd key" aria-hidden="true"></span>Python</div>
+  <h2>Структура проекта: src/, tests/, configs/</h2>
+  <p class="tldr">У каждой вещи в проекте своё место: код — в <code>src/</code>, проверки — в <code>tests/</code>, настройки — в <code>configs/</code>, исследования — в <code>notebooks/</code>, данные и модели — рядом, но не в git. Так проект понятен чужому человеку и запускается одной командой.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · что где лежит</span><span class="muted mono">oulad-risk/</span></div>
+    <div class="lab-grid" style="align-items:start">
+      <div class="ftree" id="ftree" role="group" aria-label="Дерево проекта"></div>
+      <div class="finfo" id="finfo"></div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Нажимай на папки и файлы. Серым — то, что не попадает в git.</p>
+  </div>
+
+  <h3 style="font-size:17px">Как код из src/ запускается и импортируется</h3>
+<pre>oulad-risk/
+  src/oulad_risk/__init__.py      <span class="cm"># пакет: папка с __init__.py</span>
+  src/oulad_risk/data.py
+  src/oulad_risk/train.py
+  pyproject.toml
+
+<span class="cm"># train.py импортирует соседний модуль по имени пакета</span>
+from oulad_risk.data import load_students
+
+<span class="cm"># запуск модулем из корня, а не python src/oulad_risk/train.py</span>
+python -m oulad_risk.train --config configs/baseline.yaml
+
+<span class="cm"># чтобы пакет был виден из любой папки и из ноутбуков — установить проект в venv «в режиме разработки»</span>
+pip install -e .</pre>
+  <div class="prose">
+    <ul>
+      <li><b>Почему не всё в одном ноутбуке:</b> ноутбук нельзя импортировать, тестировать и запускать на сервере по расписанию. Ноутбук — для исследования и графиков, всё повторяемое переезжает в функции в <code>src/</code>.</li>
+      <li><b>Одна ответственность на модуль:</b> <code>data.py</code> — загрузка и очистка, <code>features.py</code> — признаки, <code>train.py</code> — обучение, <code>evaluate.py</code> — метрики. Модуль на 1000 строк — сигнал разбить.</li>
+      <li><b>Конфиги вместо чисел в коде:</b> пути, гиперпараметры, список признаков — в <code>configs/*.yaml</code> или <code>.json</code>. Новый эксперимент — новый конфиг, а не правка кода.</li>
+      <li><b>Данные по слоям:</b> <code>data/raw</code> — как скачали, никогда не менять руками; <code>data/processed</code> — то, что получилось скриптом. Любой файл в processed можно пересоздать из raw.</li>
+      <li><b><code>pyproject.toml</code></b> — паспорт проекта: имя, версия Python, зависимости, настройки инструментов (линтер, тесты). Минимальный уже позволяет <code>pip install -e .</code>.</li>
+    </ul>
+  </div>
+  <div class="callout trap"><b class="h">Ловушка импортов</b><p>«В ноутбуке импорт работает, а скрипт падает с ModuleNotFoundError» — почти всегда разные текущие папки и <code>sys.path</code>. Не лечи это строчкой <code>sys.path.append("..")</code> в каждом файле: установи пакет через <code>pip install -e .</code> или запускай модулем через <code>python -m</code> из корня.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как вы организуете ML-проект, чтобы его мог запустить коллега?</summary>
+      <div class="a"><p>Стандартная структура: <code>src/</code> с пакетом, <code>tests/</code>, <code>configs/</code>, <code>notebooks/</code> для исследований, <code>data/</code> и <code>models/</code> вне git. README с разделом «как запустить» в трёх командах, зафиксированные зависимости (requirements или lock-файл), пути через конфиг или от корня проекта, секреты в <code>.env</code> с примером <code>.env.example</code>, случайность зафиксирована. Проверка: склонировать в чистую папку и запустить по README.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Где должен лежать файл, который скачали с сайта OULAD, а где — таблица после очистки?</summary>
+      <div class="a"><p><code>data/raw/</code> — исходник, не меняется руками. <code>data/processed/</code> — результат скрипта. Обе папки — в <code>.gitignore</code>.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="python.eng.0">
+    <label class="tp"><input type="checkbox" data-id="python.eng.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Структура проекта</b></span></label>
+    <span class="note" data-d="python.eng.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 13 · Инструменты</div>
+  <h2>README как витрина проекта</h2>
+  <p class="tldr">README — обложка и инструкция одновременно. Рекрутер за 30 секунд должен понять, что за задача и какой результат, а инженер за 5 минут — запустить проект. Всё остальное — бонус.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Раздел</th><th>Что в нём</th><th>Пример для проекта А</th></tr></thead>
+    <tbody>
+      <tr><td>Заголовок и одна фраза</td><td>что делает проект и для кого</td><td>«Ранняя диагностика риска не сдать курс по данным OULAD: прогноз на неделе N»</td></tr>
+      <tr><td>Результат</td><td>главная метрика на отложенной выборке и с чем сравнивали</td><td>таблица: бейзлайн, логрег, CatBoost — PR-AUC, recall при пороге</td></tr>
+      <tr><td>Данные</td><td>откуда, сколько, лицензия, как скачать</td><td>ссылка на OULAD, 7 таблиц, команда для скачивания</td></tr>
+      <tr><td>Как запустить</td><td>3–5 команд от клонирования до результата</td><td>venv → <code>pip install -r</code> → скачать → обучить</td></tr>
+      <tr><td>Структура</td><td>короткое дерево папок</td><td>как в теме 1</td></tr>
+      <tr><td>Ограничения</td><td>честно: где модель плоха и почему</td><td>«валидация на одном университете, перенос на МИРЭА не проверен»</td></tr>
+      <tr><td>Планы</td><td>что дальше — отдельно от сделанного</td><td>FastAPI, SHAP-карточки</td></tr>
+    </tbody></table></div>
+<pre># OULAD Risk — кто не сдаст курс, видно уже на 4-й неделе
+
+Модель предсказывает по активности студента в первые недели курса, что он не сдаст курс,
+чтобы куратор успел вмешаться. Данные — открытый датасет Open University (OULAD).
+
+## Результат
+| Модель | PR-AUC | Recall при precision 0.6 |
+| --- | --- | --- |
+| …заполнишь, когда будут цифры… | | |
+
+## Как запустить
+```bash
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt
+python -m oulad_risk.download     # скачает данные в data/raw
+python -m oulad_risk.train --config configs/baseline.yaml
+```</pre>
+  <div class="callout trap"><b class="h">Чего в README не должно быть</b><p>Обещаний того, чего нет (это был главный минус первой версии BRS: «шесть модулей», а готов один). Метрик без указания, на какой выборке. Скриншота кода вместо кода. Инструкции, которую ты сам ни разу не прогнал в чистой папке.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Назови три раздела README, без которых проект на собеседовании не защитить.</summary>
+      <div class="a"><p>Задача одной фразой, результат с метрикой и сравнением с бейзлайном, как запустить. Плюс «ограничения» — их обязательно спросят.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="tools.git.9">
+    <label class="tp"><input type="checkbox" data-id="tools.git.9"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>README как витрина проекта</b></span></label>
+    <span class="note" data-d="tools.git.9">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 13 · <span class="qd key" aria-hidden="true"></span>Инструменты</div>
+  <h2>.gitignore для данных, моделей и секретов</h2>
+  <p class="tldr">Зачем нужен .gitignore — в уроке 1.3. Здесь — как он на самом деле читает правила: что значит слэш в начале и в конце, звёздочки, восклицательный знак и почему исключение иногда не срабатывает.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · проверка .gitignore</span><span class="muted mono" id="giState"></span></div>
+    <div class="btns" role="group" aria-label="Примеры правил"><button class="btn gx" data-x="good">Хороший для ML</button><button class="btn gx" data-x="trap">Ловушка с исключением</button><button class="btn gx" data-x="empty">Пустой</button></div>
+    <div class="gi">
+      <textarea class="ta" id="giRules" spellcheck="false" aria-label="Правила .gitignore"></textarea>
+      <div class="flist" id="giFiles" aria-live="polite"></div>
+    </div>
+    <p class="verdict" id="giMsg"></p>
+    <p class="muted" style="font-size:13.5px">Правь правила слева — справа сразу видно, какие файлы попадут в git (зелёным — по какому правилу оставлен), а какие нет (зачёркнуто — каким правилом скрыт). Работает как git check-ignore -v для простых случаев.</p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Правило</th><th>Что значит</th></tr></thead>
+    <tbody>
+      <tr><td><code>*.csv</code></td><td>все .csv в любой папке</td></tr>
+      <tr><td><code>data/</code></td><td>папка data где угодно (слэш в конце — только папки)</td></tr>
+      <tr><td><code>/data/</code></td><td>только data в корне репозитория</td></tr>
+      <tr><td><code>models/**/*.pkl</code></td><td>pkl на любой глубине внутри models</td></tr>
+      <tr><td><code>!data/README.md</code></td><td>исключение: этот файл оставить</td></tr>
+      <tr><td><code># комментарий</code></td><td>строка не правило</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Почему исключение не работает</b><p>Если скрыта папка целиком (<code>data/</code>), git в неё даже не заглядывает, и <code>!data/README.md</code> ничего не вернёт. Нужно скрыть содержимое, а не папку: <code>data/*</code>, а потом <code>!data/README.md</code>. Проверь это кнопкой «Ловушка с исключением». Отладка в настоящем репозитории: <code>git check-ignore -v путь</code> — покажет, какое правило сработало.</p></div>
+  <div class="prose"><ul>
+    <li><b>Уже закоммиченный файл</b> .gitignore не скроет: <code>git rm --cached файл</code>, потом коммит.</li>
+    <li><b>Секрет попал в историю</b> — считай его утёкшим: <b>сначала отозвать ключ</b> у сервиса, потом чистить историю. Удаление файла новым коммитом не помогает — старый коммит всё помнит.</li>
+    <li><b>Общий gitignore</b> для мусора системы и редактора (<code>.DS_Store</code>, <code>.idea/</code>): <code>git config --global core.excludesfile ~/.gitignore_global</code>.</li>
+    <li><b>Данные и модели всё-таки хочется версионировать</b> — для этого DVC или Git LFS, а не git напрямую (неделя MLOps).</li>
+  </ul></div>
+<pre><span class="cm"># .gitignore для ML-проекта</span>
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+data/*
+!data/README.md
+models/
+mlruns/
+logs/
+.DS_Store</pre>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Вы случайно запушили файл с токеном API. Что делаете?</summary>
+      <div class="a"><p>Первым делом отзываю токен у сервиса и выпускаю новый — после пуша его могли скопировать за секунды, боты сканируют GitHub. Потом убираю секрет из кода в переменную окружения или <code>.env</code> (в <code>.gitignore</code>), а историю чищу (git filter-repo или BFG) и предупреждаю команду. Удаление файла новым коммитом не помогает — секрет остаётся в истории.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Правила <code>data/</code> и <code>!data/README.md</code>. Попадёт ли README в git?</summary>
+      <div class="a"><p>Нет: папка скрыта целиком, исключение внутри неё не работает. Нужно <code>data/*</code> + <code>!data/README.md</code>.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="tools.git.5">
+    <label class="tp"><input type="checkbox" data-id="tools.git.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>.gitignore для данных, моделей и секретов</b></span></label>
+    <span class="note" data-d="tools.git.5">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="topic" id="t4">
+  <div class="eyebrow">Тема 4 из 13 · Инструменты</div>
+  <h2>Секреты в .env, а не в коде</h2>
+  <p class="tldr">Пароли, токены и ключи API живут в переменных окружения. Локально их удобно хранить в файле <code>.env</code>, который никогда не попадает в git. В репозиторий кладут <code>.env.example</code> — те же имена без значений.</p>
+<pre><span class="cm"># .env — в .gitignore, только на твоём компьютере</span>
+OPENAI_API_KEY=sk-...
+DB_URL=postgresql://user:pass@localhost/oulad
+
+<span class="cm"># .env.example — в git: какие переменные нужны</span>
+OPENAI_API_KEY=
+DB_URL=
+
+<span class="cm"># код читает из окружения; python-dotenv подгружает .env при старте</span>
+import os
+from dotenv import load_dotenv
+load_dotenv()                                   <span class="cm"># ищет .env и кладёт значения в os.environ</span>
+key = os.environ["OPENAI_API_KEY"]              <span class="cm"># нет переменной — KeyError: падаем сразу и понятно</span>
+debug = os.getenv("DEBUG", "0") == "1"           <span class="cm"># необязательная — со значением по умолчанию</span></pre>
+  <div class="prose"><ul>
+    <li><b>Что считается секретом:</b> всё, что даёт доступ: ключи API, пароли БД, токены ботов, приватные ключи SSH, строки подключения. Не секрет — пути, гиперпараметры, имена моделей: это конфиг.</li>
+    <li><b>Откуда секреты на сервере и в CI:</b> не из файла, а из переменных окружения, которые задаёт платформа — GitHub Actions Secrets, Docker <code>--env-file</code>, хранилища секретов.</li>
+    <li><b>Секрет в ноутбуке</b> — та же утечка: вывод ячеек сохраняется в файл <code>.ipynb</code>. Не печатай ключи и не вставляй их строкой в код ячейки.</li>
+    <li><b>GitHub сам ищет секреты</b> (secret scanning) и может заблокировать пуш с узнаваемым токеном — но надеяться на это нельзя.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Чем <code>os.environ["X"]</code> отличается от <code>os.getenv("X")</code>?</summary>
+      <div class="a"><p>Первое бросает KeyError, если переменной нет — так проверяют обязательные секреты. Второе возвращает None или значение по умолчанию — для необязательных настроек.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="tools.env.4">
+    <label class="tp"><input type="checkbox" data-id="tools.env.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Секреты в .env, а не в коде</b></span></label>
+    <span class="note" data-d="tools.env.4">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="topic" id="t5">
+  <div class="eyebrow">Тема 5 из 13 · Инструменты</div>
+  <h2>Фиксация версий: == вместо &gt;=</h2>
+  <p class="tldr">Через полгода <code>pip install pandas</code> поставит другую версию, и код, который работал, может сломаться или тихо выдать другие цифры. Точные версии в requirements — гарантия, что проект соберётся так же, как у тебя сегодня.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Запись</th><th>Что поставится</th><th>Для чего</th></tr></thead>
+    <tbody>
+      <tr><td><code>pandas</code></td><td>самая новая на момент установки</td><td>никогда для проекта</td></tr>
+      <tr><td><code>pandas&gt;=2.2</code></td><td>2.2 или любая новее, включая 3.x</td><td>библиотеки, которые публикуешь сам</td></tr>
+      <tr><td><code>pandas~=2.2.3</code></td><td>2.2.3, 2.2.4… но не 2.3</td><td>«только исправления ошибок»</td></tr>
+      <tr><td><code>pandas==2.2.3</code></td><td>ровно 2.2.3</td><td>приложение, проект, эксперимент — по умолчанию</td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <p><b>Семантическое версионирование</b> (SemVer): <code>MAJOR.MINOR.PATCH</code>. PATCH — исправления, MINOR — новые возможности без поломок, MAJOR — может сломать старый код (pandas 1 → 2 поменял поведение многих функций). Так обещают авторы, но не всегда соблюдают — поэтому и фиксируют точно.</p>
+    <p><b>Прямые и транзитивные зависимости.</b> Ты ставишь <code>scikit-learn</code>, а он тянет <code>numpy</code>, <code>scipy</code>, <code>joblib</code>. Зафиксировать только свои пакеты мало: обновится numpy — и всё равно может сломаться. Поэтому есть два файла: короткий список того, что ты используешь, и полный «замок» (lock) со всеми версиями.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Инструмент</th><th>Список «что нужно»</th><th>Lock «что именно стоит»</th></tr></thead>
+    <tbody>
+      <tr><td>pip + pip-tools</td><td><code>requirements.in</code></td><td><code>pip-compile</code> → <code>requirements.txt</code> с ==</td></tr>
+      <tr><td>uv</td><td><code>pyproject.toml</code></td><td><code>uv.lock</code></td></tr>
+      <tr><td>poetry</td><td><code>pyproject.toml</code></td><td><code>poetry.lock</code></td></tr>
+      <tr><td>просто pip</td><td colspan="2"><code>pip freeze &gt; requirements.txt</code> — всё установленное с ==, включая мусор; для учебного проекта сойдёт, если окружение чистое</td></tr>
+    </tbody></table></div>
+  <div class="callout feel"><b class="h">Почему это ML-проблема особенно</b><p>Новая версия библиотеки может не упасть, а поменять результат: другой сид по умолчанию, другой порог, другая реализация метрики. Метрика из README перестанет воспроизводиться, и ты не поймёшь почему. Плюс версия Python: укажи её в README или <code>.python-version</code>, а в <code>pyproject.toml</code> — <code>requires-python</code>.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем requirements.txt отличается от lock-файла и зачем оба?</summary>
+      <div class="a"><p>Список зависимостей описывает намерение: какие пакеты нужны проекту, часто с допустимыми диапазонами. Lock фиксирует точный результат установки — все пакеты, включая транзитивные, с конкретными версиями (иногда и хешами). Список удобно править руками, lock гарантирует, что у коллеги, в CI и на сервере будет одно и то же окружение.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="tools.env.2">
+    <label class="tp"><input type="checkbox" data-id="tools.env.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Фиксация версий</b></span></label>
+    <span class="note" data-d="tools.env.2">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 2 · 2 темы</span><h2>Git в команде</h2><p>Один в репозитории ты можешь писать «fix» и «правки». В команде история коммитов — документация: по ней ищут, когда сломалось, и собирают список изменений к релизу.</p></div>
+
+<!-- ============ 6 ============ -->
+<section class="topic" id="t6">
+  <div class="eyebrow">Тема 6 из 13 · Инструменты</div>
+  <h2>Conventional Commits: feat:, fix:, docs:</h2>
+  <p class="tldr">Сообщение коммита по шаблону <code>тип(область): что сделано</code>. Тип сразу говорит, что это: новая возможность, исправление, документация. Такую историю читают люди и разбирают инструменты.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · проверка сообщения коммита</span><span class="muted mono" id="ccState"></span></div>
+    <div class="btns" role="group" aria-label="Примеры"><button class="btn cx" data-x="0">feat(data): add OULAD loader</button><button class="btn cx" data-x="1">fixed stuff</button><button class="btn cx" data-x="2">Fix: Early stopping.</button><button class="btn cx" data-x="3">feat!: drop python 3.9</button></div>
+    <input id="ccIn" type="text" spellcheck="false" aria-label="Сообщение коммита" style="width:100%;font:15px var(--f-mono);padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)">
+    <div class="readout" id="ccParts"></div>
+    <p class="verdict" id="ccMsg"></p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Тип</th><th>Когда</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td><code>feat</code></td><td>новая возможность</td><td><code>feat(features): add weekly activity counts</code></td></tr>
+      <tr><td><code>fix</code></td><td>исправление ошибки</td><td><code>fix(train): use val set for early stopping</code></td></tr>
+      <tr><td><code>docs</code></td><td>только документация</td><td><code>docs: add results table to README</code></td></tr>
+      <tr><td><code>refactor</code></td><td>переделка без изменения поведения</td><td><code>refactor(data): split loader into functions</code></td></tr>
+      <tr><td><code>test</code></td><td>тесты</td><td><code>test: check no student in both splits</code></td></tr>
+      <tr><td><code>chore</code>, <code>build</code>, <code>ci</code></td><td>обслуживание, зависимости, CI</td><td><code>build: pin pandas==2.2.3</code></td></tr>
+      <tr><td><code>perf</code>, <code>style</code></td><td>скорость, форматирование</td><td><code>perf: vectorize feature computation</code></td></tr>
+    </tbody></table></div>
+  <div class="prose"><ul>
+    <li><b>Формат:</b> тип в нижнем регистре, область в скобках по желанию, двоеточие и пробел, описание в повелительном наклонении («add», не «added»), без точки в конце, первая строка до ~72 символов. Пустая строка — и подробности в теле, если нужно.</li>
+    <li><b><code>!</code> или <code>BREAKING CHANGE:</code></b> в теле — изменение ломает обратную совместимость.</li>
+    <li><b>Атомарность важнее формата:</b> один коммит — одна логическая правка. «feat: add loader and fix README and update deps» — это три коммита. <code>git add -p</code> позволяет добавить в коммит часть изменений файла.</li>
+    <li><b>Язык:</b> в командах в России пишут и по-русски, и по-английски — следуй правилу репозитория. Для портфолио английский понятнее всем.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Перепиши «поправил баг с утечкой теста» по Conventional Commits.</summary>
+      <div class="a"><p><code>fix(train): use validation set instead of test for early stopping</code></p></div></details>
+  </div>
+  <div class="topic-check" data-for="tools.git.6">
+    <label class="tp"><input type="checkbox" data-id="tools.git.6"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Conventional Commits</b></span></label>
+    <span class="note" data-d="tools.git.6">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="topic" id="t7">
+  <div class="eyebrow">Тема 7 из 13 · Инструменты</div>
+  <h2>Разрешение merge-конфликтов</h2>
+  <p class="tldr">Шаги «увидел маркеры → выбрал → add → commit» — в уроке 1.3. Здесь — почему конфликт возникает вообще: git сравнивает три версии файла — общего предка и две ветки. Если обе ветки поменяли одно место по-разному, выбрать за тебя он не может.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · трёхстороннее слияние</span><span class="muted mono" id="mgState"></span></div>
+    <div class="btns" role="group" aria-label="Сценарий"><button class="btn mx2" data-s="clean" aria-pressed="true">Правки в разных строках</button><button class="btn mx2" data-s="conflict" aria-pressed="false">Обе ветки поменяли одну строку</button></div>
+    <div class="mrg">
+      <div class="mcol"><b>База — общий предок</b><pre id="mgBase"></pre></div>
+      <div class="mcol"><b>main — твоя ветка (ours)</b><pre id="mgOurs"></pre></div>
+      <div class="mcol"><b>feature — сливаемая (theirs)</b><pre id="mgTheirs"></pre></div>
+    </div>
+    <b class="mono muted" style="font-size:11px;letter-spacing:.06em">РЕЗУЛЬТАТ git merge feature</b>
+    <div class="mres" id="mgRes"></div>
+    <div class="btns" id="mgFix"><button class="btn" data-r="ours">Оставить свою</button><button class="btn" data-r="theirs">Взять их</button><button class="btn" data-r="both">Собрать вручную</button></div>
+    <p class="verdict" id="mgMsg"></p>
+  </div>
+  <div class="prose"><ul>
+    <li><b>Строка изменилась только в одной ветке</b> — git берёт изменённую версию сам. Поэтому большинство слияний проходит без вопросов.</li>
+    <li><b>Одна строка — по-разному в обеих</b> — конфликт. Это не ошибка, а вопрос к человеку: какой смысл правильный.</li>
+    <li><b>Взять целиком одну сторону</b> для файла: <code>git checkout --ours файл</code> или <code>--theirs</code>. При rebase «ours» и «theirs» меняются местами — это частая путаница.</li>
+    <li><b>Конфликты в .ipynb</b> — ад: ноутбук это JSON с выводами ячеек. Помогают <code>nbdime</code> (сравнение и слияние ноутбуков) и привычка не коммитить выводы (<code>nbstripout</code>).</li>
+    <li><b>Как конфликтов избегать:</b> маленькие ветки и частые слияния, <code>git pull</code> перед началом работы, не форматировать весь файл в одном коммите с правкой логики, договориться, кто правит общий конфиг.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему возникает merge-конфликт и как вы его решаете?</summary>
+      <div class="a"><p>Git делает трёхстороннее слияние: сравнивает общий предок с каждой из двух веток. Если одно и то же место изменено в обеих по-разному, он не знает, какой вариант верный, и ставит маркеры. Решение: открыть файл, понять смысл обеих правок (посмотреть <code>git log</code> по веткам или спросить автора), собрать правильный вариант, убрать маркеры, прогнать тесты, <code>git add</code> и <code>git commit</code>. Если что-то пошло не так — <code>git merge --abort</code>.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="tools.git.2">
+    <label class="tp"><input type="checkbox" data-id="tools.git.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Разрешение merge-конфликтов</b></span></label>
+    <span class="note" data-d="tools.git.2">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 3 · 5 тем</span><h2>Терминал и Jupyter в работе</h2><p>Базовые команды — в уроке 1.3. Здесь то, что понадобится, когда данные лежат на сервере, файлы по гигабайту, а ноутбук «работал вчера».</p></div>
+
+<!-- ============ 8 ============ -->
+<section class="topic" id="t8">
+  <div class="eyebrow">Тема 8 из 13 · Инструменты</div>
+  <h2>Просмотр файлов: cat, less, head, tail -f</h2>
+  <p class="tldr">Открыть CSV на гигабайт в Excel — подвиг на 10 минут. В терминале первые строки, размер и число строк видно за секунду, а лог обучения можно смотреть вживую.</p>
+<pre>ls -lh data/raw/                 <span class="cm"># размеры файлов в человеческом виде (K, M, G)</span>
+du -sh data/                     <span class="cm"># сколько занимает папка целиком</span>
+head -5 studentInfo.csv          <span class="cm"># первые 5 строк — увидеть заголовок и формат</span>
+head -1 studentInfo.csv | tr ',' '\n' | cat -n   <span class="cm"># столбцы с номерами — для cut</span>
+tail -3 studentInfo.csv          <span class="cm"># последние строки: нет ли мусора в конце</span>
+wc -l studentInfo.csv            <span class="cm"># число строк (минус заголовок — число записей)</span>
+less -S studentInfo.csv          <span class="cm"># листать без переноса строк</span>
+column -s, -t &lt; small.csv | less -S   <span class="cm"># маленький CSV ровной таблицей</span>
+tail -f logs/train.log           <span class="cm"># смотреть лог по мере записи; Ctrl+C — выйти</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Клавиша в less</th><th>Действие</th></tr></thead>
+    <tbody>
+      <tr><td><code>пробел</code> / <code>b</code></td><td>страница вниз / вверх</td></tr>
+      <tr><td><code>/слово</code>, затем <code>n</code></td><td>поиск и следующее совпадение</td></tr>
+      <tr><td><code>g</code> / <code>G</code></td><td>в начало / в конец</td></tr>
+      <tr><td><code>F</code></td><td>режим «как tail -f» внутри less</td></tr>
+      <tr><td><code>q</code></td><td>выйти</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">cat для больших файлов — нет</b><p><code>cat</code> на файл в миллион строк зальёт весь терминал. Для взгляда — <code>head</code>, <code>tail</code>, <code>less</code>. <code>cat</code> — для маленьких файлов и чтобы передать содержимое дальше по пайпу.</p></div>
+  <div class="topic-check" data-for="tools.term.1">
+    <label class="tp"><input type="checkbox" data-id="tools.term.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Просмотр файлов</b></span></label>
+    <span class="note" data-d="tools.term.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="topic" id="t9">
+  <div class="eyebrow">Тема 9 из 13 · Инструменты</div>
+  <h2>Пайпы и перенаправления: |, &gt;, &gt;&gt;, 2&gt;&amp;1</h2>
+  <p class="tldr">У каждой программы три потока: ввод (0, stdin), вывод (1, stdout) и ошибки (2, stderr). Пайп соединяет вывод одной команды со входом другой, перенаправление отправляет поток в файл. Из маленьких команд собирается анализ данных в одну строку.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · собери конвейер</span><span class="muted mono" id="ppState"></span></div>
+    <p class="muted" style="font-size:14px">Файл <code>visits.csv</code>: дата, студент, курс. Включай и выключай звенья — вывод пересчитывается.</p>
+    <div class="pipe" id="ppChain"></div>
+    <div class="term2" id="ppOut" aria-live="polite"></div>
+    <p class="verdict" id="ppMsg"></p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Запись</th><th>Что делает</th></tr></thead>
+    <tbody>
+      <tr><td><code>cmd &gt; out.txt</code> / <code>&gt;&gt;</code></td><td>stdout в файл: перезаписать / дописать</td></tr>
+      <tr><td><code>cmd 2&gt; err.txt</code></td><td>только ошибки в файл</td></tr>
+      <tr><td><code>cmd &gt; all.log 2&gt;&amp;1</code></td><td>и вывод, и ошибки в один файл. Порядок важен: сначала куда stdout, потом «2 туда же, куда 1»</td></tr>
+      <tr><td><code>cmd 2&gt;/dev/null</code></td><td>выбросить ошибки (например, «нет доступа» в find)</td></tr>
+      <tr><td><code>cmd | tee run.log</code></td><td>видеть вывод на экране и одновременно писать в файл</td></tr>
+      <tr><td><code>find . -name "*.pyc" | xargs rm</code></td><td>xargs превращает строки входа в аргументы команды</td></tr>
+      <tr><td><code>cmd &lt; in.txt</code></td><td>файл на вход вместо клавиатуры</td></tr>
+    </tbody></table></div>
+<pre>python -m oulad_risk.train 2&gt;&amp;1 | tee logs/run_$(date +%F).log   <span class="cm"># обучение: всё на экран и в файл с датой</span>
+nohup python -m oulad_risk.train &gt; train.out 2&gt;&amp;1 &amp;              <span class="cm"># на сервере: в фоне, не умрёт при выходе</span></pre>
+  <div class="callout trap"><b class="h">Ловушка с порядком</b><p><code>cmd 2&gt;&amp;1 &gt; file</code> отправит в файл только вывод, а ошибки — на экран: в момент <code>2&gt;&amp;1</code> поток 1 ещё смотрел на экран. Правильно — <code>cmd &gt; file 2&gt;&amp;1</code>. Также <code>logging</code> в Python по умолчанию пишет в stderr — поэтому без <code>2&gt;&amp;1</code> логи не попадут в файл.</p></div>
+  <div class="topic-check" data-for="tools.term.3">
+    <label class="tp"><input type="checkbox" data-id="tools.term.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Пайпы и перенаправления</b></span></label>
+    <span class="note" data-d="tools.term.3">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="topic" id="t10">
+  <div class="eyebrow">Тема 10 из 13 · Инструменты</div>
+  <h2>Права доступа: chmod, chown, sudo</h2>
+  <p class="tldr">У файла три группы пользователей — владелец, группа, все остальные — и три права для каждой: читать (r), писать (w), выполнять (x). Права записывают буквами <code>rwxr-xr-x</code> или тремя цифрами <code>755</code>.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · калькулятор прав</span><span class="muted mono" id="cmState"></span></div>
+    <div class="lab-grid" style="align-items:start">
+      <div class="perm" id="cmGrid"></div>
+      <div style="display:grid;gap:8px">
+        <div class="stat"><div class="v big2" id="cmOct">755</div><div class="k">chmod — число</div></div>
+        <div class="stat"><div class="v big2" id="cmStr" style="font-size:22px">-rwxr-xr-x</div><div class="k">как в ls -l</div></div>
+      </div>
+    </div>
+    <div class="btns" role="group" aria-label="Типичные права"><button class="btn cp" data-o="755">755 скрипт</button><button class="btn cp" data-o="644">644 обычный файл</button><button class="btn cp" data-o="600">600 ключ SSH, .env</button><button class="btn cp" data-o="700">700 личная папка</button><button class="btn cp" data-o="777">777 всем всё</button></div>
+    <p class="verdict" id="cmMsg"></p>
+  </div>
+  <div class="prose">
+    <p><b>Как считать число:</b> r = 4, w = 2, x = 1, складываем для каждой группы. <code>rwx</code> = 7, <code>r-x</code> = 5, <code>rw-</code> = 6, <code>r--</code> = 4. Три цифры — владелец, группа, остальные.</p>
+    <ul>
+      <li><code>chmod +x run.sh</code> — разрешить запуск (нужна ещё первая строка-шебанг <code>#!/usr/bin/env python3</code> или <code>#!/bin/bash</code>), затем <code>./run.sh</code>.</li>
+      <li><code>chmod 600 ~/.ssh/id_ed25519</code> — ключ SSH читает только владелец, иначе ssh откажется его использовать («permissions are too open»).</li>
+      <li><code>chown user:group файл</code> — сменить владельца. Обычно нужно, когда файлы создал root (например, контейнер Docker).</li>
+      <li><code>sudo</code> — выполнить от имени администратора. Не делай <code>sudo pip install</code>: сломаешь системный Python, ставь в venv. Не делай <code>chmod 777</code> «чтобы заработало» — это дыра, ищи, кому на самом деле не хватает прав.</li>
+      <li>У папки «x» значит «можно зайти внутрь» (cd), «r» — «можно посмотреть список файлов».</li>
+    </ul>
+  </div>
+  <div class="topic-check" data-for="tools.term.4">
+    <label class="tp"><input type="checkbox" data-id="tools.term.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Права доступа</b></span></label>
+    <span class="note" data-d="tools.term.4">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="topic" id="t11">
+  <div class="eyebrow">Тема 11 из 13 · Инструменты</div>
+  <h2>Переменные окружения, PATH, .zshrc</h2>
+  <p class="tldr">Переменная окружения — пара «имя=значение», которую процесс получает при запуске и передаёт своим детям. PATH — список папок, где терминал ищет программы. <code>~/.zshrc</code> — файл, который zsh выполняет при открытии каждого нового терминала: там живут твои настройки.</p>
+<pre>echo $PATH | tr ':' '\n'          <span class="cm"># папки поиска программ по порядку — выигрывает первая</span>
+which -a python3                  <span class="cm"># все python3 в PATH: какой запустится и какие «спрятаны»</span>
+export DATA_DIR=~/data/oulad      <span class="cm"># переменная для этого терминала и запущенных из него программ</span>
+DATA_DIR=/tmp python script.py    <span class="cm"># только для одной команды</span>
+env | grep -i data                <span class="cm"># посмотреть, что задано</span>
+
+<span class="cm"># ~/.zshrc — постоянные настройки</span>
+export PATH="$HOME/.local/bin:$PATH"     <span class="cm"># своя папка программ — в начало</span>
+alias ll="ls -lah"                       <span class="cm"># короткая команда</span>
+alias venv="source .venv/bin/activate"
+
+source ~/.zshrc                   <span class="cm"># перечитать без перезапуска терминала</span></pre>
+  <div class="prose"><ul>
+    <li><b>Наследование только вниз:</b> программа видит переменные родителя, но изменить окружение родителя не может. Поэтому <code>export</code> в одном окне не виден в другом, а скрипт <code>./set_env.sh</code> не меняет твой терминал — нужно <code>source set_env.sh</code>.</li>
+    <li><b>activate в venv</b> — это и есть правка PATH: <code>.venv/bin</code> ставится в начало (урок 1.3). Поэтому после активации <code>python</code> — это Python из окружения.</li>
+    <li><b>.zshrc и .zprofile:</b> <code>.zprofile</code> выполняется при входе в систему (один раз), <code>.zshrc</code> — для каждого интерактивного терминала. На macOS терминал по умолчанию zsh; на серверах часто bash — там <code>~/.bashrc</code>.</li>
+    <li><b>Секреты в .zshrc</b> — плохая идея: они видны всем программам и попадают в бэкапы. Лучше .env проекта (тема 4).</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Ты установил программу, а терминал пишет «command not found». Что проверишь?</summary>
+      <div class="a"><p>Есть ли её папка в PATH (<code>echo $PATH</code>, <code>which</code>); если программа ставится в <code>~/.local/bin</code> — добавить в PATH через <code>.zshrc</code> и сделать <code>source ~/.zshrc</code>; для Python-пакетов — активирован ли нужный venv.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="tools.term.5">
+    <label class="tp"><input type="checkbox" data-id="tools.term.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Переменные окружения, PATH, .zshrc</b></span></label>
+    <span class="note" data-d="tools.term.5">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 12 ============ -->
+<section class="topic" id="t12">
+  <div class="eyebrow">Тема 12 из 13 · Инструменты</div>
+  <h2>Jupyter Notebook и Lab</h2>
+  <p class="tldr">Ноутбук — это код, разбитый на ячейки, плюс ядро (kernel) — живой процесс Python, который помнит всё, что ты выполнил, в том порядке, в котором выполнил, а не в том, как ячейки стоят на экране. Отсюда и сила ноутбуков, и их главная ловушка.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · скрытое состояние</span><span class="muted mono" id="nbState"></span></div>
+    <p class="muted" style="font-size:14px">Выполняй ячейки в любом порядке кнопками ▶. Потом нажми «Restart &amp; Run All» — так ноутбук увидит коллега.</p>
+    <div class="nb" id="nbCells"></div>
+    <div class="kern" id="nbKernel"></div>
+    <div class="btns"><button class="btn" id="nbAll">Restart &amp; Run All</button><button class="btn" id="nbRestart">Restart kernel</button></div>
+    <p class="verdict" id="nbMsg"></p>
+  </div>
+  <div class="prose"><ul>
+    <li><b>Номера <code>[3]</code> слева</b> — порядок выполнения. Если они идут не по возрастанию сверху вниз — результаты на экране могли получиться из другого порядка.</li>
+    <li><b>Перед коммитом и перед тем, как показать</b> — Kernel → Restart &amp; Run All. Упало — значит, ноутбук держался на скрытом состоянии.</li>
+    <li><b>Магические команды:</b> <code>%timeit</code> и <code>%%time</code> — замер скорости; <code>%load_ext autoreload</code> + <code>%autoreload 2</code> — подхватывать правки в <code>src/</code> без перезапуска ядра; <code>%pip install</code> — поставить пакет в окружение именно этого ядра.</li>
+    <li><b>Ядро = окружение:</b> выбери ядро из <code>.venv</code> проекта (нужен <code>ipykernel</code>, урок 1.3). Чужое ядро — чужие версии библиотек.</li>
+    <li><b>Notebook или Lab:</b> Lab — современный интерфейс с вкладками, файлами и терминалом в одном окне. В VS Code ноутбуки открываются прямо в редакторе, с отладчиком и подсказками кода — для проекта удобнее всего.</li>
+    <li><b>Ноутбуки в git:</b> выводы ячеек раздувают файл и порождают конфликты. <code>nbstripout</code> убирает выводы при коммите; ноутбуки называют с номером и смыслом: <code>01_eda.ipynb</code>, <code>02_baseline.ipynb</code>.</li>
+  </ul></div>
+  <div class="callout feel"><b class="h">Когда код уезжает из ноутбука в src/</b><p>Скопировал одну функцию во второй ноутбук — пора выносить в <code>src/</code>. Ноутбук после этого становится коротким: импорт, вызов, график, вывод текстом. Так EDA проекта А (неделя 3) и устроишь.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Какие минусы у Jupyter-ноутбуков в продакшен-разработке?</summary>
+      <div class="a"><p>Скрытое состояние и произвольный порядок выполнения — результаты трудно воспроизвести. Плохо тестируются и импортируются, плохо ревьюятся и конфликтуют в git из-за JSON с выводами, поощряют копипасту. Поэтому ноутбуки — для исследования и отчётов, а повторяемый код — в модулях с тестами; ноутбук перед показом всегда прогоняют Restart &amp; Run All.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="tools.ide.1">
+    <label class="tp"><input type="checkbox" data-id="tools.ide.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Jupyter Notebook и Lab</b></span></label>
+    <span class="note" data-d="tools.ide.1">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 4 · 5 тем</span><h2>Куда подаваться</h2><p>Пять направлений этой недели: Яндекс, Т-Банк, Сбер, VK и госсектор. Здесь только проверенное по источникам на 13.10.2026, с пометкой, где источник неофициальный. Подробности, этапы и твой статус — в заметках компаний в Obsidian и на странице «Отборы».</p></div>
+
+<!-- ============ 13 ============ -->
+<section class="topic" id="t13">
+  <div class="eyebrow">Тема 13 из 13 · Карьера</div>
+  <h2>Яндекс, Т-Банк, Сбер, VK, госсектор</h2>
+  <p class="tldr">Почти везде схема похожа: анкета → онлайн-тест или контест → 1–3 технические беседы → встреча с командой. Различаются сроки и упор: у Яндекса — алгоритмы в Контесте, у банков — Python, SQL и аналитика, в госсекторе — мотивация, когнитивный тест и профильное задание.</p>
+  <div class="cos2">
+    <div class="co2 hot"><h3>Правительство Москвы — «ИТ-город»</h3>
+      <ul><li><b>Заявки до 21.10.2026</b>, стажировка февраль–июль 2027, около 100 мест.</li><li>Анкета → онлайн-тест → профильное задание → знакомство с руководителем.</li><li>Старшие курсы и выпускники, 18–35 лет, можно 20 часов в неделю.</li><li>Отдельного ML-направления в объявлении нет — смотри список в анкете.</li></ul>
+      <span class="src">Источник: <a href="https://www.mos.ru/news/item/176829073/" target="_blank" rel="noopener">mos.ru</a></span>
+      <div class="lk"><a href="https://moscowcareer.mguu.ru/itgorod/" target="_blank" rel="noopener">Подать заявку ↗</a><a href="/hire">В «Отборах» →</a></div></div>
+    <div class="co2"><h3>Яндекс — стажировка и ШАД</h3>
+      <ul><li>Сезон 2026: около 3200 стажёров, в 2025 году 56% ML-стажёров перешли в штат.</li><li>ML: исследовательский департамент и Alice AI — агенты, LLM, беспилотники, роботы.</li><li>Обновлено задание в Яндекс Контесте; не прошёл раньше — можно снова.</li><li>Готовиться: бесплатные Тренировки по алгоритмам и ML.</li></ul>
+      <span class="src">Источники: <a href="https://www.techinsider.ru/editorial/news-1726075-otkryt-novyi-sezon-stajirovok-dlya-ml-specialistov/" target="_blank" rel="noopener">Техинсайдер, 10.02.2026</a>; схема этапов — неофициальные разборы</span>
+      <div class="lk"><a href="https://yandex.ru/yaintern/" target="_blank" rel="noopener">Стажировки ↗</a><a href="https://yandex.ru/yaintern/training/algorithm-training" target="_blank" rel="noopener">Тренировки ↗</a><a href="https://shad.yandex.ru/" target="_blank" rel="noopener">ШАД ↗</a></div></div>
+    <div class="co2"><h3>Т-Банк — стажировки и Т-Образование</h3>
+      <ul><li>Официальных условий набора по ML на 2026 год в открытых источниках не нашёл.</li><li>По неофициальному гайду: первичный скрининг ведёт ИИ-ассистент, задачи в контесте стали прикладнее, наборы весной и осенью.</li><li>Т-Образование — бесплатные курсы, через которые тоже приходят на стажировки.</li></ul>
+      <span class="src">Источник: <a href="https://enigmai.ru/interview/t-bank/internship-selection/" target="_blank" rel="noopener">неофициальный гайд</a> — проверь на сайте банка</span>
+      <div class="lk"><a href="https://education.tbank.ru/" target="_blank" rel="noopener">Т-Образование ↗</a></div></div>
+    <div class="co2"><h3>Сбер — SberSeasons</h3>
+      <ul><li>Программа оплачиваемых стажировок для студентов с 2017 года.</li><li>Есть вакансии стажёра Data Science по программе — например, валидация моделей, от 20 часов в неделю.</li><li>Этапы по Data Science официально не нашёл.</li></ul>
+      <span class="src">Источники: <a href="https://vc.ru/sber/59598-sberseasons" target="_blank" rel="noopener">vc.ru</a>, <a href="https://hh.ru/vacancy/135907011" target="_blank" rel="noopener">вакансия на hh.ru</a></span>
+      <div class="lk"><a href="https://sberseasons.ru/" target="_blank" rel="noopener">SberSeasons ↗</a></div></div>
+    <div class="co2"><h3>VK — VK Education</h3>
+      <ul><li>В прошлых наборах стажировок было направление «машинное обучение»; отбор — тест и техническое собеседование, 3–6 месяцев.</li><li>VK Education — бесплатные курсы, включая ML; лучшим предлагают стажировку.</li><li>Данных о наборе 2026 года не нашёл.</li></ul>
+      <span class="src">Источник: <a href="https://snob.ru/news/vk-otkryvaet-nabor-na-oplachivaemuyu-stazhirovku-dlya-studentov-i-molodyh-specialistov/" target="_blank" rel="noopener">Сноб, прошлый набор</a></span>
+      <div class="lk"><a href="https://education.vk.company/" target="_blank" rel="noopener">VK Education ↗</a></div></div>
+    <div class="co2"><h3>Ещё госсектор</h3>
+      <ul><li><b>Ростелеком «Твоя первая»</b> — 6 месяцев, трудовой договор; ML было в прошлых наборах.</li><li><b>Газпромбанк GPB.Level Up</b> — трек Data Science был в 2024; сейчас открыт только по кибербезопасности.</li><li><b>Росатом / Гринатом</b> — стажёры в проектных командах; у «Гринатома» есть кафедра в РТУ МИРЭА.</li></ul>
+      <span class="src">Подробности и источники — в заметках компаний</span>
+      <div class="lk"><a href="/hire">Все стажировки в «Отборах» →</a></div></div>
+  </div>
+  <div class="callout feel"><b class="h">Что сделать на этой неделе</b><p>Открой страницы «ИТ-города» и Яндекса, скопируй условия в «Сырьё» заметок компаний и скажи агенту «разбери отборы» — требования привяжутся к темам плана. Если подходишь по курсу — подай в «ИТ-город» до 21.10. Поставь напоминание проверять страницы Яндекса, Т-Банка, Сбера и VK раз в месяц.</p></div>
+  <div class="topic-check multi" data-for="career.apply.0,career.apply.1,career.apply.2,career.apply.3,career.apply.14">
+    <div class="topic-check-h"><span class="eyebrow">Отметки в дереве · 5 тем</span><span class="note"></span></div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="career.apply.0"><span class="bx" aria-hidden="true"></span><span><b>Яндекс: стажировка и ШАД</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="career.apply.1"><span class="bx" aria-hidden="true"></span><span><b>Т-Банк: стажировки и Т-Образование</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="career.apply.2"><span class="bx" aria-hidden="true"></span><span><b>Сбер: SberSeasons</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="career.apply.3"><span class="bx" aria-hidden="true"></span><span><b>VK: VK Education</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="career.apply.14"><span class="bx" aria-hidden="true"></span><span><b>Госсектор: ИТ-город, Ростелеком, Газпромбанк, Росатом</b></span></label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · как на собеседовании и в работе</div>
+  <h2>Практика</h2>
+  <p class="tldr">Главная задача — завести проект А. Остальное — тренировка навыков на его же данных.</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Работа · главная задача недели, 90 минут</span>
+      <h3>Проект А: репозиторий, структура, данные OULAD, README</h3>
+      <p>Создай репозиторий <code>oulad-risk</code> со структурой из темы 1 (пакет <code>src/oulad_risk</code>, <code>tests/</code>, <code>configs/</code>, <code>notebooks/</code>, <code>data/raw</code>, <code>data/processed</code>). Скачай датасет <a href="https://analyse.kmi.open.ac.uk/open_dataset" target="_blank" rel="noopener">OULAD</a> (зеркало — <a href="https://archive.ics.uci.edu/dataset/349/open+university+learning+analytics+dataset" target="_blank" rel="noopener">UCI</a>) в <code>data/raw</code>. Напиши README с разделами «задача», «данные», «как запустить», «структура», «ограничения» (результат пока пустой). Добавь <code>.gitignore</code> из темы 3, <code>.env.example</code>, <code>requirements.txt</code> с ==, <code>pyproject.toml</code> с <code>requires-python</code>. История — 4–6 коммитов по Conventional Commits. Запушь на GitHub.</p>
+      <p class="ok">Готово, когда: репозиторий на GitHub без папок data/ и .venv; README прогнан по шагам в чистой папке; <code>python -c "import oulad_risk"</code> работает после <code>pip install -e .</code>; в <code>git log --oneline</code> нет «fix stuff».</p>
+      <details><summary>Минимальный pyproject.toml и коммиты</summary><div class="a">
+<pre>[project]
+name = "oulad-risk"
+version = "0.1.0"
+requires-python = "&gt;=3.11"
+
+[build-system]
+requires = ["setuptools&gt;=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]</pre>
+        <p>Коммиты: <code>chore: init project structure</code> → <code>build: add pinned requirements</code> → <code>chore: add gitignore and env example</code> → <code>docs: describe task, data and how to run</code> → <code>feat(data): add OULAD download script</code>.</p></div></details></div>
+
+    <div class="task"><span class="tg work">Работа · терминал, 20 минут</span>
+      <h3>Первый взгляд на OULAD без Python</h3>
+      <p>Только командами терминала: размеры всех файлов датасета; число строк в каждом CSV; столбцы <code>studentInfo.csv</code> с номерами; сколько студентов с каждым итогом курса (столбец <code>final_result</code>); первые 3 строки самой большой таблицы.</p>
+      <p class="ok">Готово, когда у тебя пять команд и ты можешь сказать, какая таблица самая большая и есть ли дисбаланс итогов.</p>
+      <details><summary>Команды</summary><div class="a">
+<pre>ls -lhS data/raw/                                  <span class="cm"># S — по размеру, самая большая сверху</span>
+wc -l data/raw/*.csv
+head -1 data/raw/studentInfo.csv | tr ',' '\n' | cat -n
+cut -d, -f12 data/raw/studentInfo.csv | sort | uniq -c | sort -rn   <span class="cm"># номер столбца — из прошлой команды</span>
+head -3 data/raw/studentVle.csv</pre>
+        <p>Если в каких-то полях есть запятые внутри кавычек, <code>cut</code> разрежет неправильно — проверь вывод глазами. Для серьёзной работы — pandas на неделе 3.</p></div></details></div>
+
+    <div class="task"><span class="tg rev">Git · тренировка</span>
+      <h3>Устрой себе конфликт и разреши его</h3>
+      <p>В <code>oulad-risk</code> создай две ветки от main. В обеих поменяй одну и ту же строку <code>configs/baseline.yaml</code> по-разному (например, <code>test_size</code>), закоммить. Слей первую в main, потом вторую — получишь конфликт. Разреши, собрав осмысленный вариант.</p>
+      <p class="ok">Готово, когда <code>git log --oneline --graph</code> показывает обе ветки и коммит слияния, а в файле нет маркеров.</p></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 3 минуты</span>
+      <h3>«Как вы организуете ML-проект, чтобы его мог запустить коллега?»</h3>
+      <p class="ok">Готово, когда в ответе есть структура, зависимости, секреты, данные, README и проверка в чистой папке.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>Пакет в <code>src/</code>, тесты, конфиги отдельно от кода, ноутбуки только для исследования. Зависимости с точными версиями или lock-файл, версия Python указана. Секреты в переменных окружения, в репозитории — <code>.env.example</code>. Данные и модели не в git: скрипт скачивания или DVC. README: задача, результат, как запустить в 3–5 командах. Случайность зафиксирована. Проверяю, склонировав в чистую папку и пройдя README по шагам; в идеале CI делает это сам на каждый пуш.</p></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 2 минуты</span>
+      <h3>«Ноутбук у вас работает, у коллеги — нет. Почему так бывает?»</h3>
+      <p class="ok">Готово, когда назвал минимум четыре причины.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>Скрытое состояние: ячейки выполнялись не по порядку или удалённая ячейка определяла переменную. Другое ядро и версии библиотек. Относительные пути и другая текущая папка. Данные лежат только у меня. Секреты или переменные окружения есть только у меня. Проверка — Restart &amp; Run All в чистом окружении по README.</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в дереве</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда прошёл «Проверку без ИИ» по теме. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Структура:</b> src/пакет, tests/, configs/, notebooks/, data/raw → processed, models/; <code>pip install -e .</code>, запуск <code>python -m</code>.</li>
+      <li><b>README:</b> задача одной фразой, результат с бейзлайном, данные, как запустить, структура, ограничения, планы отдельно.</li>
+      <li><b>.gitignore:</b> <code>/</code> в начале — от корня, в конце — только папки, <code>**</code> — любая глубина, <code>!</code> — исключение; скрытую папку не вернуть — скрывай <code>data/*</code>. <code>git check-ignore -v</code>, <code>git rm --cached</code>.</li>
+      <li><b>Секреты:</b> .env в .gitignore, .env.example в git, <code>os.environ[...]</code> для обязательных. Утёк — сначала отозвать ключ.</li>
+      <li><b>Версии:</b> проект — <code>==</code>, библиотека — диапазоны; SemVer MAJOR.MINOR.PATCH; список + lock (pip-tools, uv, poetry); версия Python.</li>
+      <li><b>Коммиты:</b> <code>тип(область): действие</code>, feat/fix/docs/refactor/test/chore, <code>!</code> — ломает совместимость, один коммит — одна правка.</li>
+      <li><b>Конфликт</b> = обе ветки поменяли одно место относительно общего предка. <code>--ours/--theirs</code> (при rebase наоборот), <code>merge --abort</code>, nbdime для ноутбуков.</li>
+      <li><b>Просмотр:</b> <code>ls -lh</code>, <code>du -sh</code>, <code>head</code>, <code>tail -f</code>, <code>wc -l</code>, <code>less -S</code> (/ поиск, q выход).</li>
+      <li><b>Потоки:</b> 0 ввод, 1 вывод, 2 ошибки. <code>&gt; file 2&gt;&amp;1</code> — порядок важен; <code>tee</code>, <code>xargs</code>, <code>2&gt;/dev/null</code>; logging пишет в stderr.</li>
+      <li><b>Права:</b> r4 w2 x1; 755 скрипт, 644 файл, 600 ключ и .env; <code>chmod +x</code> + шебанг; без <code>sudo pip</code> и <code>777</code>.</li>
+      <li><b>Окружение:</b> переменные наследуются только вниз; PATH — первая папка выигрывает; <code>.zshrc</code> + <code>source</code>; activate = правка PATH.</li>
+      <li><b>Jupyter:</b> ядро помнит порядок выполнения; перед показом Restart &amp; Run All; autoreload, %timeit, %pip; ноутбук — исследование, код — в src.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без ИИ, 15 минут</b>
+    <p>Закрой урок. По памяти: нарисуй структуру проекта А; напиши .gitignore, где скрыта data, но виден data/README.md; переведи <code>rwxr-x---</code> в число; объясни, почему <code>cmd 2&gt;&amp;1 &gt; f</code> не пишет ошибки в файл; назови три причины, почему ноутбук не запускается у коллеги. Где запнулся — туда и возвращаешься.</p>
+  </div>
+</section>
+</div>
+
+<script src="/assets/lesson.js"></script>
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- тема 1: дерево проекта ---------- */
+(function projectTree(){
+  const T=[
+    ["oulad-risk/",0,"Корень репозитория","Всё, что нужно для запуска, начинается отсюда. Команды из README выполняются из корня.",true],
+    ["README.md",1,"Витрина и инструкция","Задача, результат, данные, как запустить. Первое, что откроют на GitHub (тема 2).",true],
+    ["pyproject.toml",1,"Паспорт проекта","Имя, версия Python (requires-python), зависимости, настройки инструментов. Позволяет pip install -e .",true],
+    ["requirements.txt",1,"Точные версии","Зависимости с == (тема 5). Альтернатива — lock-файл uv или poetry.",true],
+    [".gitignore",1,"Что не попадёт в git","Окружение, данные, модели, логи, секреты (тема 3).",true],
+    [".env",1,"Твои секреты","Ключи и пароли. Только на твоём компьютере — в .gitignore (тема 4).",false],
+    [".env.example",1,"Шаблон секретов","Имена переменных без значений — чтобы коллега знал, что задать.",true],
+    ["configs/",1,"Настройки экспериментов","baseline.yaml, catboost.yaml: пути, гиперпараметры, признаки. Новый эксперимент — новый конфиг, а не правка кода.",true],
+    ["src/oulad_risk/",1,"Код проекта — пакет","__init__.py делает папку пакетом. Модули по ответственности: data.py, features.py, train.py, evaluate.py. Запуск: python -m oulad_risk.train.",true],
+    ["tests/",1,"Проверки","pytest: нет студентов сразу в train и test, у признаков нет пропусков, загрузчик не падает на пустом файле.",true],
+    ["notebooks/",1,"Исследования","01_eda.ipynb, 02_baseline.ipynb. Короткие: импорт из src, графики, выводы текстом. Выводы ячеек лучше чистить nbstripout.",true],
+    ["data/raw/",1,"Данные как скачали","Не менять руками. В git не попадают (только data/README.md с описанием, откуда взять).",false],
+    ["data/processed/",1,"Данные после скрипта","Всегда можно пересоздать из raw командой. В git не попадают.",false],
+    ["models/",1,"Обученные модели","Тяжёлые файлы — не в git. Версии моделей — MLflow или DVC (неделя MLOps).",false],
+    [".venv/",1,"Окружение","Своё на каждой машине, создаётся по requirements. Никогда не коммитят.",false]
+  ];
+  let cur=0;
+  function draw(){
+    $("ftree").innerHTML=T.map((t,i)=>`<button aria-pressed="${i===cur}" class="${t[4]?"":"ig"}" data-i="${i}">${"    ".repeat(t[1])}${t[0]}</button>`).join("");
+    const t=T[cur];
+    $("finfo").innerHTML=`<h3>${esc(t[0])}</h3><span class="tag2 ${t[4]?"yes":"no"}">${t[4]?"в git":"не в git"}</span><b>${esc(t[2])}</b><p class="muted" style="font-size:14.5px">${esc(t[3])}</p>`;
+  }
+  $("ftree").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b){cur=+b.dataset.i;draw()}});
+  draw();
+})();
+
+/* ---------- тема 3: проверка .gitignore ---------- */
+(function gitignore(){
+  const FILES=["README.md","src/oulad_risk/train.py","src/oulad_risk/__pycache__/train.cpython-311.pyc","notebooks/01_eda.ipynb","notebooks/.ipynb_checkpoints/01_eda-checkpoint.ipynb","data/README.md","data/raw/studentInfo.csv","data/processed/features.parquet","models/catboost.cbm","logs/train.log",".env",".env.example",".venv/bin/python","configs/baseline.yaml"];
+  const EX={
+    good:"# окружение и кэш\n.venv/\n__pycache__/\n.ipynb_checkpoints/\n\n# секреты\n.env\n\n# данные, модели, логи\ndata/*\n!data/README.md\nmodels/\nlogs/",
+    trap:".venv/\n__pycache__/\n.ipynb_checkpoints/\n.env\nmodels/\nlogs/\n\n# папка скрыта целиком —\n# исключение не сработает\ndata/\n!data/README.md",
+    empty:""
+  };
+  /* перевод одного шаблона gitignore в регулярное выражение для пути */
+  function compile(line){
+    let neg=false,p=line.trim();
+    if(!p||p.startsWith("#"))return null;
+    if(p.startsWith("!")){neg=true;p=p.slice(1)}
+    const dirOnly=p.endsWith("/"); if(dirOnly)p=p.slice(0,-1);
+    const anchored=p.includes("/"); if(p.startsWith("/"))p=p.slice(1);
+    let re=""; for(let i=0;i<p.length;i++){const c=p[i];
+      if(c==="*"&&p[i+1]==="*"){re+=".*";i++;if(p[i+1]==="/")i++}
+      else if(c==="*")re+="[^/]*"; else if(c==="?")re+="[^/]"; else re+=c.replace(/[.+^${}()|[\]\\]/g,"\\$&")}
+    return {neg,dirOnly,anchored,re:new RegExp("^"+re+"$"),src:line.trim()};
+  }
+  /* путь целиком или его последний компонент — как в git для шаблонов без слэша */
+  function hit(r,path,isDir){if(r.dirOnly&&!isDir)return false;return r.anchored?r.re.test(path):r.re.test(path.split("/").pop())}
+  function verdict(rules,path,isDir){let res=null;for(const r of rules)if(hit(r,path,isDir))res=r;return res}
+  function check(rules,file){
+    const parts=file.split("/");
+    for(let k=1;k<parts.length;k++){const dir=parts.slice(0,k).join("/"),r=verdict(rules,dir,true);
+      if(r&&!r.neg)return {ig:true,rule:r.src+"  (скрыта папка "+dir+"/)"}}
+    const r=verdict(rules,file,false);
+    return r?{ig:!r.neg,rule:r.src}:{ig:false,rule:""};
+  }
+  function run(){
+    const rules=$("giRules").value.split("\n").map(compile).filter(Boolean);
+    const res=FILES.map(f=>({f,...check(rules,f)}));
+    $("giFiles").innerHTML=res.map(x=>`<div class="${x.ig?"out":"keep"}"><span>${esc(x.f)}</span><span class="why">${x.ig?"скрыт: "+esc(x.rule):x.rule?"оставлен: "+esc(x.rule):"в git"}</span></div>`).join("");
+    const kept=res.filter(x=>!x.ig).map(x=>x.f), bad=kept.filter(f=>/^(\.env$|\.venv\/|data\/raw|data\/processed|models\/|logs\/)|__pycache__|checkpoints/.test(f));
+    const readme=res.find(x=>x.f==="data/README.md");
+    $("giState").textContent=`в git: ${kept.length} из ${FILES.length}`;
+    $("giMsg").textContent=bad.length?`В git утекает лишнее: ${bad.join(", ")}.`+(bad.includes(".env")?" Среди них .env — это секреты.":"")
+      :readme.ig?"Мусор скрыт, но и data/README.md тоже: папка data/ скрыта целиком, и git в неё не заглядывает — исключение не работает. Замени data/ на data/*.":"Всё как надо: в git только код, конфиги, ноутбуки, README и шаблон .env.example.";
+  }
+  document.querySelectorAll(".gx").forEach(b=>b.onclick=()=>{$("giRules").value=EX[b.dataset.x];document.querySelectorAll(".gx").forEach(x=>x.setAttribute("aria-pressed",x===b));run()});
+  $("giRules").oninput=run; $("giRules").value=EX.good; document.querySelector('.gx[data-x="good"]').setAttribute("aria-pressed","true"); run();
+})();
+
+/* ---------- тема 6: проверка Conventional Commits ---------- */
+(function commits(){
+  const EX=["feat(data): add OULAD loader","fixed stuff","Fix: Early stopping.","feat!: drop python 3.9"];
+  const TYPES=["feat","fix","docs","refactor","test","chore","build","ci","perf","style","revert"];
+  function run(){
+    const m=$("ccIn").value, re=/^([A-Za-z]+)(\(([^)]+)\))?(!)?: (.+)$/, x=m.match(re), probs=[];
+    let parts={тип:"—",область:"—",ломает:"нет",описание:"—"};
+    if(!x)probs.push("нет формы «тип: описание» — двоеточие и пробел после типа");
+    else{parts={тип:x[1],область:x[3]||"—",ломает:x[4]?"да (!)":"нет",описание:x[5]};
+      if(!TYPES.includes(x[1].toLowerCase()))probs.push(`неизвестный тип «${x[1]}» — feat, fix, docs, refactor, test, chore…`);
+      else if(x[1]!==x[1].toLowerCase())probs.push("тип пишут строчными: fix, а не Fix");
+      if(/\.$/.test(x[5]))probs.push("точку в конце не ставят");
+      if(/^[A-ZА-Я]/.test(x[5]))probs.push("описание обычно с маленькой буквы");
+      if(/^(added|fixed|updated|changed|removed)\b/i.test(x[5]))probs.push("повелительное наклонение: add, fix — а не added, fixed");}
+    if(m.length>72)probs.push(`первая строка ${m.length} символов — лучше до 72`);
+    $("ccParts").innerHTML=Object.entries(parts).map(([k,v])=>`<div class="stat"><div class="v" style="font-size:16px;font-family:var(--f-mono)">${esc(v)}</div><div class="k">${k}</div></div>`).join("");
+    $("ccMsg").textContent=!m.trim()?"Напиши сообщение коммита.":probs.length?"Поправь: "+probs.join("; ")+".":x[4]?"Хорошо. Восклицательный знак предупреждает: изменение ломает совместимость — в тело стоит добавить BREAKING CHANGE: и что делать пользователям.":"Хорошее сообщение: по типу сразу видно, что это, а по области — где.";
+    $("ccState").textContent=probs.length?`замечаний: ${probs.length}`:"ок";
+  }
+  document.querySelectorAll(".cx").forEach(b=>b.onclick=()=>{$("ccIn").value=EX[+b.dataset.x];run()});
+  $("ccIn").oninput=run; $("ccIn").value=EX[0]; run();
+})();
+
+/* ---------- тема 7: трёхстороннее слияние ---------- */
+(function merge3(){
+  const S={
+    clean:{base:["model: catboost","test_size: 0.2","depth: 6","lr: 0.05"],ours:["model: catboost","test_size: 0.25","depth: 6","lr: 0.05"],theirs:["model: catboost","test_size: 0.2","depth: 6","lr: 0.03"]},
+    conflict:{base:["model: catboost","test_size: 0.2","depth: 6","lr: 0.05"],ours:["model: catboost","test_size: 0.2","depth: 8","lr: 0.05"],theirs:["model: catboost","test_size: 0.2","depth: 4","lr: 0.05"]}
+  };
+  let sc="clean",fix=null;
+  const mark=(arr,base,cls)=>arr.map((l,i)=>l!==base[i]?`<span style="color:var(${cls})">${esc(l)}</span>`:esc(l)).join("\n");
+  function draw(){
+    const s=S[sc]; $("mgBase").innerHTML=s.base.map(esc).join("\n"); $("mgOurs").innerHTML=mark(s.ours,s.base,"--accent"); $("mgTheirs").innerHTML=mark(s.theirs,s.base,"--plum");
+    let out=[],conf=false;
+    s.base.forEach((b,i)=>{const o=s.ours[i],t=s.theirs[i];
+      if(o===t)out.push([o,""]); else if(o===b)out.push([t,"cm2"]); else if(t===b)out.push([o,"cm1"]);
+      else{conf=true;
+        if(fix==="ours")out.push([o,"cm1"]); else if(fix==="theirs")out.push([t,"cm2"]); else if(fix==="both")out.push(["depth: 6   # обсудили: вернули базовое, подбор глубины — в отдельном эксперименте",""]);
+        else out.push(["<<<<<<< HEAD","mk"],[o,"cm1"],["=======","mk"],[t,"cm2"],[">>>>>>> feature","mk"])}});
+    $("mgRes").innerHTML=out.map(([l,c])=>`<span class="${c}">${esc(l)}</span>`).join("");
+    $("mgFix").hidden=!conf;
+    $("mgState").textContent=conf?(fix?"разрешён":"конфликт"):"слито автоматически";
+    $("mgMsg").textContent=!conf?"main поменял test_size, feature — lr. Каждая строка изменилась только с одной стороны, поэтому git сам взял обе правки: зелёное — из main, сиреневое — из feature."
+      :!fix?"Обе ветки поменяли depth по-разному относительно базы (6 → 8 и 6 → 4). Git не знает, какой смысл верный, и ставит маркеры. Выбери решение кнопками."
+      :`Маркеры убраны. Теперь git add configs/baseline.yaml и git commit — слияние завершено.${fix==="both"?" Ручной вариант часто лучший: решение принято осознанно, а не «чья правка последняя».":""}`;
+    document.querySelectorAll(".mx2").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===sc));
+  }
+  document.querySelectorAll(".mx2").forEach(b=>b.onclick=()=>{sc=b.dataset.s;fix=null;draw()});
+  $("mgFix").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(b){fix=b.dataset.r;draw()}});
+  draw();
+})();
+
+/* ---------- тема 9: конвейер команд ---------- */
+(function pipeline(){
+  const DATA=["date,student,course","10-01,Аня,ML","10-01,Боря,SQL","10-02,Аня,ML","10-02,Вика,ML","10-03,Боря,ML","10-03,Аня,Python","10-04,Вика,ML","10-04,Глеб,SQL","10-05,Аня,ML","10-05,Боря,ML"];
+  const ST=[
+    {id:"grep",lbl:'grep ",ML$"',f:L=>L.filter(l=>/,ML$/.test(l)),why:"оставить только строки курса ML"},
+    {id:"cut",lbl:"cut -d, -f2",f:L=>L.map(l=>l.split(",")[1]),why:"взять второй столбец — имя"},
+    {id:"sort",lbl:"sort",f:L=>L.slice().sort((a,b)=>a.localeCompare(b,"ru")),why:"одинаковые имена рядом — uniq работает только с соседними"},
+    {id:"uniq",lbl:"uniq -c",f:L=>{const o=[];L.forEach(l=>{const t=o[o.length-1];if(t&&t[1]===l)t[0]++;else o.push([1,l])});return o.map(([c,l])=>String(c).padStart(7)+" "+l)},why:"схлопнуть повторы с подсчётом"},
+    {id:"sortn",lbl:"sort -rn",f:L=>L.slice().sort((a,b)=>parseInt(b)-parseInt(a)||a.localeCompare(b,"ru")),why:"по числу, по убыванию"},
+    {id:"head",lbl:"head -3",f:L=>L.slice(0,3),why:"первые три"}];
+  const on={grep:true,cut:true,sort:true,uniq:true,sortn:true,head:true};
+  function run(){
+    let L=DATA.slice(1), cmd=["tail -n +2 visits.csv"];
+    ST.forEach(s=>{if(on[s.id]){L=s.f(L);cmd.push(s.lbl)}});
+    $("ppChain").innerHTML=`<span>tail -n +2 visits.csv</span>`+ST.map(s=>`<span class="bar">|</span><button class="st" data-s="${s.id}" aria-pressed="${on[s.id]}" title="${esc(s.why)}">${esc(s.lbl)}</button>`).join("");
+    $("ppOut").textContent="$ "+cmd.join(" | ")+"\n"+(L.length?L.join("\n"):"(пусто)");
+    $("ppState").textContent=`звеньев: ${cmd.length}`;
+    const uniqNoSort=on.uniq&&!on.sort&&on.cut;
+    $("ppMsg").textContent=uniqNoSort?"uniq без sort: повторяющиеся имена не стоят рядом, и uniq считает их отдельно — у Ани несколько строк. Классическая ошибка: всегда sort | uniq -c."
+      :on.grep&&on.cut&&on.sort&&on.uniq&&on.sortn&&on.head?"Кто чаще всех ходил на ML — одна строка в терминале вместо нескольких строк pandas. Выключай звенья и смотри, что делает каждое."
+      :!on.grep?"Без grep считаются посещения всех курсов, а не только ML.":"Конвейер читается слева направо: вывод каждой команды — вход следующей.";
+  }
+  $("ppChain").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(b){on[b.dataset.s]=!on[b.dataset.s];run()}});
+  run();
+})();
+
+/* ---------- тема 10: калькулятор chmod ---------- */
+(function chmodCalc(){
+  const W=["Владелец","Группа","Остальные"], P=[["r",4,"читать"],["w",2,"писать"],["x",1,"выполнять"]];
+  let bits=[7,5,5];
+  function draw(){
+    $("cmGrid").innerHTML=`<span></span>`+P.map(p=>`<span class="h">${p[0]} · ${p[2]}</span>`).join("")+
+      W.map((w,i)=>`<span>${w}</span>`+P.map(p=>`<label><input type="checkbox" data-w="${i}" data-v="${p[1]}" ${bits[i]&p[1]?"checked":""} aria-label="${w}: ${p[2]}"></label>`).join("")).join("");
+    const oct=bits.join(""), str="-"+bits.map(b=>(b&4?"r":"-")+(b&2?"w":"-")+(b&1?"x":"-")).join("");
+    $("cmOct").textContent=oct; $("cmStr").textContent=str; $("cmState").textContent=`chmod ${oct} файл`;
+    const M={"755":"Скрипт или программа: владелец всё, остальные читают и запускают.","644":"Обычный файл: владелец читает и пишет, остальные только читают.","600":"Только владелец читает и пишет — так должны лежать ключ SSH и .env.","700":"Личная папка или скрипт: остальным ничего.","777":"Всем всё, включая запись. Почти никогда не нужно — это дыра в безопасности."};
+    $("cmMsg").textContent=M[oct]||(bits[2]&2?"Остальные могут писать в файл — обычно так не надо.":"Своя комбинация. Сумма для каждой группы: r=4, w=2, x=1.");
+  }
+  $("cmGrid").addEventListener("change",e=>{const c=e.target;if(!c.dataset.w)return;const i=+c.dataset.w,v=+c.dataset.v;bits[i]=c.checked?bits[i]|v:bits[i]&~v;draw()});
+  document.querySelectorAll(".cp").forEach(b=>b.onclick=()=>{bits=b.dataset.o.split("").map(Number);draw()});
+  draw();
+})();
+
+/* ---------- тема 12: скрытое состояние ноутбука ---------- */
+(function notebook(){
+  const CELLS=['df = load_scores()          # 100 студентов, средний балл 70','df["score"] = df["score"] * 1.1   # бонус 10%','avg = df["score"].mean()','print(round(avg + bonus, 1))','bonus = 5'];
+  let K,cnt,outs,last,err;
+  function restart(){K={};cnt=0;outs=CELLS.map(()=>({n:"",o:"",e:false}));last=-1;err=-1}
+  function exec(i){
+    cnt++;last=i;err=-1;let o="",e=false;
+    try{
+      if(i===0){K.df=70}
+      else if(i===1){if(!("df" in K))throw "NameError: name 'df' is not defined";K.df=K.df*1.1}
+      else if(i===2){if(!("df" in K))throw "NameError: name 'df' is not defined";K.avg=K.df}
+      else if(i===3){if(!("avg" in K))throw "NameError: name 'avg' is not defined";if(!("bonus" in K))throw "NameError: name 'bonus' is not defined";o=String(Math.round((K.avg+K.bonus)*10)/10)}
+      else if(i===4){K.bonus=5}
+    }catch(x){o=x;e=true;err=i}
+    outs[i]={n:cnt,o,e};
+  }
+  function draw(msg){
+    $("nbCells").innerHTML=CELLS.map((c,i)=>`<div class="cell2${i===last?" last":""}${outs[i].e?" err":""}"><span class="cnt">[${outs[i].n||" "}]</span><code>${esc(c)}</code><button class="btn" data-i="${i}" aria-label="Выполнить ячейку ${i+1}">▶</button>${outs[i].o?`<div class="o${outs[i].e?" e":""}">${esc(outs[i].o)}</div>`:""}</div>`).join("");
+    const v=Object.entries(K).map(([k,x])=>k==="df"?`df (средний балл ${Math.round(x*100)/100})`:`${k} = ${Math.round(x*100)/100}`);
+    $("nbKernel").textContent="Ядро помнит: "+(v.length?v.join(" · "):"ничего");
+    $("nbState").textContent=`выполнено ячеек: ${cnt}`;
+    const boost="df" in K?K.df/70:1;
+    $("nbMsg").textContent=msg||(boost>1.15?`Ячейку с бонусом выполнили ${Math.round(Math.log(boost)/Math.log(1.1))} раза — баллы выросли на ${Math.round((boost-1)*100)}%, а в коде видна одна строка «* 1.1». Результат зависит от числа нажатий.`
+      :outs[3].o&&!outs[3].e?"Ячейка 4 сработала, потому что ты заранее выполнил ячейку 5. Сверху вниз этот ноутбук упадёт — проверь «Restart & Run All».":"Выполняй ячейки в любом порядке и смотри, что помнит ядро.");
+  }
+  $("nbCells").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b){exec(+b.dataset.i);draw()}});
+  $("nbRestart").onclick=()=>{restart();draw("Ядро перезапущено: переменные стёрты, счётчики с нуля.")};
+  $("nbAll").onclick=()=>{restart();for(let i=0;i<CELLS.length;i++){exec(i);if(outs[i].e)break}
+    draw(err===3?"Сверху вниз ноутбук падает на ячейке 4: bonus определяется ниже, в ячейке 5. У тебя всё работало только из-за скрытого состояния. Исправление — перенести bonus = 5 выше.":"Прогон сверху вниз прошёл без ошибок.")};
+  restart(); draw();
+})();
+
+/* ---------- конспект для Obsidian и галочки ---------- */
+const MD=`---
+type: конспект
+tags: [инструменты, git, карьера, неделя-2]
+---
+# Проект как на работе: урок 2.3
+
+## Структура проекта
+- src/пакет (__init__.py), tests/, configs/, notebooks/, data/raw → data/processed, models/. pyproject.toml, pip install -e ., запуск python -m пакет.модуль.
+
+## README
+- Задача одной фразой, результат с бейзлайном, данные, как запустить (3–5 команд), структура, ограничения, планы отдельно.
+
+## .gitignore
+- / в начале — от корня, в конце — только папки, ** — любая глубина, ! — исключение. Скрытую папку не вернуть: data/* + !data/README.md.
+- git check-ignore -v, git rm --cached. Секрет утёк — сначала отозвать.
+
+## Секреты
+- .env в .gitignore, .env.example в git, python-dotenv, os.environ["X"] для обязательных, os.getenv для необязательных.
+
+## Версии
+- Проект — ==, библиотека — диапазоны. SemVer MAJOR.MINOR.PATCH. Список + lock (pip-tools, uv, poetry). requires-python.
+
+## Conventional Commits
+- тип(область): действие; feat, fix, docs, refactor, test, chore, build, ci, perf; ! — ломает совместимость; один коммит — одна правка.
+
+## Merge-конфликты
+- Трёхстороннее слияние: база, ours, theirs. Конфликт — одно место изменено в обеих ветках. --ours/--theirs (при rebase наоборот), merge --abort, nbdime.
+
+## Терминал
+- ls -lh, du -sh, head, tail -f, wc -l, less -S. Потоки 0/1/2, > file 2>&1 (порядок важен), tee, xargs, 2>/dev/null.
+- Права: r4 w2 x1; 755, 644, 600; chmod +x + шебанг; без sudo pip и 777.
+- Переменные наследуются вниз; PATH — первая папка выигрывает; .zshrc + source.
+
+## Jupyter
+- Ядро помнит порядок выполнения; Restart & Run All перед показом; %autoreload, %timeit, %pip; ноутбук — исследование, код — в src; nbstripout.
+
+## Куда подаваться (13.10.2026)
+- ИТ-город (Правительство Москвы): заявки до 21.10.2026.
+- Яндекс: сезон 2026 — около 3200 стажёров, 56% ML-стажёров 2025 года в штате; Контест + технические секции.
+- Т-Банк, Сбер, VK, Ростелеком, Газпромбанк, Росатом — заметки в «Отборы/Компании».
+`;
+initLesson({topics:[["python.eng.0","Структура проекта"],["tools.git.9","README как витрина проекта"],["tools.git.5",".gitignore для данных, моделей и секретов"],["tools.env.4","Секреты в .env, а не в коде"],["tools.env.2","Фиксация версий"],["tools.git.6","Conventional Commits"],["tools.git.2","Разрешение merge-конфликтов"],["tools.term.1","Просмотр файлов"],["tools.term.3","Пайпы и перенаправления"],["tools.term.4","Права доступа"],["tools.term.5","Переменные окружения, PATH, .zshrc"],["tools.ide.1","Jupyter Notebook и Lab"],["career.apply.0","Яндекс: стажировка и ШАД"],["career.apply.1","Т-Банк: стажировки и Т-Образование"],["career.apply.2","Сбер: SberSeasons"],["career.apply.3","VK: VK Education"],["career.apply.14","Госсектор: ИТ-город, Ростелеком, Газпромбанк, Росатом"]],md:MD});
+</script>
+<script src="/assets/asks.js" defer></script>
