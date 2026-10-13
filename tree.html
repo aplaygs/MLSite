@@ -238,6 +238,11 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 .lsn .lp i{flex:1;height:5px;border-radius:3px;background:var(--soft);overflow:hidden}
 .lsn .lp i::after{content:"";display:block;height:100%;width:var(--p,0%);background:var(--accent);border-radius:3px;transition:width .3s}
 .lsn.full{border-color:var(--accent)}
+.lsn.test{border-color:color-mix(in srgb,var(--key) 55%,var(--line))}
+.lsn.test .ln{color:var(--key)}
+.lsn.test .lp i::after{background:var(--key)}
+.lsn.test.full{border-color:var(--key)}
+.btn.ls.tst em{color:var(--key)}
 .lsn.soon{border-style:dashed;cursor:default;opacity:.72}
 .lsn.soon:hover{border-color:var(--line);transform:none}
 .lsn.soon .ln{color:var(--muted)}
@@ -727,9 +732,10 @@ function lessonsHTML(w){
   const L=weekLessons(w.n); if(!L.length)return "";
   const hrs=m=>m>=60?`~${String(Math.round(m/30)/2).replace(".",",")} ч`:`~${m} мин`;
   return `<div class="lessons">${L.map(l=>{const tag=l.ready===false?"div":"a",href=l.ready===false?' aria-disabled="true"':` href="/lessons/${encodeURIComponent(l.file)}"`;
-    return `<${tag} class="lsn${l.ready===false?" soon":""}" id="ls-${w.n}-${l.n}"${href}>
-    <span class="ln">Урок ${l.n} из ${L.length} · ${l.ready===false?"скоро":hrs(l.minutes)}</span><b>${esc(l.title)}</b><span class="lm">${esc(l.focus)}</span>
-    <span class="lp"><i></i><span id="lp-${w.n}-${l.n}">0 / ${l.topics.length}</span></span></${tag}>`}).join("")}</div>`;
+    const head=l.kind==="test"?`Тест недели · ${hrs(l.minutes)}`:`Урок ${l.n} из ${L.filter(x=>x.kind!=="test").length} · ${l.ready===false?"скоро":hrs(l.minutes)}`;
+    return `<${tag} class="lsn${l.ready===false?" soon":""}${l.kind==="test"?" test":""}" id="ls-${w.n}-${l.n}"${href}>
+    <span class="ln">${head}</span><b>${esc(l.title)}</b><span class="lm">${esc(l.focus)}</span>
+    <span class="lp"><i></i><span id="lp-${w.n}-${l.n}">${l.kind==="test"?"не пройден":"0 / "+l.topics.length}</span></span></${tag}>`}).join("")}</div>`;
 }
 function weekHTML(w){
   const ids=weekIds(w.n), [kname,kc]=KIND[w.kind];
@@ -808,6 +814,7 @@ function updatePlan(){
     if(ch){ch.textContent=txt;ch.className="chip "+cls}
     if(sec)sec.classList.toggle("now",cur&&cur.n===w.n);
     weekLessons(w.n).forEach(l=>{const a=document.getElementById(`ls-${w.n}-${l.n}`),t=document.getElementById(`lp-${w.n}-${l.n}`);if(!a||!t)return;
+      if(l.kind==="test"){const r=(PLAN.tests||{})[w.n];t.textContent=r?`лучший ${r.best}% · попыток ${r.attempts}`:"не пройден";a.style.setProperty("--p",(r?r.best:0)+"%");a.classList.toggle("full",!!r&&r.best>=85);return}
       const k=l.topics.filter(id=>done[id]).length;t.textContent=`${k} / ${l.topics.length}`;a.style.setProperty("--p",(k/l.topics.length*100)+"%");a.classList.toggle("full",k===l.topics.length)});
   });
   const box=document.getElementById("kWeekBox");
@@ -818,7 +825,7 @@ function updatePlan(){
     document.getElementById("kWeek").innerHTML=`${k}<small> / ${ids.length}</small>`;
     document.getElementById("kWeekBar").style.width=(ids.length?k/ids.length*100:0)+"%";
     const L=weekLessons(cur.n);
-    document.getElementById("kWeekNav").innerHTML=`<div class="wact"><a class="btn pri" href="#w-${cur.n}" data-gw="${cur.n}">Открыть неделю ${cur.n} →</a>${L.map(l=>{const k=l.topics.filter(id=>done[id]).length;return l.ready===false?`<span class="btn ls soon" title="${esc(l.title)} — урок готовится">Урок ${l.n}<em>скоро</em></span>`:`<a class="btn ls${k===l.topics.length?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)}">Урок ${l.n}<em>${k}/${l.topics.length}</em></a>`}).join("")}</div>
+    document.getElementById("kWeekNav").innerHTML=`<div class="wact"><a class="btn pri" href="#w-${cur.n}" data-gw="${cur.n}">Открыть неделю ${cur.n} →</a>${L.map(l=>{if(l.kind==="test"){const r=(PLAN.tests||{})[cur.n];return `<a class="btn ls tst${r&&r.best>=85?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)}">Тест<em>${r?r.best+"%":"—"}</em></a>`}const k=l.topics.filter(id=>done[id]).length;return l.ready===false?`<span class="btn ls soon" title="${esc(l.title)} — урок готовится">Урок ${l.n}<em>скоро</em></span>`:`<a class="btn ls${k===l.topics.length?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)}">Урок ${l.n}<em>${k}/${l.topics.length}</em></a>`}).join("")}</div>
       <div><div class="mini-cap"><span>все недели</span><span>нажми, чтобы перейти</span></div>
       <div class="mini" style="--n:${PLAN.weeks.length};margin-top:6px">${PLAN.weeks.map(w=>{const ids=weekIds(w.n),kk=ids.filter(id=>done[id]).length,pc=ids.length?kk/ids.length*100:(w.end<t?100:0);
         return `<a href="#w-${w.n}" data-gw="${w.n}" class="${w.n===cur.n?"now":""}${w.end<t?" past":""}" style="--wc:var(${KIND[w.kind][1]})" title="Неделя ${w.n} · ${esc(w.span)} — ${esc(w.focus)}"><i style="height:${pc}%"></i><span>${w.n}</span></a>`}).join("")}</div></div>`;
