@@ -1,0 +1,1083 @@
+<title>Урок 3.3 · EDA и окна</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<style>
+/* Только для этого урока: строка кода, карточки выводов, массивы окон, симулятор git, карточки компаний. */
+.btn.mono{font-family:var(--f-mono);font-size:12.5px}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:default}
+.codeline{font:500 13.5px/1.5 var(--f-mono);background:var(--soft);border-radius:10px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.codeline .k{color:var(--accent)} .codeline .e{color:var(--red)}
+.lab>label,.lab .row2 label{display:grid;gap:4px;font-size:14px}
+.lab>label .row,.lab .row2 .row{display:flex;justify-content:space-between;gap:8px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+.legendrow{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.legendrow i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hm rect.c{cursor:pointer;transition:stroke .15s}
+.hm rect.c:hover{stroke:var(--ink);stroke-width:1.5}
+.hm rect.c.sel{stroke:var(--ink);stroke-width:2.5}
+.cells .cell{width:34px;height:34px;transition:background-color .18s,border-color .18s}
+.cells .cell.win{background:var(--accent-soft);border-color:var(--accent)}
+.cells .cell.best{box-shadow:0 0 0 2px var(--warm) inset}
+.cells .cell.pre{border-style:dashed;color:var(--muted)}
+.cells .cell.hit{background:color-mix(in srgb,var(--warm) 30%,transparent);border-color:var(--warm)}
+.cellcap{font:500 11px var(--f-mono);color:var(--muted);letter-spacing:.04em;margin-bottom:4px}
+.claims{display:grid;gap:8px}
+.claim{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px}
+.claim.ok{border-color:var(--accent)} .claim.no{border-color:var(--red)}
+.claim .fb{font-size:14px;color:var(--muted)}
+.claim .fb b{color:var(--ink)}
+.zones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.zones{grid-template-columns:1fr}}
+.zone{background:var(--soft);border-radius:12px;padding:10px 12px;display:grid;gap:6px;align-content:start;min-height:120px}
+.zone h4{margin:0;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.zone .it{font:500 12.5px var(--f-mono);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 8px;overflow-wrap:anywhere;transition:border-color .2s}
+.zone .it.head{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.zone .it.gone{opacity:.35;text-decoration:line-through}
+.zone .it.pushed::after{content:" · на GitHub";color:var(--teal)}
+.zone .it.rev{border-color:var(--plum)}
+.cos2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.co2{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:8px;align-content:start}
+.co2 h3{font-size:15.5px}
+.co2 ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:14px}
+.co2 .src{font-size:12.5px;color:var(--muted)}
+.co2 .lk{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px}
+.co2 .lk a{text-decoration:none;font-weight:500}
+</style>
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w03-2.html">← Урок 2 · Логистическая регрессия</a><span class="mid">урок 3 из 3</span><a href="/lessons/w03-test.html">Тест недели 3 →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 3 · урок 3 из 3 · 15 тем · ~3,5 часа</div>
+  <h1>EDA проекта и окна во времени</h1>
+  <p>В уроке 3.1 ты научился описывать данные числами, в 3.2 построил первый бейзлайн. Теперь — EDA проекта целиком: графики в matplotlib и seaborn, таргет и дисбаланс, корреляции и письменные выводы, с которыми не стыдно прийти к тимлиду. Вторая половина — окна во времени. Клики студента «за последние 7 дней» и «с начала курса» — это скользящее окно и префиксные суммы. Тот же приём даёт быстрые признаки и решает частые задачи на алгоритмической секции. В конце — как откатывать ошибки в git и ещё пять направлений, куда подаваться.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">matplotlib</a><a href="#t2">Какой график</a><a href="#t3">Корреляции</a><a href="#t4">Таргет и дисбаланс</a><a href="#t5">Выводы</a><a href="#t6">Скользящее окно</a><a href="#t7">Префиксные суммы</a><a href="#t8">stash, reset, revert</a><a href="#t9">Куда подаваться</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<div class="part"><span class="eyebrow">Часть 1 · 5 тем</span><h2>Увидеть данные</h2><p>Числа из урока 3.1 говорят, что в данных что-то есть. График показывает, что именно: два горба, выбросы, разницу между группами. Сначала механика matplotlib, потом какой график отвечает на какой вопрос, потом связи признаков между собой.</p></div>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 15 · <span class="qd key" aria-hidden="true"></span> Визуализация</div>
+  <h2>matplotlib: fig и ax</h2>
+  <p class="tldr">В matplotlib два главных объекта. <code>fig</code> — весь холст, <code>ax</code> — одна система координат на нём, в которой рисуют. Пиши в объектном стиле: <code>fig, ax = plt.subplots()</code> и дальше методы <code>ax.…</code>. Так понятно, куда идёт каждая линия, а несколько графиков рядом не путаются.</p>
+  <div class="prose"><p>Аналогия — стенгазета. <code>fig</code> — лист ватмана, <code>ax</code> — одна из заметок на нём со своими осями, подписями и легендой. Можно повесить одну заметку, а можно сетку 2 × 2. Нажимай на части рисунка — увидишь, какой строкой кода каждая создаётся.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · анатомия рисунка</span><span class="muted mono" id="anState"></span></div>
+    <div class="lab-grid">
+      <svg id="anSvg" viewBox="0 0 360 260" role="img" aria-label="Схема рисунка matplotlib: холст, оси, заголовок, подписи, легенда"></svg>
+      <div class="ctrl">
+        <div class="btns" role="group" aria-label="Часть рисунка" id="anParts"></div>
+        <div class="btns" role="group" aria-label="Сетка графиков"><button class="btn mono anl" data-l="1">1 × 1</button><button class="btn mono anl" data-l="2">1 × 2</button><button class="btn mono anl" data-l="4">2 × 2</button></div>
+        <div class="codeline" id="anCode"></div>
+        <p class="verdict" id="anMsg" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+<pre>import matplotlib.pyplot as plt
+fig, ax = plt.subplots(figsize=(8, 4))                <span class="cm"># холст 8 × 4 дюйма и одни оси</span>
+ax.plot(weeks, pass_clicks, label="сдали")
+ax.plot(weeks, fail_clicks, label="не сдали", linestyle="--")
+ax.set(title="Клики по неделям", xlabel="неделя курса", ylabel="медиана кликов")
+ax.legend(); ax.grid(alpha=0.3)
+fig.tight_layout()                                     <span class="cm"># подписи не налезают друг на друга</span>
+fig.savefig("reports/figures/clicks_by_week.png", dpi=150)
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)   <span class="cm"># два графика рядом с общей осью y</span>
+axes[0].hist(df.clicks, bins=30); axes[1].boxplot(df.clicks)
+df.clicks.plot.hist(ax=axes[0])                        <span class="cm"># pandas и seaborn тоже рисуют на переданном ax</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Нужно</th><th>Метод</th><th>Ловушка</th></tr></thead>
+    <tbody>
+      <tr><td>подписи и заголовок</td><td><code>ax.set(title=, xlabel=, ylabel=)</code></td><td>в стиле <code>plt.</code> это <code>plt.title</code>, а у ax — <code>set_title</code></td></tr>
+      <tr><td>диапазон и шкала</td><td><code>ax.set_xlim</code>, <code>ax.set_yscale("log")</code></td><td>лог-шкала не показывает нули: сначала <code>log1p</code> или symlog</td></tr>
+      <tr><td>сетка графиков</td><td><code>plt.subplots(2, 2)</code> → <code>axes[0, 1]</code></td><td>при одной строке индекс один: <code>axes[1]</code></td></tr>
+      <tr><td>сохранить</td><td><code>fig.savefig(..., dpi=150, bbox_inches="tight")</code></td><td>вызывай до <code>plt.show()</code> — после него холст может быть пустым</td></tr>
+      <tr><td>не копить окна</td><td><code>plt.close(fig)</code></td><td>в цикле на 100 графиков без close съедается память</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Ловушка: plt.* и ax.* вперемешку</b><p><code>plt.plot</code>, <code>plt.title</code> рисуют на «текущих» осях — тех, что были созданы последними. С одним графиком это работает. С сеткой 2 × 2 подпись уезжает не на тот график. Правило: создал <code>fig, ax</code> — дальше только <code>ax.…</code>.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем Figure отличается от Axes?</summary>
+      <div class="a"><p>Figure — весь холст: размер, разрешение, сохранение в файл, общий заголовок. Axes — одна область с системой координат, на ней рисуются линии, точки, столбцы, у неё свои оси, подписи и легенда. На одной Figure может быть несколько Axes. <code>plt.subplots(nrows, ncols)</code> создаёт Figure и массив Axes. Объектный стиль явно указывает, на каких осях рисовать, поэтому он предсказуем в сложных рисунках и функциях.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Какой формы <code>axes</code> после <code>plt.subplots(2, 3)</code>? Как обратиться к правому нижнему графику?</summary>
+      <div class="a"><p>Массив numpy формы (2, 3); правый нижний — <code>axes[1, 2]</code> (или <code>axes[-1, -1]</code>).</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.viz.0">
+    <label class="tp"><input type="checkbox" data-id="data.viz.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>matplotlib: fig и ax</b></span></label>
+    <span class="note" data-d="data.viz.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Темы 2–3 из 15 · Визуализация</div>
+  <h2>seaborn · гистограмма, boxplot, scatter</h2>
+  <p class="tldr">seaborn — надстройка над matplotlib для статистических графиков: принимает DataFrame и имена столбцов, сам группирует и раскрашивает (<code>hue=</code>). Выбор графика начинается с вопроса. Как распределён признак — гистограмма. Отличаются ли группы — boxplot. Связаны ли два признака — scatter. Сколько в каждой категории — countplot. Как меняется во времени — lineplot.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · какой график ответит на вопрос</span><span class="muted mono" id="chState"></span></div>
+    <div class="btns" role="group" aria-label="Вопрос" id="chQs"></div>
+    <div class="lab-grid">
+      <svg id="chSvg" viewBox="0 0 360 250" role="img" aria-label="График по выбранному вопросу на данных 300 студентов"></svg>
+      <div class="ctrl">
+        <div class="codeline" id="chCode"></div>
+        <div class="btns"><button class="btn mono" id="chLog" aria-pressed="false">лог-шкала кликов</button></div>
+        <p class="verdict" id="chMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="legendrow" id="chLegend"></div>
+    <p class="muted" style="font-size:13.5px">Как читать: учебные данные — 300 студентов с итогом курса, кликами за семестр, средним баллом и активностью по неделям. Устроены как OULAD, но числа сгенерированы.</p>
+  </div>
+
+<pre>import seaborn as sns
+sns.set_theme(style="whitegrid")
+fig, axes = plt.subplots(2, 2, figsize=(11, 8))
+sns.histplot(df, x="clicks", bins=30, log_scale=True, ax=axes[0, 0])
+sns.boxplot(df, x="final_result", y="clicks", order=ORDER, ax=axes[0, 1])
+sns.scatterplot(df, x="clicks", y="avg_score", hue="final_result", alpha=0.4, ax=axes[1, 0])
+sns.countplot(df, x="final_result", order=ORDER, ax=axes[1, 1])
+sns.lineplot(weekly, x="week", y="clicks", hue="final_result", estimator="median")
+sns.histplot(df, x="clicks", hue="final_result", stat="density", common_norm=False)  <span class="cm"># сравнить формы, а не размеры групп</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Вопрос</th><th>График</th><th>Частая ошибка</th></tr></thead>
+    <tbody>
+      <tr><td>как распределён один признак</td><td>гистограмма <code>histplot</code>, KDE</td><td>одно число корзин на всё; хвост сплющил остальное — нужен log</td></tr>
+      <tr><td>отличаются ли группы</td><td>boxplot, violinplot, гистограммы с <code>hue</code></td><td>сравнивать только средние столбиками без разброса</td></tr>
+      <tr><td>связь двух чисел</td><td>scatter, <code>hexbin</code> для большого n</td><td>100 тысяч точек слились в пятно — нужен <code>alpha</code> или hexbin</td></tr>
+      <tr><td>сколько в категориях</td><td><code>countplot</code>, barh</td><td>круговая диаграмма с десятью долями</td></tr>
+      <tr><td>как меняется во времени</td><td><code>lineplot</code></td><td>соединять линиями то, что не упорядочено (категории)</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Ловушка: разные размеры групп</b><p>Гистограммы с <code>hue</code> по умолчанию рисуют количества. Если сдавших втрое больше, их гистограмма просто выше всех, а форма маленькой группы не видна. Чтобы сравнить формы, ставь <code>stat="density", common_norm=False</code>: каждая группа нормируется отдельно.</p></div>
+  <div class="callout feel"><b class="h">Правила хорошего графика</b><p>Один график — одна мысль, и она в заголовке («Отчисленные кликают в 5 раз меньше уже с 1-й недели»), а не «clicks vs result». Подписаны оси и единицы. Шкала начинается с нуля у столбиков. Цвет кодирует смысл, одинаковый во всём отчёте. Для хвостатых признаков — лог-шкала, и это видно по подписи.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Какой график построишь, чтобы понять, отличается ли признак у классов таргета?</summary>
+      <div class="a"><p>Boxplot или violinplot признака по классам: видно медианы, разброс и выбросы. Плюс наложенные гистограммы или KDE с <code>hue=target</code> и нормировкой по группе, чтобы сравнить формы при разном размере классов. Для хвостатых признаков — в лог-шкале. Для категориального признака — доля таргета по категориям столбиками с числом объектов в категории.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>В scatter миллион точек слились в сплошное пятно. Что сделать?</summary>
+      <div class="a"><p>Прозрачность (<code>alpha=0.05</code>), hexbin или 2D-гистограмма, или случайная подвыборка (<code>df.sample(10_000)</code>).</p></div></details>
+  </div>
+  <div class="topic-check multi" data-for="data.viz.1,data.viz.2">
+    <div class="topic-check-h"><span class="eyebrow">Отметки в дереве · 2 темы</span><span class="note"></span></div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="data.viz.1"><span class="bx" aria-hidden="true"></span><span><b>seaborn</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="data.viz.2"><span class="bx" aria-hidden="true"></span><span><b>Гистограмма, boxplot, scatter</b></span></label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Темы 4–5 из 15 · Визуализация и EDA</div>
+  <h2>Корреляции между признаками и heatmap</h2>
+  <p class="tldr">Корреляция Пирсона меряет силу линейной связи от −1 до 1. Спирмен — монотонной связи: считает то же по рангам, поэтому спокоен к выбросам и хвостам. Heatmap матрицы корреляций — быстрый обзор: какие признаки дублируют друг друга и что связано с таргетом. Ноль корреляции не значит «нет связи», а высокая корреляция не значит «причина».</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · нажми на клетку матрицы</span><span class="muted mono" id="hmState"></span></div>
+    <div class="btns" role="group" aria-label="Метод"><button class="btn mono hmm" data-m="pearson">method="pearson"</button><button class="btn mono hmm" data-m="spearman">method="spearman"</button></div>
+    <div class="lab-grid">
+      <svg id="hmSvg" class="hm" viewBox="0 0 360 330" role="img" aria-label="Матрица корреляций шести признаков студентов"></svg>
+      <div class="ctrl">
+        <svg id="hmSc" viewBox="0 0 300 230" role="img" aria-label="Диаграмма рассеяния выбранной пары признаков"></svg>
+        <div class="readout">
+          <div class="stat"><div class="v" id="hmP">0</div><div class="k">Пирсон</div></div>
+          <div class="stat"><div class="v" id="hmS">0</div><div class="k">Спирмен</div></div>
+        </div>
+        <p class="verdict" id="hmMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Как читать: зелёный — связь положительная, сиреневый — отрицательная, чем ярче, тем сильнее. Учебные данные на 400 студентов. «В зоне риска» — таргет 0/1.</p>
+  </div>
+
+  <div class="formula">
+    <div class="fx">r = cov(<span class="c1">x</span>, <span class="c2">y</span>) / (σ<sub>x</sub> · σ<sub>y</sub>)</div>
+    <div class="legend">
+      <div><span class="s">cov</span> — ковариация: среднее произведение отклонений от средних. Положительна, когда x и y вместе выше или вместе ниже своих средних</div>
+      <div>Деление на σ убирает единицы измерения: r не зависит от того, мерить в часах или минутах</div>
+      <div>r² — доля разброса y, которую объясняет прямая по x: r = 0.5 — это всего 25%</div>
+    </div>
+  </div>
+<pre>corr = df[NUM].corr()                          <span class="cm"># Пирсон по умолчанию</span>
+corr_s = df[NUM].corr(method="spearman")       <span class="cm"># по рангам: хвосты и монотонные связи</span>
+mask = np.triu(np.ones_like(corr, dtype=bool)) <span class="cm"># верхний треугольник дублирует нижний</span>
+sns.heatmap(corr, mask=mask, annot=True, fmt=".2f", cmap="vlag", vmin=-1, vmax=1, center=0)
+df[NUM].corrwith(df.target).sort_values()     <span class="cm"># связь каждого признака с таргетом</span>
+pairs = corr.abs().where(~mask).stack().sort_values(ascending=False).head(5)  <span class="cm"># самые похожие пары</span></pre>
+  <div class="prose"><ul>
+    <li><b>Ноль корреляции ≠ нет связи.</b> U-образная зависимость (риск высок и у тех, кто сидит слишком мало, и у тех, кто сидит слишком много) даёт r ≈ 0. Смотри scatter.</li>
+    <li><b>Корреляция ≠ причина.</b> Клики и баллы связаны, но не потому, что клики «ставят оценку»: за обоими стоит вовлечённость. Для вывода «если увеличить X, вырастет Y» нужен эксперимент (A/B-тест).</li>
+    <li><b>Один выброс</b> может создать или уничтожить корреляцию Пирсона. Спирмен устойчивее.</li>
+    <li><b>Пары с |r| &gt; 0.9</b> — почти дубликаты. Для линейных моделей это мультиколлинеарность (урок 3.2, тема 7): оставь один признак или включи регуляризацию.</li>
+    <li><b>Категориальные признаки</b> Пирсоном не меряют. Для «категория — таргет» смотри долю таргета по категориям, для двух категорий — Cramér's V, для числа и категории — сравнение распределений по группам.</li>
+    <li><b>Парадокс Симпсона.</b> Связь внутри каждой группы может быть обратной к связи по всем данным: смешались группы с разным уровнем. Проверяй корреляции внутри групп (курс, семестр).</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем корреляция Пирсона отличается от Спирмена? Когда что брать?</summary>
+      <div class="a"><p>Пирсон меряет линейную связь по самим значениям, чувствителен к выбросам и хвостам. Спирмен — это Пирсон, посчитанный по рангам: меряет любую монотонную связь (растёт одно — растёт другое, не обязательно по прямой) и устойчив к выбросам. Для хвостатых признаков вроде кликов, денег и времени, и для порядковых шкал — Спирмен. Когда важна именно линейность, например для линейной модели, — Пирсон, но вместе с графиком.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Корреляция признака с таргетом 0.02. Значит, признак бесполезен?</summary>
+      <div class="a"><p>Нет. Корреляция ловит только линейную (у Спирмена — монотонную) связь по одному признаку. Связь может быть нелинейной (U-образной), проявляться только вместе с другим признаком (взаимодействие) или только в части данных. Деревья и бустинги такие связи находят. Проверка — график зависимости, mutual information, важность признака в модели и абляция: качество на валидации с признаком и без.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>r = 0.6. Какую долю разброса y объясняет прямая по x?</summary>
+      <div class="a"><p>r² = 0.36, то есть 36%.</p></div></details>
+  </div>
+  <div class="topic-check multi" data-for="data.eda.2,data.viz.3">
+    <div class="topic-check-h"><span class="eyebrow">Отметки в дереве · 2 темы</span><span class="note"></span></div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="data.eda.2"><span class="bx" aria-hidden="true"></span><span><b>Корреляции между признаками</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="data.viz.3"><span class="bx" aria-hidden="true"></span><span><b>Heatmap корреляций</b></span></label>
+    </div>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 2 · 2 темы</span><h2>EDA проекта</h2><p>Таргет — первое, на что смотрят: от его распределения зависят разбиение, метрики и бейзлайн. Последнее — выводы текстом: без них EDA — просто папка с картинками.</p></div>
+
+<!-- ============ 4 ============ -->
+<section class="topic" id="t4">
+  <div class="eyebrow">Тема 6 из 15 · <span class="qd key" aria-hidden="true"></span> EDA</div>
+  <h2>Анализ таргета и дисбаланса</h2>
+  <p class="tldr">Сначала смотри на таргет. Сколько классов, какие доли, нет ли пропусков, меняется ли доля со временем и по группам. Дисбаланс — когда один класс сильно реже других. Тогда accuracy обманывает, разбиение нужно стратифицировать, а метрики выбирать под редкий класс.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · когда accuracy врёт</span><span class="muted mono" id="imState"></span></div>
+    <div class="lab-grid">
+      <svg id="imSvg" viewBox="0 0 360 230" role="img" aria-label="Доля положительного класса и метрики двух моделей"></svg>
+      <div class="ctrl">
+        <label for="imP"><span class="row"><span>Доля «в зоне риска»</span><span class="mono" id="imPV"></span></span><input type="range" id="imP" min="0" max="6" step="1" value="3"></label>
+        <div class="readout">
+          <div class="stat"><div class="v" id="imDummy">0</div><div class="k">accuracy «все сдадут»</div></div>
+          <div class="stat"><div class="v" id="imModel">0</div><div class="k">accuracy модели</div></div>
+          <div class="stat"><div class="v" id="imPrec">0</div><div class="k">тревог по делу (precision)</div></div>
+          <div class="stat"><div class="v" id="imRec">80%</div><div class="k">пойманных (recall)</div></div>
+        </div>
+        <div class="btns"><button class="btn" id="imSplit">20 разбиений: без stratify и со stratify</button></div>
+        <p class="verdict" id="imMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Как читать: 1000 студентов. Модель ловит 80% рискующих и зря тревожится о 10% остальных — она одна и та же при любой доле. Меняется только то, как её видят метрики. Нижний график появится после кнопки: сколько рискующих попадает в test из 200 строк.</p>
+  </div>
+
+<pre>y.value_counts(), y.value_counts(normalize=True)          <span class="cm"># количества и доли</span>
+df.groupby("code_module").target.mean().sort_values()       <span class="cm"># доля по группам: модули сильно разные?</span>
+df.groupby("code_presentation").target.mean()                <span class="cm"># и во времени: семестр к семестру</span>
+train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+from sklearn.model_selection import StratifiedKFold
+LogisticRegression(class_weight="balanced")                 <span class="cm"># редкий класс весит больше в log-loss</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Что сделать при дисбалансе</th><th>Как</th><th>Зачем</th></tr></thead>
+    <tbody>
+      <tr><td>Разбивать стратифицированно</td><td><code>stratify=y</code>, StratifiedKFold</td><td>чтобы в test была та же доля, а оценка не прыгала от разбиения</td></tr>
+      <tr><td>Метрики под редкий класс</td><td>precision, recall, F1, PR-AUC, ROC-AUC вместо accuracy</td><td>accuracy «все — большинство» уже высокая; подробно — на неделе метрик</td></tr>
+      <tr><td>Веса классов</td><td><code>class_weight="balanced"</code>, <code>scale_pos_weight</code> в бустингах</td><td>ошибка на редком классе стоит дороже</td></tr>
+      <tr><td>Порог</td><td>подобрать по валидации, а не 0.5</td><td>урок 3.2: порог — не часть модели</td></tr>
+      <tr><td>Пересэмплирование</td><td>undersampling, oversampling, SMOTE — только на train</td><td>иногда помогает; часто веса и порог дают то же проще</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Ловушка: пересэмплирование до разбиения</b><p>Сделал oversampling (размножил редкий класс) до <code>train_test_split</code> — копии одних и тех же студентов попали и в train, и в test. Модель «узнаёт» их, и метрика на test завышена. Любое пересэмплирование — только внутри train, а в кросс-валидации — внутри каждого фолда (<code>imblearn.pipeline.Pipeline</code>).</p></div>
+  <div class="callout brs"><b class="h">Где это в проекте</b><p>В OULAD четыре итога: Distinction, Pass, Fail, Withdrawn. Для бинарной задачи «в зоне риска» объединяешь Fail и Withdrawn. Посчитай доли сам и проверь две вещи. Сильно ли доля отличается между модулями (code_module)? Меняется ли она от семестра к семестру (code_presentation)? Если да — честная проверка — обучаться на ранних семестрах и проверять на поздних.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>В данных 2% положительного класса. Что будете делать?</summary>
+      <div class="a"><p>Не смотреть на accuracy: «все отрицательные» уже даёт 98%. Разбиение стратифицированное, при кросс-валидации — StratifiedKFold. Метрики — PR-AUC, recall при фиксированной precision или F1, ROC-AUC как дополнительная. Бейзлайн — логрег с <code>class_weight="balanced"</code> и бустинг со <code>scale_pos_weight</code>. Порог подбираю по валидации под цену ошибок. Пересэмплирование пробую только внутри train и сравниваю на валидации. Отдельно проверяю, хватает ли вообще положительных примеров. 2% от 1000 — это 20 объектов, и тогда важнее собрать данные, чем подбирать модель.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Положительных 5%. Модель всем отвечает «0». Её accuracy и recall?</summary>
+      <div class="a"><p>Accuracy 95%, recall 0.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.eda.1">
+    <label class="tp"><input type="checkbox" data-id="data.eda.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Анализ таргета и дисбаланса</b></span></label>
+    <span class="note" data-d="data.eda.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="topic" id="t5">
+  <div class="eyebrow">Тема 7 из 15 · EDA</div>
+  <h2>Письменные выводы по EDA</h2>
+  <p class="tldr">EDA заканчивается текстом, а не графиками. Хороший вывод состоит из трёх частей: факт с числом, что он значит и что ты с этим делаешь. «Клики важны» — не вывод. «У отчисленных медиана кликов за первые 4 недели в 5 раз ниже → беру клики по неделям 0–3 как признаки» — вывод.</p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · вывод или нет</span><span class="muted mono" id="clState"></span></div>
+    <p class="muted" style="font-size:14px">Числа в утверждениях условные — это тренировка формы, а не факты про OULAD.</p>
+    <div class="claims" id="clList"></div>
+  </div>
+
+  <h3 style="font-size:17px">Шаблон раздела «EDA» в README или отчёте</h3>
+<pre>## Данные
+- Что в строке, сколько строк, период, источник. Что предсказываем и в какой момент времени.
+## Таргет
+- Доли классов; как меняются по группам и во времени → как разбиваю и какую метрику беру.
+## Качество данных
+- Пропуски (где, сколько, почему) → что делаю. Дубликаты, невозможные значения → что делаю.
+## Что связано с таргетом
+- 3–5 фактов с числами и графиком → какие признаки строю.
+## Риски
+- Утечки (признаки, которые знают будущее), сдвиг между train и test, малые группы.
+## Следующие шаги
+- Что проверю дальше и какой бейзлайн обучу первым.</pre>
+  <div class="prose"><ul>
+    <li><b>Каждый график — с выводом в заголовке или подписи.</b> Если вывода нет, график не нужен в отчёте. Оставь его в ноутбуке.</li>
+    <li><b>Связь — не причина.</b> Пиши «связано», «у группы X чаще», а не «влияет» и «из-за».</li>
+    <li><b>Ограничения честно:</b> «данные только за 2013–2014 годы», «малые группы, вывод неустойчив».</li>
+    <li><b>Утечки отдельной строкой.</b> Самый ценный вывод EDA — найденный признак, который знает ответ заранее.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Расскажите, что вы нашли в EDA своего проекта.</summary>
+      <div class="a"><p>Структура ответа на 2 минуты. Что предсказываем и в какой момент. Распределение таргета и что из этого следует для разбиения и метрики. 2–3 главные находки с числами: что связано с таргетом, какие проблемы данных и как их решил. Найденные риски: утечки, сдвиг во времени. Как всё это превратилось в признаки и бейзлайн. Интервьюер проверяет, что ты думал, а не просто вызвал <code>describe()</code>.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Из каких трёх частей состоит хороший вывод EDA?</summary>
+      <div class="a"><p>Факт с числом → что он значит → какое действие или решение из этого следует.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.eda.4">
+    <label class="tp"><input type="checkbox" data-id="data.eda.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Письменные выводы по EDA</b></span></label>
+    <span class="note" data-d="data.eda.4">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 3 · 2 темы</span><h2>Окна во времени</h2><p>«Сколько кликов за последние 7 дней» и «сколько с начала курса» — главные признаки проекта и две частые задачи на алгоритмической секции. Скользящее окно не пересчитывает сумму заново, а обновляет её. Префиксные суммы отвечают на любой вопрос «сколько на отрезке» за одну операцию.</p></div>
+
+<!-- ============ 6 ============ -->
+<section class="topic" id="t6">
+  <div class="eyebrow">Тема 8 из 15 · <span class="qd key" aria-hidden="true"></span> Алгоритмы</div>
+  <h2>Скользящее окно</h2>
+  <p class="tldr">Окно — непрерывный кусок массива или строки, который двигается слева направо. Вместо того чтобы пересчитывать каждое окно с нуля за O(k), его обновляют за O(1): прибавили вошедший элемент, вычли вышедший. Весь проход — O(n). Бывает окно фиксированной длины и окно переменной длины, которое растёт справа и сжимается слева.</p>
+  <div class="prose"><p>Узнать задачу на окно просто: «непрерывный подмассив» или «подстрока», и нужно найти лучший по сумме, длине или условию. Двигай шаги и сравни число операций с перебором.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · клики по дням</span><span class="muted mono" id="swState"></span></div>
+    <div class="btns" role="group" aria-label="Задача"><button class="btn swm" data-m="fix">Окно k дней с макс. суммой</button><button class="btn swm" data-m="var">Самое короткое окно с суммой ≥ S</button></div>
+    <div class="row2">
+      <label for="swK" id="swKL"><span class="row"><span>Длина окна k</span><span class="mono" id="swKV"></span></span><input type="range" id="swK" min="2" max="6" step="1" value="3"></label>
+      <label for="swS" id="swSL"><span class="row"><span>Порог суммы S</span><span class="mono" id="swSV"></span></span><input type="range" id="swS" min="10" max="60" step="1" value="30"></label>
+    </div>
+    <div><div class="cellcap">клики по дням</div><div class="cells" id="swCells"></div></div>
+    <div class="codeline" id="swCalc"></div>
+    <div class="btns"><button class="btn" id="swPrev">← Назад</button><button class="btn" id="swNext">Следующий шаг →</button><button class="btn" id="swEnd">В конец</button></div>
+    <div class="readout">
+      <div class="stat"><div class="v" id="swSum">0</div><div class="k">сумма в окне</div></div>
+      <div class="stat"><div class="v" id="swBest">—</div><div class="k">лучший ответ</div></div>
+      <div class="stat"><div class="v" id="swOps">0</div><div class="k">операций окном</div></div>
+      <div class="stat"><div class="v" id="swBrute">0</div><div class="k">операций перебором</div></div>
+    </div>
+    <p class="verdict" id="swMsg" aria-live="polite"></p>
+  </div>
+
+<pre><span class="cm"># окно фиксированной длины: LeetCode 643</span>
+def max_window_sum(a, k):
+    s = sum(a[:k]); best = s
+    for i in range(k, len(a)):
+        s += a[i] - a[i - k]           <span class="cm"># вошёл справа, вышел слева</span>
+        best = max(best, s)
+    return best
+
+<span class="cm"># окно переменной длины: LeetCode 209</span>
+def min_len_at_least(a, target):
+    left = s = 0; best = float("inf")
+    for right, x in enumerate(a):
+        s += x                           <span class="cm"># растём справа</span>
+        while s &gt;= target:              <span class="cm"># условие выполнено — сжимаемся слева</span>
+            best = min(best, right - left + 1)
+            s -= a[left]; left += 1
+    return 0 if best == float("inf") else best
+
+<span class="cm"># в pandas то же самое — rolling</span>
+daily.groupby("id_student").clicks.rolling(7, min_periods=1).sum()</pre>
+  <div class="prose"><ul>
+    <li><b>Почему переменное окно — O(n), хотя внутри while?</b> Каждый элемент входит в окно один раз (right) и выходит один раз (left). Итого не больше 2n шагов.</li>
+    <li><b>Когда окно не работает:</b> переменное окно опирается на монотонность — расширил окно, и сумма не уменьшилась. С отрицательными числами это ломается, и задача «сумма ровно k» решается префиксными суммами (тема 9).</li>
+    <li><b>Окно со словарём</b> — для строк: «самая длинная подстрока без повторов» (LeetCode 3), «есть ли перестановка p в s» (567). Внутри окна держат Counter или dict последних позиций (урок 1.3, хеш-таблица).</li>
+    <li><b>Окно с деком</b> — максимум в каждом окне за O(n) (LeetCode 239). Это уровень medium–hard, разберём на неделе стека и очереди.</li>
+  </ul></div>
+  <div class="callout brs"><b class="h">Где это в проекте</b><p>Признак «клики за последние 7 дней на момент прогноза» — скользящее окно по дням. Важно, чтобы окно смотрело только назад: <code>rolling</code> по умолчанию включает текущую строку и прошлые, а <code>center=True</code> или сдвиг назад заглядывают в будущее. Прогноз на неделю 4 строится только из недель 0–3.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Найдите длину самой длинной подстроки без повторяющихся символов. Сложность?</summary>
+      <div class="a"><p>Окно переменной длины и словарь «символ → последняя позиция». Иду right по строке. Если символ уже встречался внутри окна, сдвигаю left на позицию после его прошлого вхождения: <code>left = max(left, last[ch] + 1)</code>. Обновляю last[ch] = right и ответ right − left + 1. Время O(n) — один проход, память O(размер алфавита). Ловушка — забыть max: старое вхождение левее окна не должно двигать left назад.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>a = [2, 1, 5, 1, 3, 2], k = 3. Максимальная сумма окна?</summary>
+      <div class="a"><p>Окна: 8, 7, 9, 6 → 9 (5 + 1 + 3).</p></div></details>
+  </div>
+  <div class="topic-check" data-for="algo.pat.2">
+    <label class="tp"><input type="checkbox" data-id="algo.pat.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Скользящее окно</b></span></label>
+    <span class="note" data-d="algo.pat.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="topic" id="t7">
+  <div class="eyebrow">Тема 9 из 15 · Алгоритмы</div>
+  <h2>Префиксные суммы</h2>
+  <p class="tldr">Префиксная сумма P[i] — сумма первых i элементов. Посчитал один раз за O(n) — и сумма любого отрезка [l, r] равна P[r + 1] − P[l], одна операция. Если таких вопросов много, это решает задачу. А в паре со словарём префиксные суммы находят подмассивы с заданной суммой даже с отрицательными числами.</p>
+  <div class="prose"><p>Аналогия — счётчик пробега в машине. Сколько проехал между Тверью и Клином? Не надо складывать каждый километр: вычти показание счётчика в Твери из показания в Клину.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · сумма на отрезке за одну операцию</span><span class="muted mono" id="pfState"></span></div>
+    <div class="row2">
+      <label for="pfL"><span class="row"><span>Начало l</span><span class="mono" id="pfLV"></span></span><input type="range" id="pfL" min="0" max="9" step="1" value="2"></label>
+      <label for="pfR"><span class="row"><span>Конец r</span><span class="mono" id="pfRV"></span></span><input type="range" id="pfR" min="0" max="9" step="1" value="6"></label>
+    </div>
+    <div><div class="cellcap">a — клики по неделям (индексы 0–9)</div><div class="cells" id="pfA"></div></div>
+    <div><div class="cellcap">P — префиксные суммы (P[0] = 0, длина n + 1)</div><div class="cells" id="pfP"></div></div>
+    <div class="codeline" id="pfCalc"></div>
+    <p class="verdict" id="pfMsg" aria-live="polite"></p>
+  </div>
+
+<pre>from itertools import accumulate
+P = [0, *accumulate(a)]                 <span class="cm"># P[i] — сумма a[0..i-1]</span>
+range_sum = lambda l, r: P[r + 1] - P[l]   <span class="cm"># отрезок [l, r] включительно; LeetCode 303</span>
+
+<span class="cm"># сколько подмассивов с суммой ровно k: LeetCode 560</span>
+from collections import defaultdict
+def subarray_sum(a, k):
+    seen = defaultdict(int); seen[0] = 1   <span class="cm"># пустой префикс</span>
+    s = count = 0
+    for x in a:
+        s += x
+        count += seen[s - k]                <span class="cm"># был префикс, после которого сумма ровно k</span>
+        seen[s] += 1
+    return count
+
+df["clicks_to_date"] = df.groupby("id_student").clicks.cumsum()   <span class="cm"># накопленные клики в pandas</span>
+np.cumsum(a)</pre>
+  <div class="prose"><ul>
+    <li><b>Сдвиг на единицу.</b> P длиной n + 1 с нулём в начале избавляет от проверок «если l = 0». Это самое частое место для ошибки на собеседовании.</li>
+    <li><b>Префикс + хеш-таблица</b> (560): сумма отрезка (j, i] равна k, когда P[i] − P[j] = k, то есть когда раньше встречался префикс P[i] − k. Работает и с отрицательными числами, где окно бессильно.</li>
+    <li><b>Префиксы и суффиксы</b>: «произведение всех, кроме себя» без деления (238) — произведение слева на произведение справа.</li>
+    <li><b>2D-префиксы</b> — сумма в любом прямоугольнике матрицы за O(1) (304). Та же идея в «интегральных изображениях» компьютерного зрения.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Сколько подмассивов имеют сумму ровно k? В массиве есть отрицательные числа.</summary>
+      <div class="a"><p>Скользящее окно не подходит: с отрицательными числами сумма не растёт монотонно с расширением окна. Использую префиксные суммы и словарь «значение префикса → сколько раз встречалось», начиная с {0: 1}. Иду по массиву, накапливаю s. Число подмассивов, оканчивающихся здесь, с суммой k — это seen[s − k]. Затем увеличиваю seen[s]. Время O(n), память O(n). Перебор всех пар — O(n²).</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>a = [3, 1, 4, 1, 5]. Чему равен P и сумма отрезка [1, 3]?</summary>
+      <div class="a"><p>P = [0, 3, 4, 8, 9, 14]. Сумма = P[4] − P[1] = 9 − 3 = 6 (1 + 4 + 1).</p></div></details>
+  </div>
+  <div class="topic-check" data-for="algo.pat.3">
+    <label class="tp"><input type="checkbox" data-id="algo.pat.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Префиксные суммы</b></span></label>
+    <span class="note" data-d="algo.pat.3">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 4 · 6 тем</span><h2>Git и карьера</h2><p>EDA — это десятки коммитов в ноутбук и обратно. Надо уметь отложить правки, отменить коммит и не сломать историю коллегам. И пять новых направлений, куда подаваться, с честной пометкой, что известно, а что — нет.</p></div>
+
+<!-- ============ 8 ============ -->
+<section class="topic" id="t8">
+  <div class="eyebrow">Тема 10 из 15 · Git</div>
+  <h2>stash, reset и revert</h2>
+  <p class="tldr"><code>stash</code> прячет незакоммиченные правки в карман, чтобы переключиться на другую задачу. <code>reset</code> переносит ветку на старый коммит — переписывает историю, поэтому только для того, что ещё не запушено. <code>revert</code> создаёт новый коммит, который отменяет старый, — безопасно для общей истории.</p>
+  <div class="prose"><p>Три зоны git (рабочая папка, индекс, история) — из урока 1.3. Здесь — как двигать изменения между ними назад. Пробуй команды и смотри, что происходит в каждой зоне.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · откатываем ошибки</span><span class="muted mono" id="gtState"></span></div>
+    <div class="btns" id="gtBtns">
+      <button class="btn" data-c="edit">Изменить ноутбук</button>
+      <button class="btn mono" data-c="add">git add</button>
+      <button class="btn mono" data-c="commit">git commit</button>
+      <button class="btn mono" data-c="stash">git stash</button>
+      <button class="btn mono" data-c="pop">git stash pop</button>
+      <button class="btn mono" data-c="soft">reset --soft HEAD~1</button>
+      <button class="btn mono" data-c="mixed">reset HEAD~1</button>
+      <button class="btn mono" data-c="hard">reset --hard HEAD~1</button>
+      <button class="btn mono" data-c="revert">git revert HEAD</button>
+      <button class="btn" data-c="init">Сначала</button>
+    </div>
+    <div class="zones">
+      <div class="zone"><h4>Рабочая папка</h4><div id="gtWork"></div></div>
+      <div class="zone"><h4>Индекс (staging)</h4><div id="gtStage"></div></div>
+      <div class="zone"><h4>История · main</h4><div id="gtLog"></div></div>
+    </div>
+    <div class="zone" style="min-height:0"><h4>stash</h4><div id="gtStash"></div></div>
+    <p class="verdict" id="gtMsg" aria-live="polite"></p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Ситуация</th><th>Команда</th><th>Что будет</th></tr></thead>
+    <tbody>
+      <tr><td>срочно на другую ветку, правки не готовы</td><td><code>git stash</code> → … → <code>git stash pop</code></td><td>правки в кармане, папка чистая; pop возвращает</td></tr>
+      <tr><td>коммит не тот, не запушен — переделать</td><td><code>git reset --soft HEAD~1</code></td><td>коммит исчез, изменения в индексе — поправь и закоммить</td></tr>
+      <tr><td>разобрать коммит заново, по файлам</td><td><code>git reset HEAD~1</code> (это --mixed)</td><td>изменения в рабочей папке, индекс пустой</td></tr>
+      <tr><td>выбросить коммит и правки целиком</td><td><code>git reset --hard HEAD~1</code></td><td>всё пропало из папки — осторожно</td></tr>
+      <tr><td>коммит уже на GitHub и сломал main</td><td><code>git revert &lt;hash&gt;</code></td><td>новый коммит-отмена, история коллег не ломается</td></tr>
+      <tr><td>сделал reset --hard и пожалел</td><td><code>git reflog</code> → <code>git reset --hard &lt;hash&gt;</code></td><td>reflog помнит, где был HEAD; закоммиченное почти всегда можно вернуть</td></tr>
+    </tbody></table></div>
+<pre>git stash push -m "eda: черновик графиков"   <span class="cm"># с подписью, чтобы потом найти</span>
+git stash list                                <span class="cm"># stash@{0}: On main: eda: черновик графиков</span>
+git stash pop                                 <span class="cm"># вернуть и удалить из кармана (apply — вернуть и оставить)</span>
+git stash -u                                  <span class="cm"># спрятать и новые неотслеживаемые файлы</span>
+git restore notebooks/01_eda.ipynb            <span class="cm"># выбросить правки одного файла</span>
+git commit --amend                            <span class="cm"># поправить последний коммит (тоже переписывает историю)</span>
+git revert a3f9c21                            <span class="cm"># отменить конкретный старый коммит</span></pre>
+  <div class="callout trap"><b class="h">Ловушка: reset запушенного</b><p>Сделал <code>reset</code> коммита, который уже на GitHub, и <code>push --force</code> — у коллег, которые его скачали, история разошлась с твоей. Их следующий pull превратится в путаницу. Правило: запушено — только <code>revert</code>. Исключение — своя личная ветка, про которую ты точно знаешь, что её никто не взял. Тогда <code>push --force-with-lease</code>.</p></div>
+  <div class="callout trap"><b class="h">Ловушка: секрет в коммите</b><p>Закоммитил .env с ключом и запушил. <code>revert</code> и <code>reset</code> не помогают: ключ остался в истории, его найдут. Первым делом отзови ключ у сервиса (урок 2.3, тема 4). Потом, если нужно, чисти историю специальными инструментами (<code>git filter-repo</code>).</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем reset отличается от revert?</summary>
+      <div class="a"><p>reset перемещает указатель ветки на другой коммит: последующие коммиты пропадают из истории ветки, то есть история переписывается. Режимы решают, что будет с изменениями: --soft оставляет их в индексе, --mixed (по умолчанию) — в рабочей папке, --hard выбрасывает. revert ничего не удаляет: создаёт новый коммит с обратными изменениями. Для того, что уже в общей ветке, — revert. reset — для локальных, ещё не опубликованных коммитов.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что делает <code>git stash pop</code>, если при возврате случился конфликт?</summary>
+      <div class="a"><p>Применяет изменения с конфликтом, который нужно разрешить, как при merge, и не удаляет запись из stash — её убирают вручную <code>git stash drop</code>.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="tools.git.8">
+    <label class="tp"><input type="checkbox" data-id="tools.git.8"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>stash, reset и revert</b></span></label>
+    <span class="note" data-d="tools.git.8">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="topic" id="t9">
+  <div class="eyebrow">Темы 11–15 из 15 · Карьера</div>
+  <h2>Ozon, Авито, МТС, Касперский, Wildberries, МегаФон, Cloud.ru, hh.ru</h2>
+  <p class="tldr">Официальных условий ML-стажировок на осень 2026 года у этих компаний в открытых источниках почти нет. Ниже только то, что нашлось на 14.10.2026, с источником и пометкой, если он неофициальный. Главное действие — открыть официальную страницу, скопировать условия в «Сырьё» заметки компании и сказать агенту «разбери отборы».</p>
+  <div class="cos2">
+    <div class="co2"><h3>Ozon — Route 256</h3>
+      <ul><li>Route 256 — курсы Ozon для разработчиков и тестировщиков; лучшие выпускники получают оффер. Отбор — алгоритмические задачи в контесте.</li><li>Стажировки Ozon делятся на офисные (Ozon Camp), IT (Route start) и Ozon Fintech.</li><li>Набор весной 2026 был на маркетинг, продукт, финансы, аналитику: тест и интервью, от 30 часов в неделю. ML-трека в найденном нет.</li></ul>
+      <span class="src">Источники: <a href="https://habr.com/ru/news/796337" target="_blank" rel="noopener">Хабр</a>, <a href="https://theblueprint.ru/l/qJRQwO7" target="_blank" rel="noopener">The Blueprint</a>, <a href="https://www.retail.ru/news/ozon-uvelichil-chislo-stazhyerov-na-15-23-aprelya-2026-277082/" target="_blank" rel="noopener">Retail.ru, 04.2026</a></span>
+      <div class="lk"><a href="https://route256.ozon.ru/" target="_blank" rel="noopener">Route 256 ↗</a></div></div>
+    <div class="co2"><h3>Авито</h3>
+      <ul><li>В январе 2026 был набор на Data Science-стажировку: SQL и тест, тестовое задание и видеоинтервью. Опыт Kaggle — плюс.</li><li>Analyst Bootcamp — набор в феврале и в мае 2026, продуктовая аналитика и BI.</li><li>По прошлым наборам: оплачиваемая, 6 месяцев, от 25 часов, с 3-го курса. Плюс — A/B-тесты и проекты по ML и NLP.</li></ul>
+      <span class="src">Источники: <a href="https://ppc.world/news/avito-zapustil-stazhirovki-po-data-science/amp/" target="_blank" rel="noopener">ppc.world</a>, <a href="https://www.eanews.ru/rossiya/20260521135616/avito-otkryvaet-nabor-dlya-podgotovki-analitikov" target="_blank" rel="noopener">eanews, 05.2026</a>, <a href="https://habr.com/ru/articles/876140" target="_blank" rel="noopener">гайд на Хабре</a> — прошлые наборы</span>
+      <div class="lk"><a href="https://career.avito.com/" target="_blank" rel="noopener">Карьера Авито ↗</a></div></div>
+    <div class="co2"><h3>МТС и Касперский</h3>
+      <ul><li><b>МТС Старт</b> — стажировки для студентов без опыта, набор круглый год. МТС ПРО (аналитика, data-инженер) — для тех, у кого уже есть полгода опыта; приём до конца сентября 2026. Отдельной DS-стажировки не нашёл. Ближе всего — магистратура МТС и ВШЭ по ИИ.</li><li><b>Касперский SafeBoard</b> — оплачиваемая стажировка в Москве, наборы весной и осенью: онлайн-тест, задание или видеоинтервью, собеседование. По неофициальному обзору 2026 года мест в ML-командах детектирования угроз стало больше.</li></ul>
+      <span class="src">Источники: <a href="https://kod.ru/novye-programmy-mts" target="_blank" rel="noopener">Код Дурова</a>, <a href="https://rozetked.me/news/23529-laboratoriya-kasperskogo-otkryvaet-nabor-na-safeboard-programmu-stazhirovok-dlya-studentov" target="_blank" rel="noopener">Rozetked</a>, <a href="https://enigmai.ru/interview/kaspersky/kaspersky-internship/" target="_blank" rel="noopener">неофициальный обзор</a></span>
+      <div class="lk"><a href="https://job.mts.ru/" target="_blank" rel="noopener">МТС ↗</a><a href="https://safeboard.kaspersky.ru/" target="_blank" rel="noopener">SafeBoard ↗</a></div></div>
+    <div class="co2"><h3>Wildberries — RWB</h3>
+      <ul><li>Сезонная стажировка RWB: весной 2026 заявки до 24 мая, до 30 часов в неделю.</li><li>По словам компании, в прошлом сезоне было 12 человек на место, 45% стажёров получили предложение остаться.</li><li>ML-трек отдельно не описан. Следи за следующим сезоном и вакансиями стажёров на hh.ru.</li></ul>
+      <span class="src">Источники: <a href="https://www.gazeta.ru/business/news/2026/05/07/28416517.shtml" target="_blank" rel="noopener">Газета.ru, 07.05.2026</a>, <a href="https://uniseller.io/blog/rwb-stazirovki-dlya-studentov-2025" target="_blank" rel="noopener">Uniseller</a></span>
+      <div class="lk"><a href="https://career.wb.ru/" target="_blank" rel="noopener">Карьера RWB ↗</a></div></div>
+    <div class="co2"><h3>МегаФон и Cloud.ru</h3>
+      <ul><li><b>МегаФон</b> — официальных условий стажировки по DS не нашёл, только неофициальные гайды по найму.</li><li><b>Cloud.ru Camp</b> — оплачиваемые стажировки, но направления — DevOps, Go, кибербезопасность, QA. ML-трека в найденных наборах не было.</li><li>Оба стоит смотреть как junior-вакансии, а не стажировки.</li></ul>
+      <span class="src">Источники: <a href="https://enigmai.ru/interview/megafon/megafon-internship/" target="_blank" rel="noopener">неофициальный гайд</a>, <a href="https://habr.com/ru/companies/cloud_ru/news/758350" target="_blank" rel="noopener">Хабр, Cloud.ru</a></span>
+      <div class="lk"><a href="https://job.megafon.ru/" target="_blank" rel="noopener">МегаФон ↗</a><a href="https://cloud.ru/career" target="_blank" rel="noopener">Cloud.ru ↗</a></div></div>
+    <div class="co2"><h3>Junior ML на hh.ru: что требуют</h3>
+      <ul><li>Задача темы — не прочитать чужой обзор, а самому выписать требования 10 вакансий «Junior ML / Data Scientist» в Москве и посчитать частоты.</li><li>Как читать вакансию: обязательное отдели от «будет плюсом»; «опыт от года» на junior часто гибкий; смотри стек (Python, SQL, pandas, sklearn, бустинги, git, Docker) и задачи (что будешь делать).</li><li>Чего нет в плане, но встречается чаще трёх раз из десяти — кандидат в «Отборы» и в план.</li></ul>
+      <span class="src">Как — в практике, задача «10 вакансий»</span>
+      <div class="lk"><a href="https://hh.ru/search/vacancy?text=junior+data+scientist&area=1" target="_blank" rel="noopener">Поиск на hh.ru ↗</a><a href="/hire">В «Отборы» →</a></div></div>
+  </div>
+  <div class="callout feel"><b class="h">Что сделать на этой неделе</b><p>Открой Авито и SafeBoard — у них ML-направления видны лучше всего. Скопируй условия в «Сырьё» заметок компаний и скажи агенту «разбери отборы». И не забудь: заявки в «ИТ-город» — до 21.10.2026 (урок 2.3).</p></div>
+  <div class="topic-check multi" data-for="career.apply.4,career.apply.5,career.apply.7,career.apply.11,career.apply.12">
+    <div class="topic-check-h"><span class="eyebrow">Отметки в дереве · 5 тем</span><span class="note"></span></div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="career.apply.4"><span class="bx" aria-hidden="true"></span><span><b>Ozon: Route 256</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="career.apply.5"><span class="bx" aria-hidden="true"></span><span><b>Avito, МТС, Лаборатория Касперского</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="career.apply.7"><span class="bx" aria-hidden="true"></span><span><b>Wildberries (RWB): стажировки и junior</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="career.apply.11"><span class="bx" aria-hidden="true"></span><span><b>Junior ML на hh.ru: что требуют</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="career.apply.12"><span class="bx" aria-hidden="true"></span><span><b>МегаФон и Cloud.ru: стажировки</b></span></label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · как на собеседовании и в работе</div>
+  <h2>Практика</h2>
+  <p class="tldr">Главная задача недели — EDA проекта А: таргет, дисбаланс, активность по неделям и выводы текстом. Остальное — задачи на окна, pandas на время и git.</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Работа · главная задача недели, Jupyter, 2 часа</span>
+      <h3>Проект А: EDA — таргет, активность по неделям, выводы</h3>
+      <p>В <code>notebooks/01_eda.ipynb</code> на <code>students.parquet</code> (урок 3.1) и <code>studentVle.csv</code>:</p>
+      <ul>
+        <li>доли итогов курса и доля «в зоне риска» по модулям и семестрам;</li>
+        <li>клики по неделям курса (неделя = <code>date // 7</code>, дни до старта отрицательные) — медиана по итогам, линиями;</li>
+        <li>признак «клики за недели 0–3» и его связь с таргетом: boxplot в лог-шкале и Спирмен;</li>
+        <li>heatmap корреляций числовых признаков;</li>
+        <li>пять выводов по шаблону из темы 7 — в README, раздел «EDA». Картинки — в <code>reports/figures/</code>.</li>
+      </ul>
+      <p class="ok">Готово, когда:</p>
+      <ul class="ok">
+        <li>ноутбук проходит Restart &amp; Run All;</li>
+        <li>у каждого графика заголовок-вывод;</li>
+        <li>в README пять выводов вида «факт с числом → смысл → действие»;</li>
+        <li>отдельной строкой — какие признаки нельзя брать из-за утечки и почему.</li>
+      </ul>
+      <details><summary>Каркас кода</summary><div class="a">
+<pre>import pandas as pd, numpy as np, matplotlib.pyplot as plt, seaborn as sns
+KEY = ["code_module", "code_presentation", "id_student"]
+st = pd.read_parquet("data/processed/students.parquet")
+st["risk"] = st.final_result.isin(["Fail", "Withdrawn"]).astype(int)
+st.final_result.value_counts(normalize=True)
+st.groupby("code_module").risk.mean().sort_values()
+st.pivot_table(index="code_module", columns="code_presentation", values="risk", aggfunc="mean")
+
+vle = pd.read_csv("data/raw/studentVle.csv", usecols=KEY + ["date", "sum_click"],
+                  dtype={"id_student": "int32", "date": "int16", "sum_click": "int32"})
+vle["week"] = vle.date // 7
+weekly = vle.groupby(KEY + ["week"], as_index=False).sum_click.sum()
+weekly = weekly.merge(st[KEY + ["final_result"]], on=KEY, validate="many_to_one")
+fig, ax = plt.subplots(figsize=(9, 4))
+sns.lineplot(weekly.query("week &lt;= 30"), x="week", y="sum_click", hue="final_result",
+             estimator="median", errorbar=None, ax=ax)
+ax.set(title="…вывод одной фразой…", xlabel="неделя курса", ylabel="медиана кликов")
+fig.savefig("reports/figures/clicks_by_week.png", dpi=150, bbox_inches="tight")
+
+early = (vle.query("0 &lt;= week &lt;= 3").groupby(KEY).sum_click.sum()
+            .rename("clicks_w0_3").reset_index())
+st = st.merge(early, on=KEY, how="left", validate="one_to_one")
+st["clicks_w0_3"] = st.clicks_w0_3.fillna(0)   <span class="cm"># нет записей — значит не кликал</span>
+sns.boxplot(st, x="final_result", y=st.clicks_w0_3 + 1, log_scale=True)
+st[["clicks_w0_3", "risk"]].corr(method="spearman")</pre>
+        <p>Учти: у неотчисленного студента клики идут весь курс, у отчисленного обрываются. Поэтому «клики за весь курс» — частично утечка: в них уже видно отчисление. Клики за ранние недели честнее. Признак «прогноз на неделе N» строится только из недель до N.</p></div></details></div>
+
+    <div class="task"><span class="tg lc">LeetCode · 6 задач</span>
+      <h3>Окна и префиксы</h3>
+      <p>Скользящее окно: 643 Maximum Average Subarray I, 3 Longest Substring Without Repeating Characters, 209 Minimum Size Subarray Sum. Префиксы: 303 Range Sum Query — Immutable, 560 Subarray Sum Equals K, 238 Product of Array Except Self.</p>
+      <p class="ok">Готово, когда все шесть приняты, а для каждой ты вслух называешь: окно или префикс, почему, и сложность по времени и памяти.</p></div>
+
+    <div class="task"><span class="tg int">Собес · live coding, 15 минут</span>
+      <h3>Признаки «за последние 7 дней» в pandas</h3>
+      <p>Таблица <code>events</code>: <code>user_id</code>, <code>ts</code> (datetime), <code>amount</code>. Для каждой строки посчитай сумму покупок этого пользователя за последние 7 дней <b>до</b> текущей покупки, не включая её, и накопленную сумму с начала.</p>
+      <p class="ok">Готово, когда первая покупка каждого пользователя получила 0 за 7 дней, а текущая сумма нигде не попала в «прошлое».</p>
+      <details><summary>Решение</summary><div class="a">
+<pre>events = events.sort_values(["user_id", "ts"])
+roll = (events.set_index("ts").groupby("user_id").amount
+              .rolling("7D", closed="left").sum()     <span class="cm"># closed="left" — без текущей строки</span>
+              .fillna(0).reset_index(level=0, drop=True))
+events["sum_7d"] = roll.to_numpy()                    <span class="cm"># порядок совпадает после sort_values</span>
+events["sum_to_date"] = events.groupby("user_id").amount.cumsum() - events.amount</pre>
+        <p>Главное, что проверяют: что признак не видит текущую и будущие строки. <code>closed="left"</code> и «cumsum минус текущая» — это и есть «только прошлое».</p></div></details></div>
+
+    <div class="task"><span class="tg rev">Git · тренировка</span>
+      <h3>Четыре аварии в репозитории проекта</h3>
+      <p>Разыграй в <code>oulad-risk</code> на отдельной ветке:</p>
+      <ul>
+        <li>(а) начал правки графиков, а нужно срочно починить main — спрячь, почини, верни;</li>
+        <li>(б) закоммитил не тот файл, ещё не запушил — переделай коммит;</li>
+        <li>(в) запушенный коммит сломал загрузку данных — отмени, не переписывая историю;</li>
+        <li>(г) сделал <code>reset --hard</code> и потерял коммит — верни его.</li>
+      </ul>
+      <p class="ok">Готово, когда для каждой аварии есть команды и <code>git log --oneline --graph</code> выглядит так, как ты ожидал.</p>
+      <details><summary>Команды</summary><div class="a"><p>(а) <code>git stash push -m "графики"</code> → <code>git switch main</code> → фикс, коммит → <code>git switch -</code> → <code>git stash pop</code>. (б) <code>git reset --soft HEAD~1</code>, поправить индекс, снова commit — или <code>git commit --amend</code>. (в) <code>git revert &lt;hash&gt;</code> и push. (г) <code>git reflog</code>, найти хеш до reset, <code>git reset --hard &lt;hash&gt;</code>.</p></div></details></div>
+
+    <div class="task"><span class="tg work">Карьера · 40 минут</span>
+      <h3>10 вакансий Junior ML / Data Scientist</h3>
+      <p>На hh.ru найди 10 свежих вакансий junior или стажёра ML / DS в Москве. Для каждой выпиши в заметку «Отборы/Входящие отборов»: компанию, обязательный стек, «будет плюсом», задачи, формат отбора, если указан. Посчитай, что встречается чаще всего.</p>
+      <p class="ok">Готово, когда есть таблица частот требований и список из 3–5 пунктов «встречается часто, а в моём плане этого нет или это поздно» — агент сверит его с планом.</p></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 3 минуты</span>
+      <h3>«Какие признаки вы бы сделали для прогноза отчисления студента?»</h3>
+      <p class="ok">Готово, когда в ответе есть: момент прогноза, окна активности, тренд, задания, анкета, проверка на утечку.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>Сначала момент прогноза: например, конец 4-й недели. Все признаки строятся только из данных до него. Активность: клики за каждую неделю и за последние 7 и 14 дней (окна), накопленные клики (префикс), число активных дней, дни с последнего входа. Тренд: последняя неделя против среднего по прошлым. Задания: сколько сдано к сроку, средний балл, опоздания. Анкета: прошлые попытки, кредиты, образование, возраст, регион. Типы материалов, по которым кликал. Всё — относительно своего курса, потому что модули разные. И проверка на утечку: никаких агрегатов по всему курсу и дат отчисления.</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в дереве</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда прошёл «Проверку без ИИ» по теме. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>matplotlib:</b> <code>fig, ax = plt.subplots()</code>, дальше только <code>ax.…</code>; <code>ax.set(title, xlabel, ylabel)</code>, <code>tight_layout</code>, <code>savefig</code> до <code>show</code>, <code>plt.close</code> в циклах.</li>
+      <li><b>Какой график:</b> распределение — hist; группы — boxplot; два числа — scatter (alpha, hexbin); категории — countplot; время — lineplot.</li>
+      <li><b>seaborn:</b> DataFrame + имена столбцов, <code>hue</code>, <code>ax=</code>; разные размеры групп — <code>stat="density", common_norm=False</code>; хвосты — <code>log_scale</code>.</li>
+      <li><b>Хороший график:</b> вывод в заголовке, подписи и единицы, столбики от нуля, цвет = смысл.</li>
+      <li><b>Корреляции:</b> Пирсон — линейная, Спирмен — монотонная по рангам. r² — объяснённая доля. 0 ≠ нет связи, связь ≠ причина. |r| &gt; 0.9 — дубликаты. Heatmap с маской и центром 0.</li>
+      <li><b>Таргет:</b> доли, по группам, во времени. Дисбаланс → stratify, метрики под редкий класс, class_weight, порог. Пересэмплирование только внутри train.</li>
+      <li><b>Выводы EDA:</b> факт с числом → смысл → действие. Разделы: данные, таргет, качество, связи, риски и утечки, следующие шаги.</li>
+      <li><b>Окно фиксированное:</b> s += a[i] − a[i − k], O(n). <b>Переменное:</b> растём справа, пока условие — сжимаемся слева; каждый элемент входит и выходит один раз. Только для неотрицательных.</li>
+      <li><b>Префиксы:</b> P длины n + 1, P[0] = 0; сумма [l, r] = P[r + 1] − P[l]. Сумма ровно k (с отрицательными) — префикс + словарь {0: 1}.</li>
+      <li><b>pandas:</b> <code>rolling(7)</code>, <code>rolling("7D", closed="left")</code>, <code>cumsum()</code> по группам — только прошлое, без текущей строки, если её нельзя знать.</li>
+      <li><b>Git:</b> stash / pop; reset --soft (в индекс), --mixed (в папку), --hard (удалить) — только не запушенное; revert — для общего; reflog спасает.</li>
+      <li><b>Карьера:</b> условия — с официальной страницы в «Сырьё» → «разбери отборы»; 10 вакансий hh.ru → частоты → план. ИТ-город — до 21.10.2026.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без ИИ, 15 минут</b>
+    <p>Закрой урок. По памяти:</p>
+    <ul>
+      <li>напиши сетку 1 × 2 из гистограммы и boxplot с подписями;</li>
+      <li>назови график под каждый из пяти вопросов;</li>
+      <li>объясни, почему корреляция 0 не значит «нет связи»;</li>
+      <li>реши 209 и 560 на бумаге;</li>
+      <li>расскажи разницу reset --soft, --mixed, --hard и revert;</li>
+      <li>напиши три вывода по EDA в правильной форме.</li>
+    </ul>
+    <p>Где запнулся — туда и возвращайся.</p>
+  </div>
+</section>
+</div>
+
+<script src="/assets/lesson.js"></script>
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fx=(v,d=2)=>(Math.abs(v)<1e-9?0:v).toFixed(d);
+function press(sel,el){document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-pressed",b===el?"true":"false"))}
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+function median(a){const s=[...a].sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2}
+function quant(a,q){const s=[...a].sort((x,y)=>x-y),p=q*(s.length-1),lo=Math.floor(p),hi=Math.min(lo+1,s.length-1);return s[lo]+(s[hi]-s[lo])*(p-lo)}
+function pearson(x,y){const mx=mean(x),my=mean(y);let sxy=0,sx=0,sy=0;for(let i=0;i<x.length;i++){const a=x[i]-mx,b=y[i]-my;sxy+=a*b;sx+=a*a;sy+=b*b}return sx&&sy?sxy/Math.sqrt(sx*sy):0}
+function ranks(a){const idx=a.map((v,i)=>[v,i]).sort((p,q)=>p[0]-q[0]),r=new Array(a.length);let i=0;while(i<idx.length){let j=i;while(j+1<idx.length&&idx[j+1][0]===idx[i][0])j++;const rk=(i+j)/2+1;for(let k=i;k<=j;k++)r[idx[k][1]]=rk;i=j+1}return r}
+const spearman=(x,y)=>pearson(ranks(x),ranks(y));
+const GRP=["Distinction","Pass","Fail","Withdrawn"], GCOL=["var(--teal)","var(--accent)","var(--warm)","var(--plum)"];
+
+/* ---------- тема 1: анатомия рисунка ---------- */
+(function anatomy(){
+  const PARTS={
+    fig:["Figure — холст","fig, ax = plt.subplots(figsize=(8, 4))","Весь лист: размер в дюймах, фон, сохранение в файл. На одном холсте может быть несколько осей."],
+    ax:["Axes — оси","fig, ax = plt.subplots()  # ax — одна система координат","Область с координатами: на ней рисуют. Не путать с Axis — отдельной осью x или y внутри неё."],
+    title:["Заголовок","ax.set_title(\"Отчисленные кликают меньше уже с 1-й недели\")","Заголовок у каждого ax свой. Общий для холста — fig.suptitle(...). Лучший заголовок — сам вывод."],
+    labels:["Подписи осей","ax.set(xlabel=\"неделя курса\", ylabel=\"медиана кликов\")","Что по оси и в каких единицах. График без подписей на собеседовании — минус."],
+    ticks:["Деления","ax.set_xticks(range(0, 31, 5)); ax.set_yscale(\"log\")","Деления и шкала. Лог-шкала для хвостатых данных — и обязательно сказать об этом в подписи."],
+    legend:["Легенда","ax.plot(x, y, label=\"сдали\"); ax.legend()","Легенда берёт тексты из label= у каждой линии. Без label легенда пустая."],
+    line:["Линия данных","ax.plot(weeks, clicks, color=\"C0\", linewidth=2)","Сами данные: plot — линии, scatter — точки, bar — столбики, hist — гистограмма."]
+  };
+  let part="ax",lay=1;
+  $("anParts").innerHTML=Object.entries(PARTS).map(([k,v])=>`<button class="btn anp" data-p="${k}">${v[0].split(" — ")[0]}</button>`).join("");
+  function draw(){
+    const hl=k=>k===part?'stroke="var(--warm)" stroke-width="3"':'stroke="var(--line)" stroke-width="1.2"';
+    let s=`<rect x="4" y="4" width="352" height="252" rx="10" fill="var(--soft)" ${hl("fig")}/>`;
+    s+=`<text class="tk" x="14" y="20">fig</text>`;
+    const boxes=lay===1?[[40,40,300,180]]:lay===2?[[30,40,150,180],[200,40,150,180]]:[[30,30,150,95],[200,30,150,95],[30,148,150,95],[200,148,150,95]];
+    boxes.forEach(([x,y,w,h],bi)=>{
+      const sel=bi===0;
+      s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--surface)" ${sel?hl("ax"):'stroke="var(--line)" stroke-width="1.2"'}/>`;
+      const name=lay===1?"ax":lay===2?`axes[${bi}]`:`axes[${bi>>1}, ${bi&1}]`;
+      s+=`<text class="tk" x="${x+w-4}" y="${y+h-4}" text-anchor="end">${name}</text>`;
+      if(sel){
+        const pts=[0,1,2,3,4,5,6].map(i=>[x+10+i*(w-20)/6,y+h-18-(Math.sin(i/2)+1)*(h-50)/2.3-i*3]);
+        s+=`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="${part==="line"?4:2.2}"/>`;
+        s+=`<polyline points="${pts.map(p=>[p[0],p[1]+20].join(",")).join(" ")}" fill="none" stroke="var(--plum)" stroke-width="2" stroke-dasharray="5 3"/>`;
+        s+=`<rect x="${x+(w-150)/2}" y="${y-22}" width="150" height="16" rx="3" fill="none" ${part==="title"?hl("title"):'stroke="none"'}/><text x="${x+w/2}" y="${y-10}" text-anchor="middle" style="font:600 11px var(--f-body);fill:var(--ink)">Клики по неделям</text>`;
+        s+=`<text class="lbl" x="${x+w/2}" y="${y+h+16}" text-anchor="middle" ${part==="labels"?'style="fill:var(--warm);font-weight:600"':""}>неделя курса</text>`;
+        s+=`<text class="lbl" x="${x-6}" y="${y+h/2}" text-anchor="middle" transform="rotate(-90 ${x-6} ${y+h/2})" ${part==="labels"?'style="fill:var(--warm);font-weight:600"':""}>клики</text>`;
+        [0,1,2,3].forEach(i=>{const tx=x+10+i*(w-20)/3;s+=`<line x1="${tx}" x2="${tx}" y1="${y+h}" y2="${y+h+4}" stroke="${part==="ticks"?"var(--warm)":"var(--muted)"}" stroke-width="${part==="ticks"?2.5:1}"/>`});
+        if(lay<4){s+=`<rect x="${x+w-78}" y="${y+8}" width="70" height="34" rx="4" fill="var(--surface)" ${part==="legend"?hl("legend"):'stroke="var(--line)"'}/><line x1="${x+w-72}" x2="${x+w-58}" y1="${y+19}" y2="${y+19}" stroke="var(--accent)" stroke-width="2"/><text class="tk" x="${x+w-54}" y="${y+22}">сдали</text><line x1="${x+w-72}" x2="${x+w-58}" y1="${y+33}" y2="${y+33}" stroke="var(--plum)" stroke-dasharray="4 2" stroke-width="2"/><text class="tk" x="${x+w-54}" y="${y+36}">нет</text>`}
+      }
+    });
+    $("anSvg").innerHTML=s;
+    const P=PARTS[part];
+    const lcode=lay===1?"fig, ax = plt.subplots()":lay===2?"fig, axes = plt.subplots(1, 2)  # axes[0], axes[1]":"fig, axes = plt.subplots(2, 2)  # axes[0, 0] … axes[1, 1]";
+    $("anCode").textContent=(part==="fig"?lcode:P[1]);
+    $("anMsg").textContent=P[2]+(lay>1?` Сетка ${lay===2?"1 × 2":"2 × 2"}: ${lay===2?"axes — одномерный массив, axes[1]":"axes — массив 2 × 2, axes[1, 0]"}. Каждый график настраивается через свой ax.`:"");
+    $("anState").textContent=P[0];
+    press(".anp",document.querySelector(`.anp[data-p="${part}"]`)); press(".anl",document.querySelector(`.anl[data-l="${lay}"]`));
+  }
+  $("anParts").addEventListener("click",e=>{const b=e.target.closest(".anp");if(b){part=b.dataset.p;draw()}});
+  document.querySelectorAll(".anl").forEach(b=>b.onclick=()=>{lay=+b.dataset.l;draw()});
+  draw();
+})();
+
+/* ---------- общие учебные данные: 300 студентов ---------- */
+const STU=(function(){
+  const r=rng(33),W=[0.1,0.42,0.22,0.26],out=[];
+  for(let i=0;i<300;i++){
+    let u=r(),g=0;while(u>W[g]){u-=W[g];g++}
+    const lvl=[5.6,5.0,4.3,3.6][g], clicks=Math.round(Math.exp(lvl+0.55*gauss(r)));
+    const score=Math.max(5,Math.min(100,[86,72,48,52][g]+0.004*Math.min(clicks,2000)+9*gauss(r)));
+    out.push({g,clicks,score});
+  }
+  return out;
+})();
+
+/* ---------- тема 2: какой график ---------- */
+(function chooser(){
+  const QS={
+    hist:["Как распределены клики?",'sns.histplot(df, x="clicks", bins=30)'],
+    box:["Отличаются ли группы?",'sns.boxplot(df, x="final_result", y="clicks")'],
+    scat:["Связаны ли клики и балл?",'sns.scatterplot(df, x="clicks", y="avg_score", hue="final_result", alpha=.5)'],
+    count:["Сколько в каждом итоге?",'sns.countplot(df, x="final_result")'],
+    line:["Как менялась активность?",'sns.lineplot(weekly, x="week", y="clicks", hue="final_result", estimator="median")']
+  };
+  let q="box",lg=true;
+  $("chQs").innerHTML=Object.entries(QS).map(([k,v])=>`<button class="btn chq" data-q="${k}">${v[0]}</button>`).join("");
+  $("chLegend").innerHTML=GRP.map((g,i)=>`<span><i style="background:${GCOL[i]}"></i>${g}</span>`).join("");
+  const tr=v=>lg?Math.log10(v):v, CL=STU.map(s=>s.clicks), cmax=Math.max(...CL);
+  function draw(){
+    let s="",msg="";
+    if(q==="hist"){
+      const V=CL.map(tr),lo=Math.min(...V),hi=Math.max(...V),B=24,w=(hi-lo)/B,C=Array(B).fill(0);
+      V.forEach(v=>C[Math.min(B-1,Math.floor((v-lo)/w))]++);
+      const F=frame(360,250,{l:34,r:10,t:12,b:30},[lo,hi],[0,Math.max(...C)*1.1]);
+      s=grid(F,[lo,(lo+hi)/2,hi],[0,Math.round(Math.max(...C)/2),Math.max(...C)],v=>lg?Math.round(10**v):Math.round(v),v=>v,lg?"клики, лог-шкала":"клики");
+      C.forEach((c,i)=>{s+=`<rect x="${F.sx(lo+i*w)+0.6}" y="${F.sy(c)}" width="${F.sx(lo+(i+1)*w)-F.sx(lo+i*w)-1.2}" height="${F.sy(0)-F.sy(c)}" fill="var(--accent)" opacity=".8"/>`});
+      msg=lg?"В лог-шкале клики похожи на колокол, но видна левая «полка» — малоактивные студенты. Без логарифма почти всё сжалось бы в первую корзину: у кликов длинный хвост (урок 3.1, тема 10).":"Без логарифма почти все студенты в первых корзинах, а несколько активистов растянули ось. Форму не видно — включи лог-шкалу.";
+    }else if(q==="box"){
+      const F=frame(360,250,{l:40,r:10,t:12,b:30},[0,4],lg?[0.8,Math.log10(cmax)*1.03]:[0,cmax*1.03]);
+      const yt=lg?[1,2,3]:[0,1000,2000,3000].filter(v=>v<=cmax);
+      s=grid(F,[],yt,v=>v,v=>lg?String(10**v):v,"","клики"+(lg?" (лог)":""));
+      GRP.forEach((gname,gi)=>{const V=STU.filter(st=>st.g===gi).map(st=>tr(st.clicks)),q1=quant(V,.25),q3=quant(V,.75),md=median(V),iq=q3-q1,lo=Math.max(Math.min(...V),q1-1.5*iq),hi=Math.min(Math.max(...V),q3+1.5*iq),cx=F.sx(gi+0.5);
+        s+=`<line x1="${cx}" x2="${cx}" y1="${F.sy(lo)}" y2="${F.sy(hi)}" stroke="var(--muted)"/><rect x="${cx-22}" y="${F.sy(q3)}" width="44" height="${F.sy(q1)-F.sy(q3)}" rx="4" fill="${GCOL[gi]}" opacity=".35" stroke="${GCOL[gi]}"/><line x1="${cx-22}" x2="${cx+22}" y1="${F.sy(md)}" y2="${F.sy(md)}" stroke="var(--ink)" stroke-width="2"/>`;
+        V.filter(v=>v<lo||v>hi).forEach(v=>{s+=`<circle cx="${cx}" cy="${F.sy(v)}" r="2.5" fill="${GCOL[gi]}"/>`});
+        s+=`<text class="tk" x="${cx}" y="${F.y1+16}" text-anchor="middle">${gname}</text>`});
+      msg="Боксплот сразу показывает: медиана кликов падает от Distinction к Withdrawn, и ящики почти не пересекаются. Это кандидат в сильные признаки. Сравнивай медианы и ящики, а не одиночные точки за усами.";
+    }else if(q==="scat"){
+      const F=frame(360,250,{l:34,r:10,t:12,b:30},lg?[1,Math.log10(cmax)*1.02]:[0,cmax],[0,100]);
+      s=grid(F,lg?[1,2,3]:[0,1000,2000,3000].filter(v=>v<=cmax),[0,50,100],v=>lg?String(10**v):v,v=>v,"клики","балл");
+      STU.forEach(st=>{s+=`<circle cx="${F.sx(tr(st.clicks))}" cy="${F.sy(st.score)}" r="3" fill="${GCOL[st.g]}" opacity=".55"/>`});
+      msg=`Связь есть: чем больше кликов, тем выше балл (Спирмен ≈ ${fx(spearman(CL,STU.map(st=>st.score)))}), но облако широкое. Цвет показывает, что группы перекрываются. Прозрачность alpha нужна, чтобы видеть, где точки гуще.`;
+    }else if(q==="count"){
+      const C=GRP.map((_,gi)=>STU.filter(st=>st.g===gi).length),F=frame(360,250,{l:34,r:10,t:12,b:30},[0,4],[0,Math.max(...C)*1.15]);
+      s=grid(F,[],[0,50,100,150].filter(v=>v<=Math.max(...C)*1.15),v=>v,v=>v,"","студентов");
+      C.forEach((c,gi)=>{const x=F.sx(gi+0.18),w=F.sx(gi+0.82)-x;s+=`<rect x="${x}" y="${F.sy(c)}" width="${w}" height="${F.sy(0)-F.sy(c)}" rx="4" fill="${GCOL[gi]}" opacity=".8"/><text class="tk" x="${x+w/2}" y="${F.sy(c)-5}" text-anchor="middle">${c}</text><text class="tk" x="${x+w/2}" y="${F.y1+16}" text-anchor="middle">${GRP[gi]}</text>`});
+      msg="Классы несбалансированы: Distinction заметно реже остальных. Для бинарного таргета «в зоне риска» (Fail + Withdrawn) посчитай доли — от них зависит разбиение и метрики (тема 6). Столбики всегда от нуля.";
+    }else{
+      const WK=Array.from({length:21},(_,i)=>i), base=[5.6,5.0,4.3,3.6];
+      const F=frame(360,250,{l:34,r:10,t:12,b:30},[0,20],[0,lg?3:600]);
+      s=grid(F,[0,5,10,15,20],lg?[0,1,2,3]:[0,200,400,600],v=>v,v=>lg?String(10**v):v,"неделя курса","медиана кликов");
+      GRP.forEach((_,gi)=>{const fn=w=>{let v=Math.exp(base[gi]-1.6)*(1+0.3*Math.sin(w/2));if(gi===3)v*=Math.max(0.05,1-w/9);if(gi===2)v*=Math.max(0.35,1-w/30);return v};
+        s+=`<path d="${pathOf(F,WK,w=>lg?Math.log10(fn(w)+1):fn(w),[0,lg?3:600])}" fill="none" stroke="${GCOL[gi]}" stroke-width="2.4"/>`});
+      msg="Линии по неделям показывают то, чего не видно в итоговых суммах: Withdrawn начинают ниже и затухают к 8–9-й неделе, Fail медленно снижаются. Значит, уже ранние недели несут сигнал. Отсюда признаки «клики за недели 0–3».";
+    }
+    $("chSvg").innerHTML=s; $("chCode").textContent=QS[q][1]+(lg&&q!=="count"?(q==="hist"?"  # + log_scale=True":q==="line"?"\nax.set_yscale(\"log\")":"\nax.set_"+(q==="scat"?"x":"y")+"scale(\"log\")"):"");
+    $("chMsg").textContent=msg; $("chState").textContent=q;
+    $("chLog").disabled=q==="count"; $("chLog").setAttribute("aria-pressed",lg);
+    press(".chq",document.querySelector(`.chq[data-q="${q}"]`));
+  }
+  $("chQs").addEventListener("click",e=>{const b=e.target.closest(".chq");if(b){q=b.dataset.q;draw()}});
+  $("chLog").onclick=()=>{lg=!lg;draw()};
+  draw();
+})();
+
+/* ---------- тема 3: heatmap корреляций ---------- */
+(function heatmap(){
+  const NAMES=["клики","сдано заданий","средний балл","кредиты","пересдачи","в зоне риска"];
+  const r=rng(77),N=400,D=NAMES.map(()=>[]);
+  for(let i=0;i<N;i++){
+    const e=gauss(r),prev=r()<0.12?(r()<0.3?2:1):0,cred=[30,60,60,60,90,120][Math.floor(r()*6)];
+    const clicks=Math.round(Math.exp(4.6+1.0*e+0.4*gauss(r)));
+    const sub=Math.max(0,Math.min(10,Math.round(6+1.8*e+1.2*gauss(r))));
+    const score=Math.max(0,Math.min(100,68+7*e+9*gauss(r)));
+    const risk=(-1.1*e+0.6*prev+0.008*(cred-60)+0.7*gauss(r))>0.55?1:0;
+    [clicks,sub,score,cred,prev,risk].forEach((v,j)=>D[j].push(v));
+  }
+  const M={pearson:NAMES.map((_,a)=>NAMES.map((_,b)=>pearson(D[a],D[b]))),spearman:NAMES.map((_,a)=>NAMES.map((_,b)=>spearman(D[a],D[b])))};
+  let method="pearson",sel=[2,0];
+  const S=40,X0=104,Y0=6;
+  function cellColor(v){return v>=0?`color-mix(in srgb,var(--accent) ${Math.round(Math.abs(v)*85)}%,var(--surface))`:`color-mix(in srgb,var(--plum) ${Math.round(Math.abs(v)*85)}%,var(--surface))`}
+  function draw(){
+    const C=M[method];let s="";
+    NAMES.forEach((n,a)=>{s+=`<text class="tk" x="${X0-6}" y="${Y0+a*S+S/2+4}" text-anchor="end">${n}</text>`;
+      s+=`<text class="tk" transform="translate(${X0+a*S+S/2+4},${Y0+6*S+8}) rotate(40)">${n}</text>`;
+      NAMES.forEach((_,b)=>{const v=C[a][b],isSel=(sel[0]===a&&sel[1]===b)||(sel[0]===b&&sel[1]===a);
+        s+=`<rect class="c${isSel?" sel":""}" data-a="${a}" data-b="${b}" x="${X0+b*S}" y="${Y0+a*S}" width="${S-2}" height="${S-2}" rx="4" fill="${cellColor(v)}"/>`;
+        s+=`<text x="${X0+b*S+S/2-1}" y="${Y0+a*S+S/2+3}" text-anchor="middle" style="font:500 10.5px var(--f-mono);fill:${Math.abs(v)>0.55?"var(--surface)":"var(--ink)"};pointer-events:none">${a===b?"1":fx(v,2).replace("0.",".")}</text>`})});
+    $("hmSvg").innerHTML=s;
+    const [a,b]=sel,x=D[b],y=D[a],F=frame(300,230,{l:40,r:8,t:10,b:30},[Math.min(...x),Math.max(...x)*1.02],[Math.min(...y),Math.max(...y)*1.04]);
+    let t=grid(F,[],[],v=>v,v=>v,NAMES[b],NAMES[a]);
+    const jit=v=>(v-0.5)*0.6, rr=rng(5);
+    x.forEach((xv,i)=>{const bin=NAMES[b]==="в зоне риска"||NAMES[b]==="пересдачи"||NAMES[b]==="кредиты"||NAMES[b]==="сдано заданий",
+      bin2=NAMES[a]==="в зоне риска"||NAMES[a]==="пересдачи"||NAMES[a]==="кредиты"||NAMES[a]==="сдано заданий";
+      const dx=bin?jit(rr())*(NAMES[b]==="кредиты"?20:1):0,dy=bin2?jit(rr())*(NAMES[a]==="кредиты"?20:1):0;
+      t+=`<circle cx="${F.sx(xv+dx)}" cy="${F.sy(y[i]+dy)}" r="2.2" fill="var(--accent)" opacity=".4"/>`});
+    t+=`<line class="ax" x1="${F.x0}" x2="${F.x1}" y1="${F.y1}" y2="${F.y1}"/><line class="ax" x1="${F.x0}" x2="${F.x0}" y1="${F.y0}" y2="${F.y1}"/>`;
+    $("hmSc").innerHTML=t;
+    const p=M.pearson[a][b],sp=M.spearman[a][b];
+    $("hmP").textContent=fx(p); $("hmS").textContent=fx(sp);
+    $("hmState").textContent=`${NAMES[a]} × ${NAMES[b]}`;
+    let msg;
+    if(a===b)msg="Диагональ — признак сам с собой, всегда 1. Нажми другую клетку.";
+    else if((NAMES[a]==="клики"||NAMES[b]==="клики")&&Math.abs(sp-p)>0.04)msg=`Пирсон ${fx(p)}, Спирмен ${fx(sp)}: у кликов длинный хвост, и несколько активистов искажают линейную корреляцию. Связь монотонная, а не прямая — для таких признаков бери Спирмена или логарифм.`;
+    else if(NAMES[a]==="в зоне риска"||NAMES[b]==="в зоне риска")msg=`Корреляция с бинарным таргетом ${fx(p)}: ${Math.abs(p)>0.3?"заметная связь — кандидат в важные признаки":"слабая линейная связь, но это не приговор: проверь график и модель"}. Это не причинность: за кликами, баллом и риском стоит вовлечённость.`;
+    else if(Math.abs(p)>0.6)msg=`Сильная связь ${fx(p)}: признаки частично дублируют друг друга. Для линейной модели это мультиколлинеарность — урок 3.2, тема 7.`;
+    else if(Math.abs(p)>0.3)msg=`Умеренная связь ${fx(p)}: r² ≈ ${fx(p*p)}, то есть прямая объясняет около ${Math.round(p*p*100)}% разброса. Признаки связаны, но несут и своё.`;
+    else msg=`Слабая связь ${fx(p)}. Признаки несут разную информацию — оба могут пригодиться.`;
+    $("hmMsg").textContent=msg;
+    press(".hmm",document.querySelector(`.hmm[data-m="${method}"]`));
+  }
+  $("hmSvg").addEventListener("click",e=>{const c=e.target.closest("rect.c");if(c){sel=[+c.dataset.a,+c.dataset.b];draw()}});
+  document.querySelectorAll(".hmm").forEach(b=>b.onclick=()=>{method=b.dataset.m;draw()});
+  draw();
+})();
+
+/* ---------- тема 4: дисбаланс ---------- */
+(function imbalance(){
+  const PS=[0.5,0.3,0.2,0.1,0.05,0.02,0.01]; let splits=null;
+  function simulate(p){const r=rng(Math.round(p*1000)+3),N=1000,pos=Math.round(N*p),y=Array(N).fill(0).map((_,i)=>i<pos?1:0),res=[];
+    for(let k=0;k<20;k++){const idx=[...Array(N).keys()];for(let i=N-1;i>0;i--){const j=Math.floor(r()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}
+      res.push(idx.slice(0,200).reduce((s,i)=>s+y[i],0))}
+    return {free:res,strat:Math.round(200*p)}}
+  function draw(){
+    const p=PS[+$("imP").value],N=1000,pos=N*p,neg=N-pos;
+    const tp=0.8*pos,fp=0.1*neg,acc=(tp+0.9*neg)/N,prec=tp/(tp+fp);
+    $("imPV").textContent=`${Math.round(p*100)}% · ${Math.round(pos)} из 1000`;
+    $("imDummy").textContent=`${Math.round((1-p)*1000)/10}%`; $("imModel").textContent=`${Math.round(acc*1000)/10}%`; $("imPrec").textContent=`${Math.round(prec*100)}%`;
+    const F=frame(360,230,{l:12,r:12,t:16,b:24},[0,1],[0,1]);
+    let s="";
+    const bw=F.x1-F.x0;
+    s+=`<text class="tk" x="${F.x0}" y="${F.y0}">1000 студентов</text>`;
+    s+=`<rect x="${F.x0}" y="${F.y0+8}" width="${bw*(1-p)}" height="26" rx="4" fill="var(--accent)" opacity=".75"/><rect x="${F.x0+bw*(1-p)}" y="${F.y0+8}" width="${Math.max(2,bw*p)}" height="26" rx="4" fill="var(--red)"/>`;
+    s+=`<text class="tk" x="${F.x0+6}" y="${F.y0+26}" style="fill:var(--surface)">сдадут ${Math.round(neg)}</text>`;
+    if(splits){
+      const y0=F.y0+70,h=110,mx=Math.max(...splits.free,splits.strat)*1.15||1,G=frame(360,230,{l:30,r:12,t:y0,b:24},[0,21],[0,mx]);
+      s+=grid(G,[],[0,Math.round(mx/2)],v=>v,v=>v,"","рискующих в test");
+      splits.free.forEach((v,i)=>{s+=`<rect x="${G.sx(i+0.6)}" y="${G.sy(v)}" width="${G.sx(1.4)-G.sx(0.6)-1}" height="${G.sy(0)-G.sy(v)}" fill="var(--muted)" opacity=".7"/>`});
+      s+=`<line x1="${G.x0}" x2="${G.x1}" y1="${G.sy(splits.strat)}" y2="${G.sy(splits.strat)}" stroke="var(--warm)" stroke-width="2.5"/><text class="tk" x="${G.x1}" y="${G.sy(splits.strat)-5}" text-anchor="end" style="fill:var(--warm)">stratify: ровно ${splits.strat}</text>`;
+    }
+    $("imSvg").innerHTML=s;
+    let msg;
+    if(p>=0.3)msg=`Классы почти сбалансированы: «все сдадут» даёт ${Math.round((1-p)*100)}%, модель — ${Math.round(acc*100)}%. Accuracy честно показывает, что модель лучше.`;
+    else if(acc>1-p)msg=`Доля рискующих ${Math.round(p*100)}%: accuracy модели ${fx(acc*100,1)}% всё ещё выше «все сдадут» (${fx((1-p)*100,1)}%), но разрыв тает, а тревоги по делу — только ${Math.round(prec*100)}%.`;
+    else msg=`Доля ${Math.round(p*100)}%: модель, которая ловит 80% рискующих, по accuracy хуже константы «все сдадут» (${fx(acc*100,1)}% против ${fx((1-p)*100,1)}%). Accuracy врёт: смотри recall и precision. Из ${Math.round(tp+fp)} тревог по делу только ${Math.round(tp)}.`;
+    if(splits)msg+=` Без stratify в test из 200 строк попадает от ${Math.min(...splits.free)} до ${Math.max(...splits.free)} рискующих — оценка качества прыгает. Со stratify — всегда ${splits.strat}.`;
+    $("imMsg").textContent=msg; $("imState").textContent=`доля ${Math.round(p*100)}%`;
+  }
+  $("imP").oninput=()=>{splits=null;draw()};
+  $("imSplit").onclick=()=>{splits=simulate(PS[+$("imP").value]);draw()};
+  draw();
+})();
+
+/* ---------- тема 5: вывод или нет ---------- */
+(function claims(){
+  const C=[
+    ["Средний clicks — 1240.",false,"Факт без смысла и без действия. И среднее для хвостатого признака обманывает. Лучше: «Медиана кликов 600, у 10% студентов больше 3000 — длинный хвост → для логрега беру log1p»."],
+    ["У отчисленных медиана кликов за недели 0–3 в 5 раз ниже, чем у сдавших → беру клики по неделям 0–3 как признаки.",true,"Факт с числом, понятно, что он значит, и есть действие. Признаки взяты только из ранних недель — без утечки."],
+    ["Клики сильно влияют на результат.",false,"Нет числа, и «влияют» — это причинность, которую EDA не доказывает. Лучше: «связаны: Спирмен 0.45»."],
+    ["imd_band пропущен в 3% строк, доля риска с пропуском и без почти одинакова → заполняю «unknown» и добавляю флаг.",true,"Сколько, проверено ли, что пропуски не сигнал, и что делаю. Образцовая строка раздела «Качество данных»."],
+    ["Данные чистые, всё хорошо.",false,"Непроверяемо. Что именно проверено: дубликаты, пропуски, невозможные значения? Перечисли с числами."],
+    ["avg_score отлично предсказывает отчисление (корреляция 0.7) → главный признак.",false,"Ловушка: avg_score посчитан по всему курсу, а у отчисленных оценок мало, потому что они ушли. Признак знает будущее. Это утечка — правильный вывод «исключаю avg_score, вместо него — баллы за задания до момента прогноза»."]
+  ];
+  let ans={};
+  function draw(){
+    $("clList").innerHTML=C.map((c,i)=>{const a=ans[i];const st=a===undefined?"":a===c[1]?"ok":"no";
+      return `<div class="claim ${st}"><span>${esc(c[0])}</span><div class="btns"><button class="btn cl" data-i="${i}" data-v="1" aria-pressed="${a===true}">Хороший вывод</button><button class="btn cl" data-i="${i}" data-v="0" aria-pressed="${a===false}">Так не пишут</button></div>${a===undefined?"":`<p class="fb"><b>${a===c[1]?"Верно.":"Не совсем."}</b> ${esc(c[2])}</p>`}</div>`}).join("");
+    const done=Object.keys(ans).length,right=C.filter((c,i)=>ans[i]===c[1]).length;
+    $("clState").textContent=done?`верно ${right} из ${done}`:"6 утверждений";
+  }
+  $("clList").addEventListener("click",e=>{const b=e.target.closest(".cl");if(b){ans[+b.dataset.i]=b.dataset.v==="1";draw()}});
+  draw();
+})();
+
+/* ---------- тема 6: скользящее окно ---------- */
+(function sliding(){
+  const A=[4,9,2,7,11,3,6,14,5,8,2,10];let mode="fix",steps=[],st=0;
+  function build(){
+    steps=[];
+    if(mode==="fix"){const k=+$("swK").value;let s=0,ops=0;for(let i=0;i<k;i++){s+=A[i];ops++}
+      let best=s,bi=0;steps.push({l:0,r:k-1,s,best,bl:0,br:k-1,ops,txt:`Первое окно [0..${k-1}]: сложили ${k} чисел, сумма ${s}.`});
+      for(let i=k;i<A.length;i++){s+=A[i]-A[i-k];ops+=2;if(s>best){best=s;bi=i-k+1}
+        steps.push({l:i-k+1,r:i,s,best,bl:bi,br:bi+k-1,ops,txt:`Сдвиг: + ${A[i]} (вошёл справа) − ${A[i-k]} (вышел слева) = ${s}. ${s===best&&bi===i-k+1?"Новый рекорд.":"Рекорд "+best+"."}`})}
+      $("swBrute").textContent=(A.length-k+1)*k;
+    }else{const S=+$("swS").value;let l=0,s=0,best=Infinity,bl=-1,br=-1,ops=0;
+      steps.push({l:0,r:-1,s:0,best,bl,br,ops,txt:`Ищем самое короткое окно с суммой ≥ ${S}. Окно пустое.`});
+      for(let r=0;r<A.length;r++){s+=A[r];ops++;steps.push({l,r,s,best,bl,br,ops,txt:`Растём справа: + ${A[r]}, сумма ${s}${s>=S?` ≥ ${S} — пробуем сжать слева.`:` < ${S}.`}`});
+        while(s>=S){const L=r-l+1;if(L<best){best=L;bl=l;br=r}s-=A[l];l++;ops++;steps.push({l,r,s,best,bl,br,ops,txt:`Окно длиной ${L} подходит${L===best?" — это рекорд":""}. Сжимаемся: − ${A[l-1]}, сумма ${s}${s>=S?` всё ещё ≥ ${S}.`:`.`}`})}}
+      $("swBrute").textContent=A.length*(A.length+1)/2;
+    }
+    st=0;
+  }
+  function draw(){
+    const p=steps[st];
+    $("swCells").innerHTML=A.map((v,i)=>`<div class="cell${i>=p.l&&i<=p.r?" win":""}${i>=p.bl&&i<=p.br&&p.bl>=0?" best":""}">${v}</div>`).join("");
+    $("swCalc").textContent=p.txt;
+    $("swSum").textContent=p.s; $("swOps").textContent=p.ops;
+    $("swBest").textContent=mode==="fix"?p.best:(p.best===Infinity?"—":`${p.best} дн.`);
+    $("swState").textContent=`шаг ${st} из ${steps.length-1}`;
+    $("swPrev").disabled=st===0; $("swNext").disabled=st===steps.length-1;
+    $("swKV").textContent=$("swK").value; $("swSV").textContent=$("swS").value;
+    $("swKL").style.opacity=mode==="fix"?1:.4; $("swSL").style.opacity=mode==="var"?1:.4;
+    const end=st===steps.length-1;
+    $("swMsg").textContent=end?(mode==="fix"?`Готово: лучшее окно — жёлтая рамка, сумма ${p.best}. Окном — ${p.ops} операций, перебором каждого окна заново — ${$("swBrute").textContent}. На миллионе дней и k = 30 разница в 15 раз.`
+      :p.best===Infinity?"Окна с такой суммой нет: ответ 0.":`Готово: самое короткое окно — ${p.best} дн. (жёлтая рамка). Каждый элемент вошёл и вышел не больше раза: ${p.ops} операций против ${$("swBrute").textContent} отрезков у перебора.`)
+      :"Жми «Следующий шаг»: окно обновляется за одну-две операции, а не пересчитывается заново.";
+    press(".swm",document.querySelector(`.swm[data-m="${mode}"]`));
+  }
+  document.querySelectorAll(".swm").forEach(b=>b.onclick=()=>{mode=b.dataset.m;build();draw()});
+  $("swK").oninput=()=>{if(mode==="fix"){build()}draw()}; $("swS").oninput=()=>{if(mode==="var"){build()}draw()};
+  $("swPrev").onclick=()=>{if(st>0){st--;draw()}}; $("swNext").onclick=()=>{if(st<steps.length-1){st++;draw()}};
+  $("swEnd").onclick=()=>{st=steps.length-1;draw()};
+  build(); draw();
+})();
+
+/* ---------- тема 7: префиксные суммы ---------- */
+(function prefix(){
+  const A=[12,30,25,8,40,18,22,5,35,15],P=[0];A.forEach(v=>P.push(P[P.length-1]+v));
+  function draw(){
+    let l=+$("pfL").value,r=+$("pfR").value;if(l>r){[l,r]=[r,l]}
+    $("pfA").innerHTML=A.map((v,i)=>`<div class="cell${i>=l&&i<=r?" win":""}">${v}</div>`).join("");
+    $("pfP").innerHTML=P.map((v,i)=>`<div class="cell pre${i===r+1||i===l?" hit":""}" title="P[${i}]">${v}</div>`).join("");
+    $("pfLV").textContent=$("pfL").value; $("pfRV").textContent=$("pfR").value;
+    const sum=P[r+1]-P[l];
+    $("pfCalc").textContent=`sum(a[${l}..${r}]) = P[${r+1}] − P[${l}] = ${P[r+1]} − ${P[l]} = ${sum}`;
+    $("pfMsg").textContent=`Одно вычитание вместо ${r-l+1} сложений. P[${r+1}] — клики за недели 0–${r}, P[${l}] — за недели до ${l}; разница — ровно отрезок. ${l===0?"При l = 0 вычитаем P[0] = 0 — поэтому в P есть ведущий ноль.":"Индекс у P сдвинут на один: P[i] — сумма первых i элементов."}`;
+    $("pfState").textContent=`отрезок [${l}, ${r}]`;
+  }
+  $("pfL").oninput=draw; $("pfR").oninput=draw; draw();
+})();
+
+/* ---------- тема 8: git stash, reset, revert ---------- */
+(function gitsim(){
+  let S;
+  const init=()=>({work:[],stage:[],log:[{m:"feat: загрузка данных OULAD",p:true},{m:"feat(eda): доли таргета",p:true},{m:"fix: путь к данным",p:false}],stash:[],n:0});
+  const MSG={init:"Три коммита: два уже на GitHub, последний только у тебя. Измени ноутбук и пробуй команды."};
+  function act(c){
+    let m="";
+    if(c==="init"){S=init();m=MSG.init}
+    else if(c==="edit"){S.n++;S.work.push(`01_eda.ipynb · правка ${S.n}`);m="Правка в рабочей папке. git status покажет modified."}
+    else if(c==="add"){if(!S.work.length)m="Нечего добавлять: рабочая папка чистая.";else{S.stage.push(...S.work);S.work=[];m="Правки в индексе — готовы к коммиту."}}
+    else if(c==="commit"){if(!S.stage.length)m="Индекс пуст — сначала git add.";else{S.log.push({m:`feat(eda): ${S.stage.length>1?S.stage.length+" правки":"графики"}`,p:false,c:[...S.stage]});S.stage=[];m="Новый коммит. Он только у тебя — на GitHub его ещё нет."}}
+    else if(c==="stash"){if(!S.work.length&&!S.stage.length)m="Нечего прятать: изменений нет.";else{S.stash.unshift([...S.stage,...S.work]);S.work=[];S.stage=[];m="Правки спрятаны в карман, папка и индекс чистые. Можно переключаться на другую ветку."}}
+    else if(c==="pop"){if(!S.stash.length)m="Карман пуст.";else{S.work.push(...S.stash.shift());m="Правки вернулись в рабочую папку, запись из stash удалена."}}
+    else if(["soft","mixed","hard"].includes(c)){
+      if(S.log.length<2)m="Откатывать некуда.";else{const top=S.log.pop(),ch=top.c||["изменения коммита «"+top.m+"»"];
+        if(c==="soft"){S.stage.push(...ch);m="Коммит убран из истории, его изменения лежат в индексе: поправь и закоммить снова."}
+        if(c==="mixed"){S.work.push(...ch);m="Коммит убран, изменения в рабочей папке, индекс пустой — можно разложить по коммитам заново."}
+        if(c==="hard"){S.work=[];S.stage=[];m="Коммит и все незакоммиченные правки выброшены. Вернуть коммит поможет git reflog."}
+        if(top.p)m+=" Внимание: этот коммит уже был на GitHub. Чтобы отправить новую историю, понадобится push --force — у коллег всё сломается. Для запушенного правильно revert."}}
+    else if(c==="revert"){const top=S.log[S.log.length-1];S.log.push({m:`Revert "${top.m}"`,p:false,rev:true});m="Новый коммит, который отменяет изменения последнего. История не переписана — безопасно для общего main."}
+    $("gtMsg").textContent=m; draw();
+  }
+  function draw(){
+    const it=(t,cls="")=>`<div class="it ${cls}">${esc(t)}</div>`;
+    $("gtWork").innerHTML=S.work.length?S.work.map(t=>it(t)).join(""):'<span class="muted" style="font-size:13px">чисто</span>';
+    $("gtStage").innerHTML=S.stage.length?S.stage.map(t=>it(t)).join(""):'<span class="muted" style="font-size:13px">пусто</span>';
+    $("gtLog").innerHTML=S.log.map((c,i)=>it((i===S.log.length-1?"HEAD → ":"")+c.m,(i===S.log.length-1?"head ":"")+(c.p?"pushed ":"")+(c.rev?"rev":""))).reverse().join("");
+    $("gtStash").innerHTML=S.stash.length?S.stash.map((s,i)=>it(`stash@{${i}}: ${s.length} правк${s.length===1?"а":"и"}`)).join(""):'<span class="muted" style="font-size:13px">пусто</span>';
+    $("gtState").textContent=`коммитов: ${S.log.length} · в stash: ${S.stash.length}`;
+  }
+  $("gtBtns").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(b)act(b.dataset.c)});
+  act("init");
+})();
+
+/* ---------- конспект для Obsidian и галочки ---------- */
+const MD=`---
+type: конспект
+tags: [eda, визуализация, алгоритмы, git, карьера, неделя-3]
+---
+# EDA проекта и окна во времени: урок 3.3
+
+## matplotlib
+- fig — холст, ax — оси. fig, ax = plt.subplots(); дальше только ax.… (plt.* рисует на «текущих» осях).
+- ax.set(title, xlabel, ylabel); tight_layout; savefig до show; plt.close в циклах; subplots(2, 2) → axes[i, j].
+
+## Какой график
+- Распределение — hist; группы — boxplot/violin; два числа — scatter (alpha, hexbin); категории — countplot; время — lineplot.
+- seaborn: DataFrame + столбцы, hue, ax=; stat="density", common_norm=False для групп разного размера; log_scale для хвостов.
+- Вывод — в заголовке; оси с единицами; столбики от нуля.
+
+## Корреляции
+- Пирсон — линейная; Спирмен — монотонная (ранги), устойчив к хвостам. r² — объяснённая доля.
+- 0 ≠ нет связи (U-форма); связь ≠ причина; |r| > 0.9 — дубликаты; парадокс Симпсона.
+- sns.heatmap(corr, mask=triu, annot=True, cmap="vlag", center=0); corrwith(target).
+
+## Таргет и дисбаланс
+- Доли, по группам, во времени. Дисбаланс → stratify, метрики под редкий класс, class_weight, порог.
+- Accuracy константы = доля большинства. Пересэмплирование только внутри train/фолда.
+
+## Выводы EDA
+- Факт с числом → смысл → действие. Разделы: данные, таргет, качество, связи, риски и утечки, следующие шаги.
+
+## Скользящее окно
+- Фиксированное: s += a[i] − a[i − k], O(n). Переменное: растём справа, сжимаемся слева, O(n). Только неотрицательные.
+- LeetCode 643, 3, 209, 567. pandas: rolling(7), rolling("7D", closed="left").
+
+## Префиксные суммы
+- P длины n + 1, P[0] = 0; sum[l..r] = P[r + 1] − P[l].
+- Сумма ровно k (есть отрицательные): префикс + словарь {0: 1}. LeetCode 303, 560, 238, 304. pandas: cumsum.
+
+## Git
+- stash push -m / list / pop / apply; -u для новых файлов.
+- reset --soft (в индекс), --mixed (в папку), --hard (удалить) — только не запушенное. revert — новый коммит-отмена. reflog спасает.
+
+## Куда подаваться (14.10.2026)
+- Авито: DS-стажировка была в январе 2026 (тест, задание, видеоинтервью); Analyst Bootcamp.
+- SafeBoard (Касперский): наборы весной и осенью, Москва. МТС Старт — круглый год.
+- RWB: сезон весной, до 30 ч/нед. Ozon Route 256 — разработка; ML-трека не найдено. Cloud.ru Camp — не ML.
+- 10 вакансий junior ML на hh.ru → частоты требований → план.
+`;
+initLesson({topics:[["data.viz.0","matplotlib: fig и ax"],["data.viz.1","seaborn"],["data.viz.2","Гистограмма, boxplot, scatter"],["data.viz.3","Heatmap корреляций"],["data.eda.1","Анализ таргета и дисбаланса"],["data.eda.2","Корреляции между признаками"],["data.eda.4","Письменные выводы по EDA"],["algo.pat.2","Скользящее окно"],["algo.pat.3","Префиксные суммы"],["tools.git.8","stash, reset и revert"],["career.apply.4","Ozon: Route 256"],["career.apply.5","Avito, МТС, Лаборатория Касперского"],["career.apply.7","Wildberries (RWB): стажировки и junior"],["career.apply.11","Junior ML на hh.ru: что требуют"],["career.apply.12","МегаФон и Cloud.ru: стажировки"]],md:MD});
+</script>
+<script src="/assets/asks.js" defer></script>
