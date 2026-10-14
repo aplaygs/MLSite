@@ -1,0 +1,1131 @@
+<title>Урок 3.2 · Логистическая регрессия</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<style>
+/* Только для этого урока: граф вычислений, столбики вероятностей, строка расчёта. */
+.btn.mono{font-family:var(--f-mono);font-size:12.5px}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:default}
+.calc{font:500 14px/1.6 var(--f-mono);background:var(--soft);border-radius:10px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere;min-height:3.4em}
+.calc .a{color:var(--accent)} .calc .p{color:var(--plum)} .calc .w{color:var(--warm);font-weight:600} .calc .r{color:var(--red)}
+.gnode circle{fill:var(--surface);stroke:var(--line);stroke-width:1.5;transition:stroke .2s,fill .2s}
+.gnode.on circle{stroke:var(--accent);fill:var(--accent-soft)}
+.gnode.back circle{stroke:var(--warm);fill:color-mix(in srgb,var(--warm) 16%,transparent)}
+.gnode text.op{font:600 14px var(--f-mono);fill:var(--ink)}
+.gval{font:500 11.5px var(--f-mono);fill:var(--accent)}
+.ggrad{font:600 11.5px var(--f-mono);fill:var(--warm)}
+.gedge{stroke:var(--line);stroke-width:1.5;fill:none}
+.gedge.on{stroke:var(--accent)} .gedge.back{stroke:var(--warm);stroke-dasharray:4 3}
+.pbars{display:grid;gap:8px}
+.pbar{display:grid;grid-template-columns:104px minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:14px}
+.pbar .nm{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pbar .tr{position:relative;height:20px;background:var(--soft);border-radius:6px;overflow:hidden}
+.pbar .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;transition:width .2s}
+.pbar .tr i.q{top:auto;height:45%;opacity:.9}
+.pbar .v{font:500 12.5px var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.pbar.true .nm::after{content:" ✓";color:var(--accent)}
+@media (max-width:520px){.pbar{grid-template-columns:84px minmax(0,1fr) 78px}}
+.lab>label,.sl4 label{display:grid;gap:4px;font-size:14px}
+.lab>label .row,.sl4 .row{display:flex;justify-content:space-between;gap:8px}
+.sl4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}
+@media (max-width:520px){.sl4{grid-template-columns:1fr}}
+#rgSvg,#rgErr,#cgSvg{max-width:600px;margin-inline:auto}
+.legendrow{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.legendrow i{display:inline-block;width:12px;height:4px;border-radius:2px;margin-right:6px;vertical-align:3px}
+</style>
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w03-1.html">← Урок 1 · Pandas и статистика</a><span class="mid">урок 2 из 3</span><span class="muted">Урок 3 · EDA проекта — скоро</span></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 3 · урок 2 из 3 · 8 тем · ~4 часа</div>
+  <h1>Логистическая регрессия изнутри</h1>
+  <p>На неделе 2 ты обучил линейную регрессию градиентным спуском. Теперь — классификация, и её главный бейзлайн: логистическая регрессия. С неё начинают почти любую задачу «да или нет» — от кредитного скоринга до прогноза, бросит ли студент курс. Урок идёт по цепочке. Как из взвешенной суммы получается вероятность. Как правило цепочки даёт градиент. Как из двух классов сделать много. Почему штраф устроен как log-loss — тут помогает теория информации: энтропия, кросс-энтропия и KL. И почему без регуляризации веса разлетаются, при чём тут обратная матрица и как это лечат L1 и L2.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Логистическая регрессия</a><a href="#t2">Правило цепочки</a><a href="#t3">Softmax</a><a href="#t4">Энтропия</a><a href="#t5">Кросс-энтропия</a><a href="#t6">KL</a><a href="#t7">Системы уравнений</a><a href="#t8">Регуляризация</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<div class="part"><span class="eyebrow">Часть 1 · 3 темы</span><h2>От прямой к вероятности</h2><p>Линейная регрессия выдаёт любое число. Классификации нужна вероятность от 0 до 1 и штраф, который больно бьёт за уверенную ошибку. Три темы ниже собирают из этого модель, учат её градиентом и расширяют с двух классов на много.</p></div>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 8 · <span class="qd key" aria-hidden="true"></span> ML</div>
+  <h2>Логистическая регрессия, сигмоида, log-loss</h2>
+  <p class="tldr">Логистическая регрессия — линейная модель для классификации. Она считает взвешенную сумму признаков z = w·x + b, а сигмоида превращает её в вероятность от 0 до 1. Учится модель, уменьшая log-loss. Граница между классами — прямая (в многомерном случае — гиперплоскость).</p>
+  <div class="prose">
+    <p>Число z называют <b>логитом</b> (logit) или «счётом уверенности»: от −∞ («точно нет») до +∞ («точно да»). Сигмоида сжимает его в вероятность: z = 0 → 0.5, z = 2 → 0.88, z = −2 → 0.12. Кривая симметрична: σ(−z) = 1 − σ(z). Производная выражается через саму сигмоиду: σ′ = σ·(1 − σ). Это пригодится в теме 2.</p>
+    <p>Почему log-loss, а не MSE, разбирали в уроке 1.1, тема 4: он неограниченно наказывает уверенную ошибку, и у логистической регрессии с ним одна яма. Здесь — как модель с ним живёт.</p>
+  </div>
+  <div class="formula">
+    <div class="fx"><span class="c2">p</span> = σ(<span class="c3">z</span>) = 1 / (1 + e<sup>−<span class="c3">z</span></sup>),   <span class="c3">z</span> = <span class="c4">w</span>·<span class="c1">x</span> + b</div>
+    <div class="fx">L = −[ y·ln <span class="c2">p</span> + (1 − y)·ln(1 − <span class="c2">p</span>) ]</div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--accent)">x</span> — признаки объекта, <span class="s" style="color:var(--teal)">w</span> и b — веса и сдвиг, которые подбирает обучение</div>
+      <div><span class="s" style="color:var(--warm)">z</span> — логит: линейная часть, та же, что у линейной регрессии</div>
+      <div><span class="s" style="color:var(--plum)">p</span> — предсказанная вероятность класса 1; y — правда, 0 или 1</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · сдаст ли студент экзамен</span><span class="muted mono" id="lrEq"></span></div>
+    <div class="lab-grid">
+      <svg id="lrSvg" viewBox="0 0 360 250" role="img" aria-label="Часы подготовки и результат экзамена, сигмоида модели и порог"></svg>
+      <div class="ctrl">
+        <label for="lrW"><span class="row"><span>Вес w</span><span class="mono" id="lrWV"></span></span><input type="range" id="lrW" min="-1" max="6" step="0.05" value="0.3"></label>
+        <label for="lrB"><span class="row"><span>Сдвиг b</span><span class="mono" id="lrBV"></span></span><input type="range" id="lrB" min="-30" max="5" step="0.1" value="-1"></label>
+        <label for="lrT"><span class="row"><span>Порог решения</span><span class="mono" id="lrTV"></span></span><input type="range" id="lrT" min="0.05" max="0.95" step="0.05" value="0.5"></label>
+        <div class="btns"><button class="btn" id="lrStep">Шаг спуска</button><button class="btn" id="lrFit">Обучить: 200 шагов</button><button class="btn" id="lrReset">Сбросить</button></div>
+        <div class="btns"><button class="btn" id="lrSep" aria-pressed="false">Разделимые данные</button><button class="btn mono" id="lrL2" aria-pressed="false">L2, λ = 0.05</button></div>
+        <div class="readout">
+          <div class="stat"><div class="v" id="lrLoss">0</div><div class="k">log-loss</div></div>
+          <div class="stat"><div class="v" id="lrAcc">0</div><div class="k">верных при пороге</div></div>
+        </div>
+        <p class="verdict" id="lrMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Как читать: внизу — не сдали, вверху — сдали, по оси — часы подготовки. Сиреневая кривая — вероятность «сдаст». Жёлтый пунктир — порог и граница решения. Обведённые красным точки модель при этом пороге путает.</p>
+  </div>
+
+  <h3 style="font-size:17px">Как читать коэффициенты: шансы</h3>
+  <div class="prose">
+    <p>Шансы (odds) — это p / (1 − p). Вероятность 0.8 — шансы 4 к 1. Если перевернуть формулу модели, получится: <code>ln(p / (1 − p)) = w·x + b</code>. Логарифм шансов линеен по признакам.</p>
+    <p>Отсюда главная интерпретация, классика собеседований: <b>признак вырос на 1 — шансы умножились на e<sup>w</sup></b>. Вес 0.7 у «часов подготовки» значит, что каждый час примерно удваивает шансы сдать (e<sup>0.7</sup> ≈ 2.01). Вероятность при этом растёт не на постоянную величину — сигмоида в середине крутая, а по краям плоская.</p>
+    <p>Сравнивать веса между собой можно, только когда признаки в одном масштабе (StandardScaler, урок 2.1, тема 8), и с поправкой на коррелированные признаки (тема 7).</p>
+  </div>
+  <h3 style="font-size:17px">Порог — это не часть модели</h3>
+  <div class="prose">
+    <p><code>predict</code> сравнивает вероятность с 0.5. Но 0.5 — просто договорённость. Если пропустить студента в зоне риска дороже, чем зря ему позвонить, порог опускают до 0.3. Тогда модель ловит больше рискующих ценой ложных тревог. Как выбирать порог по метрикам — отдельная тема. Сейчас важно одно: обучение даёт вероятности, а порог выбираешь ты.</p>
+  </div>
+<pre>from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+model = make_pipeline(StandardScaler(), LogisticRegression(C=1.0, max_iter=1000))
+model.fit(X_train, y_train)
+p = model.predict_proba(X_test)[:, 1]      <span class="cm"># вероятность класса 1 — столбец 1</span>
+y_hat = (p &gt;= 0.3).astype(int)             <span class="cm"># свой порог вместо 0.5</span>
+lr = model[-1]
+lr.coef_, lr.intercept_                    <span class="cm"># w и b</span>
+np.exp(lr.coef_)                           <span class="cm"># во сколько раз меняются шансы на +1 σ признака</span>
+model.decision_function(X_test)            <span class="cm"># сами логиты z</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Параметр</th><th>Что делает</th><th>Запомнить</th></tr></thead>
+    <tbody>
+      <tr><td><code>C</code></td><td>обратная сила регуляризации, C = 1/λ</td><td>меньше C — сильнее штраф. По умолчанию 1.0, то есть регуляризация включена всегда</td></tr>
+      <tr><td><code>l1_ratio</code></td><td>вид штрафа: 0 — L2, 1 — L1, между — ElasticNet</td><td>в sklearn 1.8+ вместо <code>penalty="l1"</code>; в старом коде и статьях встретишь <code>penalty</code></td></tr>
+      <tr><td><code>solver</code></td><td>алгоритм оптимизации</td><td>по умолчанию <code>lbfgs</code> — только L2. Для L1 — <code>saga</code> или <code>liblinear</code></td></tr>
+      <tr><td><code>class_weight</code></td><td>вес классов в log-loss</td><td><code>"balanced"</code> — при дисбалансе, редкий класс весит больше</td></tr>
+      <tr><td><code>max_iter</code></td><td>лимит итераций</td><td>ConvergenceWarning — сначала масштабируй признаки, потом увеличивай</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Ловушка: идеально разделимые данные</b><p>Если классы разделяются без единой ошибки, log-loss можно уменьшать бесконечно: чем круче сигмоида, тем ближе p к 0 и 1. Без регуляризации веса растут без предела, и спуск не сходится. Включи в лаборатории «Разделимые данные» и пообучай. Регуляризация (тема 8) ставит потолок. Поэтому в sklearn она включена по умолчанию: <code>C=1.0</code>.</p></div>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Логистическая регрессия — стандартный первый бейзлайн и рабочая лошадка там, где важно объяснить решение: кредитный скоринг, отток, кликабельность рекламы. Она быстро учится и предсказывает. Её вероятности, обученные на log-loss, обычно неплохо откалиброваны. Веса можно показать бизнесу. Если бустинг обгоняет её на 0.01 метрики, а объяснять решения нужно регулятору, часто оставляют логрег.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему логистическая регрессия — линейный классификатор, если сигмоида нелинейна?</summary>
+      <div class="a"><p>Решение «класс 1» принимается при p ≥ 0.5, а это то же самое, что z = w·x + b ≥ 0: сигмоида монотонна, и σ(0) = 0.5. Граница между классами — множество точек, где w·x + b = 0, то есть гиперплоскость. Нелинейна только связь между признаками и вероятностью, а не граница. Изогнутую границу получают, добавляя нелинейные признаки: квадраты, произведения, сплайны.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Как интерпретировать коэффициент логистической регрессии?</summary>
+      <div class="a"><p>Вес — это изменение логарифма шансов при росте признака на единицу при прочих равных. Экспонента веса — отношение шансов (odds ratio): e<sup>w</sup> = 1.5 значит «шансы класса 1 в полтора раза выше на каждую единицу признака». Знак говорит о направлении. Для сравнения важности признаков нужны признаки в одном масштабе, а сильная корреляция между признаками делает отдельные веса неустойчивыми и плохо интерпретируемыми.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Что будет с логистической регрессией на линейно разделимых данных без регуляризации?</summary>
+      <div class="a"><p>Минимума у log-loss нет: увеличивая норму весов в том же направлении, можно сколько угодно приближать все вероятности к 0 и 1 и уменьшать потерю. Веса уходят в бесконечность, оптимизатор не сходится, вероятности становятся крайне самоуверенными. Решение — регуляризация: штраф за большие веса делает минимум конечным.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Логит z = ln 3. Какая вероятность? Какие шансы?</summary>
+      <div class="a"><p>Шансы e<sup>ln 3</sup> = 3, то есть 3 к 1. Вероятность 3 / (1 + 3) = 0.75.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="ml.lin.3">
+    <label class="tp"><input type="checkbox" data-id="ml.lin.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Логистическая регрессия, сигмоида, log-loss</b></span></label>
+    <span class="note" data-d="ml.lin.3">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 8 · <span class="qd key" aria-hidden="true"></span> Математика</div>
+  <h2>Правило цепочки</h2>
+  <p class="tldr">Производная сложной функции равна произведению производных звеньев: (f(g(x)))′ = f′(g(x))·g′(x). Модель — это цепочка простых операций. Поэтому градиент считают так: идут от конца к началу и перемножают производные звеньев. Это и есть обратное распространение ошибки (backpropagation).</p>
+  <div class="prose"><p>Аналогия — обмен валют: рубли → доллары → евро. Курс «рубль к евро» — это произведение курсов на каждом шаге. Производная — это «курс обмена» маленького изменения: на сколько сдвинется выход, если чуть сдвинуть вход. Цепочка звеньев — произведение курсов.</p></div>
+  <div class="formula">
+    <div class="fx">∂L/∂<span class="c4">w</span> = <span class="c2">∂L/∂p</span> · <span class="c3">∂p/∂z</span> · <span class="c1">∂z/∂w</span></div>
+    <div class="fx">= (−y/p + (1−y)/(1−p)) · p(1−p) · x = (<span class="c2">p</span> − y) · <span class="c1">x</span></div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--plum)">∂L/∂p</span> — как штраф реагирует на вероятность</div>
+      <div><span class="s" style="color:var(--warm)">∂p/∂z = p(1 − p)</span> — наклон сигмоиды</div>
+      <div><span class="s" style="color:var(--accent)">∂z/∂w = x</span> — как логит реагирует на вес: z линеен по w</div>
+      <div>Длинные дроби сокращаются, и остаётся «ошибка × признак» — ровно как у линейной регрессии с MSE (урок 2.1, тема 7)</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · прямой и обратный проход</span><span class="muted mono" id="cgState">шаг 0 из 8</span></div>
+    <svg id="cgSvg" viewBox="0 0 360 214" role="img" aria-label="Граф вычислений логистической регрессии: x и w умножаются, прибавляется b, сигмоида, минус логарифм"></svg>
+    <div class="calc" id="cgCalc" aria-live="polite"></div>
+    <div class="sl4">
+      <label for="cgX"><span class="row"><span>Признак x</span><span class="mono" id="cgXV"></span></span><input type="range" id="cgX" min="-3" max="3" step="0.1" value="2"></label>
+      <label for="cgW"><span class="row"><span>Вес w</span><span class="mono" id="cgWV"></span></span><input type="range" id="cgW" min="-2" max="2" step="0.1" value="0.8"></label>
+    </div>
+    <div class="btns"><button class="btn" id="cgPrev">← Назад</button><button class="btn" id="cgNext">Следующий шаг →</button><button class="btn mono" id="cgY" aria-pressed="true">y = 1</button></div>
+    <p class="muted" style="font-size:13.5px">Как читать: зелёным — значения при прямом проходе (forward), жёлтым — производные при обратном (backward). b = −1. Последний шаг сверяет градиент с численной оценкой.</p>
+  </div>
+
+  <h3 style="font-size:17px">Граф вычислений</h3>
+  <div class="prose"><ul>
+    <li><b>Прямой проход</b> считает значения от входа к штрафу и запоминает промежуточные: z, p. Они нужны на обратном проходе. Поэтому обучение нейросети ест больше памяти, чем предсказание.</li>
+    <li><b>Обратный проход</b> идёт от штрафа ко входам. Каждое звено знает только свою локальную производную и умножает на неё то, что пришло сверху.</li>
+    <li><b>Несколько путей суммируются.</b> Если вес влияет на штраф двумя дорогами (через два слоя, через два объекта), градиенты по путям складываются. Градиент по батчу — это сумма или среднее градиентов по объектам.</li>
+    <li>PyTorch и другие библиотеки делают это сами (autograd): строят граф при прямом проходе, <code>loss.backward()</code> проходит его назад.</li>
+  </ul></div>
+<pre>import numpy as np
+sigmoid = lambda z: 1 / (1 + np.exp(-z))
+x, w, b, y = 2.0, 0.8, -1.0, 1
+p = sigmoid(w * x + b)
+grad_w = (p - y) * x                                     <span class="cm"># аналитически, через цепочку</span>
+loss = lambda w: -np.log(sigmoid(w * x + b))
+eps = 1e-5
+num_w = (loss(w + eps) - loss(w - eps)) / (2 * eps)     <span class="cm"># численно: проверка градиента</span>
+np.isclose(grad_w, num_w)                                <span class="cm"># True
+
+# то же в PyTorch</span>
+import torch
+w = torch.tensor(0.8, requires_grad=True)
+loss = torch.nn.functional.binary_cross_entropy_with_logits(w * 2.0 - 1.0, torch.tensor(1.0))
+loss.backward(); w.grad                                  <span class="cm"># тот же (p − y)·x</span></pre>
+  <div class="callout trap"><b class="h">Ловушка: затухающий градиент</b><p>Наклон сигмоиды не больше 0.25 (в нуле), а на краях почти 0. В цепочке из 10 сигмоид градиент умножится на 0.25 десять раз — меньше одной миллионной: первые слои перестают учиться. Поэтому в глубоких сетях внутри ставят ReLU. Та же беда у MSE поверх сигмоиды: градиент (p − y)·p(1 − p), и при уверенной ошибке (p ≈ 0, y = 1) множитель p(1 − p) почти ноль — модель ошиблась сильнее всего и учится медленнее всего. В log-loss этот множитель сокращается — ещё одна причина брать его.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Выведите градиент log-loss логистической регрессии по весам.</summary>
+      <div class="a"><p>Цепочка: L зависит от p, p — от z, z — от w. ∂L/∂p = −y/p + (1 − y)/(1 − p). ∂p/∂z = p(1 − p) — производная сигмоиды. Перемножаю: −y(1 − p) + (1 − y)p = p − y. ∂z/∂w = x. Итог для одного объекта (p − y)·x, для выборки — среднее: Xᵀ(p − y)/n, по сдвигу — среднее (p − y). Шаг спуска: w ← w − η·Xᵀ(p − y)/n.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Что такое backpropagation простыми словами?</summary>
+      <div class="a"><p>Это способ посчитать градиент штрафа по всем весам сети за один обратный проход. На прямом проходе считаем и запоминаем выходы каждого слоя. На обратном идём от штрафа к входу и по правилу цепочки умножаем пришедший сверху градиент на локальную производную слоя. Получаем градиенты по весам слоя и передаём градиент дальше вниз. Стоимость примерно как у ещё одного прямого прохода, а не как у отдельного расчёта для каждого веса.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>f(x) = (3x + 1)². Чему равна f′(1)?</summary>
+      <div class="a"><p>f′(x) = 2(3x + 1)·3. При x = 1: 2·4·3 = 24.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.calc.1">
+    <label class="tp"><input type="checkbox" data-id="math.calc.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Правило цепочки</b></span></label>
+    <span class="note" data-d="math.calc.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 8 · ML</div>
+  <h2>Многоклассовая классификация</h2>
+  <p class="tldr">Для K классов модель считает K логитов, а softmax превращает их в вероятности, которые в сумме дают 1. Функция потерь — кросс-энтропия: −ln(вероятность настоящего класса). Другой путь — one-vs-rest: K отдельных бинарных моделей «этот класс против всех остальных».</p>
+  <div class="formula">
+    <div class="fx"><span class="c2">p<sub>k</sub></span> = e<sup><span class="c3">z<sub>k</sub></span>/T</sup> / Σ<sub>j</sub> e<sup><span class="c3">z<sub>j</sub></span>/T</sup></div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--warm)">z<sub>k</sub></span> — логит класса k: своя линейная модель w<sub>k</sub>·x + b<sub>k</sub> на каждый класс</div>
+      <div><span class="s" style="color:var(--plum)">p<sub>k</sub></span> — вероятность класса k; все положительные, в сумме 1</div>
+      <div><span class="s">T</span> — температура, по умолчанию 1. Меньше 1 — распределение острее, больше 1 — ровнее</div>
+      <div>Экспонента делает всё положительным и усиливает разницу, деление на сумму нормирует. При K = 2 softmax превращается в сигмоиду от разности логитов</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · softmax для итога курса</span><span class="muted mono" id="smState"></span></div>
+    <div class="sl4" id="smSliders"></div>
+    <label for="smT"><span class="row"><span>Температура T</span><span class="mono" id="smTV">1.00</span></span><input type="range" id="smT" min="-2" max="2" step="0.1" value="0"></label>
+    <div class="pbars" id="smBars"></div>
+    <div class="btns" role="group" aria-label="Настоящий класс" id="smTrue"></div>
+    <div class="btns"><button class="btn" id="smShift">+2 ко всем логитам</button><button class="btn" id="smReset">Сбросить</button></div>
+    <div class="readout">
+      <div class="stat"><div class="v" id="smLoss">0</div><div class="k">кросс-энтропия: −ln p настоящего</div></div>
+      <div class="stat"><div class="v" id="smArg">—</div><div class="k">argmax — ответ модели</div></div>
+    </div>
+    <p class="verdict" id="smMsg" aria-live="polite"></p>
+    <p class="muted" style="font-size:13.5px">Как читать: четыре итога курса из OULAD. Ползунки — логиты модели для одного студента, столбики — вероятности после softmax. Кнопкой выбери, какой итог был на самом деле.</p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Подход</th><th>Как устроен</th><th>Когда</th></tr></thead>
+    <tbody>
+      <tr><td>Multinomial (softmax)</td><td>одна модель, K логитов, общая кросс-энтропия</td><td>по умолчанию в <code>LogisticRegression</code> и во всех нейросетях</td></tr>
+      <tr><td>One-vs-rest (OvR)</td><td>K бинарных моделей «класс k против остальных», ответ — у кого вероятность выше</td><td>модель умеет только бинарную задачу; классы сильно разные; <code>OneVsRestClassifier</code></td></tr>
+      <tr><td>One-vs-one (OvO)</td><td>модель на каждую пару классов, K(K−1)/2 штук, голосование</td><td>редко; так исторически делает SVC</td></tr>
+      <tr><td>Multi-label</td><td>K независимых сигмоид, классы не исключают друг друга</td><td>у объекта может быть несколько меток: теги статьи, жанры фильма</td></tr>
+    </tbody></table></div>
+<pre>from sklearn.linear_model import LogisticRegression
+from sklearn.multiclass import OneVsRestClassifier
+clf = LogisticRegression(max_iter=1000).fit(X, y)   <span class="cm"># y из 4 классов → softmax сам</span>
+clf.coef_.shape                                     <span class="cm"># (4, d): по вектору весов на класс</span>
+clf.predict_proba(X[:1]).sum()                      <span class="cm"># 1.0</span>
+ovr = OneVsRestClassifier(LogisticRegression()).fit(X, y)
+
+def softmax(z):
+    z = z - z.max()                                 <span class="cm"># устойчивость: exp(1000) = inf, а сдвиг ответа не меняет</span>
+    e = np.exp(z)
+    return e / e.sum()
+from scipy.special import softmax                    <span class="cm"># готовая, уже устойчивая</span></pre>
+  <div class="callout trap"><b class="h">Ловушка PyTorch: двойной softmax</b><p><code>nn.CrossEntropyLoss</code> принимает <b>логиты</b> и номер класса, а softmax и логарифм делает внутри — так устойчивее. Если поставить softmax в конце сети и подать вероятности в CrossEntropyLoss, softmax применится дважды. Обучение пойдёт, но медленно и криво — ошибки не будет. То же для двух классов: <code>BCEWithLogitsLoss</code> ждёт логит, а не сигмоиду.</p></div>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Последний слой любой нейросети-классификатора — линейный слой и softmax. Языковая модель на каждом шаге делает softmax по словарю из десятков тысяч токенов. Параметр temperature в чат-ботах — это ровно T из формулы: низкая — предсказуемые ответы, высокая — разнообразные.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем softmax отличается от K отдельных сигмоид?</summary>
+      <div class="a"><p>Softmax связывает классы: вероятности конкурируют и в сумме дают 1. Подходит, когда объект принадлежит ровно одному классу. K сигмоид независимы: каждая отвечает «есть ли этот класс», сумма может быть любой. Это multi-label, когда меток несколько сразу. Перепутать — значит заставить классы конкурировать там, где они совместимы, или наоборот.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Зачем при подсчёте softmax вычитают максимум логита?</summary>
+      <div class="a"><p>Экспонента от больших чисел переполняется: e<sup>1000</sup> — бесконечность, и выходит inf/inf = NaN. Softmax не меняется от прибавления одной константы ко всем логитам: она сокращается в числителе и знаменателе. Вычитаем максимум — самая большая экспонента становится e<sup>0</sup> = 1, переполнения нет. Аналогично log-softmax считают через logsumexp.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Логиты [2, 1, 0.1]. Вероятности? Кросс-энтропия, если правда — первый класс?</summary>
+      <div class="a"><p>≈ [0.66, 0.24, 0.10]. −ln 0.66 ≈ 0.42.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="ml.lin.4">
+    <label class="tp"><input type="checkbox" data-id="ml.lin.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Многоклассовая классификация</b></span></label>
+    <span class="note" data-d="ml.lin.4">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 2 · 3 темы</span><h2>Цена удивления</h2><p>Откуда взялся логарифм в log-loss? Из теории информации. Она меряет неопределённость и «удивление» в числах. Три понятия — энтропия, кросс-энтропия и KL — объясняют, что на самом деле минимизирует классификатор, и встречаются дальше везде: в деревьях, нейросетях, генеративных моделях и мониторинге.</p></div>
+
+<!-- ============ 4 ============ -->
+<section class="topic" id="t4">
+  <div class="eyebrow">Тема 4 из 8 · <span class="qd key" aria-hidden="true"></span> Математика</div>
+  <h2>Энтропия</h2>
+  <p class="tldr">Энтропия — средняя «неожиданность» исхода, мера неопределённости распределения. У честной монетки 1 бит, у монетки, которая всегда падает орлом, — 0. Чем равномернее распределение, тем энтропия выше.</p>
+  <div class="prose">
+    <p><b>Неожиданность</b> (surprisal) события с вероятностью p — это −log p. Событие с вероятностью 1 не удивляет совсем: −log 1 = 0. Событие 1/1024 удивляет на 10 бит. Редкое удивляет сильно — и log-loss штрафует ровно неожиданностью правильного ответа.</p>
+    <p><b>Энтропия</b> — это неожиданность, усреднённая по всем исходам с их вероятностями. С log₂ получаются биты, с ln — наты (nats). В ML почти всегда ln: так считают sklearn и PyTorch. Перевод: 1 бит = ln 2 ≈ 0.693 ната.</p>
+  </div>
+  <div class="formula">
+    <div class="fx">H(<span class="c1">p</span>) = −Σ<sub>k</sub> <span class="c1">p<sub>k</sub></span> · log <span class="c1">p<sub>k</sub></span> = средняя <span class="c3">неожиданность</span></div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--accent)">p<sub>k</sub></span> — вероятность исхода k; 0·log 0 считают нулём</div>
+      <div><span class="s" style="color:var(--warm)">−log p<sub>k</sub></span> — неожиданность исхода k</div>
+      <div>Минимум 0 — исход известен заранее. Максимум log K — все K исходов равновероятны</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · насколько непредсказуем итог</span><span class="muted mono" id="enState"></span></div>
+    <div class="sl4" id="enSliders"></div>
+    <div class="btns">
+      <button class="btn enp" data-p="1,1,1,1">Поровну</button>
+      <button class="btn enp" data-p="1,1,0,0">Монетка</button>
+      <button class="btn enp" data-p="1,7,1,1">Почти всегда Pass</button>
+      <button class="btn enp" data-p="0,1,0,0">Всегда Pass</button>
+    </div>
+    <div class="pbars" id="enBars"></div>
+    <div class="readout">
+      <div class="stat"><div class="v" id="enH">0</div><div class="k">энтропия, бит (максимум 2)</div></div>
+      <div class="stat"><div class="v" id="enN">0</div><div class="k">она же в натах</div></div>
+    </div>
+    <p class="verdict" id="enMsg" aria-live="polite"></p>
+    <p class="muted" style="font-size:13.5px">Как читать: ползунки задают, как часто встречается каждый итог (числа нормируются в вероятности). Справа у столбика — вероятность и неожиданность исхода в битах.</p>
+  </div>
+
+  <h3 style="font-size:17px">Где энтропия в ML</h3>
+  <div class="prose"><ul>
+    <li><b>Деревья решений.</b> Хорошее разбиение делает листья «чище» — с меньшей энтропией. Information gain = энтропия родителя минус взвешенная энтропия детей. Альтернатива — индекс Джини, ведёт себя похоже и считается быстрее (sklearn по умолчанию).</li>
+    <li><b>Неуверенность модели.</b> Энтропия предсказанного распределения: [0.97, 0.01, 0.01, 0.01] — модель уверена, [0.25, 0.25, 0.25, 0.25] — гадает. Так выбирают, какие объекты отдать на разметку человеку (active learning).</li>
+    <li><b>Дисбаланс классов.</b> Энтропия таргета 99/1 — около 0.08 бита. В таких данных мало информации о редком классе.</li>
+    <li><b>Сжатие.</b> Шеннон доказал: энтропия — минимум бит на символ, который в среднем нужен для кодирования. Отсюда и название «биты».</li>
+  </ul></div>
+<pre>from scipy.stats import entropy
+entropy([0.5, 0.5], base=2)                 <span class="cm"># 1.0 бит</span>
+entropy([0.25] * 4, base=2)                 <span class="cm"># 2.0 — максимум для 4 исходов</span>
+entropy([1, 7, 1, 1])                       <span class="cm"># сама нормирует; base по умолчанию e — наты</span>
+df.final_result.value_counts(normalize=True).pipe(entropy, base=2)</pre>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Что такое энтропия и где она используется в ML?</summary>
+      <div class="a"><p>Это средняя неожиданность исхода: −Σ p log p. Ноль — когда исход известен, максимум — когда все исходы равновероятны. В ML: критерий разбиения в деревьях (information gain), основа кросс-энтропии — функции потерь классификаторов, мера неуверенности модели в active learning, регуляризатор «будь менее самоуверенной» (штраф за низкую энтропию предсказаний), entropy bonus в обучении с подкреплением.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>В узле 10 объектов, 5 и 5. Разбиение дало слева 4 объекта класса A, справа 1 A и 5 B. Каков information gain?</summary>
+      <div class="a"><p>Родитель: H = 1 бит. Слева чисто: 0. Справа (1/6, 5/6): H ≈ 0.65 бита. Взвешенно: 0.4·0 + 0.6·0.65 = 0.39. Information gain ≈ 1 − 0.39 = 0.61 бита. Дерево перебирает разбиения и берёт то, где выигрыш больше.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Энтропия распределения [0.5, 0.25, 0.25] в битах?</summary>
+      <div class="a"><p>0.5·1 + 0.25·2 + 0.25·2 = 1.5 бита.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.info.0">
+    <label class="tp"><input type="checkbox" data-id="math.info.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Энтропия</b></span></label>
+    <span class="note" data-d="math.info.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="topic" id="t5">
+  <div class="eyebrow">Тема 5 из 8 · <span class="qd key" aria-hidden="true"></span> Математика</div>
+  <h2>Кросс-энтропия</h2>
+  <p class="tldr">Кросс-энтропия H(p, q) — средняя неожиданность, если события происходят по правде p, а ждём мы их по модели q. Она не меньше энтропии H(p) и равна ей, только когда q = p. Если правда — один класс (one-hot), кросс-энтропия становится ровно log-loss.</p>
+  <div class="prose"><p>Ты настроил ожидания по модели q: каждый раз, когда случается исход k, тебя удивляет −log q<sub>k</sub>. А случаются исходы по правде p. Средняя неожиданность — это кросс-энтропия. Ждёшь не того — удивляешься чаще, чем нужно.</p></div>
+  <div class="formula">
+    <div class="fx">H(<span class="c1">p</span>, <span class="c2">q</span>) = −Σ<sub>k</sub> <span class="c1">p<sub>k</sub></span> · ln <span class="c2">q<sub>k</sub></span></div>
+    <div class="fx">one-hot <span class="c1">p</span> → H = −ln <span class="c2">q<sub>правды</sub></span> = log-loss</div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--accent)">p</span> — правда: метка, обычно one-hot [0, 1, 0, 0]</div>
+      <div><span class="s" style="color:var(--plum)">q</span> — предсказание модели: вероятности после softmax или сигмоиды</div>
+      <div>При one-hot все слагаемые, кроме одного, умножаются на 0. Остаётся −ln вероятности настоящего класса</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · правда против модели</span><span class="muted mono" id="ceState"></span></div>
+    <div class="btns" role="group" aria-label="Какая правда">
+      <button class="btn cep" data-p="0,1,0,0">One-hot: Pass</button>
+      <button class="btn cep" data-p="0.033,0.9,0.033,0.034">Сглаженная метка</button>
+      <button class="btn cep" data-p="0,0.5,0.5,0">Разметчики спорят</button>
+    </div>
+    <div class="sl4" id="ceSliders"></div>
+    <div class="pbars" id="ceBars"></div>
+    <div class="legendrow"><span><i style="background:var(--accent)"></i>правда p</span><span><i style="background:var(--plum)"></i>модель q</span></div>
+    <div class="btns"><button class="btn" id="ceMatch">Сделать q = p</button></div>
+    <div class="readout">
+      <div class="stat"><div class="v" id="ceH">0</div><div class="k">H(p) — энтропия правды</div></div>
+      <div class="stat"><div class="v" id="ceX">0</div><div class="k">H(p, q) — кросс-энтропия</div></div>
+      <div class="stat"><div class="v" id="ceK" style="color:var(--warm)">0</div><div class="k">KL(p ‖ q) = разница</div></div>
+      <div class="stat"><div class="v" id="ceKr">0</div><div class="k">KL(q ‖ p) — наоборот</div></div>
+    </div>
+    <p class="verdict" id="ceMsg" aria-live="polite"></p>
+    <p class="muted" style="font-size:13.5px">Как читать: ползунки — сырые оценки модели, они нормируются в q. Всё в натах (ln), как в log-loss. Справа у каждого класса — его вклад −p·ln q.</p>
+  </div>
+
+  <h3 style="font-size:17px">Почему именно этот штраф: максимальное правдоподобие</h3>
+  <div class="prose">
+    <p>Хорошая модель приписывает высокую вероятность тому, что случилось на самом деле. Вероятность всей обучающей выборки — произведение вероятностей правильных ответов по объектам (правдоподобие, likelihood). Произведение тысяч чисел меньше 1 быстро становится машинным нулём, поэтому берут логарифм: произведение превращается в сумму. Максимизировать сумму логарифмов — то же, что минимизировать её со знаком минус. Это и есть log-loss. «Логистическая регрессия — это метод максимального правдоподобия для распределения Бернулли» — так это формулируют на собеседованиях.</p>
+  </div>
+  <div class="prose"><ul>
+    <li><b>Сглаживание меток</b> (label smoothing): вместо [0, 1, 0, 0] учить на [0.03, 0.9, 0.03, 0.03]. Модели незачем гнать логиты в бесконечность ради p = 1, она меньше переобучается и реже бывает самоуверенной. В PyTorch: <code>CrossEntropyLoss(label_smoothing=0.1)</code>.</li>
+    <li><b>Перплексия</b> (perplexity) языковых моделей — это e<sup>кросс-энтропия</sup>. Перплексия 20 — модель «колеблется» в среднем между двадцатью токенами.</li>
+    <li><b>Взвешенная кросс-энтропия</b> — при дисбалансе классов редкому даём больший вес: <code>class_weight</code> в sklearn, <code>weight=</code> в PyTorch.</li>
+  </ul></div>
+<pre>from sklearn.metrics import log_loss
+log_loss([1, 0], [0.9, 0.2])                 <span class="cm"># 0.164 = −(ln 0.9 + ln 0.8) / 2</span>
+log_loss(y_test, model.predict_proba(X_test))   <span class="cm"># вероятности, не метки!</span>
+torch.nn.CrossEntropyLoss()(logits, target)  <span class="cm"># logits: (n, K) сырые; target: номера классов</span></pre>
+  <div class="callout trap"><b class="h">Ловушка: log(0)</b><p>Если модель дала настоящему классу вероятность ровно 0, штраф бесконечен. Так бывает, если подать в <code>log_loss</code> результат <code>predict</code> (метки 0 и 1) вместо <code>predict_proba</code>: каждая ошибка даёт 0 или 1 вместо вероятности. sklearn обрезает такие значения около нуля, и получаются огромные, но конечные числа — тихая ошибка. Сама модель на логитах до нуля не доходит.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему log-loss называют кросс-энтропией?</summary>
+      <div class="a"><p>Кросс-энтропия между правдой p и предсказанием q — это −Σ p<sub>k</sub> ln q<sub>k</sub>. В классификации правда для объекта — one-hot: 1 у настоящего класса и 0 у остальных. Сумма сводится к −ln q настоящего класса. Это и есть log-loss объекта, а средняя по выборке — log-loss модели. Для двух классов та же формула записывается как −[y ln p + (1 − y) ln(1 − p)].</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Как log-loss связан с максимальным правдоподобием?</summary>
+      <div class="a"><p>Правдоподобие — вероятность наблюдаемых меток при параметрах модели: произведение p<sub>i</sub> для объектов класса 1 и (1 − p<sub>i</sub>) для класса 0. Логарифм превращает произведение в сумму, знак минус — максимизацию в минимизацию. Получается сумма −[y ln p + (1 − y) ln(1 − p)] — log-loss. Минимизировать log-loss = максимизировать правдоподобие.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Правда — класс 2. Модель дала [0.7, 0.2, 0.1]. Кросс-энтропия?</summary>
+      <div class="a"><p>−ln 0.2 ≈ 1.61.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.info.1">
+    <label class="tp"><input type="checkbox" data-id="math.info.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Кросс-энтропия</b></span></label>
+    <span class="note" data-d="math.info.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="topic" id="t6">
+  <div class="eyebrow">Тема 6 из 8 · Математика</div>
+  <h2>KL-дивергенция</h2>
+  <p class="tldr">KL-дивергенция KL(p ‖ q) = H(p, q) − H(p) — это лишняя неожиданность от того, что ждёшь q вместо правды p. Она ≥ 0 и равна нулю только при q = p. Она несимметрична: KL(p ‖ q) ≠ KL(q ‖ p), поэтому это не расстояние, а «расхождение».</p>
+  <div class="formula">
+    <div class="fx">KL(<span class="c1">p</span> ‖ <span class="c2">q</span>) = Σ<sub>k</sub> <span class="c1">p<sub>k</sub></span> · ln(<span class="c1">p<sub>k</sub></span> / <span class="c2">q<sub>k</sub></span>) = H(<span class="c1">p</span>, <span class="c2">q</span>) − H(<span class="c1">p</span>)</div>
+    <div class="legend">
+      <div>Кросс-энтропия = неустранимая неопределённость правды H(p) + штраф за неверную модель KL</div>
+      <div>H(p) от модели не зависит. Поэтому учить классификатор на кросс-энтропии — значит минимизировать KL до правды</div>
+      <div>Если q<sub>k</sub> = 0 там, где p<sub>k</sub> &gt; 0, KL бесконечна: модель «запретила» то, что бывает</div>
+    </div>
+  </div>
+  <div class="prose"><p>Несимметричность — не мелочь, а разное поведение. Попробуй описать данные с двумя горбами одним колоколом. KL(p ‖ q) наказывает q за то, что она не покрыла места, где есть правда. KL(q ‖ p) — за то, что q залезла туда, где правды нет. Минимизируй каждую и посмотри, куда встанет колокол.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · один колокол на два горба</span><span class="muted mono" id="klState"></span></div>
+    <div class="lab-grid">
+      <svg id="klSvg" viewBox="0 0 360 220" role="img" aria-label="Распределение с двумя горбами и приближающий его колокол"></svg>
+      <div class="ctrl">
+        <label for="klM"><span class="row"><span>Центр колокола μ</span><span class="mono" id="klMV"></span></span><input type="range" id="klM" min="-6" max="6" step="0.1" value="1.5"></label>
+        <label for="klS"><span class="row"><span>Ширина σ</span><span class="mono" id="klSV"></span></span><input type="range" id="klS" min="0.4" max="6" step="0.05" value="1.5"></label>
+        <div class="btns"><button class="btn mono" id="klFwd">min KL(p ‖ q)</button><button class="btn mono" id="klRev">min KL(q ‖ p)</button></div>
+        <div class="readout">
+          <div class="stat"><div class="v" id="klF" style="color:var(--accent)">0</div><div class="k">KL(p ‖ q)</div></div>
+          <div class="stat"><div class="v" id="klR" style="color:var(--plum)">0</div><div class="k">KL(q ‖ p)</div></div>
+        </div>
+        <p class="verdict" id="klMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Как читать: зелёная заливка — правда p, два горба. Сиреневая кривая — колокол q, которым пытаемся её описать. Кнопки подбирают колокол, минимизирующий одну из двух дивергенций.</p>
+  </div>
+
+  <h3 style="font-size:17px">Где встречается KL</h3>
+  <div class="prose"><ul>
+    <li><b>Обучение классификатора</b> — минимизация кросс-энтропии и есть минимизация KL до распределения меток.</li>
+    <li><b>Дистилляция знаний</b> (knowledge distillation): маленькая модель-ученик учится повторять «мягкие» вероятности большой модели-учителя, штраф — KL между ними. Часто с температурой из темы 3.</li>
+    <li><b>VAE</b>: KL тянет скрытые представления к стандартному нормальному распределению.</li>
+    <li><b>RLHF и дообучение LLM</b>: штраф KL не даёт новой модели уйти слишком далеко от исходной.</li>
+    <li><b>t-SNE</b> минимизирует KL между «соседствами» точек в исходном пространстве и на картинке.</li>
+    <li><b>Мониторинг дрейфа</b>: сравнивают распределение признака на train и в проде. Популярный в банках PSI — это симметричная версия KL по корзинам.</li>
+  </ul></div>
+<pre>from scipy.stats import entropy
+p = np.array([0.5, 0.25, 0.25]); q = np.array([0.25, 0.5, 0.25])
+entropy(p, q)                       <span class="cm"># KL(p ‖ q) в натах: scipy с двумя аргументами считает KL</span>
+entropy(q, p)                       <span class="cm"># другое число: KL несимметрична</span>
+eps = 1e-9; q = (q + eps) / (q + eps).sum()   <span class="cm"># сглаживание, чтобы не было бесконечности</span></pre>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему KL-дивергенция — не расстояние?</summary>
+      <div class="a"><p>Расстояние должно быть симметричным и удовлетворять неравенству треугольника. KL несимметрична: KL(p ‖ q) взвешивает расхождения по p, KL(q ‖ p) — по q. Неравенство треугольника для неё тоже не выполняется. Свойства «≥ 0» и «= 0 только при совпадении» у неё есть. Если нужна симметричная мера — дивергенция Дженсена–Шеннона (JS), корень из которой уже метрика.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Как связаны кросс-энтропия, энтропия и KL?</summary>
+      <div class="a"><p>H(p, q) = H(p) + KL(p ‖ q). Кросс-энтропия — это неустранимая неопределённость самих данных плюс штраф за то, что модель q отличается от правды p. При обучении H(p) фиксирована, поэтому минимизация кросс-энтропии и минимизация KL дают одну и ту же модель. Минимально возможная кросс-энтропия равна энтропии данных — ниже log-loss не опустится даже у идеальной модели, если метки шумные.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Чему равна KL(p ‖ p)? Может ли KL быть отрицательной?</summary>
+      <div class="a"><p>Нулю. Нет, KL ≥ 0 всегда (неравенство Гиббса).</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.info.2">
+    <label class="tp"><input type="checkbox" data-id="math.info.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>KL-дивергенция</b></span></label>
+    <span class="note" data-d="math.info.2">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 3 · 2 темы</span><h2>Чтобы веса не разлетались</h2><p>В теме 1 веса уходили в бесконечность на разделимых данных. У линейной регрессии то же происходит при похожих признаках. Причина одна — задача плохо обусловлена: много решений почти одинаково хороши, и шум выбирает между ними. Сначала посмотрим на это как на систему уравнений, потом вылечим регуляризацией.</p></div>
+
+<!-- ============ 7 ============ -->
+<section class="topic" id="t7">
+  <div class="eyebrow">Тема 7 из 8 · Математика</div>
+  <h2>Обратная матрица и системы уравнений</h2>
+  <p class="tldr">Система линейных уравнений — это Ax = b. Если матрица A квадратная и невырожденная (det A ≠ 0), решение одно: x = A⁻¹b. Если строки почти зависимы, матрица плохо обусловлена: крошечный шум в b сильно двигает ответ. В коде систему решают через <code>solve</code>, а не через <code>inv</code>.</p>
+  <div class="prose"><p>Два уравнения с двумя неизвестными — это две прямые на плоскости, решение — точка пересечения. Прямые пересекаются под заметным углом — точка стоит твёрдо. Прямые почти параллельны — чуть сдвинь одну, и точка пересечения уедет далеко. Параллельны совсем — решений нет или бесконечно много. Это вырожденная матрица (singular), обратной у неё нет.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · почти параллельные уравнения</span><span class="muted mono" id="syState"></span></div>
+    <div class="lab-grid">
+      <svg id="sySvg" viewBox="0 0 320 300" role="img" aria-label="Две прямые на плоскости и точка их пересечения"></svg>
+      <div class="ctrl">
+        <label for="syE"><span class="row"><span>Насколько уравнения разные</span><span class="mono" id="syEV"></span></span><input type="range" id="syE" min="0" max="100" step="1" value="70"></label>
+        <label for="syD"><span class="row"><span>Шум в данных δ</span><span class="mono" id="syDV"></span></span><input type="range" id="syD" min="-0.3" max="0.3" step="0.01" value="0.1"></label>
+        <div class="btns"><button class="btn mono" id="syR" aria-pressed="false">+ λI, как в Ridge</button></div>
+        <div class="readout">
+          <div class="stat"><div class="v" id="syDet">0</div><div class="k">det A</div></div>
+          <div class="stat"><div class="v" id="syCond">0</div><div class="k">число обусловленности</div></div>
+          <div class="stat"><div class="v" id="syX">0</div><div class="k">решение (x, y)</div></div>
+          <div class="stat"><div class="v" id="ySh" style="color:var(--red)">0</div><div class="k">сдвиг от правды</div></div>
+        </div>
+        <p class="verdict" id="syMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Как читать: система x + y = 2 и x + (1 + ε)y = 2 + ε + δ. Без шума обе прямые проходят через правду (1, 1) — серое кольцо. Сиреневая точка — решение с шумом, жёлтая — с регуляризацией.</p>
+  </div>
+
+  <h3 style="font-size:17px">Что нужно знать</h3>
+  <div class="prose"><ul>
+    <li><b>Обратная матрица</b> A⁻¹: A·A⁻¹ = I. Есть только у квадратной матрицы с det ≠ 0. Эквивалентные формулировки: строки (столбцы) линейно независимы, ранг полный, у Ax = 0 только нулевое решение.</li>
+    <li><b>Определитель 2 × 2</b>: det [[a, b], [c, d]] = ad − bc. Ноль — строки пропорциональны.</li>
+    <li><b>Число обусловленности</b> κ(A) — во сколько раз относительная ошибка в b может усилиться в ответе. κ около 1 — идеально, 10⁶ — шесть знаков точности потеряно. <code>np.linalg.cond</code>. Маленький det ещё не значит плохую обусловленность (матрица 0.001·I обусловлена идеально), смотри κ.</li>
+    <li><b>Связь с МНК</b> (урок 2.1, тема 6): веса линейной регрессии — решение нормальных уравнений (XᵀX)w = Xᵀy. Если два признака почти одинаковы (мультиколлинеарность), XᵀX почти вырождена: веса огромные, с разными знаками, и прыгают от любой новой строки данных.</li>
+    <li><b>Лечение</b> — добавить λ на диагональ: (XᵀX + λI)w = Xᵀy. Матрица становится невырожденной и хорошо обусловленной. Это ровно Ridge-регрессия — мостик к теме 8.</li>
+    <li><b>Не квадратная или вырожденная</b> — псевдообратная <code>pinv</code> или <code>lstsq</code>: решение МНК с минимальной нормой.</li>
+  </ul></div>
+<pre>A = np.array([[2., 1.], [1., 3.]]); b = np.array([3., 5.])
+np.linalg.solve(A, b)              <span class="cm"># [0.8, 1.4] — правильный способ</span>
+np.linalg.inv(A) @ b               <span class="cm"># то же, но медленнее и менее точно</span>
+np.linalg.det(A), np.linalg.cond(A)
+np.linalg.lstsq(X, y, rcond=None)[0]      <span class="cm"># МНК без явного обращения XᵀX</span>
+np.linalg.solve(X.T @ X + lam * np.eye(X.shape[1]), X.T @ y)   <span class="cm"># Ridge в одну строку</span></pre>
+  <div class="callout trap"><b class="h">Ловушка: dummy-ловушка в one-hot</b><p>Сделал one-hot для всех категорий признака и оставил свободный член — сумма dummy-столбцов всегда 1 и совпадает со столбцом константы. Столбцы линейно зависимы, XᵀX вырождена. <code>inv</code> упадёт или выдаст мусор, веса не определены однозначно. Лечение: <code>OneHotEncoder(drop="first")</code> для моделей без регуляризации, или регуляризация — она делает решение единственным. sklearn-модели с L2 по умолчанию переживают это спокойно.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Когда у матрицы нет обратной?</summary>
+      <div class="a"><p>Когда она не квадратная или когда её определитель равен нулю. Второе — то же самое, что линейная зависимость строк или столбцов: одна строка — комбинация других, ранг неполный. Тогда у Ax = b либо нет решений, либо их бесконечно много. Для неквадратных и вырожденных матриц используют псевдообратную Мура–Пенроуза: она даёт решение МНК с минимальной нормой.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Чем плоха мультиколлинеарность для линейной регрессии и как помогает Ridge?</summary>
+      <div class="a"><p>Если признаки почти линейно зависимы, матрица XᵀX почти вырождена и плохо обусловлена. Много наборов весов дают почти одинаковую ошибку, и выбор между ними делает шум. Веса получаются огромными, с противоположными знаками, неустойчивыми между выборками, интерпретировать их нельзя. Предсказания на похожих данных при этом могут быть нормальными. Ridge добавляет λ к диагонали XᵀX: матрица становится обратимой и хорошо обусловленной, веса — маленькими и устойчивыми, а у коррелированных признаков вес делится между ними.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Есть ли обратная у [[1, 2], [2, 4]]?</summary>
+      <div class="a"><p>Нет: det = 1·4 − 2·2 = 0, вторая строка — удвоенная первая.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="math.la.4">
+    <label class="tp"><input type="checkbox" data-id="math.la.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Обратная матрица и системы уравнений</b></span></label>
+    <span class="note" data-d="math.la.4">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="topic" id="t8">
+  <div class="eyebrow">Тема 8 из 8 · <span class="qd key" aria-hidden="true"></span> ML</div>
+  <h2>Регуляризация L1, L2, ElasticNet</h2>
+  <p class="tldr">Регуляризация добавляет к функции потерь штраф за большие веса. L2 (Ridge) сжимает все веса понемногу и делает решение устойчивым. L1 (Lasso) зануляет часть весов — сама отбирает признаки. ElasticNet смешивает оба. Силу штрафа λ подбирают на валидации.</p>
+  <div class="prose"><p>Идея и связь с переобучением — в уроке 1.1, тема 6: штраф делает модель проще, выше bias, ниже variance. Здесь — как именно ведут себя веса, почему L1 даёт ровно нули и как выбрать вид штрафа.</p></div>
+  <div class="formula">
+    <div class="fx">Loss = ошибка + <span class="c3">λ</span>·( <span class="c4">α</span>·Σ|w<sub>j</sub>| + (1 − <span class="c4">α</span>)/2 · Σw<sub>j</sub>² )</div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--warm)">λ</span> — сила штрафа: 0 — без регуляризации, больше — проще модель. В sklearn: <code>alpha</code> у Ridge, Lasso, ElasticNet и <code>C = 1/λ</code> у логистической регрессии и SVM</div>
+      <div><span class="s" style="color:var(--teal)">α</span> — доля L1: 0 — чистый L2, 1 — чистый L1. В sklearn: <code>l1_ratio</code></div>
+      <div>Свободный член b не штрафуют: сдвиг всех ответов — не сложность модели</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · путь регуляризации</span><span class="muted mono" id="rgState"></span></div>
+    <div class="btns" role="group" aria-label="Вид штрафа"><button class="btn rgm" data-a="0">L2 · Ridge</button><button class="btn rgm" data-a="1">L1 · Lasso</button><button class="btn rgm" data-a="0.5">ElasticNet · α = 0.5</button></div>
+    <label for="rgL"><span class="row"><span>Сила штрафа λ</span><span class="mono" id="rgLV"></span></span><input type="range" id="rgL" min="0" max="40" step="1" value="10"></label>
+    <svg id="rgSvg" viewBox="0 0 360 230" role="img" aria-label="Веса шести признаков в зависимости от силы регуляризации"></svg>
+    <svg id="rgErr" viewBox="0 0 360 110" role="img" aria-label="Ошибка на валидации в зависимости от силы регуляризации"></svg>
+    <div class="legendrow" id="rgLegend"></div>
+    <div class="readout">
+      <div class="stat"><div class="v" id="rgZero">0</div><div class="k">весов ровно 0</div></div>
+      <div class="stat"><div class="v" id="rgVal">0</div><div class="k">MSE на валидации</div></div>
+    </div>
+    <p class="verdict" id="rgMsg" aria-live="polite"></p>
+    <p class="muted" style="font-size:13.5px">Как читать: 30 студентов, балл за экзамен и шесть признаков. «Часы» и «часы, другая запись» почти совпадают, два последних — чистый шум. Верхний график — вес каждого признака при каждой λ (слева слабый штраф, справа сильный), вертикальная линия — текущая λ. Нижний — ошибка на 200 новых студентах: жёлтая точка — лучшая λ.</p>
+  </div>
+
+  <h3 style="font-size:17px">Почему L1 даёт ровно нули, а L2 — нет</h3>
+  <div class="prose">
+    <p><b>Через градиент.</b> Штраф L2 толкает вес к нулю с силой 2λw: чем меньше вес, тем слабее толчок. До нуля вес не доходит никогда, только приближается. Штраф L1 толкает с постоянной силой λ, как бы мал ни был вес. Если признак помогает ошибке слабее, чем λ, вес доезжает до нуля и там остаётся.</p>
+    <p><b>Через геометрию.</b> Регуляризация — это поиск лучших весов внутри ограничения «норма ≤ t». Для L2 это круг, для L1 — ромб с углами на осях. Линии уровня ошибки (эллипсы) чаще всего касаются ромба в углу, а угол — это точка, где один из весов равен нулю. Круг гладкий, и касание обычно в точке, где оба веса не нулевые.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Штраф</th><th>Что делает с весами</th><th>Когда брать</th></tr></thead>
+    <tbody>
+      <tr><td>L2 · Ridge</td><td>сжимает все, ни один не зануляет; коррелированным признакам делит вес поровну</td><td>по умолчанию; много полезных признаков; мультиколлинеарность</td></tr>
+      <tr><td>L1 · Lasso</td><td>зануляет часть весов; из группы похожих признаков оставляет один, причём произвольный</td><td>признаков много, полезных мало; нужна простая модель или отбор признаков</td></tr>
+      <tr><td>ElasticNet</td><td>и отбор, и устойчивость: похожие признаки держит вместе</td><td>много признаков, и они сгруппированы по смыслу (тексты, гены, лаги)</td></tr>
+    </tbody></table></div>
+<pre>from sklearn.linear_model import Ridge, Lasso, ElasticNet, LogisticRegression, LassoCV
+Ridge(alpha=1.0); Lasso(alpha=0.1); ElasticNet(alpha=0.1, l1_ratio=0.5)
+LogisticRegression(C=0.1)                                  <span class="cm"># L2, сильнее чем C=1</span>
+LogisticRegression(C=0.1, l1_ratio=1.0, solver="saga")     <span class="cm"># L1 (sklearn 1.8+)</span>
+make_pipeline(StandardScaler(), LassoCV(cv=5))             <span class="cm"># λ по кросс-валидации, сначала масштаб!</span>
+np.logspace(-3, 3, 13)                                     <span class="cm"># сетка для λ или C — по логарифму, а не 0.1, 0.2, 0.3</span></pre>
+  <div class="prose"><ul>
+    <li><b>Масштаб обязателен.</b> Штраф одинаков для всех весов. Признак в рублях получит крошечный вес и почти не будет оштрафован, а признак в миллионах — наоборот (урок 2.1, тема 8). Скейлер — в Pipeline перед моделью.</li>
+    <li><b>λ подбирают по валидации</b>, по логарифмической сетке: важен порядок величины. Слишком мало — переобучение, слишком много — модель «всем отвечает среднее».</li>
+    <li><b>Байесовский взгляд</b> (бонус на собеседовании): L2 — это нормальное априорное распределение весов, L1 — лапласовское с острым пиком в нуле. Отсюда и нули.</li>
+    <li><b>Другие регуляризации</b> делают то же другими средствами: early stopping, dropout в нейросетях, ограничение глубины деревьев, аугментация данных.</li>
+  </ul></div>
+  <div class="callout trap"><b class="h">Ловушка: «L1 сказал, что признак не нужен»</b><p>Lasso из двух почти одинаковых признаков оставит один, а второй обнулит. На другой выборке — наоборот. Ноль в Lasso значит «без этого признака можно, если есть остальные». Он не значит «признак не связан с ответом». Выводы об отборе проверяй устойчивостью: разные бутстрэп-выборки, разные λ.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему L1 даёт разреженные веса, а L2 — нет?</summary>
+      <div class="a"><p>Градиент L2-штрафа пропорционален весу и обращается в ноль вместе с ним: штраф перестаёт толкать, вес остаётся маленьким, но ненулевым. Производная L1-штрафа по модулю постоянна и равна λ при любом ненулевом весе. Если вклад признака в уменьшение ошибки меньше λ, оптимум ровно в нуле. Геометрически: ограничение L1 — ромб с вершинами на осях, и линии уровня ошибки касаются его чаще всего в вершине, где часть координат — нули. Круг L2 гладкий, такого предпочтения у него нет.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Признаки сильно коррелированы. Какую регуляризацию возьмёте?</summary>
+      <div class="a"><p>L2 или ElasticNet. Ridge разделит вес между коррелированными признаками и сделает решение устойчивым. Lasso выберет из группы один признак почти случайно и будет менять выбор от выборки к выборке. ElasticNet даёт отбор признаков и при этом держит коррелированные признаки группой. Плюс стоит посмотреть, нужны ли все копии: возможно, достаточно одного признака из группы или их среднего.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Что сильнее регуляризует: <code>LogisticRegression(C=0.01)</code> или <code>C=100</code>? А <code>Ridge(alpha=0.01)</code> или <code>alpha=100</code>?</summary>
+      <div class="a"><p>C = 0.01 (C = 1/λ). У Ridge наоборот — alpha = 100.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="ml.lin.2">
+    <label class="tp"><input type="checkbox" data-id="ml.lin.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Регуляризация L1, L2, ElasticNet</b></span></label>
+    <span class="note" data-d="ml.lin.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · как на собеседовании и в работе</div>
+  <h2>Практика</h2>
+  <p class="tldr">Главная задача — первый бейзлайн проекта А на логистической регрессии. Остальное — то, что спрашивают на ML-секции: вывод градиента, логрег на numpy, расчёты энтропии и ревью кода.</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Работа · главная задача урока, Jupyter, 60 минут</span>
+      <h3>Проект А: первый бейзлайн «студент в зоне риска»</h3>
+      <p>Возьми <code>data/processed/students.parquet</code> из урока 3.1. Таргет: <code>final_result</code> — Fail или Withdrawn. Признаки — только то, что известно при записи на курс: <code>gender</code>, <code>region</code>, <code>highest_education</code>, <code>imd_band</code>, <code>age_band</code>, <code>num_of_prev_attempts</code>, <code>studied_credits</code>, <code>disability</code>.</p>
+      <ul>
+        <li>Разбей выборку на train и test со <code>stratify</code>.</li>
+        <li>Собери Pipeline: <code>ColumnTransformer</code> (one-hot для категорий, StandardScaler для чисел) и <code>LogisticRegression</code>.</li>
+        <li>Сравни log-loss на test с <code>DummyClassifier</code> и для C из [0.01, 0.1, 1, 10].</li>
+        <li>Выпиши пять признаков с самыми большими по модулю весами и их отношение шансов.</li>
+      </ul>
+      <p class="ok">Готово, когда:</p>
+      <ul class="ok">
+        <li>log-loss модели ниже, чем у Dummy;</li>
+        <li>есть таблица C → log-loss;</li>
+        <li>у пяти признаков есть e<sup>w</sup> и по фразе на каждый;</li>
+        <li>одним абзацем объяснено, почему в признаки нельзя брать <code>avg_score</code> и <code>n_submitted</code> из урока 3.1.</li>
+      </ul>
+      <details><summary>Решение</summary><div class="a">
+<pre>import numpy as np, pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import log_loss
+
+df = pd.read_parquet("data/processed/students.parquet")
+y = df.final_result.isin(["Fail", "Withdrawn"]).astype(int)
+CAT = ["gender", "region", "highest_education", "imd_band", "age_band", "disability"]
+NUM = ["num_of_prev_attempts", "studied_credits"]
+X = df[CAT + NUM].assign(imd_band=df.imd_band.fillna("unknown"))
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+prep = ColumnTransformer([("cat", OneHotEncoder(handle_unknown="ignore"), CAT),
+                          ("num", StandardScaler(), NUM)])
+dummy = DummyClassifier().fit(X_tr, y_tr)
+print("dummy", log_loss(y_te, dummy.predict_proba(X_te)))
+for C in [0.01, 0.1, 1, 10]:
+    model = make_pipeline(prep, LogisticRegression(C=C, max_iter=2000)).fit(X_tr, y_tr)
+    print(C, log_loss(y_te, model.predict_proba(X_te)))
+
+names = model[0].get_feature_names_out()
+coef = pd.Series(model[-1].coef_[0], index=names)
+top = coef.reindex(coef.abs().sort_values(ascending=False).index).head(5)
+pd.DataFrame({"w": top, "odds_ratio": np.exp(top)})</pre>
+        <p>По одной анкете предсказать трудно: улучшение над Dummy будет скромным, и это нормально. Это бейзлайн, его будут обгонять признаки активности. <code>avg_score</code> и <code>n_submitted</code> посчитаны по всему курсу, то есть знают будущее: в момент прогноза (начало курса) их ещё нет. Это утечка. Признаки по окнам времени — в уроке 3.3.</p></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · у доски, 10 минут</span>
+      <h3>«Выведите градиент логистической регрессии и запишите шаг спуска»</h3>
+      <p class="ok">Готово, когда без подсказок на бумаге: производная сигмоиды, цепочка до (p − y)·x, векторная запись для выборки и правило обновления с learning rate. И когда можешь объяснить, почему множитель p(1 − p) сократился.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>σ′(z) = σ(z)(1 − σ(z)). ∂L/∂p = −y/p + (1 − y)/(1 − p). Умножаю на p(1 − p): −y(1 − p) + (1 − y)p = p − y. ∂z/∂w = x. Для выборки: ∇<sub>w</sub> = Xᵀ(p − y)/n, ∇<sub>b</sub> = mean(p − y). Шаг: w ← w − η·∇<sub>w</sub>. С L2-штрафом к градиенту добавляется λw. Сокращение p(1 − p) — главное отличие от MSE поверх сигмоиды: там этот множитель остаётся, и при уверенной ошибке градиент почти нулевой.</p></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · live coding, 30 минут</span>
+      <h3>Логистическая регрессия на numpy</h3>
+      <p>Это частая задача на ML-секции. Напиши функции <code>fit(X, y, lr, n_iter)</code> и <code>predict_proba(X, w, b)</code> на чистом numpy, градиентным спуском. Проверь на <code>make_classification(n_samples=500, n_features=4, random_state=0)</code> против <code>LogisticRegression(C=np.inf)</code> — без регуляризации.</p>
+      <p class="ok">Готово, когда веса совпали с sklearn до второго знака, а log-loss по итерациям монотонно падает.</p>
+      <details><summary>Решение</summary><div class="a">
+<pre>import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def fit(X, y, lr=0.1, n_iter=5000):
+    w, b = np.zeros(X.shape[1]), 0.0
+    for _ in range(n_iter):
+        p = sigmoid(X @ w + b)
+        g = p - y                          <span class="cm"># та самая ошибка из цепочки</span>
+        w -= lr * X.T @ g / len(y)
+        b -= lr * g.mean()
+    return w, b
+
+def predict_proba(X, w, b):
+    return sigmoid(X @ w + b)
+
+X, y = make_classification(n_samples=500, n_features=4, random_state=0)
+w, b = fit(X, y)
+sk = LogisticRegression(C=np.inf, max_iter=5000).fit(X, y)
+print(w.round(3), sk.coef_.round(3))       <span class="cm"># [0.781 0.123 0.859 -0.157] и то же у sklearn</span></pre>
+        <p>Если спросят про устойчивость: <code>np.exp(-z)</code> переполняется при очень отрицательных z. Есть <code>scipy.special.expit</code>, или log-loss считают через логиты: <code>np.logaddexp(0, -z)</code>.</p></div></details></div>
+
+    <div class="task"><span class="tg lc">Задача с числами · 10 минут</span>
+      <h3>Энтропия, кросс-энтропия, KL и softmax на бумаге</h3>
+      <p>Посчитай без компьютера, потом проверь в Python:</p>
+      <ul>
+        <li>(а) энтропию [0.5, 0.25, 0.25] в битах;</li>
+        <li>(б) для правды p = [0.5, 0.25, 0.25] и модели q = [0.25, 0.5, 0.25] — H(p, q) и KL(p ‖ q) в битах;</li>
+        <li>(в) softmax от логитов [ln 1, ln 2, ln 5] и кросс-энтропию в натах, если правда — третий класс;</li>
+        <li>(г) σ(ln 4).</li>
+      </ul>
+      <p class="ok">Готово, когда все четыре ответа сошлись с <code>scipy.stats.entropy</code> и <code>scipy.special.softmax</code>.</p>
+      <details><summary>Ответы</summary><div class="a"><p>(а) 1.5 бита. (б) H(p, q) = 0.5·2 + 0.25·1 + 0.25·2 = 1.75 бита, KL = 1.75 − 1.5 = 0.25 бита. (в) экспоненты 1, 2, 5 → [0.125, 0.25, 0.625], −ln 0.625 ≈ 0.47. (г) шансы 4 → 4/5 = 0.8.</p></div></details></div>
+
+    <div class="task"><span class="tg rev">Код-ревью · найди 6 ошибок</span>
+      <h3>Классификатор стажёра</h3>
+<pre>def softmax(z): return np.exp(z) / np.exp(z).sum()
+model = LogisticRegression(C=1000)          <span class="cm"># «сильная регуляризация, чтобы не переобучиться»</span>
+model.fit(X_train, y_train)                  <span class="cm"># доход в рублях, возраст в годах, без скейлера</span>
+loss = log_loss(y_test, model.predict(X_test))
+w = np.linalg.inv(X.T @ X) @ X.T @ y         <span class="cm"># X: one-hot всех категорий + столбец единиц</span>
+lasso = LogisticRegression(l1_ratio=1.0)     <span class="cm"># «L1, чтобы отобрать признаки»</span></pre>
+      <p class="ok">Готово, когда на каждую ошибку есть исправленная строка и одна фраза «почему».</p>
+      <details><summary>Ошибки</summary><div class="a"><ul>
+        <li><b>softmax без вычитания максимума</b> — переполнение на больших логитах, NaN. Нужно <code>z - z.max()</code> или <code>scipy.special.softmax</code>.</li>
+        <li><b>C = 1000 — это слабая регуляризация</b>, а не сильная: C = 1/λ. Для сильной — C = 0.01–0.1.</li>
+        <li><b>Нет масштабирования</b>: штраф несправедлив к признакам в разных единицах, lbfgs плохо сходится (ConvergenceWarning). Нужен <code>make_pipeline(StandardScaler(), ...)</code>.</li>
+        <li><b>log_loss по меткам</b>: нужен <code>predict_proba(X_test)</code>, иначе каждая ошибка — вероятность 0, и получается огромное число.</li>
+        <li><b>inv и dummy-ловушка</b>: one-hot всех категорий + константа → XᵀX вырождена. <code>drop="first"</code>, <code>lstsq</code> или Ridge, и никогда <code>inv</code> для решения систем.</li>
+        <li><b>L1 с solver по умолчанию</b>: lbfgs поддерживает только L2 — будет ошибка. Нужно <code>solver="saga"</code> или <code>"liblinear"</code>, и тоже со скейлером.</li>
+      </ul></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 4 минуты</span>
+      <h3>«Расскажите про логистическую регрессию»</h3>
+      <p class="ok">Готово, когда в ответе есть: модель и сигмоида, log-loss и максимальное правдоподобие, обучение без формулы и градиент, интерпретация через шансы, линейная граница, регуляризация и C, многоклассовый случай, когда брать и когда нет.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>Линейная модель для классификации: логит z = w·x + b, вероятность σ(z). Учится минимизацией log-loss — это максимальное правдоподобие для Бернулли. Формулы как у МНК нет, учат градиентными методами (lbfgs, saga); градиент Xᵀ(p − y)/n, log-loss выпуклый — минимум один. Граница решения линейная, порог выбирается под задачу. Вес — изменение логарифма шансов, e<sup>w</sup> — отношение шансов. Регуляризация L2 по умолчанию, C = 1/λ. Без неё на разделимых данных веса уходят в бесконечность. L1 отбирает признаки. Для многих классов — softmax и кросс-энтропия, или one-vs-rest. Нужен масштаб признаков. Беру как быстрый интерпретируемый бейзлайн и там, где важна объяснимость. Не беру, когда зависимость сильно нелинейная и нет времени строить признаки — там бустинг.</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в дереве</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда прошёл «Проверку без ИИ» по теме. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Логрег:</b> z = w·x + b, p = σ(z) = 1/(1 + e<sup>−z</sup>). σ(0) = 0.5, σ′ = σ(1 − σ). Граница w·x + b = 0 — линейная.</li>
+      <li><b>Шансы:</b> ln(p/(1 − p)) = w·x + b. +1 к признаку → шансы × e<sup>w</sup>. Сравнивать веса — только в одном масштабе.</li>
+      <li><b>Порог</b> — не часть модели: <code>predict_proba</code>, а порог под цену ошибок.</li>
+      <li><b>sklearn:</b> C = 1/λ (по умолчанию 1 — регуляризация есть), <code>l1_ratio</code> вместо <code>penalty</code> (1.8+), lbfgs — только L2, L1 — saga/liblinear, <code>class_weight="balanced"</code>, скейлер в Pipeline.</li>
+      <li><b>Разделимые данные</b> без регуляризации → веса в бесконечность.</li>
+      <li><b>Цепочка:</b> (f(g))′ = f′(g)·g′. Для логрега ∂L/∂w = (p − y)·x, по выборке Xᵀ(p − y)/n. Backprop = цепочка от штрафа ко входу; пути суммируются. Проверка: (L(w+ε) − L(w−ε))/2ε.</li>
+      <li><b>Затухание:</b> σ′ ≤ 0.25 — в глубоких сетях ReLU; MSE поверх сигмоиды учится медленно при уверенной ошибке.</li>
+      <li><b>Softmax:</b> e<sup>z<sub>k</sub></sup>/Σe<sup>z<sub>j</sub></sup>, вычитать max, температура T. OvR — K бинарных. Multi-label — K сигмоид. CrossEntropyLoss ждёт логиты.</li>
+      <li><b>Энтропия:</b> −Σ p log p — средняя неожиданность. 0 — всё известно, log K — всё равновероятно. Биты (log₂) и наты (ln). Деревья: information gain.</li>
+      <li><b>Кросс-энтропия:</b> −Σ p ln q; при one-hot = −ln q<sub>правды</sub> = log-loss = максимальное правдоподобие. Label smoothing, перплексия = e<sup>CE</sup>.</li>
+      <li><b>KL:</b> Σ p ln(p/q) = H(p, q) − H(p) ≥ 0, несимметрична. KL(p‖q) покрывает все горбы, KL(q‖p) выбирает один. Дистилляция, VAE, RLHF, дрейф (PSI).</li>
+      <li><b>Системы:</b> Ax = b → <code>solve</code>, не <code>inv</code>. det = 0 ⇔ строки зависимы ⇔ обратной нет. Число обусловленности κ — во сколько раз усиливается шум. Мультиколлинеарность → XᵀX почти вырождена; +λI = Ridge. Dummy-ловушка.</li>
+      <li><b>L2</b> сжимает и стабилизирует, <b>L1</b> зануляет (ромб, постоянный толчок λ), <b>ElasticNet</b> — отбор + группы. Свободный член не штрафуют, масштаб обязателен, λ по логарифмической сетке на валидации.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без ИИ, 15 минут</b>
+    <p>Закрой урок. На листе:</p>
+    <ul>
+      <li>выведи градиент логрега по цепочке;</li>
+      <li>объясни коэффициент 0.7 через шансы;</li>
+      <li>посчитай softmax от [0, ln 3] и энтропию монетки 0.9 / 0.1 (примерно);</li>
+      <li>запиши связь H(p, q), H(p) и KL;</li>
+      <li>объясни, почему (XᵀX)⁻¹ ломается на похожих признаках и что делает +λI;</li>
+      <li>нарисуй ромб и круг и покажи, откуда в L1 нули.</li>
+    </ul>
+    <p>Где запнулся — туда и возвращайся.</p>
+  </div>
+</section>
+</div>
+
+<script src="/assets/lesson.js"></script>
+<script>
+const sig=z=>1/(1+Math.exp(-z));
+const fx=(v,d=2)=>(Math.abs(v)<1e-9?0:v).toFixed(d);
+const CLS=["Distinction","Pass","Fail","Withdrawn"];
+function press(sel,el){document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-pressed",b===el?"true":"false"))}
+function softmaxArr(z){const m=Math.max(...z),e=z.map(v=>Math.exp(v-m)),s=e.reduce((a,b)=>a+b,0);return e.map(v=>v/s)}
+function norm(a){const s=a.reduce((x,y)=>x+y,0);return s>0?a.map(v=>v/s):a.map(()=>1/a.length)}
+function barRow(name,fill,txt,o={}){
+  return `<div class="pbar${o.true?" true":""}"><span class="nm">${name}</span><span class="tr"><i style="width:${(fill*100).toFixed(1)}%;background:${o.color||"var(--accent)"}"></i>${o.q!==undefined?`<i class="q" style="width:${(o.q*100).toFixed(1)}%;background:var(--plum)"></i>`:""}</span><span class="v">${txt}</span></div>`;
+}
+
+/* ---------- тема 1: логистическая регрессия ---------- */
+(function logregLab(){
+  const D={mix:{x0:[0.5,1,1.5,2,2.5,3,3.5,4,4.5,5.5,6.5],x1:[3,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5]},
+           sep:{x0:[0.5,1,1.5,2,2.5,3,3.5,4,4.5],x1:[5.5,6,6.5,7,7.5,8,8.5,9,9.5]}};
+  let w=0.3,b=-1,sep=false,l2=false;
+  const data=()=>{const d=sep?D.sep:D.mix;return d.x0.map(x=>[x,0]).concat(d.x1.map(x=>[x,1]))};
+  const loss=P=>-P.reduce((s,[x,y])=>{const p=Math.min(1-1e-12,Math.max(1e-12,sig(w*x+b)));return s+(y?Math.log(p):Math.log(1-p))},0)/P.length;
+  /* спуск идёт в центрированной координате x − 5: так он сходится быстро; w и b пересчитываются обратно */
+  function step(n){const P=data(),lam=l2?0.05:0;let c=b+5*w;
+    for(let k=0;k<n;k++){let gw=0,gc=0;P.forEach(([x,y])=>{const g=sig(w*(x-5)+c)-y;gw+=g*(x-5);gc+=g});
+      w-=0.1*(gw/P.length+lam*w); c-=0.5*gc/P.length}
+    b=c-5*w;}
+  const F=frame(360,250,{l:34,r:12,t:16,b:30},[0,10],[-0.1,1.1]), XS=Array.from({length:201},(_,i)=>i/20);
+  function draw(){
+    const P=data(),t=+$("lrT").value;
+    let s=grid(F,[0,2,4,6,8,10],[0,0.5,1],v=>v,v=>v,"часы подготовки","p(сдаст)");
+    s+=`<line x1="${F.x0}" x2="${F.x1}" y1="${F.sy(t)}" y2="${F.sy(t)}" stroke="var(--warm)" stroke-dasharray="4 4"/>`;
+    const xb=(Math.log(t/(1-t))-b)/w;
+    if(Math.abs(w)>1e-6&&xb>=0&&xb<=10)s+=`<line x1="${F.sx(xb)}" x2="${F.sx(xb)}" y1="${F.y0}" y2="${F.y1}" stroke="var(--warm)" stroke-dasharray="4 4"/><text class="tk" x="${F.sx(xb)+4}" y="${F.sy(0.3)}" style="fill:var(--warm)">граница ${fx(xb,1)} ч</text>`;
+    s+=`<path d="${pathOf(F,XS,x=>sig(w*x+b),[-0.1,1.1])}" fill="none" stroke="var(--plum)" stroke-width="2.5"/>`;
+    let ok=0;
+    P.forEach(([x,y],i)=>{const p=sig(w*x+b),pred=p>=t?1:0,good=pred===y;if(good)ok++;
+      const yy=F.sy(y)+(y?-1:1)*((i%3)*5);
+      s+=`<circle cx="${F.sx(x)}" cy="${yy}" r="5" fill="${y?"var(--accent)":"var(--surface)"}" stroke="${y?"var(--accent)":"var(--muted)"}" stroke-width="1.6"/>`;
+      if(!good)s+=`<circle cx="${F.sx(x)}" cy="${yy}" r="9" fill="none" stroke="var(--red)" stroke-width="1.8"/>`});
+    $("lrSvg").innerHTML=s;
+    const L=loss(P);
+    $("lrLoss").textContent=fx(L,3); $("lrAcc").textContent=`${ok} из ${P.length}`;
+    $("lrWV").textContent=fx(w); $("lrBV").textContent=fx(b);
+    $("lrTV").textContent=fx(t);
+    $("lrW").value=Math.max(-1,Math.min(6,w)); $("lrB").value=Math.max(-30,Math.min(5,b));
+    $("lrEq").textContent=`p = σ(${fx(w)}·x ${b<0?"−":"+"} ${fx(Math.abs(b))})`;
+    let msg;
+    if(sep&&!l2&&w>1)msg=`Данные разделимы: ошибок ${ok===P.length?"нет":"почти нет"}, а спуск всё равно разгоняет веса. Сейчас w = ${fx(w)}, и каждый «Обучить» делает кривую круче, а log-loss — ближе к нулю. Минимума нет, веса будут расти без конца. Включи L2: штраф остановит рост.`;
+    else if(sep&&l2&&w>1)msg=`С L2 рост весов останавливается около w ≈ 1.5: дальше крутизна не окупает штраф. Жми «Обучить» — w почти не меняется. Ошибок нет, а вероятности не доходят до 0 и 1: модель уверена, но не бесконечно.`;
+    else if(L>0.6)msg="Пока модель почти не отличает сдавших от несдавших — log-loss большой. Подвигай w и b руками или нажми «Обучить»: спуск сам найдёт лучшую кривую.";
+    else if(!sep)msg=`Лучше этой кривой на перемешанных данных не бывает: log-loss ≈ ${fx(L,3)} и ниже не уйдёт, потому что между 3 и 6.5 часами есть и сдавшие, и нет. Подвинь порог — граница поедет, а сама модель не изменится.`;
+    else msg="Двигай порог: он меняет только решение, а не вероятности модели.";
+    if(t!==0.5&&!(sep&&w>1))msg+=` Порог ${fx(t)}: граница сдвинулась на ${fx(xb,1)} ч.`;
+    $("lrMsg").textContent=msg;
+    $("lrSep").setAttribute("aria-pressed",sep); $("lrL2").setAttribute("aria-pressed",l2);
+  }
+  $("lrW").oninput=()=>{w=+$("lrW").value;draw()}; $("lrB").oninput=()=>{b=+$("lrB").value;draw()}; $("lrT").oninput=draw;
+  $("lrStep").onclick=()=>{step(1);draw()};
+  $("lrFit").onclick=()=>{let k=0;$("lrFit").disabled=true;const go=()=>{step(10);draw();if(++k<20)requestAnimationFrame(go);else $("lrFit").disabled=false};go()};
+  $("lrReset").onclick=()=>{w=0.3;b=-1;draw()};
+  $("lrSep").onclick=()=>{sep=!sep;draw()}; $("lrL2").onclick=()=>{l2=!l2;draw()};
+  draw();
+})();
+
+/* ---------- тема 2: граф вычислений ---------- */
+(function chainLab(){
+  let st=0,y=1; const B=-1, EPS=1e-5;
+  const N={x:[34,46,"x"],w:[34,118,"w"],b:[118,170,"b"],mul:[110,82,"×"],add:[184,118,"+"],sg:[256,118,"σ"],ls:[326,118,"L"]};
+  const E=[["x","mul"],["w","mul"],["mul","add"],["b","add"],["add","sg"],["sg","ls"]];
+  function draw(){
+    const x=+$("cgX").value,w=+$("cgW").value,z=w*x+B,p=sig(z),L=y?-Math.log(p):-Math.log(1-p);
+    const dLdp=y?-1/p:1/(1-p),dpdz=p*(1-p),dLdz=p-y,dLdw=dLdz*x,dLdb=dLdz;
+    const Lw=v=>{const pp=sig(v*x+B);return y?-Math.log(pp):-Math.log(1-pp)},num=(Lw(w+EPS)-Lw(w-EPS))/(2*EPS);
+    const fwdOn={x:st>=0,w:st>=0,b:st>=0,mul:st>=1,add:st>=1,sg:st>=2,ls:st>=3};
+    const backOn={ls:st>=4,sg:st>=4,add:st>=6,mul:st>=7,w:st>=7,b:st>=7};
+    const val={x:fx(x,1),w:fx(w,1),b:fx(B,1),mul:st>=1?fx(w*x):"",add:st>=1?`z=${fx(z)}`:"",sg:st>=2?`p=${fx(p,3)}`:"",ls:st>=3?fx(L,3):""};
+    const grad={ls:st>=4?"1":"",sg:st>=4?`${fx(dLdp)}`:"",add:st>=6?`${fx(dLdz,3)}`:"",mul:st>=7?`${fx(dLdz,3)}`:"",w:st>=7?`${fx(dLdw,3)}`:"",b:st>=7?`${fx(dLdb,3)}`:""};
+    let s="";
+    E.forEach(([a,c])=>{const A=N[a],C=N[c];const cls=st>=4&&backOn[c]&&backOn[a]?"back":fwdOn[c]?"on":"";
+      s+=`<line class="gedge ${cls}" x1="${A[0]}" y1="${A[1]}" x2="${C[0]}" y2="${C[1]}"/>`});
+    Object.entries(N).forEach(([k,[cx,cy,lab]])=>{
+      const cls=backOn[k]&&st>=4?"back":fwdOn[k]?"on":"";
+      s+=`<g class="gnode ${cls}"><circle cx="${cx}" cy="${cy}" r="17"/><text class="op" x="${cx}" y="${cy+5}" text-anchor="middle">${lab}</text></g>`;
+      if(val[k])s+=`<text class="gval" x="${cx}" y="${cy+32}" text-anchor="middle">${val[k]}</text>`;
+      if(grad[k])s+=`<text class="ggrad" x="${cx}" y="${cy-24}" text-anchor="middle">∂ ${grad[k]}</text>`;
+    });
+    $("cgSvg").innerHTML=s;
+    const S=[
+      `Вход: x = ${fx(x,1)}, вес w = ${fx(w,1)}, сдвиг b = −1, правда y = ${y}. Жми «Следующий шаг»: сначала прямой проход.`,
+      `<span class="a">Вперёд.</span> z = w·x + b = ${fx(w,1)}·${fx(x,1)} − 1 = <span class="a">${fx(z,3)}</span>`,
+      `<span class="a">Вперёд.</span> p = σ(z) = 1 / (1 + e^${fx(-z,2)}) = <span class="a">${fx(p,3)}</span>`,
+      `<span class="a">Вперёд.</span> L = ${y?"−ln p":"−ln(1 − p)"} = <span class="a">${fx(L,3)}</span>. Прямой проход закончен, z и p запомнены.`,
+      `<span class="w">Назад.</span> ∂L/∂p = ${y?"−1/p":"1/(1 − p)"} = <span class="w">${fx(dLdp,3)}</span>  — как штраф реагирует на вероятность`,
+      `<span class="w">Назад.</span> ∂p/∂z = p(1 − p) = ${fx(p,3)}·${fx(1-p,3)} = <span class="w">${fx(dpdz,3)}</span>  — наклон сигмоиды`,
+      `<span class="w">Назад.</span> ∂L/∂z = ∂L/∂p · ∂p/∂z = ${fx(dLdp,3)}·${fx(dpdz,3)} = <span class="w">${fx(dLdz,3)}</span>  = p − y = ${fx(p,3)} − ${y}`,
+      `<span class="w">Назад.</span> ∂L/∂w = ∂L/∂z · x = ${fx(dLdz,3)}·${fx(x,1)} = <span class="w">${fx(dLdw,3)}</span>;  ∂L/∂b = ∂L/∂z · 1 = <span class="w">${fx(dLdb,3)}</span>`,
+      `Проверка числом: (L(w + ε) − L(w − ε)) / 2ε = <span class="p">${fx(num,4)}</span>, по цепочке <span class="w">${fx(dLdw,4)}</span>. Совпало. ${dLdw>0?"Градиент положительный — шаг спуска уменьшит w.":dLdw<0?"Градиент отрицательный — шаг спуска увеличит w.":"Градиент ноль — w уже лучший."}`
+    ];
+    $("cgCalc").innerHTML=S[st];
+    $("cgState").textContent=`шаг ${st} из 8 · ${st===0?"вход":st<=3?"прямой проход":st<=7?"обратный проход":"проверка"}`;
+    $("cgXV").textContent=fx(x,1); $("cgWV").textContent=fx(w,1);
+    $("cgPrev").disabled=st===0; $("cgNext").disabled=st===8;
+    $("cgY").textContent=`y = ${y}`; $("cgY").setAttribute("aria-pressed",y===1);
+  }
+  $("cgPrev").onclick=()=>{if(st>0){st--;draw()}}; $("cgNext").onclick=()=>{if(st<8){st++;draw()}};
+  $("cgY").onclick=()=>{y=1-y;draw()};
+  $("cgX").oninput=draw; $("cgW").oninput=draw;
+  draw();
+})();
+
+/* ---------- тема 3: softmax ---------- */
+(function softmaxLab(){
+  const START=[0.5,2.0,0.2,1.2]; let Z=[...START],tr=1;
+  $("smSliders").innerHTML=CLS.map((c,i)=>`<label for="smz${i}"><span class="row"><span>логит ${c}</span><span class="mono" id="smzv${i}"></span></span><input type="range" id="smz${i}" min="-4" max="6" step="0.1" value="${Z[i]}"></label>`).join("");
+  $("smTrue").innerHTML=CLS.map((c,i)=>`<button class="btn smt" data-i="${i}">правда: ${c}</button>`).join("");
+  function draw(){
+    const T=Math.pow(2,+$("smT").value), P=softmaxArr(Z.map(z=>z/T)), am=P.indexOf(Math.max(...P)), L=-Math.log(P[tr]);
+    $("smBars").innerHTML=CLS.map((c,i)=>barRow(c,P[i],`${(P[i]*100).toFixed(1)}%`,{true:i===tr,color:i===am?"var(--plum)":"color-mix(in srgb,var(--plum) 45%,transparent)"})).join("");
+    Z.forEach((z,i)=>{$("smzv"+i).textContent=fx(z,1);$("smz"+i).value=Math.min(6,z)});
+    $("smTV").textContent=fx(T); $("smLoss").textContent=fx(L,3); $("smArg").textContent=CLS[am];
+    $("smState").textContent=`Σp = ${fx(P.reduce((a,b)=>a+b,0),3)}`;
+    let msg=am===tr?`Модель угадала: ${CLS[tr]} с вероятностью ${(P[tr]*100).toFixed(0)}%, штраф ${fx(L,2)}.`:`Модель ответила ${CLS[am]}, а правда — ${CLS[tr]}: вероятность правды ${(P[tr]*100).toFixed(1)}%, штраф ${fx(L,2)}.`;
+    if(T<0.7)msg+=" Низкая температура почти превращает softmax в argmax: побеждает один класс, ошибка становится очень дорогой.";
+    else if(T>1.6)msg+=" Высокая температура выравнивает вероятности: модель «сомневается», штраф за ошибку мягче, но и за верный ответ награда меньше.";
+    else msg+=" Подними один логит — его вероятность растёт, а остальные падают: классы конкурируют за общую единицу.";
+    $("smMsg").textContent=msg;
+    press(".smt",document.querySelector(`.smt[data-i="${tr}"]`));
+  }
+  CLS.forEach((_,i)=>$("smz"+i).oninput=e=>{Z[i]=+e.target.value;draw()});
+  $("smT").oninput=draw;
+  $("smTrue").addEventListener("click",e=>{const b=e.target.closest(".smt");if(b){tr=+b.dataset.i;draw()}});
+  $("smShift").onclick=()=>{Z=Z.map(z=>z+2);draw();$("smMsg").textContent="Все логиты выросли на 2 — а вероятности не изменились ни на долю процента: константа сокращается в числителе и знаменателе. Поэтому для устойчивости вычитают максимум."};
+  $("smReset").onclick=()=>{Z=[...START];$("smT").value=0;draw()};
+  draw();
+})();
+
+/* ---------- тема 4: энтропия ---------- */
+(function entropyLab(){
+  let Wt=[1,7,1,1];
+  $("enSliders").innerHTML=CLS.map((c,i)=>`<label for="enw${i}"><span class="row"><span>${c}</span><span class="mono" id="enwv${i}"></span></span><input type="range" id="enw${i}" min="0" max="10" step="0.5" value="${Wt[i]}"></label>`).join("");
+  function draw(){
+    const P=norm(Wt), H=-P.reduce((s,p)=>s+(p>0?p*Math.log2(p):0),0);
+    $("enBars").innerHTML=CLS.map((c,i)=>barRow(c,P[i],`${(P[i]*100).toFixed(0)}% · ${P[i]>0?fx(-Math.log2(P[i]),2)+" бит":"—"}`)).join("");
+    Wt.forEach((v,i)=>{$("enwv"+i).textContent=v;$("enw"+i).value=v});
+    $("enH").textContent=fx(H,2); $("enN").textContent=fx(H*Math.LN2,2);
+    $("enState").textContent=`H = ${fx(H,2)} из 2 бит`;
+    const nz=P.filter(p=>p>0).length;
+    $("enMsg").textContent=H<0.01?"Исход известен заранее: энтропия 0. Такой таргет нечему предсказывать, а такой признак — константа.":
+      H>1.98?"Все четыре исхода равновероятны: энтропия максимальна, log₂ 4 = 2 бита. Угадать невозможно, нужно 2 вопроса «да/нет», чтобы узнать ответ.":
+      nz===2&&Math.abs(P.filter(p=>p>0)[0]-0.5)<0.01?"Как честная монетка: 1 бит — ровно один вопрос «да или нет».":
+      `Распределение перекошено: частый исход почти не удивляет (${fx(-Math.log2(Math.max(...P)),2)} бита), редкие удивляют сильно, но случаются редко. В среднем — ${fx(H,2)} бита: меньше максимума 2.`;
+  }
+  CLS.forEach((_,i)=>$("enw"+i).oninput=e=>{Wt[i]=+e.target.value;draw()});
+  document.querySelectorAll(".enp").forEach(b=>b.onclick=()=>{Wt=b.dataset.p.split(",").map(Number);draw()});
+  draw();
+})();
+
+/* ---------- тема 5: кросс-энтропия ---------- */
+(function ceLab(){
+  let P=[0,1,0,0],Q=[1,4,2,1],pName="0,1,0,0";
+  $("ceSliders").innerHTML=CLS.map((c,i)=>`<label for="ceq${i}"><span class="row"><span>модель: ${c}</span><span class="mono" id="ceqv${i}"></span></span><input type="range" id="ceq${i}" min="0" max="10" step="0.5" value="${Q[i]}"></label>`).join("");
+  const H=a=>-a.reduce((s,p)=>s+(p>0?p*Math.log(p):0),0);
+  const X=(p,q)=>p.reduce((s,pk,k)=>pk>0?s-(q[k]>0?pk*Math.log(q[k]):-Infinity):s,0);
+  const show=v=>isFinite(v)?fx(v,3):"∞";
+  function draw(){
+    const q=norm(Q),hp=H(P),xc=X(P,q),kl=xc-hp,klr=X(q,P)-H(q);
+    $("ceBars").innerHTML=CLS.map((c,i)=>{const contrib=P[i]>0?(q[i]>0?-P[i]*Math.log(q[i]):Infinity):0;
+      return barRow(c,P[i],`${(q[i]*100).toFixed(0)}% · ${P[i]>0?show(contrib):"0"}`,{q:q[i]})}).join("");
+    Q.forEach((v,i)=>{$("ceqv"+i).textContent=v;$("ceq"+i).value=v});
+    $("ceH").textContent=fx(hp,3); $("ceX").textContent=show(xc); $("ceK").textContent=show(kl); $("ceKr").textContent=show(klr);
+    $("ceState").textContent="наты (ln)";
+    let msg;
+    if(!isFinite(xc))msg="Модель дала нулевую вероятность исходу, который в правде бывает: кросс-энтропия и KL бесконечны. Одна такая ошибка уничтожает весь log-loss — поэтому вероятности не обнуляют, а сглаживают.";
+    else if(kl<0.002)msg=`q совпала с p: кросс-энтропия равна энтропии правды ${fx(hp,3)}, KL = 0. Ниже опуститься нельзя.`+(hp>0?" Энтропия правды ненулевая, значит даже идеальная модель получит такой log-loss: метки сами неопределённы.":"");
+    else if(pName==="0,1,0,0")msg=`Правда one-hot, H(p) = 0, поэтому кросс-энтропия целиком равна KL и равна −ln q(Pass) = ${fx(xc,3)}. Это и есть log-loss одного объекта. Остальные классы в сумму не входят — у них p = 0.`;
+    else msg=`Кросс-энтропия ${fx(xc,3)} = энтропия правды ${fx(hp,3)} + KL ${fx(kl,3)}. Модель отвечает только за KL. Обрати внимание: KL(q‖p) — ${show(klr)}, другое число.`;
+    $("ceMsg").textContent=msg;
+    press(".cep",document.querySelector(`.cep[data-p="${pName}"]`));
+  }
+  CLS.forEach((_,i)=>$("ceq"+i).oninput=e=>{Q[i]=+e.target.value;draw()});
+  document.querySelectorAll(".cep").forEach(b=>b.onclick=()=>{pName=b.dataset.p;P=pName.split(",").map(Number);draw()});
+  $("ceMatch").onclick=()=>{Q=P.map(p=>Math.round(p*20)/2);if(Q.every(v=>v===0))Q=[1,1,1,1];draw()};
+  draw();
+})();
+
+/* ---------- тема 6: KL, два горба ---------- */
+(function klLab(){
+  const XS=Array.from({length:321},(_,i)=>-8+i*0.05), dx=0.05;
+  const g=(x,m,s)=>Math.exp(-((x-m)**2)/(2*s*s))/(s*Math.sqrt(2*Math.PI));
+  const P=XS.map(x=>0.5*g(x,-3,1)+0.5*g(x,3,1));
+  const kl=(a,b)=>a.reduce((s,ai,i)=>s+(ai>1e-12?ai*Math.log(ai/Math.max(b[i],1e-300))*dx:0),0);
+  const Qof=(m,s)=>XS.map(x=>g(x,m,s));
+  function best(dir){let bm=0,bs=1,bv=Infinity;
+    for(let m=-6;m<=6.001;m+=0.1)for(let s=0.4;s<=6.001;s+=0.05){const Q=Qof(m,s),v=dir?kl(P,Q):kl(Q,P);if(v<bv){bv=v;bm=m;bs=s}}
+    return [bm,bs]}
+  const F=frame(360,220,{l:14,r:14,t:14,b:28},[-8,8],[0,0.42]);
+  function draw(note){
+    const m=+$("klM").value,s=+$("klS").value,Q=Qof(m,s),f=kl(P,Q),r=kl(Q,P);
+    let h=grid(F,[-8,-4,0,4,8],[]);
+    h+=`<path d="M${F.sx(-8)},${F.sy(0)} ${XS.map((x,i)=>`L${F.sx(x).toFixed(1)},${F.sy(P[i]).toFixed(1)}`).join(" ")} L${F.sx(8)},${F.sy(0)}Z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>`;
+    h+=`<path d="${pathOf(F,XS,x=>g(x,m,s),[0,0.42])}" fill="none" stroke="var(--plum)" stroke-width="2.5"/>`;
+    h+=`<line class="ax" x1="${F.x0}" x2="${F.x1}" y1="${F.sy(0)}" y2="${F.sy(0)}"/>`;
+    $("klSvg").innerHTML=h;
+    $("klMV").textContent=fx(m,1); $("klSV").textContent=fx(s,2);
+    $("klF").textContent=f>99?">99":fx(f,2); $("klR").textContent=r>99?">99":fx(r,2);
+    $("klState").textContent=`q = N(${fx(m,1)}, ${fx(s,2)}²)`;
+    $("klMsg").textContent=note||"Подвигай колокол руками. Широкий колокол посередине — маленькая KL(p‖q), но огромная KL(q‖p): он кладёт вероятность в провал, где правды нет. Узкий на одном горбе — наоборот.";
+  }
+  $("klM").oninput=()=>draw(); $("klS").oninput=()=>draw();
+  $("klFwd").onclick=()=>{const [m,s]=best(true);$("klM").value=m;$("klS").value=s;draw(`Минимум KL(p ‖ q): колокол встал посередине (μ ≈ ${fx(m,1)}) и раздулся до σ ≈ ${fx(s,1)}, чтобы накрыть оба горба. Штраф за непокрытую правду бесконечно дорог, поэтому q покрывает всё — даже провал, где правды нет. Так ведёт себя обычное обучение на кросс-энтропии.`)};
+  $("klRev").onclick=()=>{const [m,s]=best(false);$("klM").value=m;$("klS").value=s;draw(`Минимум KL(q ‖ p): колокол сел на один горб (μ ≈ ${fx(m,1)}, σ ≈ ${fx(s,1)}) и проигнорировал второй. Здесь дорого класть вероятность туда, где правды нет, а пропустить горб — дёшево. Так ведут себя вариационные методы: выбирают одну моду.`)};
+  draw();
+})();
+
+/* ---------- тема 7: системы уравнений ---------- */
+(function sysLab(){
+  let ridge=false; const LAM=0.05;
+  const F=frame(320,300,{l:30,r:12,t:12,b:28},[-1,4],[-1,4]);
+  function solve2(a,b,c,d,e,f){const det=a*d-b*c;return [(e*d-b*f)/det,(a*f-e*c)/det]}
+  function draw(){
+    const eps=0.02*Math.pow(100,+$("syE").value/100), dl=+$("syD").value;
+    const A=[[1,1],[1,1+eps]],bb=[2,2+eps+dl], det=eps;
+    const [x,y]=solve2(1,1,1,1+eps,bb[0],bb[1]);
+    /* число обусловленности через собственные числа AᵀA */
+    const a11=2,a12=2+eps,a22=1+(1+eps)**2,tr=a11+a22,dt=a11*a22-a12*a12,disc=Math.sqrt(tr*tr/4-dt);
+    const cond=Math.sqrt((tr/2+disc)/(tr/2-disc));
+    let rx=NaN,ry=NaN;
+    if(ridge){const Atb=[bb[0]+bb[1],bb[0]+(1+eps)*bb[1]];[rx,ry]=solve2(a11+LAM,a12,a12,a22+LAM,Atb[0],Atb[1])}
+    let s=grid(F,[-1,0,1,2,3,4],[-1,0,1,2,3,4]);
+    const line=(fn,c)=>`<path d="${pathOf(F,Array.from({length:101},(_,i)=>-1+i*0.05),fn,[-50,50])}" fill="none" stroke="${c}" stroke-width="2.2"/>`;
+    s=`<clipPath id="syClip"><rect x="${F.x0}" y="${F.y0}" width="${F.x1-F.x0}" height="${F.y1-F.y0}"/></clipPath>`+s+`<g clip-path="url(#syClip)">`+line(X=>2-X,"var(--accent)")+line(X=>(bb[1]-X)/(1+eps),"var(--teal)");
+    s+=`<circle cx="${F.sx(1)}" cy="${F.sy(1)}" r="8" fill="none" stroke="var(--muted)" stroke-width="2"/>`;
+    if(isFinite(x)&&Math.abs(x)<50)s+=`<circle cx="${F.sx(x)}" cy="${F.sy(y)}" r="5.5" fill="var(--plum)"/>`;
+    if(ridge)s+=`<circle cx="${F.sx(rx)}" cy="${F.sy(ry)}" r="5.5" fill="var(--warm)"/>`;
+    s+="</g>";
+    const out=!(x>=-1&&x<=4&&y>=-1&&y<=4);
+    if(out)s+=`<text class="tk" x="${F.x1-4}" y="${F.y0+12}" text-anchor="end" style="fill:var(--plum)">решение за краем: (${fx(x,1)}, ${fx(y,1)})</text>`;
+    $("sySvg").innerHTML=s;
+    const sh=Math.hypot(x-1,y-1);
+    $("syEV").textContent=`ε = ${fx(eps,3)}`; $("syDV").textContent=fx(dl);
+    $("syDet").textContent=fx(det,3); $("syCond").textContent=cond>=100?Math.round(cond):fx(cond,1);
+    $("syX").textContent=Math.abs(x)>999?"огромное":`${fx(x,1)}, ${fx(y,1)}`; $("ySh").textContent=sh>999?"> 999":fx(sh,2);
+    let msg;
+    if(Math.abs(dl)<0.005)msg="Шума нет — обе прямые проходят через правду (1, 1), и решение точное при любом угле. Добавь шум δ.";
+    else if(cond<10)msg=`Прямые пересекаются под большим углом, κ ≈ ${fx(cond,1)}. Шум δ = ${fx(dl)} сдвинул решение всего на ${fx(sh,2)}: задача устойчива.`;
+    else msg=`Прямые почти параллельны: det = ${fx(det,3)}, κ ≈ ${Math.round(cond)}. Тот же шум δ = ${fx(dl)} увёл решение на ${sh>999?"огромное расстояние":fx(sh,2)} — шум усилился в ${Math.round(sh/Math.abs(dl))} раз. Так ведут себя веса МНК при почти одинаковых признаках.`;
+    if(ridge)msg+=` С λI жёлтое решение (${fx(rx,2)}, ${fx(ry,2)}) стоит рядом с правдой: регуляризация жертвует точностью на чистых данных ради устойчивости к шуму.`;
+    $("syMsg").textContent=msg; $("syR").setAttribute("aria-pressed",ridge);
+  }
+  $("syE").oninput=draw; $("syD").oninput=draw; $("syR").onclick=()=>{ridge=!ridge;draw()};
+  draw();
+})();
+
+/* ---------- тема 8: путь регуляризации ---------- */
+(function regLab(){
+  const NAMES=["часы","часы (дубль)","пропуски","лабы","шум 1","шум 2"], COL=["var(--accent)","var(--teal)","var(--red)","var(--plum)","var(--warm)","var(--muted)"];
+  const TRUE=[3,0,-2,1,0,0], r=rng(1);
+  function make(n){const X=[],y=[];for(let i=0;i<n;i++){const a=gauss(r),row=[a,a+0.1*gauss(r),gauss(r),gauss(r),gauss(r),gauss(r)];X.push(row);y.push(row.reduce((s,v,j)=>s+v*TRUE[j],0)+3*gauss(r))}return {X,y}}
+  const TR=make(30),VA=make(200);
+  /* стандартизация по train */
+  const mu=[0,1,2,3,4,5].map(j=>mean(TR.X.map(r=>r[j]))), sd=[0,1,2,3,4,5].map(j=>Math.sqrt(mean(TR.X.map(r=>(r[j]-mu[j])**2))));
+  const ym=mean(TR.y), st=X=>X.map(r=>r.map((v,j)=>(v-mu[j])/sd[j]));
+  const Xt=st(TR.X),yt=TR.y.map(v=>v-ym),Xv=st(VA.X),yv=VA.y;
+  function mean(a){return a.reduce((s,v)=>s+v,0)/a.length}
+  const LAMS=Array.from({length:41},(_,i)=>Math.pow(10,-3+i*0.1));
+  function path(alpha){
+    let w=[0,0,0,0,0,0];const n=Xt.length,out=[];
+    for(let li=LAMS.length-1;li>=0;li--){const lam=LAMS[li];
+      for(let it=0;it<200;it++){for(let j=0;j<6;j++){
+        let rho=0;for(let i=0;i<n;i++){let pred=0;for(let k=0;k<6;k++)if(k!==j)pred+=Xt[i][k]*w[k];rho+=Xt[i][j]*(yt[i]-pred)}rho/=n;
+        const soft=Math.sign(rho)*Math.max(0,Math.abs(rho)-lam*alpha);
+        w[j]=soft/(1+lam*(1-alpha))}}
+      const val=mean(Xv.map((row,i)=>(row.reduce((s,v,k)=>s+v*w[k],0)+ym-yv[i])**2));
+      out[li]={w:[...w],val}}
+    return out}
+  const CACHE={}; let alpha=0;
+  $("rgLegend").innerHTML=NAMES.map((n,i)=>`<span><i style="background:${COL[i]}"></i>${n}</span>`).join("");
+  function draw(){
+    const P=CACHE[alpha]||(CACHE[alpha]=path(alpha)), li=+$("rgL").value, cur=P[li];
+    const lx=i=>Math.log10(LAMS[i]);
+    const allW=P.flatMap(p=>p.w), ymax=Math.max(3.5,...allW.map(Math.abs));
+    const F=frame(360,230,{l:34,r:12,t:12,b:28},[-3,1],[-ymax*1.05,ymax*1.05]);
+    const stp=Math.max(1,Math.ceil(ymax/3)),yt=[-3,-2,-1,0,1,2,3].map(k=>k*stp).filter(v=>Math.abs(v)<=ymax);
+    let s=grid(F,[-3,-2,-1,0,1],yt,v=>`10^${v}`,v=>v,"λ","вес");
+    s+=`<line class="ax" x1="${F.x0}" x2="${F.x1}" y1="${F.sy(0)}" y2="${F.sy(0)}" stroke="var(--muted)"/>`;
+    for(let j=0;j<6;j++)s+=`<path d="${P.map((p,i)=>`${i?"L":"M"}${F.sx(lx(i)).toFixed(1)},${F.sy(p.w[j]).toFixed(1)}`).join("")}" fill="none" stroke="${COL[j]}" stroke-width="2.2"/>`;
+    s+=`<line x1="${F.sx(lx(li))}" x2="${F.sx(lx(li))}" y1="${F.y0}" y2="${F.y1}" stroke="var(--ink)" stroke-dasharray="3 3"/>`;
+    cur.w.forEach((v,j)=>{s+=`<circle cx="${F.sx(lx(li))}" cy="${F.sy(v)}" r="4" fill="${COL[j]}" stroke="var(--surface)"/>`});
+    $("rgSvg").innerHTML=s;
+    const vals=P.map(p=>p.val), vmin=Math.min(...vals), vmax=Math.max(...vals), bi=vals.indexOf(vmin);
+    const G=frame(360,110,{l:34,r:12,t:10,b:24},[-3,1],[vmin*0.95,vmax*1.03]);
+    let e=grid(G,[-3,-2,-1,0,1],[],v=>`10^${v}`,v=>v,"","MSE val");
+    e+=`<path d="${P.map((p,i)=>`${i?"L":"M"}${G.sx(lx(i)).toFixed(1)},${G.sy(p.val).toFixed(1)}`).join("")}" fill="none" stroke="var(--plum)" stroke-width="2.2"/>`;
+    e+=`<circle cx="${G.sx(lx(bi))}" cy="${G.sy(vmin)}" r="4" fill="var(--warm)"/>`;
+    e+=`<line x1="${G.sx(lx(li))}" x2="${G.sx(lx(li))}" y1="${G.y0}" y2="${G.y1}" stroke="var(--ink)" stroke-dasharray="3 3"/>`;
+    $("rgErr").innerHTML=e;
+    const zeros=cur.w.filter(v=>Math.abs(v)<1e-6).length;
+    $("rgLV").textContent=LAMS[li]<0.1?LAMS[li].toFixed(3):LAMS[li]<10?LAMS[li].toFixed(2):LAMS[li].toFixed(1);
+    $("rgZero").textContent=`${zeros} из 6`; $("rgVal").textContent=fx(cur.val,2);
+    $("rgState").textContent=alpha===0?"Ridge":alpha===1?"Lasso":"ElasticNet";
+    const [h,hd]=cur.w;
+    let msg;
+    if(li<=4)msg=`Штрафа почти нет — это обычный МНК. «Часы» и «дубль» получили ${fx(h,2)} и ${fx(hd,2)}: огромные веса, которые почти гасят друг друга. Это мультиколлинеарность из темы 7. Шумовые признаки тоже получили ненулевые веса.`;
+    else if(alpha===0)msg=`Ridge: все веса плавно сжимаются, ни один не стал нулём. «Часы» и «дубль» сближаются (${fx(h,2)} и ${fx(hd,2)}) — L2 делит вес между похожими признаками поровну.`;
+    else if(alpha===1)msg=zeros>=6?"λ так велик, что Lasso обнулил всё: модель отвечает средним. Ошибка на валидации — максимальная.":`Lasso: обнулено ${zeros} из 6. Сначала исчезают шумовые признаки, а из пары «часы — дубль» остаётся одна копия (${fx(h,2)} и ${fx(hd,2)}). Какая именно — дело случая.`;
+    else msg=`ElasticNet: обнулено ${zeros} из 6, как у Lasso, но «часы» и «дубль» держатся вместе (${fx(h,2)} и ${fx(hd,2)}), как у Ridge.`;
+    msg+=li===bi?" Сейчас λ на минимуме ошибки валидации — жёлтая точка внизу.":` Лучшая λ по валидации ≈ ${LAMS[bi].toFixed(LAMS[bi]<0.1?3:2)} — жёлтая точка внизу.`;
+    $("rgMsg").textContent=msg;
+    press(".rgm",document.querySelector(`.rgm[data-a="${alpha}"]`));
+  }
+  document.querySelectorAll(".rgm").forEach(b=>b.onclick=()=>{alpha=+b.dataset.a;draw()});
+  $("rgL").oninput=draw;
+  draw();
+})();
+
+/* ---------- конспект для Obsidian и галочки ---------- */
+const MD=`---
+type: конспект
+tags: [логистическая-регрессия, теория-информации, регуляризация, неделя-3]
+---
+# Логистическая регрессия изнутри: урок 3.2
+
+## Логистическая регрессия
+- z = w·x + b (логит), p = σ(z) = 1 / (1 + e^−z). σ(0) = 0.5, σ(−z) = 1 − σ(z), σ′ = σ(1 − σ).
+- Граница решения w·x + b = 0 — линейная. Порог выбираешь ты: predict_proba + свой порог.
+- ln(p / (1 − p)) = w·x + b: +1 к признаку → шансы × e^w. Сравнивать веса — только в одном масштабе.
+- sklearn: C = 1/λ (по умолчанию 1), l1_ratio вместо penalty (1.8+), lbfgs — только L2, L1 — saga/liblinear, class_weight="balanced", StandardScaler в Pipeline.
+- Разделимые данные без регуляризации → веса в бесконечность.
+
+## Правило цепочки
+- (f(g(x)))′ = f′(g(x)) · g′(x). Backprop: прямой проход запоминает значения, обратный перемножает локальные производные; пути суммируются.
+- Логрег: ∂L/∂p · ∂p/∂z = p − y, ∂L/∂w = (p − y)·x; по выборке Xᵀ(p − y)/n.
+- Проверка градиента: (L(w + ε) − L(w − ε)) / 2ε.
+- σ′ ≤ 0.25 → затухание градиента; MSE поверх сигмоиды медленно учится при уверенной ошибке.
+
+## Многоклассовая
+- softmax: p_k = e^(z_k/T) / Σ e^(z_j/T); вычитать max; T — температура.
+- Потеря — кросс-энтропия −ln p настоящего класса. OvR — K бинарных моделей. Multi-label — K сигмоид.
+- PyTorch CrossEntropyLoss ждёт логиты (без softmax), BCEWithLogitsLoss — логит.
+
+## Энтропия
+- Неожиданность −log p; энтропия H(p) = −Σ p log p — средняя неожиданность.
+- 0 — исход известен, log K — всё равновероятно. Биты (log₂), наты (ln).
+- Деревья: information gain; неуверенность модели; дисбаланс.
+
+## Кросс-энтропия
+- H(p, q) = −Σ p ln q ≥ H(p). One-hot → −ln q_правды = log-loss.
+- Минимизировать log-loss = максимизировать правдоподобие (Бернулли).
+- Label smoothing; перплексия = e^CE; log_loss — по predict_proba.
+
+## KL-дивергенция
+- KL(p‖q) = Σ p ln(p/q) = H(p, q) − H(p) ≥ 0; несимметрична, не расстояние.
+- KL(p‖q) покрывает все моды, KL(q‖p) выбирает одну.
+- Дистилляция, VAE, RLHF, t-SNE, мониторинг дрейфа (PSI).
+
+## Обратная матрица и системы
+- Ax = b → np.linalg.solve, не inv. det = 0 ⇔ строки зависимы ⇔ нет обратной.
+- Число обусловленности κ — во сколько раз усиливается шум (np.linalg.cond).
+- МНК: (XᵀX)w = Xᵀy; мультиколлинеарность → почти вырождена; + λI = Ridge. Dummy-ловушка: drop="first".
+
+## Регуляризация
+- Loss + λ(α·Σ|w| + (1 − α)/2·Σw²). sklearn: alpha у Ridge/Lasso, C = 1/λ у логрега, l1_ratio.
+- L2 сжимает и делит вес между похожими; L1 зануляет (постоянный толчок, ромб); ElasticNet — отбор + группы.
+- Свободный член не штрафуют; масштаб обязателен; λ по логарифмической сетке на валидации.
+- Ноль в Lasso ≠ «признак не связан с ответом».
+`;
+initLesson({topics:[["ml.lin.3","Логистическая регрессия, сигмоида, log-loss"],["math.calc.1","Правило цепочки"],["ml.lin.4","Многоклассовая классификация"],["math.info.0","Энтропия"],["math.info.1","Кросс-энтропия"],["math.info.2","KL-дивергенция"],["math.la.4","Обратная матрица и системы уравнений"],["ml.lin.2","Регуляризация L1, L2, ElasticNet"]],md:MD});
+</script>
+<script src="/assets/asks.js" defer></script>
