@@ -1,5 +1,6 @@
 /* Тест недели. Страница теста вызывает initQuiz({week, title, intro, minutes, lessons, questions}).
-   lessons: [{n, file, title, cover}] — уроки недели (для ссылок «повторить» и итога по урокам).
+   lessons: [{n, file, title, cover, label?}] — уроки недели (для ссылок «повторить» и итога по урокам). label — своя подпись вместо «Урок 2.4»
+     (например «Повторение недели 1»); у вопроса file — свой файл урока для ссылки «повторить» (вопросы повторения прошлых недель).
    Вопрос: {lesson, topic, ref, refTitle, type, q, code?, opts?, ans, tol?, explain, points?, model?}
      type "one"  — один ответ, ans — индекс верного варианта;
           "many" — несколько, ans — массив индексов (засчитывается полностью только точный набор, частично — доля);
@@ -28,7 +29,8 @@ function initQuiz(cfg) {
   };
   const shuffle = n => { const a = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const lessonOf = q => cfg.lessons.find(l => l.n === q.lesson);
-  const refLink = q => { const l = lessonOf(q); return `/lessons/${l.file}${q.ref || ""}`; };
+  const refLink = q => { const l = lessonOf(q); return `/lessons/${q.file || l.file}${q.ref || ""}`; };
+  const lname = l => l.label || `Урок ${cfg.week}.${l.n}`;
   const plural = (n, a, b, c) => { const x = n % 10, y = n % 100; return x === 1 && y !== 11 ? a : x >= 2 && x <= 4 && (y < 12 || y > 14) ? b : c; };
   const top = () => window.scrollTo({top: root.getBoundingClientRect().top + scrollY - 80, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
 
@@ -48,7 +50,7 @@ function initQuiz(cfg) {
       <h1>${esc(cfg.title)}</h1>
       <p class="muted" style="max-width:66ch">${cfg.intro}</p>
       <div class="qz-meta"><span>${N} ${plural(N, "вопрос", "вопроса", "вопросов")}</span><span>~${cfg.minutes} минут</span><span>без подсказок и без ИИ</span></div>
-      <div class="qz-lessons">${cfg.lessons.map(l => `<a href="/lessons/${l.file}"><span class="n">Урок ${cfg.week}.${l.n} · ${Q.filter(q => q.lesson === l.n).length} ${plural(Q.filter(q => q.lesson === l.n).length, "вопрос", "вопроса", "вопросов")}</span><b>${esc(l.title)}</b><span class="c">${esc(l.cover)}</span></a>`).join("")}</div>
+      <div class="qz-lessons">${cfg.lessons.map(l => `<a href="/lessons/${l.file}"><span class="n">${esc(lname(l))} · ${Q.filter(q => q.lesson === l.n).length} ${plural(Q.filter(q => q.lesson === l.n).length, "вопрос", "вопроса", "вопросов")}</span><b>${esc(l.title)}</b><span class="c">${esc(l.cover)}</span></a>`).join("")}</div>
       <div class="callout feel"><b class="h">Как проходить</b><p>${cfg.howto || `Отвечай по памяти, как на собеседовании: не открывай уроки, пока не увидишь итог. В открытых вопросах сначала напиши или проговори свой ответ, потом сверяйся с эталоном и честно отмечай, что назвал. После каждого ответа — короткий разбор и ссылка на место в уроке. Клавиши: <code>1</code>–<code>5</code> — выбрать вариант, <code>Enter</code> — проверить и дальше.`}</p></div>
       <div class="qz-start"><button class="qz-btn" id="qzGo">${can ? "Начать заново" : "Начать тест"}</button>${can ? `<button class="qz-btn ghost" id="qzCont">Продолжить с вопроса ${Object.keys(saved.res).length + 1}</button>` : ""}<span class="qz-hist" id="qzHist"></span></div>
     </div>`;
@@ -78,7 +80,7 @@ function initQuiz(cfg) {
     }
     root.innerHTML = `<div class="qz-top"><div class="qz-row"><span>Вопрос ${S.i + 1} из ${S.list.length}${S.retry ? " · работа над ошибками" : ""}</span><span>${Object.keys(S.res).length} ${plural(Object.keys(S.res).length, "ответ", "ответа", "ответов")}</span></div><div class="qz-dots" style="--n:${S.list.length}">${dots}</div></div>
       <div class="qz-card">
-        <div class="qz-tag"><span>Урок ${cfg.week}.${l.n}</span><span class="k">${esc(q.refTitle)}</span><span>${{one: "один ответ", many: "несколько ответов", num: "числом", open: "своими словами", text: "впиши ответ"}[q.type]}</span></div>
+        <div class="qz-tag"><span>${esc(lname(l))}</span><span class="k">${esc(q.refTitle)}</span><span>${{one: "один ответ", many: "несколько ответов", num: "числом", open: "своими словами", text: "впиши ответ"}[q.type]}</span></div>
         <div class="qz-q">${q.q}</div>
         ${q.say ? `<button class="qz-say" id="qzSay" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>Послушать</button>` : ""}
         ${q.code ? `<pre>${esc(q.code)}</pre>` : ""}
@@ -183,10 +185,10 @@ function initQuiz(cfg) {
           <text x="90" y="98" text-anchor="middle" font-size="38" font-weight="700" fill="var(--ink)">${pct}%</text>
           <text x="90" y="122" text-anchor="middle" font-size="11" fill="var(--muted)" style="font-family:var(--f-mono)">${Math.round(total * 10) / 10} из ${list.length}</text></svg>
         <div class="qz-grade"><span class="eyebrow">${S.retry ? "Работа над ошибками" : "Итог теста недели " + cfg.week}</span><h2>${grade[0]}</h2><p class="muted">${grade[1]}</p>
-          <div class="qz-bars">${byL.map(x => `<div class="qz-bar"><span>Урок ${cfg.week}.${x.l.n} · ${esc(x.l.title)}</span><span class="t"><i data-w="${x.pct}" style="width:0;background:${x.pct >= 85 ? "var(--accent)" : x.pct >= 60 ? "var(--warm)" : "var(--red)"}"></i></span><span class="v">${x.pct}%</span></div>`).join("")}</div></div>
+          <div class="qz-bars">${byL.map(x => `<div class="qz-bar"><span>${esc(lname(x.l))} · ${esc(x.l.title)}</span><span class="t"><i data-w="${x.pct}" style="width:0;background:${x.pct >= 85 ? "var(--accent)" : x.pct >= 60 ? "var(--warm)" : "var(--red)"}"></i></span><span class="v">${x.pct}%</span></div>`).join("")}</div></div>
       </div></div>
       ${miss.length ? `<section style="display:grid;gap:10px"><div class="eyebrow">Что повторить · ${miss.length} ${plural(miss.length, "вопрос", "вопроса", "вопросов")}</div>
-        <div class="qz-miss">${miss.map(qi => { const q = Q[qi], r = S.res[qi]; return `<a href="${refLink(q)}"><span><b>${esc(q.refTitle)}</b> · урок ${cfg.week}.${q.lesson}<br><span class="s">${q.q.replace(/<[^>]+>/g, "").slice(0, 110)}${q.q.length > 110 ? "…" : ""}${r && r.score > 0 ? ` · засчитано ${Math.round(r.score * 100)}%` : ""}</span></span><span class="go">повторить →</span></a>`; }).join("")}</div></section>` : `<div class="callout feel"><b class="h">Без ошибок</b><p>Все ответы верные. Через неделю пройди тест ещё раз — проверить, что знания держатся.</p></div>`}
+        <div class="qz-miss">${miss.map(qi => { const q = Q[qi], r = S.res[qi]; return `<a href="${refLink(q)}"><span><b>${esc(q.refTitle)}</b> · ${esc(lname(lessonOf(q)).toLowerCase())}<br><span class="s">${q.q.replace(/<[^>]+>/g, "").slice(0, 110)}${q.q.length > 110 ? "…" : ""}${r && r.score > 0 ? ` · засчитано ${Math.round(r.score * 100)}%` : ""}</span></span><span class="go">повторить →</span></a>`; }).join("")}</div></section>` : `<div class="callout feel"><b class="h">Без ошибок</b><p>Все ответы верные. Через неделю пройди тест ещё раз — проверить, что знания держатся.</p></div>`}
       <div class="qz-start">${miss.length ? `<button class="qz-btn" id="qzRetry">Работа над ошибками (${miss.length})</button>` : ""}<button class="qz-btn ghost" id="qzAgain">Пройти тест заново</button><button class="qz-btn ghost" id="qzCopy">Скопировать итог в Obsidian</button><span class="qz-hist" id="qzSaved"></span></div>`;
     requestAnimationFrame(() => { document.getElementById("qzArc").style.strokeDashoffset = C * (1 - pct / 100);
       root.querySelectorAll(".qz-bar i").forEach(i => i.style.width = i.dataset.w + "%"); });
@@ -194,8 +196,8 @@ function initQuiz(cfg) {
     document.getElementById("qzAgain").onclick = () => { store.del(); start([...Array(N).keys()]); };
     document.getElementById("qzCopy").onclick = () => {
       const d = new Date(), date = `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
-      const md = `### Тест недели ${cfg.week} · ${date} · ${pct}%\n` + byL.map(x => `- Урок ${cfg.week}.${x.l.n} «${x.l.title}»: ${x.pct}%`).join("\n")
-        + (miss.length ? `\n\nПовторить:\n` + miss.map(qi => `- ${Q[qi].refTitle} (урок ${cfg.week}.${Q[qi].lesson})`).join("\n") : "") + "\n";
+      const md = `### Тест недели ${cfg.week} · ${date} · ${pct}%\n` + byL.map(x => `- ${lname(x.l)} «${x.l.title}»: ${x.pct}%`).join("\n")
+        + (miss.length ? `\n\nПовторить:\n` + miss.map(qi => `- ${Q[qi].refTitle} (${lname(lessonOf(Q[qi])).toLowerCase()})`).join("\n") : "") + "\n";
       const done = () => document.getElementById("qzSaved").textContent = "Скопировано";
       try { navigator.clipboard.writeText(md).then(done, () => prompt("Скопируй:", md)); } catch (e) { prompt("Скопируй:", md); }
     };

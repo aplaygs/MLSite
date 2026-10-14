@@ -1,0 +1,573 @@
+<title>Урок 2.3 · Просьбы, анкета, be или do</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/en.css">
+<style>
+/* Только для этого урока: анкета с проверкой, быстрый выбор be / do, дерево be или do (как в 2.1). */
+.tree{display:grid;gap:8px}
+.tree .q{background:var(--bg);border-radius:12px;padding:12px 14px;font-weight:500}
+.tree .br{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.tree .br{grid-template-columns:1fr}}
+.tree .br div{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:4px;font-size:15px;background:var(--surface)}
+.tree .br b{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.tree .br div:last-child b{color:var(--sun-ink)}
+.fm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+@media (max-width:560px){.fm{grid-template-columns:1fr}}
+.fm label{display:grid;gap:4px;font-size:14px}
+.fm label span{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fm label span i{font:400 12px var(--f-body);text-transform:none;letter-spacing:0}
+.fm input{font:16px var(--f-body);padding:9px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);min-width:0}
+.fm input:focus{outline:none;border-color:var(--accent)}
+.fm input.bad{border-color:var(--red)} .fm input.warn{border-color:var(--warm)} .fm input.good{border-color:var(--accent)}
+.fm-out{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14.5px}
+.fm-out li.good{color:var(--accent)} .fm-out li.warn{color:var(--sun-ink)} .fm-out li.bad{color:var(--red)}
+.qc{display:grid;gap:14px;text-align:center}
+.qc-ph{font:600 clamp(22px,4.6vw,32px)/1.25 var(--f-display);background:var(--bg);border-radius:14px;padding:22px 14px;min-height:88px;display:flex;align-items:center;justify-content:center}
+.qc-ph .gap{display:inline-block;min-width:2.6em;border-bottom:3px solid var(--accent);margin-right:.25em;color:var(--accent)}
+.qc-ph.ok{background:var(--accent-soft)} .qc-ph.no{background:color-mix(in srgb,var(--red) 14%,var(--bg))}
+.qc-b{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.qc-b .btn{min-width:72px;font-size:17px}
+.qc-meta{display:flex;justify-content:center;gap:16px;font:500 13px var(--f-mono);color:var(--muted)}
+.qc-miss{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.qc-miss .say{background:var(--bg);border-radius:8px;padding:3px 8px;font-size:14.5px}
+</style>
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e02-2.html">← Урок 2 · Вопросы с do/does</a><span class="mid">урок 3 из 3</span><a href="/lessons/e02-test.html">Тест недели 2 →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · Work and study · урок 3 из 3 · 3 темы · ~60 минут</div>
+  <h1>Просьбы, анкета, be или do</h1>
+  <p>То, что нужно в первый же день в другой стране или на стажировке: попросить кофе, пароль от Wi-Fi или помощь — вежливо, а не «Give me». Заполнить анкету так, чтобы дату не перепутали и фамилию прочитали. И главное повторение недели: <b>be</b> или <b>do</b> — до автоматизма, на скорость.</p>
+  <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Просьбы</a><a href="#t2">Анкета</a><a href="#t3">be или do</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 3 · Речь</div>
+  <h2>Попросить что-то и ответить: Can I have…?</h2>
+  <p class="tldr">Попросить вещь — <span class="say">Can I have a coffee, please?</span> Попросить сделать — <span class="say">Can you help me, please?</span> Ещё вежливее — <b>Could</b>: <span class="say">Could I have the menu, please?</span> Без <b>please</b> просьба звучит как приказ.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Ситуация</th><th>Что сказать</th></tr></thead>
+    <tbody>
+      <tr><td>Попросить вещь</td><td><span class="say">Can I have a tea, please?</span> <span class="say">Could I have the bill, please?</span></td></tr>
+      <tr><td>Сказать, чего хочешь</td><td><span class="say">I'd like a large cappuccino, please.</span></td></tr>
+      <tr><td>Попросить сделать</td><td><span class="say">Can you help me, please?</span> <span class="say">Could you say that again?</span></td></tr>
+      <tr><td>Дать вещь</td><td><span class="say">Here you are.</span></td></tr>
+      <tr><td>Согласиться / отказать</td><td><span class="say">Sure.</span> <span class="say">Of course.</span> <span class="say">Sorry, we don't have any.</span></td></tr>
+      <tr><td>Спросить цену</td><td><span class="say">How much is it?</span> — <span class="say">It's three pounds fifty.</span></td></tr>
+      <tr><td>«Что-нибудь ещё?»</td><td><span class="say">Anything else?</span> — <span class="say">No, that's all, thanks.</span></td></tr>
+      <tr><td>Ответить на «спасибо»</td><td><span class="say">You're welcome.</span> <span class="say">No problem.</span></td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <ul>
+      <li><b>Can I…?</b> — для себя («можно мне»). <b>Can you…?</b> — просишь другого что-то сделать. <b>Could</b> — то же, но мягче: с незнакомыми, в офисе, в письме.</li>
+      <li><span class="say">Can I get a coffee?</span> — так говорят в Америке, в кафе это нормально. В Британии привычнее <span class="say">Can I have…?</span></li>
+      <li><span class="say">I'd like…</span> (= I would like) — вежливое «я бы хотел». А <span class="say">I want…</span> в просьбе звучит по-детски или грубо.</li>
+    </ul>
+  </div>
+  <div class="callout ru"><b class="h">Ошибки русскоговорящих</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">Give me a coffee.</span><span class="yes"><span class="say">Can I have a coffee, please?</span></span><span class="n">«Дайте кофе» по-русски нормально. По-английски повелительное наклонение в просьбе — грубо.</span></div>
+      <div class="pair"><span class="no">I want a tea.</span><span class="yes"><span class="say">I'd like a tea, please.</span></span></div>
+      <div class="pair"><span class="no">Please. (отдавая вещь)</span><span class="yes"><span class="say">Here you are.</span></span><span class="n">please — только «прошу». Когда протягиваешь — Here you are.</span></div>
+      <div class="pair"><span class="no">Please. (в ответ на thank you)</span><span class="yes"><span class="say">You're welcome.</span></span><span class="n">Ответ на «спасибо» — You're welcome или No problem.</span></div>
+      <div class="pair"><span class="no">How many is it?</span><span class="yes"><span class="say">How much is it?</span></span><span class="n">Цена — how much.</span></div>
+    </div>
+  </div>
+  <div class="callout mem"><b class="h">Как запомнить</b><p>Русское «пожалуйста» — это три английских фразы: <b>прошу</b> — <span class="say">please</span>, <b>на, возьми</b> — <span class="say">Here you are.</span>, <b>не за что</b> — <span class="say">You're welcome.</span></p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Диалог · в кафе</span><span class="btns"><button class="btn" type="button" id="cafePlay">▶ Весь диалог</button><button class="btn" type="button" id="cafeHide" aria-pressed="false">Скрыть реплики B</button></span></div>
+    <div class="dlg" id="cafe"></div>
+  </div>
+
+  <div class="ex" id="ex1a"><div class="ex-h"><span class="eyebrow">Упражнение 1 · что сказать</span><p>Выбери фразу для ситуации.</p></div></div>
+  <div class="ex" id="ex1b"><div class="ex-h"><span class="eyebrow">Упражнение 2 · собери фразу</span><p>Переведи. Есть лишние плитки.</p></div></div>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Как сказать «пожалуйста» в трёх ситуациях: просишь, протягиваешь, отвечаешь на спасибо?</summary>
+      <div class="a"><p><span class="say">please</span> · <span class="say">Here you are.</span> · <span class="say">You're welcome.</span></p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Попроси у коллеги пароль от Wi-Fi и попроси его помочь — вежливо.</summary>
+      <div class="a"><p><span class="say">Could I have the Wi-Fi password, please?</span> <span class="say">Could you help me, please?</span></p></div></details>
+  </div>
+  <div class="topic-check" data-for="en.02.3.1">
+    <label class="tp"><input type="checkbox" data-id="en.02.3.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>просьбы и ответы: Can I have…?</b></span></label>
+    <span class="note" data-d="en.02.3.1">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 3 · Письмо</div>
+  <h2>Заполнить анкету: правописание</h2>
+  <p class="tldr">Анкета — на курс, в отель, на стажировку, на визу. Ошибки в ней дорогие: перепутанная дата или фамилия с маленькой буквы. Три правила: <b>имена и национальность — с большой</b>, <b>месяц — словом</b>, <b>номер дома — перед улицей</b>.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Поле</th><th>Что писать</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td><b>First name</b></td><td>имя</td><td>Anna</td></tr>
+      <tr><td><b>Surname</b> / <b>Last name</b></td><td>фамилия</td><td>Smith</td></tr>
+      <tr><td><b>Date of birth</b></td><td>дата рождения</td><td>15 March 2005</td></tr>
+      <tr><td><b>Nationality</b></td><td>национальность — прилагательное</td><td>Russian, British</td></tr>
+      <tr><td><b>Address</b></td><td>адрес: дом, улица, город</td><td>12 Baker Street, London</td></tr>
+      <tr><td><b>Postcode</b></td><td>почтовый индекс</td><td>NW1 6XE</td></tr>
+      <tr><td><b>Occupation</b></td><td>род занятий, без a / an</td><td>student</td></tr>
+      <tr><td><b>Signature</b></td><td>подпись</td><td></td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <ul>
+      <li><b>Даты — ловушка.</b> В Британии 05/06/2026 — это 5 июня, в Америке — 6 мая (месяц первым). Поэтому в анкете на английском надёжнее писать месяц словом: <span class="say">5 June 2026</span>. Читается <span class="say">the fifth of June</span>.</li>
+      <li>Порядковые: <span class="say">first, second, third</span>, дальше +th: <span class="say">fourth, fifth, twelfth, twentieth</span>, <span class="say">twenty-first</span>, <span class="say">thirtieth</span>.</li>
+      <li><b>Адрес:</b> номер дома — перед улицей. «ул. Ленина, д. 5» → <span class="say">5 Lenin Street</span>. Город и индекс — после.</li>
+      <li><b>Двойные буквы</b> в частых словах: <b>a<u>dd</u>re<u>ss</u></b>, <b>o<u>cc</u>upation</b>, <b>co<u>ll</u>ege</b>, <b>rea<u>ll</u>y</b>, <b>Ru<u>ss</u>ia</b>. Немые буквы: <b>We<u>d</u>nesday</b>, <b>Fe<u>b</u>ruary</b>.</li>
+    </ul>
+  </div>
+  <div class="callout ru"><b class="h">Ошибки русскоговорящих</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">Nationality: Russia</span><span class="yes">Nationality: Russian</span><span class="n">Russia — страна, Russian — национальность.</span></div>
+      <div class="pair"><span class="no">Date of birth: 15 march 2005</span><span class="yes">15 March 2005</span><span class="n">Месяцы — с большой буквы.</span></div>
+      <div class="pair"><span class="no">Address: Lenin Street 5</span><span class="yes">5 Lenin Street</span></div>
+      <div class="pair"><span class="no">Occupation: a student</span><span class="yes">Occupation: student</span><span class="n">В анкете — без артикля.</span></div>
+      <div class="pair"><span class="no">adress, ocupation</span><span class="yes">address, occupation</span></div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · анкета на курс</span><span class="muted mono" id="fmState"></span></div>
+    <p class="muted" style="font-size:13.5px">Заполни своими данными. Проверка подскажет заглавные, формат даты и почты. Всё остаётся только в этом браузере — никуда не отправляется.</p>
+    <div class="fm" id="fm">
+      <label><span>First name <i>· имя</i></span><input id="fFirst" autocomplete="off" placeholder="Anna"></label>
+      <label><span>Surname <i>· фамилия</i></span><input id="fLast" autocomplete="off" placeholder="Smith"></label>
+      <label><span>Date of birth <i>· дата рождения</i></span><input id="fDob" autocomplete="off" placeholder="15 March 2005"></label>
+      <label><span>Nationality <i>· национальность</i></span><input id="fNat" autocomplete="off" placeholder="British"></label>
+      <label><span>Address <i>· адрес</i></span><input id="fAddr" autocomplete="off" placeholder="12 Baker Street, London"></label>
+      <label><span>Email</span><input id="fMail" autocomplete="off" inputmode="email" placeholder="anna.smith@mail.com"></label>
+      <label><span>Occupation <i>· род занятий</i></span><input id="fOcc" autocomplete="off" placeholder="student"></label>
+    </div>
+    <ul class="fm-out" id="fmOut" aria-live="polite"></ul>
+    <div class="btns"><button class="btn" type="button" id="fmCopy">Скопировать в Obsidian</button><button class="btn" type="button" id="fmClear">Очистить</button><span class="muted" id="fmMsg" role="status" style="font-size:13.5px"></span></div>
+  </div>
+
+  <div class="ex" id="ex2a"><div class="ex-h"><span class="eyebrow">Упражнение 3 · напиши по-английски</span><p>Впиши слово. Здесь важен регистр первой буквы: месяцы, дни и национальности — с большой, остальное — с маленькой.</p></div></div>
+  <div class="ex" id="ex2b"><div class="ex-h"><span class="eyebrow">Упражнение 4 · дата словами</span><p>Запиши дату по-британски: число, месяц словом, год — <b>13 October 2026</b>.</p></div></div>
+
+  <div class="topic-check" data-for="en.02.3.2">
+    <label class="tp"><input type="checkbox" data-id="en.02.3.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>анкета и правописание</b></span></label>
+    <span class="note" data-d="en.02.3.2">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 3 · Повторение</div>
+  <h2>Повторение: be против do/does — главная путаница</h2>
+  <p class="tldr">Один вопрос решает всё: <b>есть ли в предложении глагол-действие?</b> Нет — <b>am / is / are</b>. Есть — сам глагол, а для вопроса и отрицания <b>do / does</b>. Вместе они не встречаются: никаких «I'm work» и «Are you like».</p>
+
+  <div class="tree">
+    <div class="q">Есть глагол-действие (work, live, like, study, have…)?</div>
+    <div class="br">
+      <div><b>Нет — be</b><span class="say">Are you a student?</span><span class="say">She isn't at home.</span><span class="say">I'm tired.</span></div>
+      <div><b>Да — do / does</b><span class="say">Do you study?</span><span class="say">She doesn't work.</span><span class="say">I don't sleep much.</span></div>
+    </div>
+  </div>
+  <div class="tbl"><table class="forms">
+    <thead><tr><th>be — кто, какой, где</th><th>do — что делает</th></tr></thead>
+    <tbody>
+      <tr><td><span class="say">Are you a student?</span></td><td><span class="say">Do you study?</span></td></tr>
+      <tr><td><span class="say">Is he at work?</span></td><td><span class="say">Does he work?</span></td></tr>
+      <tr><td><span class="say">I'm not tired.</span></td><td><span class="say">I don't sleep.</span></td></tr>
+      <tr><td><span class="say">Where are you from?</span></td><td><span class="say">Where do you live?</span></td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Ловушки: в русском глагол, в английском be</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">Do you tired?</span><span class="yes"><span class="say">Are you tired?</span></span><span class="n">«Устал» — по-английски состояние: be + tired.</span></div>
+      <div class="pair"><span class="no">I'm not agree.</span><span class="yes"><span class="say">I don't agree.</span></span><span class="n">А agree — наоборот, глагол, хотя по-русски «я согласен».</span></div>
+      <div class="pair"><span class="no">Do you married?</span><span class="yes"><span class="say">Are you married?</span></span><span class="n">«Женат» — состояние, be.</span></div>
+      <div class="pair"><span class="no">I'm interesting in ML.</span><span class="yes"><span class="say">I'm interested in ML.</span></span><span class="n">be + interested — «мне интересно». Подробнее — в следующих неделях.</span></div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · быстрый выбор</span><span class="muted mono" id="qcState"></span></div>
+    <div class="qc">
+      <div class="qc-ph" id="qcPh">20 вопросов на скорость: am, is, are, do или does?</div>
+      <div class="qc-b" id="qcB" role="group" aria-label="Варианты"></div>
+      <div class="qc-meta"><span id="qcScore"></span><span id="qcTime"></span><span id="qcBest"></span></div>
+      <div class="qc-miss" id="qcMiss"></div>
+      <div class="btns" style="justify-content:center"><button class="btn" type="button" id="qcGo">Начать</button></div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Клавиши 1–5 выбирают ответ. Цель — 20 из 20 меньше чем за 40 секунд. Ошибки в конце можно послушать.</p>
+  </div>
+
+  <div class="ex" id="ex3a"><div class="ex-h"><span class="eyebrow">Упражнение 5 · ошибки недели</span><p>Нажми на неправильное слово. В одном предложении ошибки нет.</p></div></div>
+  <div class="ex" id="ex3b"><div class="ex-h"><span class="eyebrow">Упражнение 6 · собери фразу</span><p>Переведи. Сначала реши: be или do.</p></div></div>
+  <div class="ex" id="ex3c"><div class="ex-h"><span class="eyebrow">Упражнение 7 · be или do</span><p>Впиши форму: am / is / are, do / does или отрицание. (not) — нужна отрицательная форма. Enter — проверить и дальше.</p></div></div>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Переведи: «Ты устал?», «Ты работаешь?», «Он не дома», «Он не работает».</summary>
+      <div class="a"><p><span class="say">Are you tired?</span> <span class="say">Do you work?</span> <span class="say">He isn't at home.</span> <span class="say">He doesn't work.</span></p></div></details>
+  </div>
+  <div class="topic-check" data-for="en.02.3.3">
+    <label class="tp"><input type="checkbox" data-id="en.02.3.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>be против do/does</b></span></label>
+    <span class="note" data-d="en.02.3.3">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · ролевая игра</div>
+  <h2>Практика</h2>
+  <p class="tldr">Сцена: первый день на стажировке. Послушай диалог, потом скрой реплики B и говори их сам. Здесь вся неделя: be и do, вопросы, короткие ответы, просьбы.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Диалог · первый день на стажировке</span><span class="btns"><button class="btn" type="button" id="offPlay">▶ Весь диалог</button><button class="btn" type="button" id="offHide" aria-pressed="false">Скрыть реплики B</button></span></div>
+    <div class="dlg" id="off"></div>
+  </div>
+  <div class="prac">
+    <div class="task"><span class="tg work">Говорить · 5 минут</span>
+      <h3>Знакомство с коллегой</h3>
+      <p>Вслух: представься, скажи, чем занимаешься и что учишь (be и present simple). Задай коллеге четыре вопроса: два с be (<i>Are you…? Where are you from?</i>) и два с do (<i>Do you…? What do you do?</i>). Попроси одну вещь вежливо.</p>
+      <p class="ok">Готово, когда ни разу не смешал be и do в одном вопросе.</p>
+      <details><summary>Образец</summary><div class="a">
+        <p><span class="say">Hi, I'm Vlad. I'm a student and I study machine learning.</span> <span class="say">Are you a developer? Where are you from? Do you work from home? What do you do at the weekend?</span> <span class="say">Could I have the Wi-Fi password, please?</span></p></div></details>
+    </div>
+    <div class="task"><span class="tg rev">Писать · 10 минут</span>
+      <h3>Переведи и проверь себя</h3>
+      <p>1. Можно мне чек, пожалуйста? 2. Ты студент? — Нет, я работаю. 3. Где работает твой брат? 4. Она не замужем, и у неё нет детей. 5. Не могли бы вы помочь мне? — Конечно.</p>
+      <details><summary>Ответы</summary><div class="a">
+        <p>1. <span class="say">Can I have the bill, please?</span> 2. <span class="say">Are you a student? — No, I'm not. I work.</span> 3. <span class="say">Where does your brother work?</span> 4. <span class="say">She isn't married and she doesn't have children.</span> 5. <span class="say">Could you help me, please? — Of course.</span></p></div></details>
+    </div>
+  </div>
+  <div class="callout mem"><b class="h">Дальше</b><p>После урока — <a href="/lessons/e02-test.html">тест недели 2</a>: 24 вопроса по трём урокам и повторение недели 1, с аудированием. Слова недели — в <a href="/words">тренажёр</a>, 10–15 минут в день.</p></div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в плане</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда сделал упражнения темы без ошибок или с одной. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Попросить вещь:</b> <span class="say">Can I have…, please?</span> · вежливее <span class="say">Could I have…?</span> · <span class="say">I'd like…</span>. Не «Give me», не «I want».</li>
+      <li><b>Попросить сделать:</b> <span class="say">Can you / Could you help me?</span></li>
+      <li><b>«Пожалуйста»:</b> прошу — please · на, возьми — <span class="say">Here you are.</span> · не за что — <span class="say">You're welcome.</span></li>
+      <li><span class="say">How much is it?</span> · <span class="say">Anything else? — No, that's all, thanks.</span></li>
+      <li><b>Анкета:</b> first name, surname, date of birth, nationality (Russian, не Russia), address, postcode, occupation (без a), signature.</li>
+      <li><b>Дата</b> — месяц словом: <span class="say">13 October 2026</span>. 05/06 в Британии — 5 июня, в Америке — 6 мая.</li>
+      <li><b>Адрес:</b> дом перед улицей — <span class="say">5 Lenin Street</span>. Пишутся с двумя буквами: address, occupation, college.</li>
+      <li><b>be или do:</b> нет глагола — am / is / are (<span class="say">Are you tired?</span>); есть глагол — do / does (<span class="say">Do you work?</span>). Вместе — никогда.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+    <p class="muted" style="font-size:13.5px">Конспект этого урока уже лежит в Obsidian: <code>65_Английский/Уроки</code>.</p>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b>
+    <p>Закрой урок. Вслух: закажи в кафе напиток и еду, спроси цену, ответь на «Anything else?» и на «Thank you». На бумаге: анкета о себе (7 полей), дата рождения словами. Потом десять вопросов вперемешку — пять с be, пять с do. Где запнулся — туда и возвращаешься.</p>
+  </div>
+  <p><a class="btn" href="/lessons/e02-test.html" style="text-decoration:none">Дальше: тест недели 2 →</a></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+# 🇬🇧 Урок 2.3 · Просьбы, анкета, be или do
+
+## Попросить что-то и ответить
+- Вещь: *Can I have a coffee, please?* · вежливее *Could I have the bill, please?* · *I'd like a large cappuccino, please.*
+- Сделать: *Can you help me, please? Could you say that again?*
+- Дать: *Here you are.* · Согласиться: *Sure. Of course.* · Отказать: *Sorry, we don't have any.*
+- Цена: *How much is it? — It's three pounds fifty.*
+- *Anything else? — No, that's all, thanks.*
+- На «спасибо»: *You're welcome. No problem.*
+
+> [!tip] «Пожалуйста» — три фразы
+> прошу — *please* · на, возьми — *Here you are* · не за что — *You're welcome*
+
+> [!warning] Ошибки
+> - ~~Give me a coffee~~ → *Can I have a coffee, please?*
+> - ~~I want a tea~~ → *I'd like a tea, please.*
+> - ~~How many is it?~~ → *How much is it?*
+
+## Анкета
+| Поле | Что | Пример |
+| :--- | :--- | :--- |
+| First name | имя | Anna |
+| Surname / Last name | фамилия | Smith |
+| Date of birth | дата рождения | 15 March 2005 |
+| Nationality | национальность | Russian |
+| Address | адрес | 12 Baker Street, London |
+| Postcode | индекс | NW1 6XE |
+| Occupation | род занятий, без a | student |
+| Signature | подпись | |
+
+- Дата — месяц словом: *13 October 2026* (читается *the thirteenth of October*). 05/06 в Британии — 5 июня, в США — 6 мая.
+- Адрес: номер дома перед улицей — *5 Lenin Street*.
+- Двойные буквы: address, occupation, college, really, Russia. Немые: Wednesday, February.
+
+> [!warning] Ошибки
+> - ~~Nationality: Russia~~ → *Russian*
+> - ~~15 march~~ → *15 March*
+> - ~~Lenin Street 5~~ → *5 Lenin Street*
+> - ~~Occupation: a student~~ → *student*
+
+## be против do/does
+Есть глагол-действие? Нет — **am / is / are**. Есть — **do / does** в вопросе и отрицании. Вместе — никогда.
+
+| be | do |
+| :--- | :--- |
+| Are you a student? | Do you study? |
+| Is he at work? | Does he work? |
+| I'm not tired. | I don't sleep. |
+| Where are you from? | Where do you live? |
+
+> [!warning] Ловушки
+> - ~~Do you tired?~~ → *Are you tired?*
+> - ~~I'm not agree~~ → *I don't agree.*
+> - ~~Do you married?~~ → *Are you married?*
+
+## Проверь себя
+> [!question]- «Пожалуйста»: просишь, протягиваешь, отвечаешь на спасибо
+> *please · Here you are · You're welcome*
+
+> [!question]- Запиши словами дату 21/02/2005 и прочитай её
+> *21 February 2005 — the twenty-first of February, two thousand and five*
+
+> [!question]- «Ты устал?», «Ты работаешь?», «Он не дома», «Он не работает»
+> *Are you tired? Do you work? He isn't at home. He doesn't work.*
+
+> [!question]- Исправь: «Are you like coffee?», «She is work here», «I don't tired»
+> *Do you like coffee? She works here. I'm not tired.*
+</script>
+
+<script src="/assets/lesson.js"></script>
+<script src="/assets/en.js"></script>
+<script>
+/* ---------- диалоги: озвучка ролей, скрыть реплики B ---------- */
+function dialog(id,D){
+  const box=$(id), play=$(id+"Play"), hide=$(id+"Hide");
+  box.innerHTML=D.map(([w,en,ru],i)=>`<div class="dl ${w==="B"?"b":""}" data-i="${i}"><span class="who">${w}</span><span class="tx"><span class="say" data-say="${enEsc(en)}">${en}</span><span class="ru">${ru}</span></span></div>`).join("");
+  hide.onclick=()=>{const on=hide.getAttribute("aria-pressed")!=="true";hide.setAttribute("aria-pressed",on);
+    box.querySelectorAll(".dl.b .say").forEach(s=>{s.style.filter=on?"blur(7px)":"";s.title=on?"Скажи сам, потом нажми — откроется":""})};
+  box.addEventListener("click",e=>{const s=e.target.closest(".dl.b .say");if(s)s.style.filter=""});
+  let playing=false;
+  const stop=()=>{playing=false;play.textContent="▶ Весь диалог";box.querySelectorAll(".tx").forEach(t=>t.style.outline="")};
+  play.onclick=()=>{
+    if(!("speechSynthesis" in window))return;
+    if(playing){speechSynthesis.cancel();stop();return}
+    playing=true;play.textContent="■ Стоп";speechSynthesis.cancel();
+    D.forEach(([w,en],i)=>{const u=new SpeechSynthesisUtterance(en);if(EN_VOICE)u.voice=EN_VOICE;u.lang="en-GB";u.rate=w==="A"?0.95:0.85;u.pitch=w==="A"?1.1:0.9;
+      u.onstart=()=>box.querySelectorAll(".dl").forEach((d,k)=>d.querySelector(".tx").style.outline=k===i?"2px solid var(--accent)":"");
+      if(i===D.length-1)u.onend=stop;
+      speechSynthesis.speak(u)});
+  };
+}
+dialog("cafe",[
+  ["A","Hi! What can I get you?","Привет! Что вам предложить?"],
+  ["B","Can I have a cappuccino, please?","Можно мне капучино?"],
+  ["A","Sure. Small or large?","Конечно. Маленький или большой?"],
+  ["B","Large, please.","Большой, пожалуйста."],
+  ["A","Anything else?","Что-нибудь ещё?"],
+  ["B","Could I have a croissant too?","А можно ещё круассан?"],
+  ["A","Sorry, we don't have croissants today. We have muffins.","Простите, круассанов сегодня нет. Есть маффины."],
+  ["B","OK, a chocolate muffin, then.","Хорошо, тогда шоколадный маффин."],
+  ["A","Is that to eat in or take away?","Здесь или с собой?"],
+  ["B","Take away, please. How much is it?","С собой. Сколько с меня?"],
+  ["A","That's six pounds twenty.","Шесть фунтов двадцать."],
+  ["B","Here you are.","Вот, пожалуйста."],
+  ["A","Thanks. Have a nice day!","Спасибо. Хорошего дня!"],
+  ["B","Thanks, you too.","Спасибо, и вам."]
+]);
+dialog("off",[
+  ["A","Hi! Are you the new intern?","Привет! Ты новый стажёр?"],
+  ["B","Yes, I am. I'm Vlad. Nice to meet you.","Да. Я Влад. Приятно познакомиться."],
+  ["A","Nice to meet you too. I'm Kate. Where are you from, Vlad?","Мне тоже. Я Кейт. Откуда ты, Влад?"],
+  ["B","I'm from Russia.","Я из России."],
+  ["A","Great. Do you study too?","Здорово. Ты ещё и учишься?"],
+  ["B","Yes, I do. I study machine learning.","Да. Я изучаю машинное обучение."],
+  ["A","Cool. Can I help you with anything?","Классно. Тебе чем-нибудь помочь?"],
+  ["B","Yes, please. Could I have the Wi-Fi password?","Да, пожалуйста. Можно пароль от Wi-Fi?"],
+  ["A","Of course. It's on this card. Here you are.","Конечно. Он на этой карточке. Держи."],
+  ["B","Thanks a lot. And where is the kitchen?","Большое спасибо. А где кухня?"],
+  ["A","It's next to the lift. Do you drink coffee?","Рядом с лифтом. Ты пьёшь кофе?"],
+  ["B","Yes, I do. Every morning!","Да. Каждое утро!"],
+  ["A","Then this cup is for you.","Тогда эта кружка — тебе."],
+  ["B","Great, thank you!","Отлично, спасибо!"],
+  ["A","You're welcome.","Не за что."]
+]);
+
+/* ---------- тема 2: анкета ---------- */
+(function form(){
+  const MONTHS=["january","february","march","april","may","june","july","august","september","october","november","december"];
+  const COUNTRY={russia:"Russian",england:"English",britain:"British",spain:"Spanish",germany:"German",france:"French",italy:"Italian",china:"Chinese",japan:"Japanese",america:"American",usa:"American",turkey:"Turkish",brazil:"Brazilian",greece:"Greek"};
+  const F={fFirst:"First name",fLast:"Surname",fDob:"Date of birth",fNat:"Nationality",fAddr:"Address",fMail:"Email",fOcc:"Occupation"};
+  const KEY="en-form", cap=w=>w[0].toUpperCase()+w.slice(1);
+  function rules(id,v){
+    if(!v)return null;
+    if(id==="fFirst"||id==="fLast"){
+      if(/[а-яё]/i.test(v))return["bad",`${F[id]}: латиницей.`];
+      if(!/^[A-Z]/.test(v))return["bad",`${F[id]}: с большой буквы — ${cap(v)}.`];
+      return["good",`${F[id]} ✓`];}
+    if(id==="fDob"){
+      const m=v.match(/^(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+)\s+(\d{4})$/);
+      if(m){const k=MONTHS.indexOf(m[2].toLowerCase());
+        if(k<0)return["bad",`Date of birth: нет такого месяца «${m[2]}». Проверь написание.`];
+        if(!/^[A-Z]/.test(m[2]))return["bad",`Date of birth: месяц с большой — ${cap(m[2].toLowerCase())}.`];
+        if(+m[1]<1||+m[1]>31)return["bad","Date of birth: такого числа нет."];
+        return["good",`Date of birth ✓ — читается «the ${+m[1]}${["th","st","nd","rd"][(+m[1]%10<4&&Math.floor(+m[1]/10)!==1)?+m[1]%10:0]} of ${cap(MONTHS[k])}»`];}
+      const n=v.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
+      if(n){if(+n[1]<=12&&+n[2]<=12&&n[1]!==n[2])return["warn",`Date of birth: ${v} в Британии и в Америке прочитают по-разному. Напиши месяц словом: ${+n[1]} ${cap(MONTHS[+n[2]-1])} ${n[3]}.`];
+        return["warn","Date of birth: цифрами можно, но месяц словом надёжнее — 15 March 2005."];}
+      return["bad","Date of birth: формат — число, месяц словом, год: 15 March 2005."];}
+    if(id==="fNat"){
+      const c=COUNTRY[v.toLowerCase()];
+      if(c)return["bad",`Nationality: ${v} — это страна. Национальность — ${c}.`];
+      if(!/^[A-Z]/.test(v))return["bad",`Nationality: с большой буквы — ${cap(v)}.`];
+      return["good","Nationality ✓"];}
+    if(id==="fAddr"){
+      if(/[а-яё]/i.test(v))return["bad","Address: латиницей."];
+      if(/^[A-Za-z]/.test(v)&&/\b\d+\w?\b/.test(v))return["warn","Address: номер дома — перед улицей: 5 Lenin Street."];
+      return["good","Address ✓"];}
+    if(id==="fMail"){
+      if(!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v))return["bad","Email: проверь — нужны @ и точка: name@mail.com."];
+      if(/[A-Z]/.test(v))return["warn","Email: почту обычно пишут маленькими буквами."];
+      return["good","Email ✓"];}
+    if(id==="fOcc"){
+      if(/^(a|an)\s/i.test(v))return["warn",`Occupation: в анкете без артикля — ${v.replace(/^(a|an)\s+/i,"")}.`];
+      if(/[а-яё]/i.test(v))return["bad","Occupation: по-английски — student, developer…"];
+      return["good","Occupation ✓"];}
+  }
+  function check(){
+    const out=[]; let filled=0, ok=0;
+    for(const id in F){const inp=$(id), r=rules(id,inp.value.trim());inp.classList.remove("good","warn","bad");
+      if(r){filled++;inp.classList.add(r[0]);if(r[0]==="good")ok++;else out.push(r)}}
+    $("fmOut").innerHTML=out.map(([c,m])=>`<li class="${c}">${m}</li>`).join("")+(filled&&!out.length?`<li class="good">Всё верно. ${filled<7?"Заполни остальные поля.":"Анкету можно отправлять."}</li>`:"");
+    $("fmState").textContent=filled?`верно ${ok} из ${filled}`:"";
+    try{localStorage.setItem(KEY,JSON.stringify(Object.fromEntries(Object.keys(F).map(id=>[id,$(id).value]))))}catch(e){}
+  }
+  $("fm").addEventListener("input",check);
+  try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(d){for(const id in F)if(d[id])$(id).value=d[id];check()}}catch(e){}
+  $("fmClear").onclick=()=>{for(const id in F)$(id).value="";check();$("fmMsg").textContent=""};
+  $("fmCopy").onclick=()=>{const d=new Date(),md=`### Анкета · ${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}\n\n`+Object.entries(F).map(([id,l])=>`- **${l}:** ${$(id).value.trim()}`).join("\n")+"\n";
+    try{navigator.clipboard.writeText(md).then(()=>$("fmMsg").textContent="Скопировано — вставь в заметку",()=>prompt("Скопируй:",md))}catch(e){prompt("Скопируй:",md)}};
+})();
+
+/* ---------- тема 3: быстрый выбор be / do ---------- */
+(function quickChoice(){
+  const OPT=["Am","Is","Are","Do","Does"];
+  const Q=[["you a student?","Are"],["you study at university?","Do"],["she at home now?","Is"],["she work from home?","Does"],["they from Spain?","Are"],
+    ["they speak Spanish?","Do"],["I late?","Am"],["your brother like football?","Does"],["your parents at work?","Are"],["it cold today?","Is"],
+    ["the lecture start at nine?","Does"],["the lecture interesting?","Is"],["you tired?","Are"],["you have a laptop?","Do"],["Anna your sister?","Is"],
+    ["Anna live in Kazan?","Does"],["we have homework today?","Do"],["he a developer?","Is"],["he know Python?","Does"],["your friends funny?","Are"]];
+  const KEY="en-bedo-best";
+  let order=[],i=0,right=0,t0=0,tick=null,miss=[],lock=false,on=false;
+  const best=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){return null}};
+  const showBest=()=>{const b=best();$("qcBest").textContent=b?`лучший: ${b.r}/20 · ${b.s} с`:""};
+  $("qcB").innerHTML=OPT.map((o,k)=>`<button class="btn" type="button" data-o="${o}" disabled><span class="muted mono" style="font-size:11px;margin-right:6px">${k+1}</span>${o}</button>`).join("");
+  function show(){const [rest]=Q[order[i]];$("qcPh").className="qc-ph";$("qcPh").innerHTML=`<span class="gap">&nbsp;</span>${rest}`;
+    $("qcScore").textContent=`${i+1} / ${Q.length}`;$("qcState").textContent=`верно ${right}`;lock=false}
+  function start(){order=enShuffle(Q.map((_,k)=>k));i=0;right=0;miss=[];on=true;t0=Date.now();$("qcMiss").innerHTML="";
+    $("qcB").querySelectorAll(".btn").forEach(b=>b.disabled=false);$("qcGo").textContent="Заново";
+    clearInterval(tick);tick=setInterval(()=>$("qcTime").textContent=`${((Date.now()-t0)/1000).toFixed(0)} с`,250);show()}
+  function finish(){on=false;clearInterval(tick);const s=Math.round((Date.now()-t0)/1000);
+    $("qcB").querySelectorAll(".btn").forEach(b=>b.disabled=true);$("qcTime").textContent=`${s} с`;
+    const b=best(), better=!b||right>b.r||(right===b.r&&s<b.s);
+    if(better)try{localStorage.setItem(KEY,JSON.stringify({r:right,s}))}catch(e){}
+    $("qcPh").className="qc-ph "+(right===Q.length?"ok":"");
+    $("qcPh").textContent=`${right} из ${Q.length} за ${s} с${better?" — новый рекорд":""}. ${right===Q.length&&s<40?"Автоматизм есть.":right===Q.length?"Без ошибок — теперь быстрее.":"Ошибки ниже — послушай их."}`;
+    $("qcMiss").innerHTML=miss.map(t=>`<span class="say" data-say="${enEsc(t)}">${enEsc(t)}</span>`).join("");
+    $("qcState").textContent=`верно ${right}`;showBest()}
+  function pick(o){if(!on||lock)return;lock=true;const [rest,a]=Q[order[i]],ok=o===a,full=`${a} ${rest}`;
+    $("qcPh").className="qc-ph "+(ok?"ok":"no");$("qcPh").innerHTML=`<b>${a}</b>&nbsp;${rest}`;
+    if(ok)right++;else miss.push(full);
+    setTimeout(()=>{i++;if(i<Q.length)show();else finish()},ok?260:1000)}
+  $("qcB").onclick=e=>{const b=e.target.closest(".btn");if(b)pick(b.dataset.o)};
+  $("qcGo").onclick=start;
+  document.addEventListener("keydown",e=>{if(!on||/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=+e.key;if(k>=1&&k<=5){e.preventDefault();pick(OPT[k-1])}});
+  $("qcScore").textContent=`0 / ${Q.length}`;showBest();
+})();
+
+/* ---------- упражнения: тема 1 ---------- */
+exGap($("ex1a"),[
+  {s:"В кафе хочешь чай. — ___",opts:["Can I have a tea, please?","Give me a tea.","I want tea."],a:"Can I have a tea, please?"},
+  {s:"Тебе говорят «Thank you!» — ___",opts:["You're welcome.","Please.","Nothing."],a:"You're welcome.",why:"на «спасибо» — You're welcome или No problem"},
+  {s:"Протягиваешь человеку его телефон. — ___",opts:["Here you are.","Please.","Take."],a:"Here you are."},
+  {s:"Официант: «Anything else?» Больше ничего не нужно. — ___",opts:["No, that's all, thanks.","No, it's everything.","No, nothing more give."],a:"No, that's all, thanks."},
+  {s:"Хочешь узнать цену. — ___",opts:["How much is it?","How many is it?","What costs it?"],a:"How much is it?",why:"цена — how much"},
+  {s:"Ты официант, а круассанов нет. — ___",opts:["Sorry, we don't have any.","Sorry, we aren't have.","Sorry, no have."],a:"Sorry, we don't have any.",why:"have — глагол, отрицание через don't"},
+  {s:"Просишь коллегу помочь. — ___",opts:["Could you help me, please?","You help me?","Help me."],a:"Could you help me, please?",why:"Can you / Could you — попросить другого сделать"}
+]);
+exBuild($("ex1b"),[
+  {ru:"Можно мне большой капучино, пожалуйста?",w:"Can I have a large cappuccino , please ?",alt:["Could I have a large cappuccino , please ?"],extra:["Give","want"]},
+  {ru:"Сколько это стоит?",w:"How much is it ?",extra:["many","costs"]},
+  {ru:"Не могли бы вы повторить?",w:"Could you say that again ?",extra:["repeat","me"]},
+  {ru:"Нет, это всё, спасибо.",w:"No , that's all , thanks .",extra:["it's","everything"]}
+]);
+
+/* ---------- тема 2 ---------- */
+exGap($("ex2a"),[
+  {s:"адрес — ___",a:"address",exact:1,why:"две d и две s"},
+  {s:"род занятий (в анкете) — ___",a:"occupation",exact:1,why:"две c"},
+  {s:"февраль — ___",a:"February",exact:1,why:"месяц — с большой; первая r читается слабо, но пишется"},
+  {s:"среда — ___",a:"Wednesday",exact:1,why:"день — с большой; d не читается: «уэнзди»"},
+  {s:"подпись — ___",a:"signature",exact:1},
+  {s:"фамилия — ___",a:["surname","last name"],exact:1},
+  {s:"I'm from Russia. I'm ___.",a:"Russian",exact:1,why:"национальность — с большой"},
+  {s:"дата рождения — ___",a:"date of birth",exact:1}
+]);
+exGap($("ex2b"),[
+  {s:"13/10/2026 → ___",a:["13 October 2026","13th October 2026"],exact:1},
+  {s:"05/06/2026 (британская) → ___",a:["5 June 2026","5th June 2026"],exact:1,why:"в Британии сначала число: 5 июня"},
+  {s:"03/04/2027 написал американец → ___",a:["4 March 2027","4th March 2027"],exact:1,why:"в Америке месяц первым: 03 — март, 04 — число"},
+  {s:"Послушай и запиши: ___",say:"the twenty-first of February, two thousand and five",a:["21 February 2005","21st February 2005"],exact:1}
+]);
+
+/* ---------- тема 3 ---------- */
+exSpot($("ex3a"),[
+  {s:"I'm agree with you.",bad:0,fix:"I",why:"agree — глагол, be не нужен: I agree"},
+  {s:"She is work in a hospital.",bad:1,n:2,also:[2],fix:"works",why:"есть глагол — be не нужен, а у she глагол с -s"},
+  {s:"Are you like coffee?",bad:0,fix:"Do",why:"like — глагол, вопрос через do"},
+  {s:"Does he a student?",bad:0,fix:"Is",why:"глагола нет — be"},
+  {s:"I don't tired.",bad:0,n:2,also:[1],fix:"I'm not",why:"tired — состояние, be"},
+  {s:"My brother don't live here.",bad:2,fix:"doesn't",why:"brother — один, как he"},
+  {s:"Where you are from?",bad:1,n:2,also:[2],fix:"are you",why:"в вопросе be перед подлежащим"},
+  {s:"Do you a doctor?",bad:0,fix:"Are",why:"глагола нет — be"},
+  {s:"Is your sister at university?",bad:-1}
+]);
+exBuild($("ex3b"),[
+  {ru:"Ты студент?",w:"Are you a student ?",extra:["Do"]},
+  {ru:"Ты учишься?",w:"Do you study ?",extra:["Are","studies"]},
+  {ru:"Он не на работе.",w:"He isn't at work .",alt:["He is not at work .","He's not at work ."],extra:["doesn't"]},
+  {ru:"Он не работает.",w:"He doesn't work .",alt:["He does not work ."],extra:["isn't","works"]},
+  {ru:"Твои друзья из Москвы?",w:"Are your friends from Moscow ?",extra:["Do","Is"]},
+  {ru:"Где живут твои друзья?",w:"Where do your friends live ?",extra:["are","lives"]}
+]);
+exGap($("ex3c"),[
+  {s:"I ___ a student.",a:["am","'m"],full:"I'm a student."},
+  {s:"She ___ work on Fridays. (not)",a:["doesn't","does not"],full:"She doesn't work on Fridays."},
+  {s:"___ you like your job?",a:"Do",full:"Do you like your job?"},
+  {s:"My parents ___ at home. (not)",a:["aren't","are not"],full:"My parents aren't at home."},
+  {s:"Where ___ he live?",a:"does",full:"Where does he live?"},
+  {s:"Where ___ he from?",a:"is",full:"Where is he from?"},
+  {s:"They ___ speak English. (not)",a:["don't","do not"],full:"They don't speak English."},
+  {s:"___ your sister married?",a:"Is",full:"Is your sister married?",why:"married — состояние, be"},
+  {s:"I ___ tired. (not)",a:["'m not","am not"],full:"I'm not tired."},
+  {s:"What ___ your friends do?",a:"do",full:"What do your friends do?",why:"friends — много: do"}
+]);
+
+initLesson({topics:[["en.02.3.1","Попросить что-то и ответить: Can I have…?"],["en.02.3.2","Заполнить анкету: правописание"],["en.02.3.3","Повторение: be против do/does — главная путаница"]]});
+</script>

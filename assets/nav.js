@@ -46,6 +46,7 @@ html{scroll-padding-top:calc(var(--navh) + 8px);scroll-behavior:smooth}
 .sitenav .nav-wk, .sitenav .wk{margin:0 0 0 auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;text-decoration:none;font:500 12.5px var(--f-mono,ui-monospace);color:var(--surface,#fff)!important;background:var(--accent)!important;border:0!important;box-shadow:none!important;height:32px;padding:0 14px;border-radius:999px;white-space:nowrap;line-height:1;box-sizing:border-box;transition:filter .15s,transform .15s}
 .sitenav .nav-wk:hover, .sitenav .wk:hover{filter:brightness(1.08)} .sitenav .nav-wk:active, .sitenav .wk:active{transform:scale(.96)}
 @media (max-width:560px){.sitenav .brand span{display:none}.sitenav .lk{padding:7px 9px;font-size:13.5px}.sitenav .nav-wk, .sitenav .wk{padding:0 10px;height:30px;font-size:12px}}
+@media (max-width:440px){.sitenav .nav-wk{display:none!important}}
 @media (prefers-reduced-motion:reduce){.sitenav *{transition:none!important}}`;
   const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
   const path = location.pathname.replace(/\/$/, "");

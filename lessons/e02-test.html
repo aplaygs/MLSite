@@ -1,0 +1,110 @@
+<title>Тест недели 2 · English</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/en.css">
+<link rel="stylesheet" href="/assets/quiz.css">
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация"><a href="/lessons/e02-3.html">← Урок 2.3 · Просьбы, анкета, be или do</a><span class="mid">тест недели 2</span><a href="/en#w-2">Неделя 2 в плане →</a></nav>
+<main class="qz" id="qz" aria-live="polite"></main>
+</div>
+
+<script src="/assets/en.js"></script>
+<script src="/assets/quiz.js"></script>
+<script>
+initQuiz({
+  week: 2, minutes: 25, section: "en",
+  title: "Тест недели 2 · Work and study",
+  intro: "24 вопроса: present simple в утверждении, отрицании и вопросах, -s у he / she / it, короткие ответы, работа и учёба, in / on / at, звук -s, просьбы, анкета и даты, be против do. И четыре вопроса повторения недели 1. Есть задания на слух — включи звук.",
+  howto: "Отвечай по памяти, не открывая уроки. Где надо впечатать — пиши как в обычном тексте: регистр, ’ и точка в конце не важны. В заданиях с 🔊 фраза прозвучит сама, кнопкой её можно повторить. После каждого ответа — разбор и ссылка в урок. Клавиши: <code>1</code>–<code>4</code> — выбрать вариант, <code>Enter</code> — проверить и дальше.",
+  lessons: [
+    {n: 1, file: "e02-1.html", title: "Present simple: что я делаю всегда", cover: "+ и −, -s у he/she/it, don't/doesn't, профессии и связки с work"},
+    {n: 2, file: "e02-2.html", title: "Вопросы с do/does, учёба и звук -s", cover: "Do/Does…? короткие ответы, вопросы со словом, учёба, in/on/at, /s/ /z/ /ɪz/"},
+    {n: 3, file: "e02-3.html", title: "Просьбы, анкета, be или do", cover: "Can I have…? анкета и даты, be против do"},
+    {n: 4, file: "e01-1.html", label: "Повторение недели 1", title: "People", cover: "a/an, his/her, вопросы с be и where"}
+  ],
+  questions: [
+    /* ---------- урок 2.1 ---------- */
+    {lesson: 1, topic: "en.02.1.1", ref: "#t1", refTitle: "Present simple: + и −", type: "one",
+     q: "My sister ___ in a bank.", opts: ["works", "work", "is work", "working"], ans: 0,
+     explain: "sister — одна, как she: глагол с <b>-s</b>. <i>is work</i> — be рядом с глаголом не ставят."},
+    {lesson: 1, topic: "en.02.1.1", ref: "#t1", refTitle: "Как добавить -s", type: "text",
+     q: "Впиши форму: (study) He ___ computer science.", ans: ["studies"],
+     explain: "Согласная + y → <b>ies</b>: <i>studies</i>. А после гласной — просто -s: <i>plays</i>."},
+    {lesson: 1, topic: "en.02.1.1", ref: "#t1", refTitle: "Отрицание", type: "text",
+     q: "Сделай отрицание: <i>She likes tea.</i> → She ___ tea.", ans: ["doesn't like", "does not like"],
+     explain: "<b>doesn't like</b>: -s ушла в does, глагол голый."},
+    {lesson: 1, topic: "en.02.1.1", ref: "#t1", refTitle: "Present simple: + и −", type: "many",
+     q: "Какие предложения <b>правильные</b>?", opts: ["I'm work from home.", "My parents live in Kazan.", "He don't like coffee.", "She watches TV in the evening."], ans: [1, 3],
+     explain: "<i>I work from home</i> — без be. <i>He doesn't like</i> — he требует does. <i>parents</i> — много, без -s; <i>watches</i> — после ch +es."},
+    {lesson: 1, topic: "en.02.1.1", ref: "#t1", refTitle: "Звук -s", type: "text", say: "She finishes work at six.",
+     q: "🔊 Послушай и впиши глагол так, как он прозвучал — с окончанием.", ans: ["finishes"],
+     explain: "<b>finishes</b> — после sh окончание +es, звучит /ɪz/."},
+    {lesson: 1, topic: "en.02.1.2", ref: "#t2", refTitle: "Связки с work", type: "one",
+     q: "«Он работает разработчиком».", opts: ["He works as a developer.", "He works like a developer.", "He is work as developer.", "He works as developer."], ans: 0,
+     explain: "Кем — <b>as</b> + a/an: <i>He works as a developer.</i> like — «похоже на»."},
+    {lesson: 1, topic: "en.02.1.2", ref: "#t2", refTitle: "What do you do?", type: "one",
+     q: "Что значит <i>What do you do?</i>", opts: ["Кем ты работаешь?", "Что ты делаешь прямо сейчас?", "Как у тебя дела?", "Что тебе нравится?"], ans: 0,
+     explain: "<b>What do you do?</b> — о работе и занятиях. «Что делаешь сейчас» — <i>What are you doing?</i>"},
+    {lesson: 1, topic: "en.02.1.2", ref: "#t2", refTitle: "Связки с work", type: "one",
+     q: "I work ___ a big IT company.", opts: ["for", "in", "as", "with"], ans: 0,
+     explain: "Компания — <b>for</b> (или at). <i>in</i> — про место: <i>in an office</i>."},
+    /* ---------- урок 2.2 ---------- */
+    {lesson: 2, topic: "en.02.2.1", ref: "#t1", refTitle: "Вопросы с do/does", type: "one",
+     q: "___ your brother live in Moscow?", opts: ["Does", "Do", "Is", "Are"], ans: 0,
+     explain: "brother — один, как he, и есть глагол live: <b>Does</b>."},
+    {lesson: 2, topic: "en.02.2.1", ref: "#t1", refTitle: "Вопросы с do/does", type: "text",
+     q: "Сделай вопрос: <i>They play football.</i> → ?", ans: ["Do they play football?", "Do they play football"],
+     explain: "<b>Do they play football?</b> — помощник впереди, глагол не меняется."},
+    {lesson: 2, topic: "en.02.2.1", ref: "#t1", refTitle: "Короткие ответы", type: "one",
+     q: "Do you like coffee? — (да)", opts: ["Yes, I do.", "Yes, I am.", "Yes, I like.", "Yes, I does."], ans: 0,
+     explain: "Отвечают тем же помощником: спросили с do — <b>Yes, I do.</b>"},
+    {lesson: 2, topic: "en.02.2.1", ref: "#t1", refTitle: "Вопрос со словом", type: "text", say: "Where does she work?",
+     q: "🔊 Послушай вопрос и впиши его.", ans: ["Where does she work?", "Where does she work"],
+     explain: "<b>Where does she work?</b> — слово + does + кто + глагол без -s."},
+    {lesson: 2, topic: "en.02.2.1", ref: "#t1", refTitle: "Вопросы с do/does", type: "many",
+     q: "Какие вопросы <b>неправильные</b>?", opts: ["Does she works here?", "Where do you live?", "What you do?", "When does the lecture start?"], ans: [0, 2],
+     explain: "<i>Does she <b>work</b></i> — -s уже в does. <i>What <b>do you</b> do?</i> — после вопросительного слова нужен помощник."},
+    {lesson: 2, topic: "en.02.2.2", ref: "#t2", refTitle: "in, on, at", type: "one",
+     q: "I usually study ___ night.", opts: ["at", "in", "on", "—"], ans: 0,
+     explain: "Ночь — исключение: <b>at night</b>. Но <i>in the morning, in the evening</i>."},
+    {lesson: 2, topic: "en.02.2.2", ref: "#t2", refTitle: "Учёба", type: "one",
+     q: "«Сдавать экзамен» (идти на экзамен) — это…", opts: ["take an exam", "pass an exam", "make an exam", "give an exam"], ans: 0,
+     explain: "<b>take an exam</b> — сдавать. <i>pass</i> — сдать успешно, <i>fail</i> — провалить."},
+    {lesson: 2, topic: "en.02.2.3", ref: "#t3", refTitle: "Звук -s", type: "many", say: "watches, plays, finishes, works",
+     q: "🔊 В каких словах окончание звучит как /ɪz/?", opts: ["watches", "plays", "finishes", "works"], ans: [0, 2],
+     explain: "После ch и sh — <b>/ɪz/</b>: <i>watches, finishes</i>. <i>plays</i> — /z/, <i>works</i> — /s/."},
+    /* ---------- урок 2.3 ---------- */
+    {lesson: 3, topic: "en.02.3.1", ref: "#t1", refTitle: "Просьбы", type: "one",
+     q: "Ты в кафе. Как вежливо попросить кофе?", opts: ["Can I have a coffee, please?", "Give me a coffee.", "I want coffee.", "Coffee for me now."], ans: 0,
+     explain: "<b>Can I have…, please?</b> Повелительное <i>Give me</i> и <i>I want</i> в просьбе звучат грубо."},
+    {lesson: 3, topic: "en.02.3.1", ref: "#t1", refTitle: "Ответы на просьбы", type: "one",
+     q: "Тебе сказали «Thank you!». Что ответить?", opts: ["You're welcome.", "Please.", "Nothing.", "Here you are."], ans: 0,
+     explain: "«Не за что» — <b>You're welcome.</b> <i>Here you are</i> — когда протягиваешь вещь, <i>please</i> — когда просишь."},
+    {lesson: 3, topic: "en.02.3.2", ref: "#t2", refTitle: "Даты", type: "text", say: "the thirteenth of October, two thousand and twenty-six",
+     q: "🔊 Запиши дату цифрами по-британски: ДД/ММ/ГГГГ.", ans: ["13/10/2026", "13.10.2026"],
+     explain: "<b>13/10/2026</b> — в Британии сначала число, потом месяц. Читается <i>the thirteenth of October</i>."},
+    {lesson: 3, topic: "en.02.3.3", ref: "#t3", refTitle: "be или do", type: "text",
+     q: "Переведи: «Ты устал?»", ans: ["Are you tired?", "Are you tired"],
+     explain: "«Устал» — состояние, глагола-действия нет: <b>Are you tired?</b> А не <i>Do you tired?</i>"},
+    /* ---------- повторение недели 1 ---------- */
+    {lesson: 4, file: "e01-1.html", topic: "en.01.1.2", ref: "#t2", refTitle: "a / an", type: "one",
+     q: "She's ___ engineer.", opts: ["an", "a", "the", "—"], ans: 0,
+     explain: "engineer начинается с гласного звука: <b>an engineer</b>. Профессия — всегда с a/an."},
+    {lesson: 4, file: "e01-1.html", topic: "en.01.1.2", ref: "#t2", refTitle: "my, his, her", type: "one",
+     q: "Anna lives with ___ husband.", opts: ["her", "his", "she", "their"], ans: 0,
+     explain: "Владелец — Анна: <b>her</b> husband."},
+    {lesson: 4, file: "e01-2.html", topic: "en.01.2.1", ref: "#t1", refTitle: "Вопросы с be", type: "text",
+     q: "Сделай вопрос: <i>She is from Spain.</i> → ?", ans: ["Is she from Spain?", "Is she from Spain"],
+     explain: "Глагола нет — be встаёт вперёд: <b>Is she from Spain?</b>"},
+    {lesson: 4, file: "e01-2.html", topic: "en.01.2.2", ref: "#t2", refTitle: "Вопросительные слова", type: "one",
+     q: "Как спросить «Откуда ты?»", opts: ["Where are you from?", "Where you are from?", "From where are you?", "Where do you from?"], ans: 0,
+     explain: "<b>Where are you from?</b> — слово + be + подлежащее, предлог в конце. Глагола нет — значит не do."}
+  ]
+});
+</script>

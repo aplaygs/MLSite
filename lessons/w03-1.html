@@ -1,0 +1,1404 @@
+<title>Урок 3.1 · Pandas и статистика</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<style>
+/* Только для этого урока: мини-таблицы pandas в лабораториях, группы groupby, сырой CSV. */
+.dfw{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.df{border-collapse:collapse;width:100%;font:13px/1.4 var(--f-mono);font-variant-numeric:tabular-nums}
+.df th,.df td{padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:left;vertical-align:middle;transition:opacity .18s,background-color .18s}
+.df th{font:500 11.5px var(--f-mono);letter-spacing:.02em;text-transform:none;color:var(--muted)}
+.df tr:last-child td{border-bottom:0}
+.df .ix{color:var(--muted);border-right:1px solid var(--line)}
+.df td.num{text-align:right}
+.df td.na{color:var(--red)}
+.df td.fill{background:color-mix(in srgb,var(--warm) 22%,transparent)}
+.df td.bad{color:var(--red);font-weight:500}
+.df tr.sel td{background:var(--accent-soft)}
+.df tr.dim td,.df .dimc{opacity:.32}
+.df tr.sel td.dimc{background:transparent}
+.df td.calc{color:var(--muted);font-size:12px}
+.serrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 14px}
+.sercap{display:grid;justify-items:center;gap:6px;font:500 11px var(--f-mono);color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.sercap .dfw{text-transform:none;letter-spacing:0}
+.mxop{font:500 22px var(--f-mono);color:var(--muted)}
+.codeline{font:500 13.5px/1.5 var(--f-mono);background:var(--soft);border-radius:10px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.codeline .k{color:var(--accent)} .codeline .e{color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 12px var(--f-mono);padding:3px 9px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
+.chip.ok{border-color:var(--accent);color:var(--accent)}
+.chip.no{border-color:var(--red);color:var(--red)}
+.btn.mono{font-family:var(--f-mono);font-size:12.5px}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:default}
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.gbox{border:1.5px solid var(--line);border-radius:12px;padding:8px;display:grid;gap:6px;align-content:start;background:var(--surface)}
+.gbox h4{margin:0;font:600 12px var(--f-mono);letter-spacing:.04em}
+.gbox .res{font:500 13px var(--f-mono);border-top:1px dashed var(--line);padding-top:6px}
+.g0{--g:var(--accent)} .g1{--g:var(--plum)} .g2{--g:var(--teal)}
+.gbox.g0,.gbox.g1,.gbox.g2{border-color:var(--g)}
+.gbox h4{color:var(--g)}
+.gt{display:inline-block;min-width:22px;text-align:center;border-radius:6px;padding:0 6px;color:var(--surface);background:var(--g);font-weight:600}
+.legendrow{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.legendrow i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.knob{cursor:grab}
+.knob:active{cursor:grabbing}
+</style>
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/plan#w-3">← Неделя 3 в плане</a><span class="mid">урок 1 из 3</span><span class="muted">Урок 2 · Логистическая регрессия — скоро</span></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 3 · урок 1 из 3 · 10 тем · ~4 часа</div>
+  <h1>Pandas и описательная статистика</h1>
+  <p>На неделе 2 ты скачал OULAD и завёл репозиторий проекта. Теперь данные надо открыть и понять. Первая часть урока — pandas: как устроена таблица, как прочитать файл и ничего не испортить, как выбрать нужные строки, что делать с пропусками, как считать по группам и склеивать таблицы. Вторая часть — как описать столбец несколькими числами: где центр, какой разброс, есть ли выбросы и какой формы распределение. Вместе это фундамент EDA (разведочного анализа данных). В уроке 3 ты нарисуешь графики, разберёшь таргет и напишешь выводы по проекту. Здесь ты учишься видеть данные в цифрах. Все примеры проверены на pandas 3. Где pandas 2 ведёт себя иначе, это сказано отдельно.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Series и DataFrame</a><a href="#t2">Чтение файлов</a><a href="#t3">loc и iloc</a><a href="#t4">Пропуски</a><a href="#t5">groupby</a><a href="#t6">merge</a><a href="#t7">Среднее и медиана</a><a href="#t8">Разброс и квантили</a><a href="#t9">Выбросы</a><a href="#t10">Распределения</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<div class="part"><span class="eyebrow">Часть 1 · 6 тем</span><h2>Таблица в руках</h2><p>Pandas — это Excel, которым управляют кодом. С него начинается любая задача с табличными данными, а на отборах на стажировку часто дают живое задание на pandas. Шесть тем ниже покрывают почти всё, что ты будешь делать с таблицами каждый день.</p></div>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 10 · <span class="qd key" aria-hidden="true"></span> Данные</div>
+  <h2>Series и DataFrame</h2>
+  <p class="tldr">Series — это один столбец: значения плюс подписи к ним (индекс). DataFrame — таблица из нескольких Series с общим индексом. Главное отличие от списка: pandas сопоставляет данные по подписям, а не по позициям.</p>
+  <div class="prose">
+    <p>Представь журнал группы. Слева фамилии — это <b>индекс</b> (index). Сверху предметы — это <b>столбцы</b> (columns). Один предмет со всеми оценками — это <b>Series</b>. Весь журнал — это <b>DataFrame</b>.</p>
+    <p>Внутри каждый столбец — массив numpy (или похожий на него) одного типа. Поэтому <code>df.score * 1.1</code> считается сразу для миллиона строк, без цикла на Python. Векторы из урока 2.1 (тема 1) — это ровно они.</p>
+  </div>
+<pre>import pandas as pd
+df = pd.DataFrame({
+    "name":  ["Аня", "Боря", "Вика"],
+    "group": ["А", "А", "Б"],
+    "score": [87, 64, 91],
+})
+df.shape            <span class="cm"># (3, 3) — строки × столбцы</span>
+df.dtypes           <span class="cm"># name str, group str, score int64 (в pandas 2 строки были object)</span>
+df["score"]         <span class="cm"># Series — один столбец</span>
+df[["score"]]       <span class="cm"># DataFrame из одного столбца — двойные скобки</span>
+df.score.mean()     <span class="cm"># 80.67 — векторно, без цикла</span>
+df["passed"] = df.score &gt;= 70   <span class="cm"># новый столбец одной строкой</span>
+df.info()           <span class="cm"># типы, непустые значения, память — первая команда на новых данных</span>
+df.head(), df.sample(5, random_state=0)   <span class="cm"># первые строки и случайные строки</span></pre>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · складываем два столбца</span><span class="muted mono" id="alState"></span></div>
+    <div class="serrow">
+      <div class="sercap"><div class="dfw" id="alA"></div>a · тест 1</div>
+      <span class="mxop">+</span>
+      <div class="sercap"><div class="dfw" id="alB"></div>b · тест 2</div>
+      <span class="mxop">=</span>
+      <div class="sercap"><div class="dfw" id="alR"></div>результат</div>
+    </div>
+    <div class="btns" role="group" aria-label="Способ сложения">
+      <button class="btn mono alm" data-m="add">a + b</button>
+      <button class="btn mono alm" data-m="fill">a.add(b, fill_value=0)</button>
+      <button class="btn mono alm" data-m="vals">a.to_numpy() + b.to_numpy()</button>
+    </div>
+    <p class="verdict" id="alMsg" aria-live="polite"></p>
+    <p class="muted" style="font-size:13.5px">Как читать: слева подписи (индекс), справа значения. Баллы второго теста записаны в другом порядке, а Гоша и Дима писали только по одному тесту. Серый столбец «как посчитано» показывает, какие числа сложились.</p>
+  </div>
+
+  <h3 style="font-size:17px">Индекс: зачем он нужен</h3>
+  <div class="prose"><ul>
+    <li><b>Сопоставление по подписям.</b> Арифметика между Series и присваивание столбца <code>df["new"] = s</code> выравниваются по индексу. Строки не перепутаются, даже если порядок разный.</li>
+    <li><b>Быстрый поиск по ключу.</b> <code>df.set_index("id_student").loc[28400]</code> — это та же хеш-таблица, что в уроке 1.3: строка находится без перебора.</li>
+    <li><b>Индекс переживает фильтр и сортировку.</b> После <code>df[df.score &gt; 70]</code> подписи остаются старыми: 0, 2, 5… Нужны 0, 1, 2 — вызови <code>.reset_index(drop=True)</code>.</li>
+    <li><b>Индекс может быть из нескольких уровней</b> (MultiIndex). Его даёт <code>groupby</code> по двум столбцам. Обычно его сразу превращают в столбцы через <code>.reset_index()</code>.</li>
+  </ul></div>
+  <h3 style="font-size:17px">Векторно, а не циклом</h3>
+  <div class="prose">
+    <p>Цикл <code>for _, row in df.iterrows()</code> на большой таблице медленнее векторной операции в десятки и сотни раз: каждая строка становится отдельным объектом Python. Почти любая задача решается без него.</p>
+    <ul>
+      <li>Арифметика и сравнения: <code>df.a / df.b</code>, <code>df.score &gt;= 70</code>.</li>
+      <li>Условие: <code>np.where(df.score &gt;= 70, "сдал", "не сдал")</code>.</li>
+      <li>Замена по словарю: <code>df.grade.map({"A": 5, "B": 4})</code>.</li>
+      <li>Строки: <code>df.name.str.lower()</code>.</li>
+      <li>Даты: <code>df.date.dt.month</code>.</li>
+    </ul>
+    <p><code>apply</code> — тот же цикл, только спрятанный. Подробно о нём — в отдельной теме дерева.</p>
+  </div>
+  <div class="callout trap"><b class="h">Ловушка</b><p><code>df2 = df</code> не копирует таблицу: это второй ярлык на тот же объект (урок 1.2, тема 1). Нужна независимая таблица — пиши <code>df.copy()</code>.</p></div>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Признаки — это DataFrame <code>X</code>, ответ — Series <code>y</code>. Модели sklearn принимают DataFrame напрямую и запоминают имена столбцов (<code>model.feature_names_in_</code>). Поэтому на проде колонки в другом порядке или с другими названиями — ошибка, а не тихий мусор.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем Series отличается от DataFrame, а DataFrame — от массива numpy?</summary>
+      <div class="a"><p>Series — одномерный массив значений с индексом. DataFrame — набор Series с общим индексом, у каждого столбца свой тип. Массив numpy — это голые числа одного типа без подписей: строки и столбцы в нём различаются только позицией. DataFrame добавляет имена столбцов, выравнивание по индексу, разные типы в разных столбцах, работу с пропусками, группировки и склейки. Внутри столбцы — это массивы, поэтому операции такие же быстрые.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Почему <code>s1 + s2</code> может дать NaN, хотя пропусков в данных нет?</summary>
+      <div class="a"><p>pandas складывает значения с одинаковыми подписями, а результат строит по объединению индексов. Если метка есть только в одной Series, пары нет, и получается NaN. Лечится так: <code>s1.add(s2, fill_value=0)</code>, если отсутствие значит ноль; или выровнять индексы заранее. Частая причина на практике — индекс «поехал» после фильтра или <code>reset_index</code> только у одной из таблиц.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Какой формы <code>df["score"]</code> и <code>df[["score"]]</code> для таблицы из 3 строк?</summary>
+      <div class="a"><p>Series формы (3,) и DataFrame формы (3, 1).</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.pd.0">
+    <label class="tp"><input type="checkbox" data-id="data.pd.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Series и DataFrame</b></span></label>
+    <span class="note" data-d="data.pd.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 10 · Данные</div>
+  <h2>Чтение и запись CSV, Parquet, Excel</h2>
+  <p class="tldr"><code>read_csv</code> сам угадывает разделитель, десятичную запятую, пропуски и даты. И часто угадывает неправильно, причём молча. Поэтому параметры чтения задают явно, а после чтения сразу смотрят <code>dtypes</code>. Свои промежуточные данные храни в Parquet: он помнит типы и весит меньше.</p>
+  <div class="prose"><p>Типичный файл из российского Excel: разделитель — точка с запятой, дробная часть — через запятую, пропуск записан словами, дата — «день.месяц.год». Включай параметры по одному и смотри, что меняется.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · читаем выгрузку из Excel</span><span class="muted mono" id="csState"></span></div>
+<pre id="csRaw" aria-label="Содержимое файла grades.csv">name;group;score;date
+Аня;А-1;87,5;03.10.2026
+Боря;А-1;нет данных;05.10.2026
+Вика;Б-2;91;04.10.2026
+Гоша;Б-2;64,0;</pre>
+    <div class="btns" role="group" aria-label="Параметры read_csv">
+      <button class="btn mono csb" data-k="sep" aria-pressed="false">sep=";"</button>
+      <button class="btn mono csb" data-k="dec" aria-pressed="false">decimal=","</button>
+      <button class="btn mono csb" data-k="na" aria-pressed="false">na_values=["нет данных"]</button>
+      <button class="btn mono csb" data-k="dt" aria-pressed="false">parse_dates=["date"]</button>
+      <button class="btn mono csb" data-k="df" aria-pressed="false">dayfirst=True</button>
+    </div>
+    <div class="codeline" id="csCode"></div>
+    <div class="dfw" id="csTable"></div>
+    <div class="chips" id="csTypes" aria-label="Типы столбцов"></div>
+    <div class="codeline" id="csMean"></div>
+    <p class="verdict" id="csMsg" aria-live="polite"></p>
+    <p class="muted" style="font-size:13.5px">Как читать: сверху сырой файл, ниже — что получилось в DataFrame, типы столбцов (зелёные — правильные) и попытка посчитать средний балл. Красным отмечены пропуски.</p>
+  </div>
+
+  <h3 style="font-size:17px">Параметры read_csv, которые нужны каждую неделю</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Параметр</th><th>Зачем</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td><code>sep</code></td><td>разделитель столбцов</td><td><code>sep=";"</code>, <code>sep="\t"</code></td></tr>
+      <tr><td><code>decimal</code></td><td>знак дробной части</td><td><code>decimal=","</code></td></tr>
+      <tr><td><code>encoding</code></td><td>кодировка: «кракозябры» вместо букв</td><td><code>encoding="cp1251"</code> для старых выгрузок Windows</td></tr>
+      <tr><td><code>na_values</code></td><td>что ещё считать пропуском</td><td><code>na_values=["?", "-", "нет данных"]</code></td></tr>
+      <tr><td><code>parse_dates</code> + <code>date_format</code></td><td>сразу прочитать даты и указать формат</td><td><code>date_format="%d.%m.%Y"</code></td></tr>
+      <tr><td><code>dtype</code></td><td>задать типы, не угадывать</td><td><code>dtype={"id_student": "int32", "region": "category"}</code></td></tr>
+      <tr><td><code>usecols</code>, <code>nrows</code></td><td>читать не всё: нужные столбцы, первые N строк</td><td><code>usecols=["id", "score"]</code>, <code>nrows=1000</code></td></tr>
+      <tr><td><code>index_col</code></td><td>какой столбец сделать индексом</td><td><code>index_col="id"</code></td></tr>
+      <tr><td><code>chunksize</code></td><td>читать огромный файл кусками</td><td><code>for part in pd.read_csv(f, chunksize=10**6)</code></td></tr>
+    </tbody></table></div>
+  <h3 style="font-size:17px">Какой формат когда</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Формат</th><th>Плюсы</th><th>Минусы</th></tr></thead>
+    <tbody>
+      <tr><td>CSV</td><td>читает кто угодно, видно глазами, удобно смотреть в git diff</td><td>не хранит типы, весит много, проблемы с запятыми и кодировкой</td></tr>
+      <tr><td>Parquet</td><td>хранит типы, сжат, хранит данные по столбцам: читает только нужные столбцы</td><td>бинарный, глазами не посмотреть; нужен <code>pyarrow</code></td></tr>
+      <tr><td>Excel</td><td>так присылают люди: несколько листов, форматирование</td><td>медленный, формулы и объединённые ячейки ломают чтение; нужен <code>openpyxl</code></td></tr>
+      <tr><td>JSON</td><td>ответы API, вложенные структуры</td><td>вложенность приходится раскрывать: <code>pd.json_normalize</code></td></tr>
+    </tbody></table></div>
+<pre>df.to_csv("data/processed/students.csv", index=False)  <span class="cm"># без index=False индекс станет лишним столбцом</span>
+df.to_parquet("data/processed/students.parquet")      <span class="cm"># типы сохранятся как были</span>
+pd.read_parquet("data/processed/students.parquet", columns=["id_student", "score"])
+pd.read_excel("grades.xlsx", sheet_name="Осень", skiprows=2)  <span class="cm"># лист и шапка-заголовок над таблицей</span>
+pd.to_datetime(df.date, format="%d.%m.%Y")            <span class="cm"># надёжнее, чем угадывать: формат задан явно</span>
+df.memory_usage(deep=True).sum() / 2**20              <span class="cm"># сколько мегабайт занимает таблица</span></pre>
+  <div class="callout trap"><b class="h">Ловушка: Unnamed: 0</b><p>Сохранил <code>to_csv</code> без <code>index=False</code> — индекс записался первым столбцом без имени. При следующем чтении появится столбец <code>Unnamed: 0</code>, и он тихо попадёт в признаки модели. Это признак-номер строки: бесполезный, а иногда и утечка, если строки упорядочены по таргету.</p></div>
+  <div class="callout brs"><b class="h">Где это в проекте</b><p>Самая большая таблица OULAD — <code>studentVle</code>, клики студентов по дням. Прочитай её один раз с <code>usecols</code> и <code>dtype</code> (int32 вместо int64 вдвое экономит память) и сохрани в Parquet. Дальше она открывается за секунды.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем Parquet лучше CSV для данных проекта?</summary>
+      <div class="a"><p>Parquet хранит типы: даты остаются датами, категории — категориями, ничего не надо угадывать заново. Он сжат и обычно в разы меньше CSV. Он хранит данные по столбцам: можно прочитать только нужные, не читая файл целиком. CSV оставляют для обмена с людьми и маленьких файлов, которые хочется видеть в git diff.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Файл открылся, но все числа оказались строками, а <code>mean()</code> падает. Назови две вероятные причины.</summary>
+      <div class="a"><p>Десятичная запятая без <code>decimal=","</code>. Или в столбце есть нечисловое значение-пропуск («?», «нет данных»), которое не передали в <code>na_values</code>.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.pd.1">
+    <label class="tp"><input type="checkbox" data-id="data.pd.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Чтение и запись CSV, Parquet, Excel</b></span></label>
+    <span class="note" data-d="data.pd.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 10 · <span class="qd key" aria-hidden="true"></span> Данные</div>
+  <h2>loc и iloc, фильтрация</h2>
+  <p class="tldr"><code>loc</code> выбирает по подписям, <code>iloc</code> — по номерам позиций. Фильтр — это маска из True и False: <code>df[маска]</code>. Условия в маске соединяют <code>&amp;</code>, <code>|</code>, <code>~</code>, а каждое условие берут в скобки.</p>
+  <div class="prose"><p><code>loc</code> — это «найди Борю по фамилии». <code>iloc</code> — это «дай третью строку сверху». Отсортировал журнал по баллам — Боря остался Борей, но третьей строкой теперь стал кто-то другой. Таблица ниже отсортирована по баллу, поэтому подписи идут вразнобой. Ровно так она выглядит после <code>sort_values</code> в реальной работе.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · что выберет запрос</span><span class="muted mono" id="lcState"></span></div>
+    <div class="btns" id="lcBtns" role="group" aria-label="Запросы"></div>
+    <div class="codeline" id="lcCode"></div>
+    <div class="dfw" id="lcTable"></div>
+    <p class="verdict" id="lcMsg" aria-live="polite"></p>
+    <p class="muted" style="font-size:13.5px">Как читать: выбранные строки подсвечены, невыбранные строки и столбцы бледные. Серая колонка слева — индекс. Это подписи, а не номера строк.</p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Запись</th><th>Что делает</th><th>Ловушка</th></tr></thead>
+    <tbody>
+      <tr><td><code>df.loc[12]</code></td><td>строка с меткой 12 (Series)</td><td>если меток 12 несколько — вернёт DataFrame</td></tr>
+      <tr><td><code>df.iloc[0]</code></td><td>первая строка по позиции</td><td>после сортировки это другая строка</td></tr>
+      <tr><td><code>df.loc[11:12]</code></td><td>от метки до метки <b>включительно</b></td><td>идёт по порядку строк в таблице, а не по значению меток</td></tr>
+      <tr><td><code>df.iloc[0:3]</code></td><td>позиции 0, 1, 2</td><td>правый край не входит, как в срезах Python</td></tr>
+      <tr><td><code>df.loc[маска, "col"]</code></td><td>строки по условию, нужный столбец</td><td>так же и присваивают: одна операция</td></tr>
+      <tr><td><code>df.at[12, "score"]</code></td><td>одно значение, быстро</td><td><code>iat</code> — то же по позициям</td></tr>
+    </tbody></table></div>
+  <h3 style="font-size:17px">Маски</h3>
+<pre>m = (df.score &gt;= 70) &amp; (df.group == "А")      <span class="cm"># и: каждое условие в скобках</span>
+df[(df.score &lt; 50) | df.score.isna()]          <span class="cm"># или</span>
+df[~df.group.isin(["Б", "В"])]                  <span class="cm"># не: ~ инвертирует маску</span>
+df[df.score.between(50, 80)]                    <span class="cm"># границы включены</span>
+df[df.name.str.startswith("А")]
+limit = 70
+df.query("score &gt;= @limit and group == 'А'")    <span class="cm"># строкой; @ — переменная Python</span>
+m.sum(), m.mean()                               <span class="cm"># сколько строк и какая доля проходит условие</span></pre>
+  <h3 style="font-size:17px">Присваивание: одной операцией loc</h3>
+<pre><span class="bad">df[df.score &lt; 50]["score"] = 50</span>         <span class="cm"># цепочка: меняется копия, df не меняется</span>
+df.loc[df.score &lt; 50, "score"] = 50     <span class="cm"># правильно: строки и столбец в одном loc</span>
+low = df[df.score &lt; 50].copy()          <span class="cm"># нужна отдельная таблица — копируй явно</span>
+low["flag"] = True                      <span class="cm"># теперь без предупреждений и сюрпризов</span></pre>
+  <div class="callout trap"><b class="h">Ловушка: цепочка присваиваний</b><p><code>df[маска]["col"] = v</code> — это две операции: сначала берётся кусок таблицы, потом меняется уже он. В pandas 2 это иногда срабатывало, иногда нет, и выдавало <code>SettingWithCopyWarning</code>. В pandas 3 действует Copy-on-Write: такая цепочка <b>никогда</b> не меняет исходную таблицу, а pandas пишет <code>ChainedAssignmentError</code>. На собеседованиях до сих пор спрашивают про SettingWithCopyWarning. Ответ один: присваивай через один <code>.loc[строки, столбцы]</code>.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>В чём разница между loc и iloc?</summary>
+      <div class="a"><p><code>loc</code> работает с метками: индекс и имена столбцов, срез включает правую границу, принимает маски. <code>iloc</code> работает с целыми позициями 0…n−1, срез как в Python — без правой границы. Пока индекс 0, 1, 2…, разницы не видно. Но после сортировки, фильтра или <code>set_index</code> метки и позиции расходятся, и путать их — частая тихая ошибка.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Что такое SettingWithCopyWarning и как от неё избавиться?</summary>
+      <div class="a"><p>Это предупреждение о присваивании в объект, который может быть копией: обычно цепочка <code>df[маска]["col"] = v</code> или правка таблицы, полученной фильтром из другой. Исходная таблица при этом может не измениться. Исправление: менять исходную через один <code>df.loc[маска, "col"] = v</code>. Если нужна отдельная таблица — делать явный <code>.copy()</code>. В pandas 3 с Copy-on-Write цепочка гарантированно не работает, поэтому правило то же.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Почему <code>df[df.a &gt; 1 and df.b &lt; 5]</code> падает?</summary>
+      <div class="a"><p><code>and</code> спрашивает у Series «ты истинна?», а у столбца из многих значений нет одной истинности — <code>ValueError: The truth value of a Series is ambiguous</code> (урок 1.2, тема 2). Нужно <code>(df.a &gt; 1) &amp; (df.b &lt; 5)</code>.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.pd.2">
+    <label class="tp"><input type="checkbox" data-id="data.pd.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>loc и iloc, фильтрация</b></span></label>
+    <span class="note" data-d="data.pd.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="topic" id="t4">
+  <div class="eyebrow">Тема 4 из 10 · <span class="qd key" aria-hidden="true"></span> Данные</div>
+  <h2>Пропуски</h2>
+  <p class="tldr">Пропуск — это не ноль и не пустая строка, а «значения нет». Сначала пойми, почему его нет. Потом решай: удалить, заполнить или оставить признак «был пропуск». Числа для заполнения считают только по train.</p>
+  <div class="prose">
+    <p>В pandas пропуск выглядит по-разному: <code>NaN</code> в числах, <code>NaT</code> в датах, <code>None</code> или <code>NaN</code> в строках, <code>pd.NA</code> в «нулевых» (nullable) типах. Проверка у всех одна — <code>isna()</code>. Сравнение не работает: <code>nan == nan</code> даёт False (урок 1.2).</p>
+    <p>Мелочь, которая удивляет: целый столбец с одним пропуском становится float. <code>[1, None, 3]</code> — это <code>float64</code>, потому что NaN — число с плавающей точкой. Нужны целые с пропусками — тип <code>"Int64"</code> с большой буквы.</p>
+  </div>
+<pre>df.isna().sum()                                  <span class="cm"># сколько пропусков в каждом столбце</span>
+df.isna().mean().sort_values(ascending=False)    <span class="cm"># доля — так нагляднее</span>
+df[df.score.isna()]                              <span class="cm"># посмотреть сами строки с пропуском</span>
+df.score.count(), len(df)                        <span class="cm"># count не считает NaN, len — считает</span>
+df.region.value_counts(dropna=False)             <span class="cm"># по умолчанию NaN в подсчёт не попадает</span></pre>
+  <h3 style="font-size:17px">Почему значения нет</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Тип</th><th>Что значит</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td>Совсем случайно (MCAR)</td><td>пропуск ни от чего не зависит</td><td>строка потерялась при выгрузке</td></tr>
+      <tr><td>Зависит от других признаков (MAR)</td><td>по другим столбцам можно предсказать, где пропуск</td><td>заочники реже заполняют анкету — можно заполнить по группе</td></tr>
+      <tr><td>Зависит от самого значения (MNAR)</td><td>пропуск сам несёт информацию</td><td>не указывают низкий доход; нет даты отчисления — значит, не отчислялся</td></tr>
+    </tbody></table></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · чем заполнить пропуски</span><span class="muted mono" id="nsState"></span></div>
+    <div class="lab-grid">
+      <svg id="nsSvg" viewBox="0 0 360 230" role="img" aria-label="Активность студентов двух групп: известные значения и заполненные пропуски"></svg>
+      <div class="ctrl">
+        <div class="btns" role="group" aria-label="Стратегия">
+          <button class="btn mono nsb" data-s="skip">как есть</button>
+          <button class="btn mono nsb" data-s="drop">dropna()</button>
+          <button class="btn mono nsb" data-s="zero">fillna(0)</button>
+          <button class="btn mono nsb" data-s="mean">fillna(mean)</button>
+          <button class="btn mono nsb" data-s="median">fillna(median)</button>
+          <button class="btn mono nsb" data-s="group">медиана группы</button>
+        </div>
+        <div class="readout">
+          <div class="stat"><div class="v" id="nsRows">0</div><div class="k">строк в таблице</div></div>
+          <div class="stat"><div class="v" id="nsMean">0</div><div class="k">среднее (правда — <span id="nsTrue"></span>)</div></div>
+          <div class="stat"><div class="v" id="nsStd">0</div><div class="k">std (правда — <span id="nsTrueStd"></span>)</div></div>
+          <div class="stat"><div class="v" id="nsErr">—</div><div class="k">средняя ошибка заполнения</div></div>
+        </div>
+        <p class="verdict" id="nsMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Как читать: клики за неделю у 28 студентов. Зелёные точки известны, у 8 студентов значение потеряно. Жёлтые точки — чем мы их заполнили. Сиреневая линия — среднее после обработки, пунктир — настоящее среднее (в лаборатории мы знаем правду, в жизни — нет).</p>
+  </div>
+
+  <h3 style="font-size:17px">Что делать с пропусками</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Способ</th><th>Когда</th><th>Цена</th></tr></thead>
+    <tbody>
+      <tr><td>Удалить строки <code>dropna()</code></td><td>пропусков мало и они случайные; пропуск в таргете</td><td>теряешь данные; если пропуски не случайны — выборка смещается. На проде строку не удалишь — модели всё равно надо ответить</td></tr>
+      <tr><td>Удалить столбец</td><td>пропусков больше половины, и признак не важен</td><td>теряешь признак</td></tr>
+      <tr><td>Константа: 0, «unknown»</td><td>у пропуска есть смысл «события не было»</td><td>если смысла нет — искажает числа</td></tr>
+      <tr><td>Медиана или мода</td><td>быстрый безопасный вариант по умолчанию</td><td>сжимает разброс, рисует пик в одной точке</td></tr>
+      <tr><td>Медиана по группе</td><td>значение сильно зависит от группы</td><td>нужна осмысленная группа (<code>transform</code>, тема 5)</td></tr>
+      <tr><td>Флаг + заполнение</td><td>сам пропуск может быть сигналом</td><td>плюс один признак</td></tr>
+      <tr><td>Оставить NaN</td><td>бустинги (CatBoost, LightGBM, XGBoost) и <code>HistGradientBoosting</code> умеют сами</td><td>линейные модели и kNN упадут с ошибкой</td></tr>
+    </tbody></table></div>
+<pre>df["imd_missing"] = df.imd_band.isna()           <span class="cm"># флаг — до заполнения</span>
+df["imd_band"] = df.imd_band.fillna("unknown")   <span class="cm"># категория «неизвестно»</span>
+df = df.dropna(subset=["final_result"])          <span class="cm"># без таргета строка для обучения бесполезна</span>
+df.dropna(thresh=5)                              <span class="cm"># оставить строки, где непустых хотя бы 5</span>
+
+from sklearn.impute import SimpleImputer
+imp = SimpleImputer(strategy="median", add_indicator=True)  <span class="cm"># медиана + столбцы-флаги</span>
+X_train = imp.fit_transform(X_train)             <span class="cm"># медианы считаются только по train</span>
+X_test = imp.transform(X_test)                   <span class="cm"># к test применяются те же самые числа</span></pre>
+  <div class="callout trap"><b class="h">Ловушка: заполнить до разбиения</b><p><code>df.fillna(df.mean())</code> до разбиения на train и test — и среднее посчитано с участием test. Модель «подсмотрела» test, и оценка качества получается чуть лучше, чем будет на самом деле. Это утечка данных (data leakage). Правило: всё, что что-то вычисляет по данным (среднее, медиана, скейлер, кодировщик), обучается на train и только применяется к test. Поэтому заполнение живёт внутри <code>Pipeline</code>.</p></div>
+  <div class="callout brs"><b class="h">Где это в проекте</b><p>В OULAD у <code>studentRegistration</code> пустая <code>date_unregistration</code> значит «студент не отчислялся». Это пропуск со смыслом, а не потеря данных: заполнять его медианой — значит придумать отчисление тем, кто учился до конца. У <code>imd_band</code> (индекс бедности района) пропуски обычные — заполни «unknown» и добавь флаг.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как вы обрабатываете пропуски?</summary>
+      <div class="a"><p>Сначала смотрю, сколько их и где: <code>isna().mean()</code> по столбцам, смотрю строки с пропусками. Пытаюсь понять причину: случайные, зависят от других признаков или сам пропуск — сигнал. Дальше по ситуации. Пропуск в таргете — удаляю строку. Признак почти пустой и неважный — удаляю столбец. Числа — медиана, иногда по группе. Категории — отдельная категория «unknown». Если пропуск может что-то значить — добавляю флаг. Для бустингов часто оставляю NaN как есть. Все заполнения обучаю только на train, внутри Pipeline, чтобы не было утечки. И сравниваю варианты на валидации, а не выбираю на глаз.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Почему заполнять пропуски средним плохо, даже если утечки нет?</summary>
+      <div class="a"><p>Среднее чувствительно к выбросам: один огромный доход сдвинет значение заполнения. Все заполненные строки получают одно число. Разброс признака искусственно сжимается, на гистограмме появляется пик, связи с другими признаками ослабевают. Если пропуски не случайны, среднее ещё и смещено: пропуски у «бедных» заполняются средним по «богатым». Медиана устойчивее, медиана по группе обычно ближе к правде, а флаг сохраняет информацию о самом пропуске.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span><code>s = pd.Series([1, None, 3])</code>. Чему равны <code>s.mean()</code>, <code>s.count()</code>, <code>len(s)</code> и какой у s тип?</summary>
+      <div class="a"><p>2.0 (NaN пропускается), 2, 3, float64.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.pd.3">
+    <label class="tp"><input type="checkbox" data-id="data.pd.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Пропуски</b></span></label>
+    <span class="note" data-d="data.pd.3">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="topic" id="t5">
+  <div class="eyebrow">Тема 5 из 10 · <span class="qd key" aria-hidden="true"></span> Данные</div>
+  <h2>groupby, agg, transform</h2>
+  <p class="tldr"><code>groupby</code> работает в три шага: разбить на группы, посчитать в каждой, собрать вместе (split — apply — combine). <code>agg</code> сворачивает группу в одну строку. <code>transform</code> возвращает результат каждой исходной строке — так делают признаки вида «среднее по группе».</p>
+  <div class="prose"><p>Деканат раскладывает зачётки по группам и считает средний балл каждой группы. Получается отчёт на три строки — это <code>agg</code>. А можно вписать средний балл группы в каждую зачётку: зачёток столько же, но в каждой новая графа — это <code>transform</code>. В SQL первое — это <code>GROUP BY</code>, второе — оконная функция <code>AVG(...) OVER (PARTITION BY ...)</code>.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · groupby по шагам</span><span class="muted mono" id="gbState">шаг 0 из 3</span></div>
+    <div class="btns" role="group" aria-label="Что считаем">
+      <button class="btn mono gbm" data-m="mean">.mean()</button>
+      <button class="btn mono gbm" data-m="agg">.agg(…)</button>
+      <button class="btn mono gbm" data-m="tr">.transform("mean")</button>
+    </div>
+    <div class="codeline" id="gbCode"></div>
+    <div id="gbView"></div>
+    <div class="btns"><button class="btn" id="gbPrev">← Назад</button><button class="btn" id="gbNext">Следующий шаг →</button></div>
+    <p class="verdict" id="gbMsg" aria-live="polite"></p>
+  </div>
+
+<pre>g = df.groupby("group")
+g["score"].mean()                       <span class="cm"># Series: группа → средний балл</span>
+g.size()                                <span class="cm"># строк в группе, вместе с пропусками</span>
+g["score"].count()                      <span class="cm"># только непустые значения</span>
+df.groupby("group", as_index=False)["score"].mean()   <span class="cm"># группа — обычный столбец, а не индекс</span>
+df.groupby(["module", "group"])["score"].agg(["mean", "max"])
+df.groupby("group").agg(n=("score", "size"),           <span class="cm"># именованная агрегация:</span>
+                        avg=("score", "mean"),         <span class="cm"># имя = (столбец, функция)</span>
+                        best=("score", "max"))
+df["group_avg"] = g["score"].transform("mean")         <span class="cm"># длина как у df</span>
+df["vs_group"] = df.score - df.group_avg               <span class="cm"># выше или ниже своей группы</span>
+df[g["score"].transform("size") &gt;= 5]                  <span class="cm"># только группы от 5 человек</span>
+df.sort_values("score").groupby("group").tail(1)       <span class="cm"># лучший в каждой группе</span></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Метод</th><th>Что возвращает</th><th>Когда</th></tr></thead>
+    <tbody>
+      <tr><td><code>agg</code>, <code>mean</code>, <code>sum</code>…</td><td>одну строку на группу</td><td>отчёт, сводка, признаки на уровне объекта</td></tr>
+      <tr><td><code>transform</code></td><td>столько же строк, сколько было</td><td>признаки «относительно группы», заполнение пропусков по группе</td></tr>
+      <tr><td><code>filter</code></td><td>строки только тех групп, что прошли условие</td><td>убрать маленькие группы</td></tr>
+      <tr><td><code>apply</code></td><td>что угодно</td><td>когда ничего другого не подходит: это медленный цикл по группам</td></tr>
+    </tbody></table></div>
+  <div class="callout trap"><b class="h">Три ловушки groupby</b><p><b>NaN в ключе.</b> Строки, где ключ группы пустой, по умолчанию молча выпадают. Нужны — <code>groupby(..., dropna=False)</code>.</p><p><b>Текстовые столбцы.</b> <code>df.groupby("group").mean()</code> на таблице со строковыми столбцами в pandas 2 и 3 падает с TypeError. Выбери столбцы: <code>g[["score", "visits"]].mean()</code> или передай <code>numeric_only=True</code>.</p><p><b>size и count.</b> <code>size</code> считает строки, <code>count</code> — непустые значения. Разница между ними и есть число пропусков в группе.</p></div>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Половина сильных признаков в табличных задачах — агрегаты. Сколько кликов было у студента за первые 4 недели. Какую долю заданий он сдал. Насколько его балл выше среднего по курсу. Отдельный приём — target encoding: заменить категорию средним таргетом по ней. Его считают строго на train, иначе это прямая утечка ответа в признак.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Чем agg отличается от transform?</summary>
+      <div class="a"><p><code>agg</code> сворачивает каждую группу в одно значение: на выходе столько строк, сколько групп, индекс — ключи групп. <code>transform</code> считает то же самое, но раздаёт результат каждой строке группы: на выходе индекс и длина исходной таблицы. Поэтому результат <code>transform</code> можно сразу записать новым столбцом: «средний балл группы», «доля заказа в сумме клиента». С результатом <code>agg</code> для этого пришлось бы делать merge обратно.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Как получить по каждому пользователю первую по времени запись?</summary>
+      <div class="a"><p>Отсортировать по времени и взять первую строку в каждой группе: <code>df.sort_values("ts").groupby("user_id").head(1)</code>. Или найти индекс минимума: <code>df.loc[df.groupby("user_id")["ts"].idxmin()]</code>. Вариант с <code>drop_duplicates("user_id")</code> после сортировки тоже работает. Цикл по пользователям — нет: медленно.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>В группе 10 строк, у 3 пропуск в score. Что вернут <code>size()</code> и <code>["score"].count()</code>?</summary>
+      <div class="a"><p>10 и 7.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.pd.5">
+    <label class="tp"><input type="checkbox" data-id="data.pd.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>groupby, agg, transform</b></span></label>
+    <span class="note" data-d="data.pd.5">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="topic" id="t6">
+  <div class="eyebrow">Тема 6 из 10 · <span class="qd key" aria-hidden="true"></span> Данные</div>
+  <h2>merge, join, concat</h2>
+  <p class="tldr"><code>merge</code> склеивает таблицы по ключу, как JOIN в SQL. Параметр <code>how</code> решает, что делать со строками без пары. <code>concat</code> ставит таблицы друг под другом или рядом. Главная опасность merge — повторяющиеся ключи: строки молча размножаются.</p>
+  <div class="prose"><p>Реальные данные почти никогда не лежат в одной таблице. Студенты — в одной, оценки — в другой, задания — в третьей. Связывает их ключ — столбец, который есть в обеих таблицах: <code>id_student</code>, <code>id_assessment</code>. В левой таблице ниже одна строка на студента, в правой — одна строка на оценку: у Ани их две, у Бори и Гоши ни одной, а у студента 5 оценка есть, а записи в списке нет.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · склеиваем студентов и оценки</span><span class="muted mono" id="mgState"></span></div>
+    <div class="serrow">
+      <div class="sercap"><div class="dfw" id="mgL"></div>students</div>
+      <div class="sercap"><div class="dfw" id="mgR"></div>scores</div>
+    </div>
+    <div class="btns" role="group" aria-label="Тип склейки">
+      <button class="btn mono mgh" data-h="inner">how="inner"</button>
+      <button class="btn mono mgh" data-h="left">how="left"</button>
+      <button class="btn mono mgh" data-h="right">how="right"</button>
+      <button class="btn mono mgh" data-h="outer">how="outer"</button>
+    </div>
+    <div class="btns">
+      <button class="btn mono" id="mgInd" aria-pressed="false">indicator=True</button>
+      <button class="btn" id="mgDup" aria-pressed="false">Задвоить Аню в students</button>
+    </div>
+    <div class="codeline" id="mgCode"></div>
+    <div class="dfw" id="mgRes"></div>
+    <p class="verdict" id="mgMsg" aria-live="polite"></p>
+    <p class="muted" style="font-size:13.5px">Как читать: результат склейки — внизу. Красный NaN — у строки не нашлось пары в другой таблице. Счётчик сверху сравнивает число строк до и после.</p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>how</th><th>Что остаётся</th><th>Когда</th></tr></thead>
+    <tbody>
+      <tr><td><code>inner</code> (по умолчанию)</td><td>только ключи, которые есть в обеих</td><td>нужны только полные пары</td></tr>
+      <tr><td><code>left</code></td><td>все строки левой, справа NaN, если пары нет</td><td>самый частый: к основной таблице дописать признаки</td></tr>
+      <tr><td><code>right</code></td><td>все строки правой</td><td>редко: проще поменять таблицы местами и сделать left</td></tr>
+      <tr><td><code>outer</code></td><td>все ключи из обеих</td><td>сверка: что есть только слева и только справа</td></tr>
+    </tbody></table></div>
+<pre>res = students.merge(scores, on="id_student", how="left",
+                     validate="one_to_many",   <span class="cm"># упадёт, если в students ключ повторяется</span>
+                     indicator=True)           <span class="cm"># столбец _merge: both / left_only / right_only</span>
+res["_merge"].value_counts()                   <span class="cm"># сколько строк не нашли пару</span>
+a.merge(b, left_on="student", right_on="id_student")   <span class="cm"># ключ называется по-разному</span>
+a.merge(b, on=["course", "semester", "id_student"])    <span class="cm"># составной ключ</span>
+a.merge(b, on="id", suffixes=("", "_b"))       <span class="cm"># одинаковые столбцы: вместо score_x и score_y</span>
+students.duplicated("id_student").sum()        <span class="cm"># перед merge: уникален ли ключ</span>
+pd.concat([autumn, spring], ignore_index=True) <span class="cm"># друг под другом, индекс заново</span>
+pd.concat([X, extra], axis=1)                  <span class="cm"># рядом — выравнивание по индексу (тема 1)</span>
+a.join(b)                                      <span class="cm"># merge по индексу</span></pre>
+  <div class="callout trap"><b class="h">Ловушка: строк стало больше</b><p>Если ключ повторяется в обеих таблицах, каждая строка слева соединяется с каждой парной строкой справа. 2 строки на 2 строки дают 4. Ошибки нет, просто таблица распухла, а средние и суммы стали неверными. Поэтому у каждого merge в проекте стоит <code>validate</code>, а после него — проверка числа строк: <code>assert len(res) == len(students)</code>.</p></div>
+  <div class="callout brs"><b class="h">Где это в проекте</b><p>OULAD — это семь таблиц, связанных ключами: студенты, регистрации, курсы, задания, оценки, материалы курса и клики. Почти каждый признак проекта появится через merge. Перед каждым проверяй, уникален ли ключ там, где ты ждёшь одну строку: <code>df.duplicated(ключи).sum() == 0</code>.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Какие бывают виды join? Чем left отличается от inner?</summary>
+      <div class="a"><p>inner оставляет только ключи, которые есть в обеих таблицах. left — все строки левой: где пары нет, справа будут NaN. right — то же для правой. outer — объединение ключей, NaN с обеих сторон. Бывает ещё cross — каждая строка с каждой. Разница left и inner видна на студентах без оценок: в left они остаются с NaN, в inner исчезают. Если считать по inner долю сдавших, «молчащие» студенты выпадут, и результат будет завышен.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>После merge строк стало больше, чем в левой таблице. Почему и как найти причину?</summary>
+      <div class="a"><p>В правой таблице ключ не уникален. Это либо так и задумано (один ко многим: одна строка на каждую оценку), либо дубликаты, и тогда это ошибка. Проверяю <code>right.duplicated(key).sum()</code> и смотрю сами дубликаты: <code>right[right.duplicated(key, keep=False)]</code>. Часто оказывается, что ключ составной, и одного столбца мало. Защита на будущее — <code>validate="one_to_one"</code> или <code>"many_to_one"</code>: merge упадёт с понятной ошибкой вместо тихого размножения.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Слева 100 строк с уникальными ключами. Справа у каждого ключа ровно 2 строки, и все ключи совпадают. Сколько строк даст left merge?</summary>
+      <div class="a"><p>200.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.pd.6">
+    <label class="tp"><input type="checkbox" data-id="data.pd.6"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>merge, join, concat</b></span></label>
+    <span class="note" data-d="data.pd.6">отметка в дереве</span>
+  </div>
+</section>
+
+<div class="part"><span class="eyebrow">Часть 2 · 4 темы</span><h2>Столбец в трёх числах</h2><p>Миллион значений глазами не прочитать. Описательная статистика сжимает столбец до нескольких чисел: где центр, какой разброс, есть ли странные значения и какой формы распределение. С этого начинается любой EDA и любой ответ на вопрос «что у тебя в данных».</p></div>
+
+<!-- ============ 7 ============ -->
+<section class="topic" id="t7">
+  <div class="eyebrow">Тема 7 из 10 · Статистика</div>
+  <h2>Среднее, медиана, мода</h2>
+  <p class="tldr">Среднее — центр тяжести. Медиана — значение посередине после сортировки. Мода — самое частое значение. В симметричных данных они почти совпадают. При длинном хвосте или выбросах они расходятся, и уже это говорит о данных.</p>
+  <div class="prose"><p>Почему MSE приводит к среднему, а MAE — к медиане, мы разобрали в уроке 1.1, тема 4. Здесь вопрос другой: какое число назвать «типичным», когда описываешь данные. Подвигай точки и посмотри, кто из троих реагирует на хвост.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · тяни точки по оси</span><span class="muted mono" id="ctState"></span></div>
+    <div class="lab-grid">
+      <svg id="ctSvg" viewBox="0 0 360 190" role="img" aria-label="Часы на платформе за неделю у студентов: точки, среднее и медиана"></svg>
+      <div class="ctrl">
+        <div class="readout">
+          <div class="stat"><div class="v" id="ctMean" style="color:var(--plum)">0</div><div class="k">среднее</div></div>
+          <div class="stat"><div class="v" id="ctMed" style="color:var(--warm)">0</div><div class="k">медиана</div></div>
+          <div class="stat"><div class="v" id="ctMode">0</div><div class="k">мода</div></div>
+          <div class="stat"><div class="v" id="ctTrim">0</div><div class="k">усечённое среднее, 10%</div></div>
+        </div>
+        <div class="btns">
+          <button class="btn" id="ctAdd">Добавить «залипшего» на 28 ч</button>
+          <button class="btn" id="ctPop">Убрать последнего</button>
+          <button class="btn" id="ctReset">Сбросить</button>
+        </div>
+        <p class="verdict" id="ctMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Как читать: каждая точка — студент, ось — часы на платформе за неделю. Одинаковые значения встают столбиком. Точку можно тянуть мышкой или пальцем.</p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Мера</th><th>Как считать</th><th>Когда брать</th></tr></thead>
+    <tbody>
+      <tr><td>Среднее</td><td>сумма / n; боится выбросов</td><td>симметричные данные; когда важна сумма: выручка, нагрузка на сервер (сумма = среднее × n)</td></tr>
+      <tr><td>Медиана</td><td>середина после сортировки; при чётном n — среднее двух средних; выбросов не боится</td><td>всё с хвостом: зарплаты, время, клики, цены квартир</td></tr>
+      <tr><td>Мода</td><td>самое частое; мод может быть несколько</td><td>категории и дискретные значения: самый частый регион, оценка</td></tr>
+      <tr><td>Усечённое среднее</td><td>отбросить по 5–10% с каждого края и усреднить</td><td>компромисс: оценки жюри, где выкидывают крайние</td></tr>
+    </tbody></table></div>
+<pre>s.mean(), s.median()
+s.mode()                              <span class="cm"># Series: мод может быть несколько, бери s.mode()[0]</span>
+from scipy import stats
+stats.trim_mean(s, 0.1)               <span class="cm"># без 10% с каждого края</span>
+np.average(grades, weights=credits)   <span class="cm"># взвешенное: средний балл с учётом кредитов курса</span></pre>
+  <div class="callout trap"><b class="h">Ловушка: среднее средних</b><p>В группе А 10 студентов со средним 80, в группе Б 90 студентов со средним 60. Общее среднее — не (80 + 60) / 2 = 70, а (10·80 + 90·60) / 100 = 62. Средние групп разного размера нельзя усреднять напрямую: либо взвешивай по размеру, либо считай по исходным строкам. На этом ловят и в аналитике, и в метриках: macro и micro усреднение — это та же история.</p></div>
+  <div class="callout feel"><b class="h">Физический смысл</b><p>Среднее — точка, где уравновесилась бы доска с грузами в местах значений: далёкий груз давит сильнее, как рычаг. Медиане важно только, сколько точек слева и справа, а не насколько они далеко. Поэтому один миллиардер сдвигает среднюю зарплату в стране и не трогает медианную.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Что лучше описывает типичную зарплату — среднее или медиана?</summary>
+      <div class="a"><p>Медиана. У зарплат длинный правый хвост: немного очень больших значений тянет среднее вверх, и «средняя зарплата» оказывается выше, чем у большинства. Медиана — значение, выше и ниже которого по половине людей. Её не сдвигают крайние значения. Хорошо назвать обе: если среднее заметно больше медианы, это само по себе говорит о хвосте.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Когда среднее полезнее медианы?</summary>
+      <div class="a"><p>Когда важна сумма. Бюджет, выручка, суммарная нагрузка: сумма = среднее × n, а медиана сумму не восстанавливает. Ещё — при симметричных данных без выбросов: там среднее точнее как оценка центра, и на нём построены t-тесты и доверительные интервалы.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>3, 5, 5, 6, 100. Среднее, медиана, мода?</summary>
+      <div class="a"><p>23.8, 5, 5.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="stats.desc.0">
+    <label class="tp"><input type="checkbox" data-id="stats.desc.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Среднее, медиана, мода</b></span></label>
+    <span class="note" data-d="stats.desc.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="topic" id="t8">
+  <div class="eyebrow">Тема 8 из 10 · <span class="qd key" aria-hidden="true"></span> Статистика</div>
+  <h2>Дисперсия, стандартное отклонение, квантили</h2>
+  <p class="tldr">Дисперсия — средний квадрат отклонения от среднего. Стандартное отклонение (std, σ) — корень из неё, в тех же единицах, что и данные. Квантиль уровня q — значение, ниже которого лежит доля q данных. Медиана — квантиль 0.5, квартили — 0.25 и 0.75.</p>
+  <div class="prose"><p>Две группы со средним 70. В первой у всех от 68 до 72. Во второй половина набрала 40, половина — 100. Среднее одинаковое, а группы совсем разные. Центр без разброса — половина описания.</p></div>
+  <div class="formula">
+    <div class="fx"><span class="c3">σ²</span> = Σ(<span class="c1">xᵢ</span> − <span class="c2">x̄</span>)² / (<span class="c4">n − 1</span>)</div>
+    <div class="fx">σ = √<span class="c3">σ²</span>    IQR = Q3 − Q1</div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--accent)">xᵢ</span> — значения, <span class="s" style="color:var(--plum)">x̄</span> — их среднее</div>
+      <div><span class="s" style="color:var(--warm)">σ²</span> — дисперсия: средний квадрат отклонения. Единицы в квадрате («баллы²»), поэтому для описания берут σ</div>
+      <div><span class="s" style="color:var(--teal)">n − 1</span> — поправка Бесселя для выборки (ниже — зачем)</div>
+      <div><span class="s">Q1, Q3</span> — квартили: ниже Q1 лежит четверть данных, ниже Q3 — три четверти. IQR — ширина средней половины данных</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · разброс и квантили</span><span class="muted mono" id="spState"></span></div>
+    <div class="lab-grid">
+      <svg id="spSvg" viewBox="0 0 360 220" role="img" aria-label="Баллы 20 студентов, полоса среднее плюс-минус сигма, квартили и выбранный квантиль"></svg>
+      <div class="ctrl">
+        <label for="spS"><span class="row"><span>Насколько разные студенты</span><span class="mono" id="spSV">12</span></span>
+          <input type="range" id="spS" min="2" max="24" step="1" value="12"></label>
+        <label for="spQ"><span class="row"><span>Квантиль q</span><span class="mono" id="spQV">0.75</span></span>
+          <input type="range" id="spQ" min="0" max="100" step="5" value="75"></label>
+        <div class="btns"><button class="btn mono" id="spDdof" aria-pressed="false">ddof=0, как в numpy</button></div>
+        <div class="readout">
+          <div class="stat"><div class="v" id="spStd">0</div><div class="k">std, σ</div></div>
+          <div class="stat"><div class="v" id="spIqr">0</div><div class="k">IQR = Q3 − Q1</div></div>
+          <div class="stat"><div class="v" id="spQv" style="color:var(--teal)">0</div><div class="k" id="spQk">квантиль</div></div>
+          <div class="stat"><div class="v" id="spIn">0</div><div class="k">внутри x̄ ± σ</div></div>
+        </div>
+        <p class="verdict" id="spMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Как читать: точки — баллы 20 студентов, среднее всегда около 70. Зелёная полоса — x̄ ± σ. Жёлтые черты — квартили Q1 и Q3. Бирюзовая линия — выбранный квантиль.</p>
+  </div>
+
+  <h3 style="font-size:17px">Почему n − 1</h3>
+  <div class="prose">
+    <p>Отклонения считаются от среднего, посчитанного по этой же выборке. Выборочное среднее всегда «подстроено» под свои точки, поэтому отклонения от него в сумме чуть меньше, чем от настоящего среднего всех студентов на свете. Деление на n − 1 вместо n эту недооценку исправляет. Уже при n в сотни разницы почти нет.</p>
+    <p>Практическая ловушка: <code>pd.Series.std()</code> делит на n − 1 (<code>ddof=1</code>), а <code>np.std</code> — на n (<code>ddof=0</code>). Одни и те же данные — разные числа. Включи кнопку в лаборатории и посмотри, насколько.</p>
+  </div>
+  <h3 style="font-size:17px">Как читать describe()</h3>
+<pre>s = pd.Series([52, 58, 64, 70, 71, 75, 78, 82, 87, 91], name="score")
+s.describe()
+<span class="cm"># count    10.00   — непустых значений</span>
+<span class="cm"># mean     72.80</span>
+<span class="cm"># std      12.43   — ddof=1</span>
+<span class="cm"># min      52.00</span>
+<span class="cm"># 25%      65.50   — Q1</span>
+<span class="cm"># 50%      73.00   — медиана</span>
+<span class="cm"># 75%      81.00   — Q3</span>
+<span class="cm"># max      91.00</span>
+s.quantile([0.1, 0.9]), s.var(), s.std(ddof=0)
+(s - s.mean()) / s.std()            <span class="cm"># z-оценка: сколько σ от среднего</span></pre>
+  <div class="prose"><ul>
+    <li><b>Квантиль, перцентиль, квартиль.</b> Квантиль 0.95 = 95-й перцентиль. Квартили — это квантили 0.25, 0.5, 0.75. Децили — шаг 0.1.</li>
+    <li><b>Правило 68–95–99.7.</b> Для нормального («колокол») распределения в пределах x̄ ± σ лежит около 68% данных, ± 2σ — около 95%, ± 3σ — около 99.7%. Для перекошенных данных правило не работает.</li>
+    <li><b>z-оценка</b> (x − x̄) / σ — это ровно StandardScaler из урока 2.1, тема 8.</li>
+    <li><b>Коэффициент вариации</b> σ / x̄ — разброс в долях от среднего. Позволяет сравнить разброс зарплат в рублях и роста в сантиметрах.</li>
+  </ul></div>
+  <div class="callout feel"><b class="h">На практике</b><p>В продакшене про время ответа модели говорят квантилями: «p50 — 40 мс, p99 — 300 мс». Среднее тут обманывает: 1% очень медленных запросов почти не меняет среднее, а пользователи их замечают. Квантили показывают и типичный случай, и худший.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Почему в выборочной дисперсии делят на n − 1?</summary>
+      <div class="a"><p>Потому что отклонения меряют от выборочного среднего, а оно подогнано под ту же выборку: сумма квадратов отклонений от него минимальна и меньше, чем от настоящего среднего генеральной совокупности. Деление на n систематически занижает дисперсию. Деление на n − 1 даёт несмещённую оценку. Ещё говорят, что одна степень свободы «потрачена» на оценку среднего. На больших выборках разница пренебрежимо мала.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Чем стандартное отклонение отличается от IQR? Когда что брать?</summary>
+      <div class="a"><p>σ учитывает все точки, причём отклонения в квадрате: один выброс сильно его раздувает. IQR — ширина средней половины данных, крайние значения на него не влияют вовсе. Для симметричных данных без выбросов σ информативнее, и с ним работает правило 68–95–99.7. Для данных с хвостами и выбросами — IQR и медиана: так устроены боксплот и RobustScaler.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>2, 4, 4, 4, 5, 5, 7, 9. Среднее и σ при ddof=0? А что выдаст pandas?</summary>
+      <div class="a"><p>Среднее 5, σ = 2 (сумма квадратов отклонений 32, 32 / 8 = 4). pandas с ddof=1: √(32 / 7) ≈ 2.14.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="stats.desc.1">
+    <label class="tp"><input type="checkbox" data-id="stats.desc.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Дисперсия, стандартное отклонение, квантили</b></span></label>
+    <span class="note" data-d="stats.desc.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="topic" id="t9">
+  <div class="eyebrow">Тема 9 из 10 · Статистика</div>
+  <h2>Выбросы и IQR</h2>
+  <p class="tldr">Выброс — значение, сильно оторванное от остальных. Стандартное правило: всё, что дальше 1.5 × IQR от квартилей, подозрительно. «Подозрительно» не значит «удалить». Сначала выясни, ошибка это или редкий, но настоящий случай.</p>
+  <div class="formula">
+    <div class="fx">границы = [ <span class="c3">Q1</span> − <span class="c4">1.5</span>·<span class="c1">IQR</span> ;  <span class="c3">Q3</span> + <span class="c4">1.5</span>·<span class="c1">IQR</span> ]</div>
+    <div class="legend">
+      <div><span class="s" style="color:var(--warm)">Q1, Q3</span> — края «ящика»: между ними средняя половина данных</div>
+      <div><span class="s" style="color:var(--accent)">IQR</span> — его ширина, Q3 − Q1</div>
+      <div><span class="s" style="color:var(--teal)">1.5</span> — договорённость Тьюки (Tukey). Иногда берут 3 — тогда ловят только «далёкие» выбросы</div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · ящик с усами и два правила</span><span class="muted mono" id="obState"></span></div>
+    <div class="lab-grid">
+      <svg id="obSvg" viewBox="0 0 360 210" role="img" aria-label="Боксплот кликов за неделю, точки и найденные выбросы"></svg>
+      <div class="ctrl">
+        <label for="obN"><span class="row"><span>Сколько выбросов добавить</span><span class="mono" id="obNV">1</span></span>
+          <input type="range" id="obN" min="0" max="6" step="1" value="1"></label>
+        <div class="btns" role="group" aria-label="Множитель IQR"><button class="btn mono obk" data-k="1.5">k = 1.5</button><button class="btn mono obk" data-k="3">k = 3</button></div>
+        <div class="readout">
+          <div class="stat"><div class="v" id="obHi">0</div><div class="k">верхняя граница</div></div>
+          <div class="stat"><div class="v" id="obStd">0</div><div class="k">std всех точек</div></div>
+          <div class="stat"><div class="v" id="obIqr" style="color:var(--red)">0</div><div class="k">выбросов по IQR</div></div>
+          <div class="stat"><div class="v" id="obZ" style="color:var(--plum)">0</div><div class="k">выбросов по |z| &gt; 3</div></div>
+        </div>
+        <p class="verdict" id="obMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="legendrow"><span><i style="background:var(--accent)"></i>обычная точка</span><span><i style="background:var(--red)"></i>выброс по IQR</span><span><i style="border:2px solid var(--plum)"></i>выброс по z-оценке</span></div>
+  </div>
+
+  <h3 style="font-size:17px">Как читать ящик с усами (boxplot)</h3>
+  <div class="prose"><ul>
+    <li><b>Ящик</b> — от Q1 до Q3, внутри половина данных. Черта в ящике — медиана.</li>
+    <li><b>Усы</b> тянутся до самой дальней точки, которая ещё внутри границ.</li>
+    <li><b>Точки за усами</b> — кандидаты в выбросы.</li>
+    <li>Медиана не по центру ящика, а один ус длиннее — распределение перекошено.</li>
+  </ul></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Правило</th><th>Как</th><th>Минус</th></tr></thead>
+    <tbody>
+      <tr><td>IQR (Тьюки)</td><td>за Q1 − 1.5·IQR или Q3 + 1.5·IQR</td><td>на длинном хвосте помечает много нормальных значений</td></tr>
+      <tr><td>z-оценка</td><td>|x − x̄| / σ &gt; 3</td><td>сами выбросы раздувают σ и прячут друг друга (маскировка); работает только для «колокола»</td></tr>
+      <tr><td>Квантили</td><td>всё ниже 1% и выше 99%</td><td>всегда помечает ровно 2%, даже когда выбросов нет</td></tr>
+      <tr><td>Знание предметной области</td><td>возраст 250, балл 130 из 100</td><td>нужен человек, который знает данные, — зато самое точное</td></tr>
+    </tbody></table></div>
+<pre>q1, q3 = s.quantile([0.25, 0.75])
+iqr = q3 - q1
+mask = (s &lt; q1 - 1.5 * iqr) | (s &gt; q3 + 1.5 * iqr)
+s[mask].sort_values()                         <span class="cm"># сначала посмотреть глазами</span>
+lo, hi = s.quantile([0.01, 0.99])
+s_clip = s.clip(lo, hi)                       <span class="cm"># обрезать края — винзоризация</span>
+s_log = np.log1p(s)                           <span class="cm"># сжать длинный хвост (тема 10)</span></pre>
+  <h3 style="font-size:17px">Что делать с выбросом</h3>
+  <div class="prose"><ul>
+    <li><b>Ошибка данных</b> (возраст 250, отрицательная цена, 99999 как «нет данных») — исправить или превратить в NaN, дальше как с пропуском.</li>
+    <li><b>Редкий, но настоящий случай</b> (студент сидел на платформе 60 часов) — оставить. Можно ослабить: обрезать по квантилям, взять логарифм, выбрать устойчивую модель или функцию потерь (деревья, MAE или Huber из урока 1.1).</li>
+    <li><b>Выброс и есть цель</b> — мошенничество, поломка, аномальная активность. Тогда это не мусор, а то, что ищем.</li>
+    <li><b>Никогда не удаляй выбросы из test.</b> Test должен быть похож на жизнь, а в жизни выбросы приходят. Границы обрезки считай по train.</li>
+  </ul></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Как найти выбросы в признаке?</summary>
+      <div class="a"><p>Начинаю с глаз: <code>describe()</code>, боксплот, гистограмма, сортировка по значению — видно, где значения невозможны физически. Формально — правило IQR: за пределами Q1 − 1.5·IQR и Q3 + 1.5·IQR. Для примерно нормальных данных можно z-оценку |z| &gt; 3, но помню, что выбросы раздувают σ и маскируют друг друга. Для многомерных выбросов, когда каждое значение нормальное, а сочетание странное, есть Isolation Forest и LOF. Это отдельная тема.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>Нужно ли удалять выбросы?</summary>
+      <div class="a"><p>Не по умолчанию. Если это ошибка данных — исправляю или делаю NaN. Если это настоящие редкие значения — чаще оставляю. Для линейных моделей ослабляю их влияние: обрезка по квантилям train, логарифм, Huber-потери. Деревьям выбросы в признаках почти не мешают: важен порядок значений, а не расстояние. Удалять можно только из обучающей выборки, и проверять на валидации, стало ли лучше. Test не трогаю.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Q1 = 40, Q3 = 60. Где границы по правилу 1.5·IQR?</summary>
+      <div class="a"><p>IQR = 20, границы 40 − 30 = 10 и 60 + 30 = 90.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="stats.desc.2">
+    <label class="tp"><input type="checkbox" data-id="stats.desc.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Выбросы и IQR</b></span></label>
+    <span class="note" data-d="stats.desc.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="topic" id="t10">
+  <div class="eyebrow">Тема 10 из 10 · <span class="qd key" aria-hidden="true"></span> EDA</div>
+  <h2>Описательная статистика и распределения признаков</h2>
+  <p class="tldr">Распределение показывает, как разложены значения признака: где густо, где пусто, есть ли хвост и несколько горбов. Первый осмотр датасета — <code>describe</code>, доли категорий, пропуски и гистограммы. По ним решают, что чистить, что логарифмировать и чего ждать от модели.</p>
+  <div class="prose"><p>Гистограмма делит ось на корзины (bins) и считает, сколько значений попало в каждую. Корзин мало — детали сливаются. Корзин много — видишь шум вместо формы. Переключай признаки, двигай число корзин и следи, как расходятся среднее и медиана.</p></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · форма распределения</span><span class="muted mono" id="dsState"></span></div>
+    <div class="lab-grid">
+      <svg id="dsSvg" viewBox="0 0 360 230" role="img" aria-label="Гистограмма признака, линии среднего и медианы"></svg>
+      <div class="ctrl">
+        <div class="btns" role="group" aria-label="Признак">
+          <button class="btn dsf" data-f="norm">Баллы за тест</button>
+          <button class="btn dsf" data-f="tail">Клики за семестр</button>
+          <button class="btn dsf" data-f="bi">Возраст: очники и заочники</button>
+        </div>
+        <div class="btns"><button class="btn mono" id="dsLog" aria-pressed="false">np.log1p(x)</button></div>
+        <label for="dsB"><span class="row"><span>Корзин (bins)</span><span class="mono" id="dsBV">20</span></span>
+          <input type="range" id="dsB" min="3" max="40" step="1" value="20"></label>
+        <div class="readout">
+          <div class="stat"><div class="v" id="dsMean" style="color:var(--plum)">0</div><div class="k">среднее</div></div>
+          <div class="stat"><div class="v" id="dsMed" style="color:var(--warm)">0</div><div class="k">медиана</div></div>
+          <div class="stat"><div class="v" id="dsSkew">0</div><div class="k">асимметрия, skew</div></div>
+          <div class="stat"><div class="v" id="dsN">400</div><div class="k">значений</div></div>
+        </div>
+        <p class="verdict" id="dsMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Как читать: высота столбика — сколько из 400 значений попало в корзину. Сиреневая линия — среднее, жёлтая — медиана. Асимметрия больше 0 — хвост справа, меньше 0 — слева. По модулю больше 1 — сильный перекос.</p>
+  </div>
+
+  <h3 style="font-size:17px">Формы, которые встречаются постоянно</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Форма</th><th>Как узнать</th><th>Что делать</th></tr></thead>
+    <tbody>
+      <tr><td>Колокол, симметричная</td><td>среднее ≈ медиане, skew около 0</td><td>ничего особого; σ и правило 68–95–99.7 работают</td></tr>
+      <tr><td>Длинный правый хвост</td><td>среднее заметно больше медианы, skew &gt; 1: деньги, клики, время, просмотры</td><td><code>log1p</code> для линейных моделей и kNN; описывать медианой и квантилями</td></tr>
+      <tr><td>Два горба</td><td>на гистограмме две вершины</td><td>в данных две группы — найди, какой признак их разделяет, и подумай, нужен ли он модели</td></tr>
+      <tr><td>Почти одно значение</td><td>одно значение у 95% строк</td><td>признак почти ничего не несёт; проверь, не ошибка ли заполнения</td></tr>
+      <tr><td>Все значения разные</td><td><code>nunique() == len(df)</code></td><td>это идентификатор, а не признак: в модель не класть</td></tr>
+    </tbody></table></div>
+  <h3 style="font-size:17px">Категориальные признаки</h3>
+  <div class="prose"><ul>
+    <li><code>value_counts(normalize=True)</code> — доли категорий. Сразу видно редкие категории и перекосы.</li>
+    <li><code>nunique()</code> — кардинальность, то есть сколько разных значений. Регион — десяток, город — тысячи. От этого зависит, как кодировать признак (one-hot или иначе).</li>
+    <li>Редкие категории (меньше 1% строк) часто сливают в одну «other»: по паре строк модель ничему не научится, а на test встретит незнакомое значение.</li>
+    <li>Порядковые категории («0-10%», «10-20%»… или «A-level», «HE») — у них есть порядок. Его стоит сохранить, а не превращать в равноправные метки.</li>
+  </ul></div>
+  <h3 style="font-size:17px">Первые 10 минут с новым датасетом</h3>
+<pre>df.shape; df.dtypes; df.head()
+df.isna().mean().sort_values(ascending=False).head(10)  <span class="cm"># где пропуски</span>
+df.duplicated().sum()                                    <span class="cm"># полные дубликаты строк</span>
+df.describe().T                                          <span class="cm"># числа: строки — признаки, так читать удобнее</span>
+df.describe(include="str").T                             <span class="cm"># строки: count, unique, top, freq (в pandas 2 — include="object")</span>
+df.nunique().sort_values()                               <span class="cm"># константы сверху, идентификаторы снизу</span>
+df["region"].value_counts(normalize=True).head()
+df.skew(numeric_only=True).sort_values()                 <span class="cm"># где длинные хвосты</span></pre>
+  <div class="callout feel"><b class="h">Где это в ML</b><p>Форма распределения влияет на модель. Линейные модели, kNN и нейросети страдают от длинных хвостов и разных масштабов (урок 2.1, тема 8). Деревьям важен только порядок значений. Ещё важнее сравнить распределения train и test: если они разные (в test другие курсы, другой год), качество на валидации обманет. На проде то же самое называют дрейфом данных (data drift) и следят за ним.</p></div>
+  <div class="callout brs"><b class="h">Где это в проекте</b><p>Графики (гистограммы, боксплоты по группам, корреляции) и анализ таргета ждут тебя в уроке 3.3. Там ты сделаешь EDA проекта целиком. Здесь задача скромнее: научиться читать признак по пяти числам и одной гистограмме.</p></div>
+  <div class="qs">
+    <details class="q"><summary><span class="t">Собес</span>Вам дали новый датасет. С чего начнёте?</summary>
+      <div class="a"><p>С вопроса, что в строке и что предсказываем. Потом размер и типы: правильно ли прочиталось. Потом пропуски по столбцам и дубликаты. Потом <code>describe</code> по числам и <code>value_counts</code> по категориям: невозможные значения, константы, идентификаторы, перекосы. Дальше гистограммы и распределение таргета: дисбаланс классов. Потом связи признаков с таргетом и между собой. И отдельно ищу признаки, которые знают ответ заранее, — утечки. Итог записываю текстом: что увидел и что с этим буду делать.</p></div></details>
+    <details class="q"><summary><span class="t">Собес</span>У признака длинный правый хвост. Что будете делать?</summary>
+      <div class="a"><p>Зависит от модели. Для деревьев и бустингов обычно ничего: им важен порядок значений. Для линейных моделей, kNN и нейросетей — <code>log1p</code> (логарифм от x + 1, работает с нулями), реже Box-Cox или Yeo-Johnson. Если на хвосте есть явные ошибки — разбираюсь с ними как с выбросами. Описываю такой признак медианой и квантилями, а не средним и σ. Если хвост в таргете (регрессия цены) — часто обучаю на log(y) и перевожу предсказание обратно.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Среднее 120, медиана 40. Какая форма распределения?</summary>
+      <div class="a"><p>Длинный правый хвост: немного очень больших значений тянут среднее вверх.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="data.eda.0">
+    <label class="tp"><input type="checkbox" data-id="data.eda.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Описательная статистика и распределения признаков</b></span></label>
+    <span class="note" data-d="data.eda.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · как на собеседовании и в работе</div>
+  <h2>Практика</h2>
+  <p class="tldr">Главная задача — первая сводная таблица проекта А на настоящих данных OULAD. Остальное — то, что дают на live coding по pandas, и устные вопросы.</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Работа · главная задача урока, Jupyter, 90 минут</span>
+      <h3>Проект А: одна строка — один студент на одном курсе</h3>
+      <p>В <code>notebooks/01_eda.ipynb</code> прочитай <code>studentInfo</code>, <code>assessments</code> и <code>studentAssessment</code>. Для каждой таблицы выведи размер, типы и долю пропусков по столбцам. Посмотри через <code>head()</code>, как в файлах записаны пропуски. Потом собери таблицу «одна строка — один студент на одном курсе»: все столбцы <code>studentInfo</code>, число сданных заданий и средний балл по ним. Посчитай долю сдавших (Pass или Distinction) по каждому модулю <code>code_module</code>. Сохрани таблицу в <code>data/processed/students.parquet</code>.</p>
+      <p class="ok">Готово, когда:</p>
+      <ul class="ok">
+        <li>строк в итоговой таблице столько же, сколько в <code>studentInfo</code>, и это проверяет <code>assert</code>;</li>
+        <li>у каждого merge стоит <code>validate</code>;</li>
+        <li>в ноутбуке три вывода текстом: где больше всего пропусков, какой модуль самый трудный, сколько студентов не сдали ни одного задания.</li>
+      </ul>
+      <details><summary>Решение</summary><div class="a">
+<pre>import pandas as pd
+RAW = "data/raw/"
+info = pd.read_csv(RAW + "studentInfo.csv")
+tasks = pd.read_csv(RAW + "assessments.csv")
+sa = pd.read_csv(RAW + "studentAssessment.csv")   <span class="cm"># если пропуск записан «?», добавь na_values=["?"]</span>
+
+for name, t in {"info": info, "tasks": tasks, "sa": sa}.items():
+    print(name, t.shape)
+    print(t.isna().mean().sort_values(ascending=False).head(), "\n")
+
+KEY = ["code_module", "code_presentation", "id_student"]
+<span class="cm"># у оценки нет курса — берём его из таблицы заданий; у задания ровно одна строка</span>
+sa = sa.merge(tasks[["id_assessment", "code_module", "code_presentation"]],
+              on="id_assessment", how="left", validate="many_to_one")
+per_student = (sa.groupby(KEY)
+                 .agg(n_submitted=("id_assessment", "size"),
+                      avg_score=("score", "mean"))
+                 .reset_index())
+students = info.merge(per_student, on=KEY, how="left", validate="one_to_one")
+students["n_submitted"] = students.n_submitted.fillna(0).astype(int)
+assert len(students) == len(info)
+
+students["passed"] = students.final_result.isin(["Pass", "Distinction"])
+students.groupby("code_module").passed.mean().sort_values()   <span class="cm"># самый трудный модуль — сверху</span>
+(students.n_submitted == 0).sum()
+students.to_parquet("data/processed/students.parquet", index=False)</pre>
+        <p><code>avg_score</code> у тех, кто ничего не сдал, остаётся NaN, и это правильно: оценки нет, а не ноль. Число сданных — 0, потому что «не сдал ни одного» — это факт, а не пропуск. Если <code>validate="one_to_one"</code> упал — разберись, какой ключ повторяется (задача ниже).</p></div></details></div>
+
+    <div class="task"><span class="tg rev">Отладка · 15 минут</span>
+      <h3>«После merge студентов стало больше»</h3>
+      <p>Коллега пишет: <code>info.merge(reg, on="id_student")</code>, где <code>reg</code> — <code>studentRegistration.csv</code>. Строк в результате больше, чем в <code>info</code>, хотя «у каждого студента одна регистрация». Найди причину по данным и исправь.</p>
+      <p class="ok">Готово, когда ты показал кодом повторы ключа, назвал причину одной фразой, и исправленный merge проходит <code>validate="one_to_one"</code>.</p>
+      <details><summary>Разбор</summary><div class="a">
+<pre>info.id_student.duplicated().sum()          <span class="cm"># больше нуля: id_student повторяется</span>
+info[info.id_student.duplicated(keep=False)].sort_values("id_student").head()
+KEY = ["code_module", "code_presentation", "id_student"]
+info.duplicated(KEY).sum()                  <span class="cm"># 0 — уникальна тройка</span>
+info.merge(reg, on=KEY, validate="one_to_one")</pre>
+        <p>Один человек проходит несколько курсов или один курс в разных семестрах. Студент на курсе — это тройка (модуль, семестр, id), а не id. Merge по одному id соединил каждую запись студента с каждой его регистрацией.</p></div></details></div>
+
+    <div class="task"><span class="tg rev">Код-ревью · найди 6 ошибок</span>
+      <h3>Ноутбук стажёра перед обучением модели</h3>
+<pre>df = pd.read_csv("grades.csv")              <span class="cm"># выгрузка из Excel: 87,5 и даты 03.10.2026</span>
+df["score"] = df["score"].fillna(df["score"].mean())
+train, test = df[:800], df[800:]
+df[df.group == "А"]["bonus"] = 5
+top = df[df.score &gt; 80 and df.visits &gt; 10]
+by_group = df.groupby("group").mean()
+res = df.merge(courses, on="course")        <span class="cm"># строк стало больше — «ну и ладно»</span></pre>
+      <p class="ok">Готово, когда для каждой ошибки есть исправленная строка и одна фраза «почему».</p>
+      <details><summary>Ошибки</summary><div class="a"><ul>
+        <li><b>Чтение:</b> нет <code>sep=";"</code>, <code>decimal=","</code> и формата дат — score прочитается строками, даты не станут датами.</li>
+        <li><b>Заполнение до разбиения и средним:</b> утечка из test плюс чувствительность к выбросам. Разбить сначала, медиана по train — лучше внутри Pipeline.</li>
+        <li><b>Разбиение срезом:</b> если файл отсортирован (по дате, по группе), test окажется другим миром. Нужен <code>train_test_split</code> с <code>random_state</code> или осознанное разбиение по времени.</li>
+        <li><b>Цепочка присваиваний:</b> bonus не запишется. Нужно <code>df.loc[df.group == "А", "bonus"] = 5</code>.</li>
+        <li><b><code>and</code> между масками:</b> ValueError. Нужно <code>(df.score &gt; 80) &amp; (df.visits &gt; 10)</code>.</li>
+        <li><b><code>groupby().mean()</code> со строковыми столбцами</b> — TypeError: выбери числовые столбцы. А размножение строк после merge — это не «ну и ладно»: дубликаты ключа в <code>courses</code>, нужен <code>validate="many_to_one"</code> и разбор повторов.</li>
+      </ul></div></details></div>
+
+    <div class="task"><span class="tg int">Собес · live coding, 15 минут</span>
+      <h3>Заказы пользователей</h3>
+      <p>Есть таблица <code>orders</code> со столбцами <code>user_id</code>, <code>order_date</code>, <code>amount</code>. Напиши без циклов:</p>
+      <ul>
+        <li>(а) для каждого пользователя число заказов, сумму и средний чек;</li>
+        <li>(б) только пользователей с тремя и более заказами, по убыванию суммы;</li>
+        <li>(в) столбец <code>share</code> — доля заказа в сумме пользователя;</li>
+        <li>(г) первый заказ каждого пользователя.</li>
+      </ul>
+      <p class="ok">Готово, когда всё работает на таблице из 10 строк, которую ты придумал сам, а суммы долей у каждого пользователя равны 1.</p>
+      <details><summary>Решение</summary><div class="a">
+<pre>stats = (orders.groupby("user_id")
+               .agg(n=("amount", "size"), total=("amount", "sum"), avg=("amount", "mean"))
+               .query("n &gt;= 3")
+               .sort_values("total", ascending=False))
+orders["share"] = orders.amount / orders.groupby("user_id").amount.transform("sum")
+first = orders.sort_values("order_date").groupby("user_id").head(1)
+<span class="cm"># проверка: orders.groupby("user_id").share.sum() — везде 1.0</span></pre></div></details></div>
+
+    <div class="task"><span class="tg lc">LeetCode · 6 задач на pandas</span>
+      <h3>30 Days of Pandas: фильтры, группировки, склейки</h3>
+      <p>В учебном плане <a href="https://leetcode.com/studyplan/30-days-of-pandas/" target="_blank" rel="noopener">30 Days of Pandas</a> реши на pandas:</p>
+      <ul>
+        <li>фильтры — 595 Big Countries, 1757 Recyclable and Low Fat Products, 183 Customers Who Never Order;</li>
+        <li>группировки — 1741 Find Total Time Spent by Each Employee, 596 Classes More Than 5 Students;</li>
+        <li>склейки — 1280 Students and Examinations.</li>
+      </ul>
+      <p class="ok">Готово, когда все шесть приняты без подсказок, а 183 решена двумя способами: через <code>isin</code> и через merge с <code>indicator=True</code>.</p></div>
+
+    <div class="task"><span class="tg int">Собес · устно · 3 минуты</span>
+      <h3>«В признаке "доход" 15% пропусков и несколько огромных значений. Что будете делать?»</h3>
+      <p class="ok">Готово, когда в ответе есть: причина пропусков, флаг, медиана по train, проверка выбросов на ошибки, логарифм или обрезка, зависимость от модели.</p>
+      <details><summary>Каким должен быть ответ</summary><div class="a"><p>Сначала посмотрю, почему пропуски: если доход не указывают люди с низким доходом, пропуск — сам по себе сигнал. Поэтому добавлю флаг <code>income_missing</code>. Заполню медианой, лучше по осмысленной группе (регион, возраст), и посчитаю её только на train — внутри Pipeline. Огромные значения проверю: ошибка ввода (лишние нули) — исправлю или сделаю NaN; настоящие — оставлю. У дохода длинный правый хвост, поэтому для линейной модели возьму <code>log1p</code> или обрежу по 99-му перцентилю train. Для бустинга, скорее всего, оставлю как есть, даже с NaN. Выбор между вариантами — по качеству на валидации.</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в дереве</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда прошёл «Проверку без ИИ» по теме. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Series</b> — столбец с индексом, <b>DataFrame</b> — Series с общим индексом. Арифметика выравнивается по меткам: нет пары — NaN. <code>info()</code> — первая команда.</li>
+      <li><b>Векторно, не циклом:</b> арифметика, <code>np.where</code>, <code>map</code>, <code>.str</code>, <code>.dt</code>. <code>iterrows</code> и <code>apply</code> — медленные циклы.</li>
+      <li><b>read_csv явно:</b> <code>sep</code>, <code>decimal</code>, <code>encoding</code>, <code>na_values</code>, <code>parse_dates</code> + <code>date_format</code>, <code>dtype</code>. После чтения — <code>dtypes</code>. <code>to_csv(index=False)</code>. Свои данные — Parquet.</li>
+      <li><b>loc</b> — метки, срез включительно; <b>iloc</b> — позиции, срез без правого края. После сортировки они расходятся.</li>
+      <li><b>Маски:</b> <code>&amp; | ~</code>, каждое условие в скобках, не <code>and</code>. <code>isin</code>, <code>between</code>, <code>query("x &gt; @v")</code>.</li>
+      <li><b>Присваивание</b> — один <code>df.loc[маска, "col"] = v</code>. Цепочка не работает (pandas 3: Copy-on-Write). Отдельная таблица — <code>.copy()</code>.</li>
+      <li><b>Пропуски:</b> <code>isna().mean()</code>; причина — случайно, по группе или сам пропуск — сигнал. Удалить, медиана, по группе, «unknown», флаг или оставить NaN для бустинга. Заполнение — только по train, в Pipeline.</li>
+      <li><b>groupby:</b> split → apply → combine. <code>agg</code> — строка на группу, <code>transform</code> — длина как у df. Именованная агрегация. NaN-ключи выпадают; size ≠ count.</li>
+      <li><b>merge:</b> inner, left, right, outer. <code>validate</code>, <code>indicator=True</code>, проверка числа строк. Повторяющийся ключ размножает строки. <code>concat</code> — друг под другом или рядом.</li>
+      <li><b>Центр:</b> среднее боится выбросов, медиана — нет, мода — для категорий. Среднее больше медианы — хвост справа. Среднее средних — только со взвешиванием.</li>
+      <li><b>Разброс:</b> σ² = Σ(x − x̄)² / (n − 1). pandas <code>std</code> — ddof=1, numpy — ddof=0. 68–95–99.7 — только для колокола. Квантили: p50, p99.</li>
+      <li><b>Выбросы:</b> за Q1 − 1.5·IQR и Q3 + 1.5·IQR. z &gt; 3 страдает от маскировки. Ошибка — исправить; настоящий — оставить, log, clip по train. Test не чистить.</li>
+      <li><b>Распределения:</b> колокол, правый хвост (log1p), два горба (две группы), константа, идентификатор. <code>skew</code> &gt; 1 — сильный перекос.</li>
+      <li><b>Первые 10 минут:</b> shape, dtypes, пропуски, дубликаты, describe (.T), nunique, value_counts(normalize=True), skew.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без ИИ, 15 минут</b>
+    <p>Закрой урок. По памяти:</p>
+    <ul>
+      <li>напиши <code>read_csv</code> для файла из Excel с запятой в дробях и датами 03.10.2026;</li>
+      <li>выбери студентов группы А с баллом от 70 и дай им бонус одной строкой;</li>
+      <li>заполни пропуск медианой по группе;</li>
+      <li>посчитай для каждой группы число студентов и средний балл, а каждому студенту — отклонение от среднего его группы;</li>
+      <li>объясни, почему строк после merge может стать больше;</li>
+      <li>посчитай границы выбросов для Q1 = 30, Q3 = 50.</li>
+    </ul>
+    <p>Где запнулся — туда и возвращайся.</p>
+  </div>
+</section>
+</div>
+
+<script src="/assets/lesson.js"></script>
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const NA=null;
+const f1=v=>v.toFixed(1);
+/* Мини-таблица DataFrame: cols — заголовки (первый — индекс), rows — массивы значений (первое — метка индекса).
+   cls(i,j,v) → класс ячейки; rcls(i) → класс строки; ccls(j) → класс столбца. NA рисуется красным NaN. */
+function dfHTML(cols,rows,o={}){
+  const cc=j=>o.ccls?o.ccls(j)||"":"";
+  let h=`<table class="df"><thead><tr>${cols.map((c,j)=>`<th class="${j?"":"ix"} ${cc(j)}">${esc(c)}</th>`).join("")}</tr></thead><tbody>`;
+  rows.forEach((r,i)=>{
+    h+=`<tr class="${o.rcls?o.rcls(i)||"":""}">`+r.map((v,j)=>{
+      const na=v===NA||v==="NaT", txt=v===NA?"NaN":v;
+      let c=(j?"":"ix ")+cc(j)+(na?" na":"")+(typeof v==="number"?" num":"");
+      if(o.cls)c+=" "+(o.cls(i,j,v)||"");
+      return `<td class="${c}">${esc(txt)}</td>`}).join("")+"</tr>";
+  });
+  return h+"</tbody></table>";
+}
+function press(sel,el){document.querySelectorAll(sel).forEach(b=>b.setAttribute("aria-pressed",b===el?"true":"false"))}
+function median(a){const s=[...a].sort((x,y)=>x-y),n=s.length;return n?(n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2):NaN}
+function mean(a){return a.reduce((x,y)=>x+y,0)/a.length}
+function stdv(a,ddof=1){const m=mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-ddof))}
+function quant(a,q){const s=[...a].sort((x,y)=>x-y),p=q*(s.length-1),lo=Math.floor(p),hi=Math.min(lo+1,s.length-1);return s[lo]+(s[hi]-s[lo])*(p-lo)}
+function skew(a){const n=a.length,m=mean(a),sd=stdv(a,0);if(!sd)return 0;const g=a.reduce((s,x)=>s+((x-m)/sd)**3,0)/n;return g*Math.sqrt(n*(n-1))/(n-2)}
+
+/* ---------- тема 1: выравнивание по индексу ---------- */
+(function align(){
+  const A=[["Аня",70],["Боря",55],["Вика",90],["Гоша",62]], B=[["Вика",80],["Аня",75],["Дима",60],["Боря",58]];
+  const bm=Object.fromEntries(B), am=Object.fromEntries(A);
+  $("alA").innerHTML=dfHTML(["",""],A); $("alB").innerHTML=dfHTML(["",""],B);
+  function run(m){
+    let rows,msg;
+    if(m==="vals"){
+      rows=A.map(([k,v],i)=>{const [bk,bv]=B[i];return [k,v+bv,`${v} + ${bv}`+(bk!==k?` (${bk})`:"")]});
+      msg="Это сложение по позициям, подписи потеряны. Аня получила 70 + 80 — баллы Вики, Вика — 90 + 60 от Димы. Ни одной ошибки, все числа «нормальные», и все неверные. Именно так выглядят самые опасные баги: .to_numpy() и списки отбрасывают индекс.";
+    }else{
+      const keys=[...new Set([...A.map(x=>x[0]),...B.map(x=>x[0])])].sort((x,y)=>x.localeCompare(y,"ru"));
+      rows=keys.map(k=>{const a=am[k],b=bm[k],both=a!==undefined&&b!==undefined;
+        if(both)return [k,a+b,`${a} + ${b}`];
+        if(m==="add")return [k,NA,a!==undefined?`${a} + нет пары`:`нет пары + ${b}`];
+        return [k,(a??0)+(b??0),a!==undefined?`${a} + 0`:`0 + ${b}`]});
+      msg=m==="add"
+        ?"pandas сложил баллы по именам, а не по порядку строк: у Ани 70 + 75, хотя во второй таблице она вторая. Гоша и Дима есть только в одной таблице, пары нет — получился NaN. Результат построен по объединению индексов: 5 строк из 4 + 4."
+        :"fill_value=0 говорит: «нет пары — считай нулём». NaN исчезли. Подходит, если отсутствие и правда значит ноль (не было покупок). Для баллов за тест это спорно: Гоша не писал второй тест, а не получил за него 0.";
+    }
+    $("alR").innerHTML=dfHTML(["","результат","как посчитано"],rows,{cls:(i,j,v)=>j===2?"calc":(m==="vals"&&j===1&&A[i][0]!==B[i][0]?"bad":"")});
+    $("alMsg").textContent=msg;
+    $("alState").textContent=m==="vals"?"по позициям":"по меткам индекса";
+    press(".alm",document.querySelector(`.alm[data-m="${m}"]`));
+  }
+  document.querySelectorAll(".alm").forEach(b=>b.onclick=()=>run(b.dataset.m));
+  run("add");
+})();
+
+/* ---------- тема 2: read_csv ---------- */
+(function readcsv(){
+  const RAW=[["Аня","А-1","87,5","03.10.2026"],["Боря","А-1","нет данных","05.10.2026"],["Вика","Б-2","91","04.10.2026"],["Гоша","Б-2","64,0",""]];
+  const on={sep:false,dec:false,na:false,dt:false,df:false};
+  const ISO=(s,dayfirst)=>{const [a,b,y]=s.split(".");return dayfirst?`${y}-${b}-${a}`:`${y}-${a}-${b}`};
+  const RU=["","января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+  function run(){
+    const args=['"grades.csv"'];
+    if(on.sep)args.push('sep=";"'); if(on.dec)args.push('decimal=","'); if(on.na)args.push('na_values=["нет данных"]');
+    if(on.dt)args.push('parse_dates=["date"]'); if(on.df)args.push("dayfirst=True");
+    $("csCode").innerHTML=`df = pd.read_csv(${args.map(esc).join(", ")})`;
+    let cols,rows,types,meanTxt,msg,ok=0;
+    if(!on.sep){
+      cols=["","name;group;score;date"];
+      rows=[["Аня;А-1;87","5;03.10.2026"],["Боря;А-1;нет данных;05.10.2026",NA],["Вика;Б-2;91;04.10.2026",NA],["Гоша;Б-2;64","0;"]];
+      types=[["name;group;score;date","str",false]];
+      meanTxt=`df.score.mean()  <span class="e">→ KeyError: 'score'</span>`;
+      msg="По умолчанию разделитель — запятая. Вся строка легла в один столбец, а запятая внутри 87,5 и 64,0 разрезала строки Ани и Гоши: кусок до запятой стал индексом. Ошибки при чтении нет — мусор молча.";
+    }else{
+      const numeric=on.dec&&on.na;
+      cols=["","name","group","score","date"];
+      rows=RAW.map((r,i)=>{
+        let sc=r[2]; if(on.na&&sc==="нет данных")sc=NA;
+        if(numeric&&sc!==NA)sc=parseFloat(sc.replace(",","."));
+        let d=r[3]===""?(on.dt?"NaT":NA):(on.dt?ISO(r[3],on.df):r[3]);
+        return [i,r[0],r[1],numeric&&sc!==NA?sc.toFixed(1):sc,d];
+      });
+      const dOk=on.dt&&on.df;
+      types=[["name","str",true],["group","str",true],["score",numeric?"float64":"str",numeric],["date",on.dt?"datetime64":"str",dOk]];
+      ok=types.filter(t=>t[2]).length;
+      meanTxt=numeric?`df.score.mean()  <span class="k">→ 80.83</span>`:`df.score.mean()  <span class="e">→ TypeError: Cannot perform reduction 'mean' with string dtype</span>`;
+      if(!on.dec&&!on.na)msg="Столбцы разделились, но score — строки: «87,5» с запятой для pandas не число, и «нет данных» тоже. Среднее не посчитать.";
+      else if(on.dec&&!on.na)msg="decimal включён, а score всё равно строки: одно значение «нет данных» не превращается в число, и pandas оставляет строками весь столбец, даже 87,5. Добавь na_values.";
+      else if(!on.dec&&on.na)msg="«нет данных» стало NaN, но 87,5 и 64,0 с запятой — по-прежнему не числа. Нужен decimal=\",\".";
+      else if(!on.dt)msg="score — float64, среднее считается (NaN пропущен). Осталась дата: это строки, разницу дат или день недели не посчитать. Включи parse_dates.";
+      else if(!on.df){const [,m,dd]=ISO(RAW[0][3],false).split("-");msg=`Даты прочитались — и прочитались неверно. 03.10.2026 стало ${+dd} ${RU[+m]}: pandas по умолчанию считает, что первым идёт месяц. Ни ошибки, ни предупреждения. Включи dayfirst=True, а надёжнее — date_format="%d.%m.%Y".`}
+      else msg="Всё прочитано верно: score — float64, у Бори NaN, date — даты, у Гоши NaT (даты нет). Так и проверяют любой новый файл: dtypes и пара строк глазами.";
+    }
+    $("csTable").innerHTML=dfHTML(cols,rows);
+    $("csTypes").innerHTML=types.map(t=>`<span class="chip ${t[2]?"ok":"no"}">${esc(t[0])}: ${t[1]}</span>`).join("");
+    $("csMean").innerHTML=meanTxt; $("csMsg").textContent=msg;
+    $("csState").textContent=on.sep?`верных типов: ${ok} из 4`:"1 столбец";
+    document.querySelectorAll(".csb").forEach(b=>b.setAttribute("aria-pressed",on[b.dataset.k]?"true":"false"));
+  }
+  document.querySelectorAll(".csb").forEach(b=>b.onclick=()=>{on[b.dataset.k]=!on[b.dataset.k];run()});
+  run();
+})();
+
+/* ---------- тема 3: loc и iloc ---------- */
+(function locLab(){
+  const IX=[14,11,17,12,16,13,15], COLS=["name","group","score","visits"];
+  const D=[["Вика","Б",91,22],["Аня","А",87,18],["Дима","В",78,9],["Боря","А",64,15],["Женя","В",58,4],["Гоша","Б",52,11],["Ева","А",45,6]];
+  const P=[
+    {c:"df.iloc[0:3]",r:[14,11,17],m:"Позиции 0, 1, 2 — первые три строки сверху, правый край 3 не входит. Метки тут ни при чём: это Вика, Аня и Дима, потому что таблица отсортирована по баллу."},
+    {c:"df.loc[11:12]",r:[11,17,12],m:"Срез loc идёт от метки 11 до метки 12 включительно — по порядку строк в таблице, а не по значению. Поэтому внутрь попал Дима с меткой 17. Ошибки нет, сюрприз есть."},
+    {c:"df.loc[12]",r:[12],m:"Одна метка — одна строка, и вернётся Series (столбцы станут подписями). Нужен DataFrame из одной строки — df.loc[[12]]."},
+    {c:"df.iloc[12]",err:"IndexError: single positional indexer is out-of-bounds",m:"iloc понимает 12 как позицию, а строк всего 7. Метка 12 существует, но iloc на метки не смотрит."},
+    {c:'df.loc[df.score > 70, ["name", "score"]]',r:[14,11,17],k:["name","score"],m:"Самая рабочая форма loc: маска по строкам и список столбцов. Так же и присваивают: df.loc[маска, \"score\"] = …"},
+    {c:'df[(df.group == "А") & (df.visits >= 10)]',r:[11,12],m:"Два условия через &, каждое в скобках. Ева тоже из группы А, но у неё 6 посещений."},
+    {c:'df[df.group == "А" & df.visits >= 10]',err:"TypeError: Cannot perform 'rand_' with a dtyped [int64] array and scalar of type [bool]",m:"Без скобок & выполняется раньше сравнений: Python пытается посчитать \"А\" & df.visits. Отсюда невнятная TypeError. Лечится скобками."},
+    {c:'df[df.group.isin(["Б", "В"])]',r:[14,17,16,13],m:"isin — «значение из списка». Вместо цепочки (g == \"Б\") | (g == \"В\")."},
+    {c:'df.query("score > 60 and visits < 16")',r:[17,12],m:"query пишет условие строкой, внутри можно and и or. Удобно читать, но опечатку в имени столбца увидишь только при запуске."},
+    {c:"df.iloc[:, 1:3]",r:IX,k:["group","score"],m:"Все строки, столбцы на позициях 1 и 2. Индекс — не столбец, поэтому name — позиция 0."}
+  ];
+  $("lcBtns").innerHTML=P.map((p,i)=>`<button class="btn mono lcb" data-i="${i}">${esc(p.c)}</button>`).join("");
+  function run(i){
+    const p=P[i], rs=p.r||[], ks=p.k||COLS;
+    const allCols=!p.k&&!p.err;
+    $("lcCode").innerHTML=esc(p.c)+(p.err?`\n<span class="e">${esc(p.err)}</span>`:"");
+    $("lcTable").innerHTML=dfHTML(["",...COLS],D.map((r,j)=>[IX[j],...r]),{
+      rcls:j=>p.err?"dim":rs.includes(IX[j])?"sel":"dim",
+      ccls:j=>j&&!allCols&&!ks.includes(COLS[j-1])?"dimc":""});
+    $("lcMsg").textContent=p.m;
+    $("lcState").textContent=p.err?"ошибка":rs.length===1&&!p.k?"Series":`${rs.length} × ${ks.length}`;
+    press(".lcb",document.querySelector(`.lcb[data-i="${i}"]`));
+  }
+  $("lcBtns").addEventListener("click",e=>{const b=e.target.closest(".lcb");if(b)run(+b.dataset.i)});
+  run(1);
+})();
+
+/* ---------- тема 4: пропуски ---------- */
+(function nanLab(){
+  const G=[{name:"очно",v:[48,52,55,58,60,61,63,66,70,72,75,80,88,104],miss:[2,7,10]},
+           {name:"заочно",v:[8,12,15,18,20,22,24,25,27,30,33,36,41,58],miss:[1,4,7,9,12]}];
+  const ALL=G.flatMap(g=>g.v), TM=mean(ALL), TS=stdv(ALL);
+  const known=G.flatMap(g=>g.v.filter((_,i)=>!g.miss.includes(i)));
+  const KM=mean(known), KMed=median(known);
+  const gMed=G.map(g=>median(g.v.filter((_,i)=>!g.miss.includes(i))));
+  $("nsTrue").textContent=f1(TM); $("nsTrueStd").textContent=f1(TS);
+  const MSG={
+    skip:()=>`pandas по умолчанию пропускает NaN: среднее посчитано по 20 известным. Но 5 из 8 пропусков — у заочников с низкой активностью, поэтому среднее ${f1(KM)} завышено против правды ${f1(TM)}. Пропуски не случайны (MAR), и даже «ничего не делать» искажает картину.`,
+    drop:()=>"dropna выкинул 8 строк. Заочников осталось 9 из 14, и таблица «помолодела» в сторону очников: среднее завышено так же, как без обработки. Ещё и строки пропали — модели на проде так не ответить.",
+    zero:()=>"Ноль — значит «не заходил вообще». Это неправда: у этих студентов были клики. Среднее упало ниже правды, а разброс раздулся из-за ложных нулей. Ноль уместен, только если пропуск значит «события не было».",
+    mean:()=>"Все 8 студентов получили одно число — общее среднее. Заочники получили клики очников: ошибка заполнения большая, а σ сжалась — 8 одинаковых точек в середине.",
+    median:()=>"Медиана устойчивее к выбросам, чем среднее, но беда та же: одно число на всех, заочникам завышено, разброс сжат.",
+    group:()=>"Медиана по группе — df.groupby(\"форма\").clicks.transform(\"median\"). Заочники получили типичное для заочников значение: ошибка заполнения в разы меньше, среднее близко к правде. Плюс флаг «был пропуск» — модель сама решит, важен ли он."
+  };
+  function run(s){
+    let rows=0,vals=[],err=[],pts=[];
+    G.forEach((g,gi)=>g.v.forEach((t,i)=>{
+      const m=g.miss.includes(i);
+      if(!m){vals.push(t);rows++;pts.push({gi,x:t,f:false});return}
+      if(s==="drop")return;
+      rows++;
+      if(s==="skip")return;
+      const f=s==="zero"?0:s==="mean"?KM:s==="median"?KMed:gMed[gi];
+      vals.push(f);err.push(Math.abs(f-t));pts.push({gi,x:f,f:true});
+    }));
+    const M=mean(vals),S=stdv(vals);
+    const F=frame(360,230,{l:62,r:14,t:18,b:30},[0,110],[0,1]);
+    let h=grid(F,[0,20,40,60,80,100],[],v=>v,v=>v,"клики за неделю");
+    G.forEach((g,gi)=>{const y=gi?150:75;h+=`<text class="lbl" x="6" y="${y+4}">${g.name}</text><line class="ax" x1="${F.x0}" x2="${F.x1}" y1="${y}" y2="${y}" stroke-dasharray="2 4"/>`});
+    /* точки: одинаковые x в одной строке — чуть в сторону по вертикали */
+    const seen={};
+    pts.forEach(p=>{const y0=p.gi?150:75,key=p.gi+"_"+Math.round(p.x),k=seen[key]=(seen[key]||0)+1;
+      const y=y0-(k-1)*9;
+      h+=p.f?`<circle cx="${F.sx(p.x)}" cy="${y}" r="5" fill="var(--warm)" stroke="var(--surface)" stroke-width="1.5"/>`
+             :`<circle cx="${F.sx(p.x)}" cy="${y}" r="4.2" fill="var(--accent)" opacity=".85"/>`});
+    h+=`<line x1="${F.sx(TM)}" x2="${F.sx(TM)}" y1="${F.y0}" y2="${F.y1}" stroke="var(--muted)" stroke-dasharray="4 4"/>`;
+    h+=`<line x1="${F.sx(M)}" x2="${F.sx(M)}" y1="${F.y0}" y2="${F.y1}" stroke="var(--plum)" stroke-width="2"/>`;
+    h+=`<text class="tk" x="${F.sx(M)+4}" y="${F.y0+8}" style="fill:var(--plum)">среднее</text>`;
+    $("nsSvg").innerHTML=h;
+    $("nsRows").textContent=rows; $("nsMean").textContent=f1(M); $("nsStd").textContent=f1(S);
+    $("nsErr").textContent=err.length?f1(mean(err)):"—";
+    $("nsMsg").textContent=MSG[s]();
+    $("nsState").textContent=s==="group"?"fillna(transform) + флаг":s==="skip"?"skipna=True":s;
+    press(".nsb",document.querySelector(`.nsb[data-s="${s}"]`));
+  }
+  document.querySelectorAll(".nsb").forEach(b=>b.onclick=()=>run(b.dataset.s));
+  run("skip");
+})();
+
+/* ---------- тема 5: groupby по шагам ---------- */
+(function gbLab(){
+  const D=[["Аня","А",87],["Боря","А",64],["Вика","Б",91],["Гоша","Б",52],["Дима","В",78],["Ева","А",45],["Женя","В",58],["Зоя","Б",70]];
+  const GS=["А","Б","В"], gi=g=>GS.indexOf(g);
+  const CODE={mean:'df.groupby("group")["score"].mean()',
+    agg:'df.groupby("group").agg(n=("score", "size"), avg=("score", "mean"), best=("score", "max"))',
+    tr:'df["group_avg"] = df.groupby("group")["score"].transform("mean")'};
+  let mode="mean",step=0;
+  const tag=g=>`<span class="gt g${gi(g)}">${g}</span>`;
+  const rowsOf=g=>D.map((r,i)=>[i,...r]).filter(r=>r[2]===g);
+  const avg=g=>mean(rowsOf(g).map(r=>r[3]));
+  function tableHTML(rows,extra){
+    let h=`<table class="df"><thead><tr><th class="ix"></th><th>name</th><th>group</th><th>score</th>${extra?`<th>group_avg</th>`:""}</tr></thead><tbody>`;
+    rows.forEach(r=>{h+=`<tr><td class="ix">${r[0]}</td><td>${r[1]}</td><td>${tag(r[2])}</td><td class="num">${r[3]}</td>${extra?`<td class="num fill">${f2(avg(r[2]))}</td>`:""}</tr>`});
+    return h+"</tbody></table>";
+  }
+  function apply(g){
+    const v=rowsOf(g).map(r=>r[3]);
+    if(mode==="agg")return `n=${v.length} · avg=${f2(mean(v))} · best=${Math.max(...v)}`;
+    return `mean = ${f2(mean(v))}`;
+  }
+  function draw(){
+    let h="",msg="";
+    if(step===0){h=`<div class="dfw">${tableHTML(D.map((r,i)=>[i,...r]))}</div>`;msg="Исходная таблица: 8 студентов, группы вперемешку. groupby(\"group\") ещё ничего не считает — он только запоминает, как разбить."}
+    else if(step<3){
+      h=`<div class="groups">${GS.map(g=>`<div class="gbox g${gi(g)}"><h4>группа ${g} · ${rowsOf(g).length} строки</h4><div class="dfw">${tableHTML(rowsOf(g))}</div>${step===2?`<div class="res">${apply(g)}</div>`:""}</div>`).join("")}</div>`;
+      msg=step===1?"split: строки разложены по группам. Индекс у каждой строки свой, старый — по нему pandas потом знает, куда вернуть результат.":mode==="agg"?"apply: в каждой группе считаются три функции сразу — размер, среднее и максимум.":"apply: в каждой группе считается среднее score.";
+    }else{
+      if(mode==="mean"){h=`<div class="dfw">${dfHTML(["group","score"],GS.map(g=>[g,f2(avg(g))]))}</div>`;msg="combine: Series из 3 значений, индекс — названия групп. 8 строк свернулись в 3 — это агрегация."}
+      else if(mode==="agg"){h=`<div class="dfw">${dfHTML(["group","n","avg","best"],GS.map(g=>{const v=rowsOf(g).map(r=>r[3]);return [g,v.length,f2(mean(v)),Math.max(...v)]}))}</div>`;msg="combine: DataFrame на 3 строки, имена столбцов заданы в agg. Это и есть сводная по группам — как отчёт деканата."}
+      else{h=`<div class="dfw">${tableHTML(D.map((r,i)=>[i,...r]),true)}</div>`;msg="combine для transform: результат раздан обратно каждой строке по её индексу. Снова 8 строк в исходном порядке, и среднее группы можно записать новым столбцом. Дальше df.score − df.group_avg — «насколько студент лучше своей группы»."}
+    }
+    $("gbView").innerHTML=h; $("gbMsg").textContent=msg;
+    $("gbState").textContent=`шаг ${step} из 3 · ${["исходная","split","apply","combine"][step]}`;
+    $("gbCode").textContent=CODE[mode];
+    $("gbPrev").disabled=step===0; $("gbNext").disabled=step===3;
+    press(".gbm",document.querySelector(`.gbm[data-m="${mode}"]`));
+  }
+  document.querySelectorAll(".gbm").forEach(b=>b.onclick=()=>{mode=b.dataset.m;draw()});
+  $("gbPrev").onclick=()=>{if(step>0){step--;draw()}};
+  $("gbNext").onclick=()=>{if(step<3){step++;draw()}};
+  draw();
+})();
+
+/* ---------- тема 6: merge ---------- */
+(function mergeLab(){
+  const L0=[[1,"Аня"],[2,"Боря"],[3,"Вика"],[4,"Гоша"]], R=[[1,80],[1,90],[3,70],[5,60]];
+  let how="left",ind=false,dup=false;
+  function merge(L){
+    const out=[];
+    if(how==="right"){R.forEach(r=>{const ms=L.filter(l=>l[0]===r[0]);if(ms.length)ms.forEach(l=>out.push([r[0],l[1],r[1],"both"]));else out.push([r[0],NA,r[1],"right_only"])});return out}
+    L.forEach(l=>{const ms=R.filter(r=>r[0]===l[0]);if(ms.length)ms.forEach(r=>out.push([l[0],l[1],r[1],"both"]));else if(how!=="inner")out.push([l[0],l[1],NA,"left_only"])});
+    if(how==="outer"){R.forEach(r=>{if(!L.some(l=>l[0]===r[0]))out.push([r[0],NA,r[1],"right_only"])});out.sort((a,b)=>a[0]-b[0])}
+    return out;
+  }
+  function run(){
+    const L=dup?[...L0.slice(0,1),[1,"Аня (повтор)"],...L0.slice(1)]:L0;
+    $("mgL").innerHTML=dfHTML(["","id","name"],L.map((r,i)=>[i,...r]),{rcls:i=>dup&&i<2?"sel":""});
+    $("mgR").innerHTML=dfHTML(["","id","score"],R.map((r,i)=>[i,...r]),{rcls:i=>i<2?"sel":""});
+    const res=merge(L);
+    const cols=["","id","name","score"].concat(ind?["_merge"]:[]);
+    $("mgRes").innerHTML=dfHTML(cols,res.map((r,i)=>[i,r[0],r[1],r[2]].concat(ind?[r[3]]:[])),{cls:(i,j,v)=>j===4&&v!=="both"?"bad":""});
+    $("mgCode").innerHTML=esc(`students.merge(scores, on="id", how="${how}"${ind?", indicator=True":""})`)+(dup&&how!=="right"?`\n<span class="e">${esc('# с validate="one_to_many" здесь была бы MergeError: ключи в students не уникальны')}</span>`:"");
+    $("mgState").textContent=`строк: ${L.length} слева, ${R.length} справа → ${res.length}`;
+    const T={inner:"inner оставил только пары: Аню (дважды — у неё две оценки) и Вику. Боря и Гоша без оценок исчезли, студент 5 без записи — тоже. Посчитаешь по такой таблице долю сдавших — «молчащие» студенты выпадут из знаменателя.",
+      left:"left сохранил всех студентов: Боря и Гоша получили NaN в score — оценок нет. Аня занимает две строки, потому что справа у неё две оценки: это нормальный «один ко многим». Студент 5 пропал — его нет в левой таблице.",
+      right:"right сохранил все оценки. У студента 5 имя NaN — в students его нет. Обычно так не пишут: меняют таблицы местами и делают left.",
+      outer:"outer сохранил всё с обеих сторон и отсортировал по ключу. Это режим для сверки: с indicator=True сразу видно left_only (студенты без оценок) и right_only (оценки неизвестных студентов)."};
+    let msg=T[how];
+    if(dup&&how!=="right")msg=`Аня записана дважды и слева, и справа: 2 × 2 = 4 строки Ани. Каждая оценка посчиталась дважды — средний балл не изменился, а суммы и число оценок удвоились. Ошибки нет. Защита — validate="one_to_many": merge упадёт сразу.`;
+    if(dup&&how==="right")msg="Справа у Ани две оценки, слева две записи Ани — каждая оценка размножилась на две строки. Вместо 4 строк — 6.";
+    if(ind&&!dup)msg+=" Столбец _merge показывает происхождение каждой строки — проверь его value_counts() после любого merge.";
+    $("mgMsg").textContent=msg;
+    press(".mgh",document.querySelector(`.mgh[data-h="${how}"]`));
+    $("mgInd").setAttribute("aria-pressed",ind);$("mgDup").setAttribute("aria-pressed",dup);
+  }
+  document.querySelectorAll(".mgh").forEach(b=>b.onclick=()=>{how=b.dataset.h;run()});
+  $("mgInd").onclick=()=>{ind=!ind;run()}; $("mgDup").onclick=()=>{dup=!dup;run()};
+  run();
+})();
+
+/* ---------- тема 7: среднее, медиана, мода ---------- */
+(function centerLab(){
+  const START=[2,3,3,4,5,5,5,6,8,9,12];
+  let V=[...START], cur=-1;
+  const F=frame(360,190,{l:14,r:14,t:34,b:30},[0,30],[0,1]), BASE=140, R=5.5;
+  const fm=v=>Number.isInteger(v)?String(v):f2(v);
+  const svg=$("ctSvg");
+  function pos(){ /* одинаковые значения — столбиком */
+    const cnt={};return V.map(v=>{const k=cnt[v]=(cnt[v]||0)+1;return {x:F.sx(v),y:BASE-(k-1)*(R*2+1)}});
+  }
+  function modes(){const c={};V.forEach(v=>c[v]=(c[v]||0)+1);const mx=Math.max(...Object.values(c));return mx<2?[]:Object.keys(c).filter(k=>c[k]===mx).map(Number)}
+  function trim(){const s=[...V].sort((a,b)=>a-b),k=Math.floor(s.length*0.1);return mean(s.slice(k,s.length-k))}
+  function draw(){
+    const P=pos(), M=mean(V), Md=median(V), mo=modes();
+    let h=grid(F,[0,5,10,15,20,25,30],[],v=>v,v=>v);
+    h+=`<line class="ax" x1="${F.x0}" x2="${F.x1}" y1="${BASE+R+2}" y2="${BASE+R+2}"/>`;
+    const lx=(x,c,t,dy)=>`<line x1="${F.sx(x)}" x2="${F.sx(x)}" y1="${F.y0}" y2="${BASE+R+2}" stroke="${c}" stroke-width="2"/><text class="tk" x="${F.sx(x)}" y="${F.y0-6+dy}" text-anchor="middle" style="fill:${c}">${t}</text>`;
+    h+=lx(Md,"var(--warm)","медиана",Math.abs(F.sx(M)-F.sx(Md))<46?-12:0)+lx(M,"var(--plum)","среднее",0);
+    P.forEach((p,i)=>{h+=`<circle class="knob" cx="${p.x}" cy="${p.y}" r="${R}" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.5" ${i===cur?'opacity=".7"':""}/>`});
+    svg.innerHTML=h;
+    $("ctMean").textContent=fm(M); $("ctMed").textContent=fm(Md);
+    $("ctMode").textContent=mo.length?mo.slice(0,3).join(", "):"нет"; $("ctTrim").textContent=fm(trim());
+    const d=M-Md;
+    $("ctMsg").textContent=Math.abs(d)<0.6?"Среднее и медиана почти совпали — данные примерно симметричны. Любая мера центра честно скажет «типичный студент».":
+      d>0?`Среднее больше медианы на ${f2(d)} ч: правый хвост тянет его вверх. Медиана стоит на месте, пока точек слева и справа поровну. «Типичный студент» — это медиана ${fm(Md)} ч, а не ${fm(M)}.`:
+      `Среднее меньше медианы на ${f2(-d)} ч: хвост слева. Так бывает у оценок, когда почти все сдали хорошо, а несколько человек — провально.`;
+    $("ctState").textContent=`n = ${V.length}`;
+  }
+  draggable(svg,p=>{const P=pos();let best=-1,bd=16;P.forEach((q,i)=>{const dd=Math.hypot(q.x-p.x,q.y-p.y);if(dd<bd){bd=dd;best=i}});cur=best;return best>=0},
+    x=>{if(cur<0)return;V[cur]=Math.max(0,Math.min(30,Math.round(F.ix(x))));draw()});
+  svg.addEventListener("pointerup",()=>{cur=-1;draw()});
+  $("ctAdd").onclick=()=>{V.push(28);draw()};
+  $("ctPop").onclick=()=>{if(V.length>3){V.pop();draw()}};
+  $("ctReset").onclick=()=>{V=[...START];draw()};
+  draw();
+})();
+
+/* ---------- тема 8: разброс и квантили ---------- */
+(function spreadLab(){
+  const r=rng(8); let Z=Array.from({length:20},()=>gauss(r));
+  const zm=mean(Z),zs=stdv(Z,0); Z=Z.map(z=>(z-zm)/zs);
+  let ddof=1;
+  const F=frame(360,220,{l:14,r:14,t:30,b:30},[0,100],[0,1]), BASE=150, R=4.6;
+  function draw(){
+    const s=+$("spS").value,q=+$("spQ").value/100;
+    const V=Z.map(z=>Math.max(0,Math.min(100,Math.round(70+s*z))));
+    const M=mean(V),S=stdv(V,ddof),q1=quant(V,.25),q3=quant(V,.75),qv=quant(V,q);
+    let h=grid(F,[0,20,40,60,80,100],[],v=>v,v=>v,"балл");
+    h+=`<rect x="${F.sx(Math.max(0,M-S))}" y="${F.y0+14}" width="${F.sx(Math.min(100,M+S))-F.sx(Math.max(0,M-S))}" height="${BASE+R+2-F.y0-14}" fill="var(--accent-soft)" rx="6"/>`;
+    h+=`<text class="tk" x="${F.sx(M)}" y="${F.y0+26}" text-anchor="middle" style="fill:var(--accent)">x̄ ± σ</text>`;
+    const cnt={};
+    [...V].sort((a,b)=>a-b).forEach(v=>{const b=Math.round(v/2.8),k=cnt[b]=(cnt[b]||0)+1;
+      h+=`<circle cx="${F.sx(v)}" cy="${BASE-(k-1)*(R*2+1)}" r="${R}" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.2"/>`});
+    h+=`<line class="ax" x1="${F.x0}" x2="${F.x1}" y1="${BASE+R+2}" y2="${BASE+R+2}"/>`;
+    [[q1,"Q1"],[q3,"Q3"]].forEach(([v,t])=>{h+=`<line x1="${F.sx(v)}" x2="${F.sx(v)}" y1="${BASE+R+2}" y2="${BASE+R+14}" stroke="var(--warm)" stroke-width="3"/><text class="tk" x="${F.sx(v)}" y="${BASE+R+26}" text-anchor="middle" style="fill:var(--warm)">${t}</text>`});
+    h+=`<line x1="${F.sx(M)}" x2="${F.sx(M)}" y1="${F.y0+30}" y2="${BASE+R+2}" stroke="var(--plum)" stroke-width="2"/>`;
+    h+=`<line x1="${F.sx(qv)}" x2="${F.sx(qv)}" y1="${F.y0}" y2="${BASE+R+2}" stroke="var(--teal)" stroke-width="2" stroke-dasharray="5 3"/><text class="tk" x="${Math.min(F.x1-30,Math.max(F.x0+30,F.sx(qv)))}" y="${F.y0+6}" text-anchor="middle" style="fill:var(--teal)">q = ${q.toFixed(2)}</text>`;
+    $("spSvg").innerHTML=h;
+    const inside=V.filter(v=>v>=M-S&&v<=M+S).length, below=V.filter(v=>v<=qv).length;
+    $("spSV").textContent=s; $("spQV").textContent=q.toFixed(2);
+    $("spStd").textContent=f2(S); $("spIqr").textContent=f2(q3-q1); $("spQv").textContent=f2(qv);
+    $("spQk").textContent=q===.5?"квантиль 0.5 = медиана":`квантиль ${q.toFixed(2)}`;
+    $("spIn").textContent=`${inside} из 20`;
+    $("spState").textContent=`x̄ = ${f2(M)} · σ² = ${f2(S*S)}`;
+    const other=stdv(V,1-ddof);
+    $("spMsg").textContent=`Внутри x̄ ± σ — ${inside} из 20 (${Math.round(inside/20*100)}%), рядом с 68% из правила для колокола. Квантиль ${q.toFixed(2)} = ${f2(qv)}: не выше этого балла — ${below} из 20. `+
+      (ddof===0?`Сейчас σ по формуле numpy (делим на n). pandas дал бы ${f2(other)} — на 20 точках разница около 2.5%.`:`pandas делит на n − 1. С ddof=0, как np.std, было бы ${f2(other)}.`);
+    $("spDdof").setAttribute("aria-pressed",ddof===0);
+  }
+  $("spS").oninput=draw; $("spQ").oninput=draw;
+  $("spDdof").onclick=()=>{ddof=ddof?0:1;draw()};
+  draw();
+})();
+
+/* ---------- тема 9: выбросы ---------- */
+(function outLab(){
+  const r=rng(19), BASE=Array.from({length:30},()=>Math.max(8,Math.min(85,Math.round(42+13*gauss(r)))));
+  const OUT=[135,165,195,225,255,285], JIT=Array.from({length:40},()=>r());
+  let k=1.5;
+  const F=frame(360,210,{l:14,r:14,t:18,b:30},[0,300],[0,1]);
+  function draw(){
+    const n=+$("obN").value, V=BASE.concat(OUT.slice(0,n));
+    const q1=quant(V,.25),q3=quant(V,.75),iqr=q3-q1,lo=q1-k*iqr,hi=q3+k*iqr;
+    const M=mean(V),S=stdv(V);
+    const isI=v=>v<lo||v>hi, isZ=v=>Math.abs(v-M)/S>3;
+    const inV=V.filter(v=>!isI(v)), wl=Math.min(...inV), wh=Math.max(...inV), med=median(V);
+    const by=58,bh=34;
+    let h=grid(F,[0,50,100,150,200,250,300],[],v=>v,v=>v,"клики за неделю");
+    h+=`<line x1="${F.sx(Math.max(0,lo))}" x2="${F.sx(Math.max(0,lo))}" y1="${F.y0}" y2="${F.y1}" stroke="var(--warm)" stroke-dasharray="3 4"/>`;
+    h+=`<line x1="${F.sx(hi)}" x2="${F.sx(hi)}" y1="${F.y0}" y2="${F.y1}" stroke="var(--warm)" stroke-dasharray="3 4"/><text class="tk" x="${F.sx(hi)+4}" y="${F.y0+10}" style="fill:var(--warm)">Q3 + ${k}·IQR</text>`;
+    h+=`<line x1="${F.sx(wl)}" x2="${F.sx(q1)}" y1="${by}" y2="${by}" stroke="var(--ink)"/><line x1="${F.sx(q3)}" x2="${F.sx(wh)}" y1="${by}" y2="${by}" stroke="var(--ink)"/>`;
+    h+=`<line x1="${F.sx(wl)}" x2="${F.sx(wl)}" y1="${by-8}" y2="${by+8}" stroke="var(--ink)"/><line x1="${F.sx(wh)}" x2="${F.sx(wh)}" y1="${by-8}" y2="${by+8}" stroke="var(--ink)"/>`;
+    h+=`<rect x="${F.sx(q1)}" y="${by-bh/2}" width="${F.sx(q3)-F.sx(q1)}" height="${bh}" rx="4" fill="var(--accent-soft)" stroke="var(--accent)"/>`;
+    h+=`<line x1="${F.sx(med)}" x2="${F.sx(med)}" y1="${by-bh/2}" y2="${by+bh/2}" stroke="var(--warm)" stroke-width="2.5"/>`;
+    V.forEach((v,i)=>{const y=114+JIT[i]*36,o=isI(v),z=isZ(v);
+      h+=`<circle cx="${F.sx(v)}" cy="${y}" r="${o?5:3.6}" fill="${o?"var(--red)":"var(--accent)"}" opacity="${o?1:.75}"/>`;
+      if(z)h+=`<circle cx="${F.sx(v)}" cy="${y}" r="9" fill="none" stroke="var(--plum)" stroke-width="2"/>`});
+    $("obSvg").innerHTML=h;
+    const nI=V.filter(isI).length,nZ=V.filter(isZ).length;
+    $("obNV").textContent=n; $("obHi").textContent=f2(hi); $("obStd").textContent=f2(S);
+    $("obIqr").textContent=nI; $("obZ").textContent=nZ;
+    $("obState").textContent=`Q1 = ${f2(q1)} · Q3 = ${f2(q3)} · IQR = ${f2(iqr)}`;
+    let msg;
+    if(n===0)msg=nI?`Добавленных выбросов нет, но правило всё равно пометило ${nI}: это крайние точки обычного разброса. «Подозрительно» не значит «ошибка».`:"Выбросов нет, и оба правила молчат. Ящик — средняя половина данных, усы — до самых дальних обычных точек.";
+    else if(nZ<n&&nI>=n)msg=`Правило IQR нашло все ${n}, а z-оценка — только ${nZ}. Выбросы раздули σ до ${f2(S)}: каждый «прячет» соседей, потому что сам увеличил знаменатель. Это маскировка — квартили к ней устойчивы.`;
+    else msg=`Добавлено выбросов: ${n}. Оба правила их видят: σ выросла до ${f2(S)}, но выбросы пока далеко. Добавь ещё — z-оценка начнёт их терять.`;
+    if(k===3)msg+=" При k = 3 границы шире: остаются только самые далёкие точки.";
+    $("obMsg").textContent=msg;
+    press(".obk",document.querySelector(`.obk[data-k="${k}"]`));
+  }
+  $("obN").oninput=draw;
+  document.querySelectorAll(".obk").forEach(b=>b.onclick=()=>{k=+b.dataset.k;draw()});
+  draw();
+})();
+
+/* ---------- тема 10: распределения ---------- */
+(function distLab(){
+  const r=rng(10), N=400;
+  const DATA={
+    norm:Array.from({length:N},()=>Math.max(0,Math.min(100,70+10*gauss(r)))),
+    tail:Array.from({length:N},()=>Math.exp(4+0.85*gauss(r))),
+    bi:Array.from({length:N},(_,i)=>i<260?Math.max(16,19+1.6*gauss(r)):Math.max(22,34+6*gauss(r)))
+  };
+  const NAME={norm:"баллы",tail:"клики",bi:"возраст"};
+  let feat="tail",lg=false;
+  function draw(){
+    const bins=+$("dsB").value, V=DATA[feat].map(v=>lg?Math.log1p(v):v);
+    let lo=Math.min(...V),hi=Math.max(...V); const w=(hi-lo)/bins||1;
+    const C=Array(bins).fill(0); V.forEach(v=>C[Math.min(bins-1,Math.floor((v-lo)/w))]++);
+    const top=Math.max(...C), F=frame(360,230,{l:36,r:12,t:16,b:30},[lo,hi],[0,top*1.12]);
+    const tk=[0,1,2,3,4].map(i=>lo+(hi-lo)*i/4);
+    let h=grid(F,tk,[0,Math.round(top/2),top],v=>lg?v.toFixed(1):Math.round(v),v=>v,lg?`log1p(${NAME[feat]})`:NAME[feat]);
+    C.forEach((c,i)=>{const x0=F.sx(lo+i*w),x1=F.sx(lo+(i+1)*w);
+      h+=`<rect x="${x0+0.6}" y="${F.sy(c)}" width="${Math.max(0.5,x1-x0-1.2)}" height="${F.sy(0)-F.sy(c)}" fill="var(--accent)" opacity=".8" rx="1.5"/>`});
+    const M=mean(V),Md=median(V),sk=skew(V);
+    h+=`<line x1="${F.sx(M)}" x2="${F.sx(M)}" y1="${F.y0}" y2="${F.y1}" stroke="var(--plum)" stroke-width="2"/>`;
+    h+=`<line x1="${F.sx(Md)}" x2="${F.sx(Md)}" y1="${F.y0}" y2="${F.y1}" stroke="var(--warm)" stroke-width="2" stroke-dasharray="5 3"/>`;
+    $("dsSvg").innerHTML=h;
+    $("dsBV").textContent=bins; $("dsMean").textContent=f2(M); $("dsMed").textContent=f2(Md); $("dsSkew").textContent=sk.toFixed(2);
+    $("dsState").textContent=`bins = ${bins}${lg?" · log1p":""}`;
+    let msg;
+    if(feat==="tail"&&!lg)msg=`Длинный правый хвост, как у денег и кликов: skew ${sk.toFixed(1)}, среднее ${f2(M)} заметно больше медианы ${f2(Md)}. Большинство кликает мало, единицы — очень много. Описывай медианой; для линейной модели попробуй log1p.`;
+    else if(feat==="tail")msg=`После log1p хвост исчез: skew ${sk.toFixed(2)}, среднее и медиана почти совпали. Логарифм сжимает большие значения сильнее, чем маленькие. Для деревьев это не нужно, им важен только порядок.`;
+    else if(feat==="bi")msg=bins<=6?"Корзин мало — два горба слились в один перекошенный. Так легко пропустить, что в данных две разные группы. Добавь корзин.":
+      `Два горба: в данных две группы — очники около 19 лет и заочники около 34. Среднее ${f2(M)} попадает в провал, где почти никого нет: такое «среднее» не описывает ни одну группу. Ищи признак, который их разделяет.`;
+    else msg=lg?"У симметричного признака логарифм создаёт левый хвост на пустом месте. Логарифм — лекарство от правого хвоста, а не процедура для всех.":
+      `Почти колокол: skew ${sk.toFixed(2)}, среднее ≈ медиане. Хвост слева обрезан на нуле, справа — на 100 баллах. Работает правило 68–95–99.7.`;
+    if(bins>=34&&!(feat==="bi"&&bins<=6))msg+=" Корзин много — столбики скачут от шума, форма читается хуже.";
+    $("dsMsg").textContent=msg;
+    press(".dsf",document.querySelector(`.dsf[data-f="${feat}"]`)); $("dsLog").setAttribute("aria-pressed",lg);
+  }
+  document.querySelectorAll(".dsf").forEach(b=>b.onclick=()=>{feat=b.dataset.f;draw()});
+  $("dsLog").onclick=()=>{lg=!lg;draw()};
+  $("dsB").oninput=draw;
+  draw();
+})();
+
+/* ---------- конспект для Obsidian и галочки ---------- */
+const MD=`---
+type: конспект
+tags: [pandas, статистика, eda, неделя-3]
+---
+# Pandas и описательная статистика: урок 3.1
+
+## Series и DataFrame
+- Series — столбец с индексом; DataFrame — Series с общим индексом, у каждого столбца свой тип.
+- Арифметика выравнивается по меткам: нет пары → NaN. .to_numpy() и списки индекс теряют.
+- df["c"] — Series, df[["c"]] — DataFrame. info() — первая команда. Векторно, без iterrows и apply.
+
+## Чтение и запись
+- read_csv явно: sep, decimal, encoding, na_values, parse_dates + date_format ("%d.%m.%Y"), dtype, usecols, chunksize.
+- После чтения — dtypes и пара строк глазами. Даты 03.10 без dayfirst читаются как месяц.день — молча.
+- to_csv(index=False), иначе Unnamed: 0. Свои данные — Parquet: типы, сжатие, чтение столбцов.
+
+## loc и iloc
+- loc — метки, срез включительно, по порядку строк. iloc — позиции, правый край не входит.
+- Маски: (a) & (b), |, ~; не and. isin, between, query("x > @v").
+- Присваивание — один df.loc[маска, "col"] = v. Цепочка не работает (pandas 3: Copy-on-Write; в pandas 2 — SettingWithCopyWarning).
+
+## Пропуски
+- isna().mean() по столбцам. count не считает NaN. int с NaN → float (или "Int64").
+- Причина: случайно / по другим признакам / сам пропуск — сигнал.
+- Удалить, константа, медиана, медиана по группе (transform), флаг, или оставить NaN для бустинга.
+- Всё, что считается по данным, — только по train (Pipeline, SimpleImputer). Иначе утечка.
+
+## groupby
+- split → apply → combine. agg — строка на группу; transform — длина как у df; filter; apply медленный.
+- Именованная агрегация: agg(n=("score", "size"), avg=("score", "mean")).
+- NaN-ключи выпадают (dropna=False). Текстовые столбцы ломают mean(). size ≠ count.
+
+## merge и concat
+- inner / left / right / outer. validate, indicator=True, assert на число строк.
+- Повторяющийся ключ размножает строки. Составные ключи: on=[...].
+- concat — друг под другом (ignore_index=True) или рядом (axis=1).
+
+## Центр
+- Среднее боится выбросов, медиана нет, мода — для категорий. Среднее > медианы → хвост справа.
+- Среднее средних групп разного размера — только взвешенно.
+
+## Разброс и квантили
+- σ² = Σ(x − x̄)² / (n − 1); σ в единицах данных. pandas std — ddof=1, numpy — ddof=0.
+- Квантили: Q1, медиана, Q3; IQR = Q3 − Q1; p50/p99. 68–95–99.7 — только для колокола.
+
+## Выбросы
+- Границы Q1 − 1.5·IQR и Q3 + 1.5·IQR. z > 3 страдает от маскировки.
+- Ошибка → исправить/NaN; настоящий → оставить, log1p, clip по квантилям train. Test не чистить.
+
+## Распределения и первый осмотр
+- Колокол; правый хвост (log1p, медиана); два горба (две группы); константа; идентификатор.
+- shape, dtypes, isna().mean(), duplicated(), describe().T, describe(include="str"), nunique, value_counts(normalize=True), skew.
+`;
+initLesson({topics:[["data.pd.0","Series и DataFrame"],["data.pd.1","Чтение и запись CSV, Parquet, Excel"],["data.pd.2","loc и iloc, фильтрация"],["data.pd.3","Пропуски"],["data.pd.5","groupby, agg, transform"],["data.pd.6","merge, join, concat"],["stats.desc.0","Среднее, медиана, мода"],["stats.desc.1","Дисперсия, стандартное отклонение, квантили"],["stats.desc.2","Выбросы и IQR"],["data.eda.0","Описательная статистика и распределения признаков"]],md:MD});
+</script>
+<script src="/assets/asks.js" defer></script>
