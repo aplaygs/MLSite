@@ -181,7 +181,7 @@ function initQuiz(cfg) {
     root.innerHTML = `<div class="qz-card">
       <div class="qz-final">
         <svg class="qz-ring" viewBox="0 0 180 180" role="img" aria-label="Результат ${pct} процентов"><circle cx="90" cy="90" r="70" fill="none" stroke="var(--soft)" stroke-width="14"/>
-          <circle id="qzArc" cx="90" cy="90" r="70" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" transform="rotate(-90 90 90)" style="transition:stroke-dashoffset .8s ease"/>
+          <circle id="qzArc" cx="90" cy="90" r="70" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" transform="rotate(-90 90 90)" style="transition:stroke-dashoffset .45s ease"/>
           <text x="90" y="98" text-anchor="middle" font-size="38" font-weight="700" fill="var(--ink)">${pct}%</text>
           <text x="90" y="122" text-anchor="middle" font-size="11" fill="var(--muted)" style="font-family:var(--f-mono)">${Math.round(total * 10) / 10} из ${list.length}</text></svg>
         <div class="qz-grade"><span class="eyebrow">${S.retry ? "Работа над ошибками" : "Итог теста недели " + cfg.week}</span><h2>${grade[0]}</h2><p class="muted">${grade[1]}</p>

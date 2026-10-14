@@ -51,7 +51,7 @@ header.top p{color:var(--muted);max-width:68ch;margin:0}
 /* KPI карточки */
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 @media (max-width:960px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:540px){.kpis{grid-template-columns:1fr}}
+@media (max-width:540px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.kp{padding:10px 11px;gap:3px;border-radius:13px}.kp .k{font-size:11.5px;line-height:1.25}.kp .v{font-size:22px}.kp .v small{font-size:13px}.kp .sub{display:none}.kp:last-child{grid-column:1/-1}.controls-bar .keys-hint{display:none}header.top{padding-block:20px 0}}
 .kp{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:grid;gap:6px;align-content:start}
 .kp .k{font-size:12.5px;color:var(--muted)}
 .kp .v{font:700 32px/1 var(--f-display);font-variant-numeric:tabular-nums;color:var(--ink)}
