@@ -344,7 +344,7 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted);border-top:1px s
   <section class="block" id="a2">
     <div class="eyebrow">План уровня A2</div>
     <h2>15 недель по Empower A2</h2>
-    <p>Юнит учебника — неделя, плюс три недели повторения: после шестого юнита, на Новый год и итог уровня. Галочки синхронизированы с файлами недель в Obsidian (<code>65_Английский/План</code>).</p>
+    <p>Юнит учебника — неделя, плюс три недели повторения: после шестого юнита, на Новый год и итог уровня. Отмечаешь здесь и в уроках, файлы недель в Obsidian (<code>65_Английский/План</code>) показывают прогресс.</p>
     <div class="weeks" id="weeks"><p class="muted">Загружаю план недели…</p></div>
     <p class="muted" id="sync" role="status" style="font-size:13px;margin-top:6px"></p>
   </section>
@@ -354,8 +354,9 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted);border-top:1px s
     <div class="eyebrow">Инструменты раздела</div>
     <h2>Что уже есть и что появится</h2>
     <div class="tools-grid">
-      <a class="tool" href="/words"><b>Тренажёр слов</b><span>Карточки с интервальным повторением (Лейтнер). Синхронно со словарём в Obsidian.</span></a>
-      <a class="tool" href="#a2"><b>План по неделям</b><span>15 недель уровня A2 с галочками, синхронно с файлами недель в Obsidian.</span></a>
+      <a class="tool" href="/words"><b>Тренажёр слов</b><span>Карточки с интервальным повторением. Слова из уроков и свои; в Obsidian — «Словарь».</span></a>
+      <a class="tool" href="/rules"><b>Правила на заучку</b><span>Правила, которые трудно запомнить: вопрос → ответ вслух → проверка. В Obsidian — «Правила на заучку».</span></a>
+      <a class="tool" href="#a2"><b>План по неделям</b><span>15 недель уровня A2 с отметками; Obsidian показывает прогресс недель.</span></a>
       <a class="tool" href="/lessons/e01-1.html"><b>Интерактивные уроки</b><span>Готова неделя 1: шкала времён, конструктор, озвучка в браузере, конспекты для телефона.</span></a>
       <div class="tool soon"><b>Дерево навыков English</b><span>Большая карта грамматики, лексики и IT-английского по уровням A2, B1 и B2.</span></div>
     </div>
@@ -598,7 +599,7 @@ async function load(){
     P=await (await fetch("/api/en/plan")).json();
     done=P.done||{};
     render();
-    $("sync").textContent="✓ Связь с Obsidian активна (галочки синхронизируются)";
+    $("sync").textContent="✓ Отметки сохраняются · Obsidian показывает прогресс";
     (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(jump,80));
   }catch(e){
     $("weeks").innerHTML='<p class="muted">Сервер не отвечает: запусти <code>python3 .agents/scripts/apps.py serve</code></p>';

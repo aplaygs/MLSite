@@ -1,7 +1,7 @@
 /* Общий код уроков. Подключать обычным <script src="/assets/lesson.js"></script> ДО скрипта урока.
    Даёт: $, NS, f2, rng, gauss — мелочи; frame, grid, pathOf — графики в SVG;
    initLesson({topics, md}) (md можно не передавать, если в уроке есть <script type="text/markdown" id="md">) — верхняя навигация на localhost, галочки тем (карточки .topic-check и список #topics,
-   синхронно с Obsidian через /api/tree) и кнопка «Скопировать конспект» (#bCopy). */
+   на сервере через /api/tree, Obsidian их показывает) и кнопка «Скопировать конспект» (#bCopy). */
 const NS="http://www.w3.org/2000/svg";
 const $=id=>document.getElementById(id);
 const f2=v=>Math.abs(v)>=100?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
@@ -61,7 +61,7 @@ function initLesson({topics,md}){
     try{navigator.clipboard.writeText(md).then(()=>$("copyMsg").textContent="Скопировано",fb)}catch(e){fb()}
   };
   if(!LOCAL){
-    if(note)note.textContent="Галочки синхронизируются с Obsidian, когда урок открыт на сайте дерева (localhost:8765).";
+    if(note)note.textContent="Отметки сохраняются, когда урок открыт с компьютера (localhost:8765).";
     document.querySelectorAll(".topic-check .note").forEach(el=>{el.textContent="только на localhost"});
     return;
   }
@@ -72,7 +72,7 @@ function initLesson({topics,md}){
       const on=!!d[id];
       document.querySelectorAll(`input[data-id="${id}"]`).forEach(cb=>{cb.checked=on});
       const dt=on?fmt(d[id]):"";
-      document.querySelectorAll(`[data-d="${id}"]`).forEach(el=>{el.textContent=on?(dt?`✓ ${dt} в Obsidian`:"✓ в Obsidian"):MARK_HINT});
+      document.querySelectorAll(`[data-d="${id}"]`).forEach(el=>{el.textContent=on?(dt?`✓ пройдено ${dt}`:"✓ пройдено"):MARK_HINT});
     });
     document.querySelectorAll(".topic-check").forEach(card=>{
       const ids=(card.dataset.for||"").split(",").map(s=>s.trim()).filter(Boolean);
@@ -92,7 +92,7 @@ function initLesson({topics,md}){
       const r=await fetch(TREE_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(checked?{set:{[id]:day()}}:{unset:[id]})});
       if(!r.ok)throw 0;
       apply((await r.json()).done||{});
-      if(note)note.textContent="Сохранено в файле недели в Obsidian";
+      if(note)note.textContent="Сохранено — видно и в файле недели в Obsidian";
     }catch(err){
       document.querySelectorAll(`input[data-id="${id}"]`).forEach(c=>{c.checked=!checked});
       if(note)note.textContent="Не сохранилось: сервер не отвечает. Запусти «Тренажёр и дерево».";

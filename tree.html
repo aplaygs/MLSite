@@ -228,6 +228,9 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 .tasks li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px}
 .tasks .st{width:16px;height:16px;margin-top:2px;border-radius:50%;border:1.5px dashed var(--muted)}
 .tasks .st.ok{border:0;background:var(--s3)}
+.tasks li[data-task]{cursor:pointer;border-radius:8px;padding:2px 4px;margin:0 -4px}
+.tasks li[data-task]:hover{background:var(--soft,rgba(0,0,0,.04))}
+.tasks li[data-task]:focus-visible{outline:2px solid var(--accent,currentColor);outline-offset:1px}
 .wfoot{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;border-top:1px dashed var(--line);padding-top:12px}
 .wfoot a{color:var(--accent)}
 .lessons{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
@@ -290,7 +293,7 @@ if(PAGE==="tree"&&/^#(w-\d+|plan|brs|obsidian)$/.test(location.hash))location.re
         <span class="eyebrow" id="nextTitle">Дальше: темы, которые спрашивают</span>
         <ol id="nextList"></ol>
       </div>
-      <div class="sync" id="sync" role="status">Загружаю галочки из Obsidian…</div>
+      <div class="sync" id="sync" role="status">Загружаю отметки…</div>
     </aside>
   </div>
 
@@ -366,18 +369,18 @@ if(PAGE==="tree"&&/^#(w-\d+|plan|brs|obsidian)$/.test(location.hash))location.re
       <div class="card obs">
         <h3>Где что лежит</h3>
         <ul>
-          <li>Файлы недель — <span class="nums">60_Машинное обучение/План ML</span>. Галочки там и здесь одни и те же.</li>
+          <li>Файлы недель — <span class="nums">60_Машинное обучение/План ML</span>. Только просмотр: отмечаешь здесь, Obsidian показывает те же отметки.</li>
           <li>«План ML» — обзор: текущая неделя, хвосты, прогресс по всем неделям.</li>
           <li>«После января — по желанию» — темы, которые не нужны к первым собеседованиям.</li>
-          <li>Конспект темы — дописывай прямо после галочки: <span class="nums">- [x] Тема — [[Мой конспект]]</span>.</li>
+          <li>Свои заметки и ссылки на конспекты — в разделе «📝 Мои заметки» внизу файла недели: его скрипты не трогают.</li>
         </ul>
         <div class="row" id="obsLinks"></div>
       </div>
       <div class="card obs">
         <h3>Как пользоваться</h3>
         <ul>
-          <li>На компьютере — эта страница: удобно смотреть всё дерево и отмечать.</li>
-          <li>С телефона — файл недели в Obsidian: те же темы и галочки.</li>
+          <li>На компьютере — эта страница: здесь отмечаешь темы и задачи проекта.</li>
+          <li>С телефона — файл недели в Obsidian: что пройдено и что осталось.</li>
           <li>Неделя тяжёлая в вузе — не догоняй всё сразу: темы с кружком — первыми, остальное уйдёт в хвосты.</li>
           <li>В воскресенье агент собирает план недели и смотрит хвосты.</li>
         </ul>
@@ -661,9 +664,9 @@ function updateProgress(){
 }
 document.getElementById("nextList").addEventListener("click",e=>{const a=e.target.closest("[data-go]");if(a){e.preventDefault();goTo(a.dataset.go)}});
 
-/* ---------- storage: синхронизация с Obsidian ---------- */
-// На сервер уходят только изменения (set/unset), сервер накладывает их на то, что сейчас в файлах недель.
-// Каждые 15 секунд, при возврате на вкладку и после сохранения страница сверяется с Obsidian.
+/* ---------- storage: отметки на сервере (Obsidian их только показывает) ---------- */
+// На сервер уходят только изменения (set/unset), сервер накладывает их на сохранённые отметки (.agents/data/progress/ml.json).
+// Каждые 15 секунд и при возврате на вкладку страница подтягивает свежие отметки (их могли поставить в уроке).
 let pending={set:{},unset:new Set()}, saving=false, again=false, tmr=null, online=false;
 const hhmm=()=>new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
 const setSync=(t,bad)=>{const el=document.getElementById("sync");el.textContent=t;el.style.color=bad?"var(--s5)":""};
@@ -677,7 +680,7 @@ function applyServer(srv){
   done=merged; if(changed){syncAll();updateProgress()}
   return changed;
 }
-function persist(){clearTimeout(tmr);tmr=setTimeout(flush,500);setSync("Сохраняю в Obsidian…")}
+function persist(){clearTimeout(tmr);tmr=setTimeout(flush,500);setSync("Сохраняю…")}
 async function flush(){
   if(saving){again=true;return}
   if(!hasPending())return;
@@ -687,9 +690,9 @@ async function flush(){
   try{const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     if(!r.ok)throw new Error(await r.text());
     const d=await r.json(); applyServer(d.done||{}); online=true;
-    setSync("Сохранено в Obsidian · "+hhmm())}
+    setSync("Сохранено · "+hhmm())}
   catch(e){Object.assign(pending.set,body.set);body.unset.forEach(k=>{if(!(k in pending.set))pending.unset.add(k)});online=false;
-    setSync("Не сохранено: нет связи с Obsidian. Запусти «Тренажёр и дерево» — отметки отправятся сами.",true)}
+    setSync("Не сохранено: нет связи с сервером. Запусти «Тренажёр и дерево» — отметки отправятся сами.",true)}
   saving=false; if(again||hasPending()){again=false;setTimeout(flush,1500)}
 }
 async function load(quiet){
@@ -697,8 +700,8 @@ async function load(quiet){
     const r=await fetch("/api/tree");const d=await r.json();
     const changed=applyServer(d.done||{}); online=true;
     if(hasPending()){flush();return}
-    setSync((changed&&quiet?"Подтянул отметки из Obsidian · ":"Синхронизировано с Obsidian · ")+hhmm())}
-  catch(e){online=false;setSync("Нет связи с Obsidian: запусти «Тренажёр и дерево». Пока отметки не сохраняются.",true)}
+    setSync((changed&&quiet?"Подтянул свежие отметки · ":"Отметки сохранены, Obsidian показывает их · ")+hhmm())}
+  catch(e){online=false;setSync("Нет связи с сервером: запусти «Тренажёр и дерево». Пока отметки не сохраняются.",true)}
 }
 async function initStore(){
   mode="db";
@@ -745,7 +748,7 @@ function weekHTML(w){
     const its=ids.filter(id=>PLAN.assign[id][1]===tk).map(id=>ITEMS[id]);
     const tasks=tk==="proj"?w.tasks:[];
     if(!its.length&&!tasks.length)return "";
-    return `<div class="grp"><h4>${tt}</h4><ul>${its.map(itemHTML).join("")}</ul>${tasks.length?`<ul class="tasks" style="margin-top:6px">${tasks.map(t=>`<li><span class="st${t.done?" ok":""}" title="${t.done?"сделано":"задача проекта"}"></span><span>${esc(t.text)}</span></li>`).join("")}</ul>`:""}</div>`}).join("");
+    return `<div class="grp"><h4>${tt}</h4><ul>${its.map(itemHTML).join("")}</ul>${tasks.length?`<ul class="tasks" style="margin-top:6px">${tasks.map(t=>`<li data-task="${esc(t.key)}" role="checkbox" tabindex="0" aria-checked="${!!t.done}" title="${t.done?"сделано — нажми, чтобы снять":"задача проекта — нажми, когда сделаешь"}"><span class="st${t.done?" ok":""}"></span><span>${esc(t.text)}</span></li>`).join("")}</ul>`:""}</div>`}).join("");
   return `<section class="wk" id="w-${w.n}" style="--wc:var(${kc});--mc:var(${kc})"><details data-w="${w.n}">
     <summary><span class="wnum">${w.n}</span>
       <div class="mmeta"><h3>${esc(w.span)}</h3><span class="chip" id="ws-${w.n}"></span></div>
@@ -845,6 +848,18 @@ function updatePlan(){
 }
 document.getElementById("kWeekNav").addEventListener("click",e=>{const a=e.target.closest("[data-gw]");if(a){e.preventDefault();goWeek(+a.dataset.gw)}});
 document.getElementById("nextList").addEventListener("click",e=>{const a=e.target.closest("[data-gw]");if(a){e.preventDefault();goWeek(+a.dataset.gw)}});
+/* Задачи проекта: отметка на сайте → .agents/data/progress/ml.json, файл недели в Obsidian пересобирается сам. */
+async function toggleTask(li){
+  const key=li.dataset.task, on=li.getAttribute("aria-checked")!=="true";
+  const paint=v=>{li.setAttribute("aria-checked",v);li.querySelector(".st").classList.toggle("ok",v);li.title=v?"сделано — нажми, чтобы снять":"задача проекта — нажми, когда сделаешь"};
+  paint(on);
+  try{const r=await fetch("/api/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(on?{tasks_set:[key]}:{tasks_unset:[key]})});
+    if(!r.ok)throw 0;
+    (PLAN.weeks||[]).forEach(w=>w.tasks.forEach(t=>{if(t.key===key)t.done=on}));setSync("Сохранено · "+hhmm())}
+  catch(e){paint(!on);setSync("Не сохранено: нет связи с сервером.",true)}
+}
+document.addEventListener("click",e=>{const li=e.target.closest(".tasks li[data-task]");if(li)toggleTask(li)});
+document.addEventListener("keydown",e=>{const li=e.target.closest&&e.target.closest(".tasks li[data-task]");if(li&&(e.key===" "||e.key==="Enter")){e.preventDefault();toggleTask(li)}});
 async function refreshPlan(){
   const r=await fetch("/api/plan"); const p=await r.json();
   const changed=!PLAN||JSON.stringify(p)!==JSON.stringify(PLAN);
