@@ -88,9 +88,9 @@ li.ok .sword,li.bad .sword{pointer-events:none}
 /* Ударение */
 .stress{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
 .st{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
-.st.ok{border-color:var(--accent)} .st.bad{border-color:var(--red)}
-.stsay,.wc-say{border:0;background:transparent;cursor:pointer;font-size:15px;padding:2px 4px;border-radius:6px}
+.stsay,.wc-say{border:0;background:transparent;cursor:pointer;padding:3px 6px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;color:var(--accent);transition:all .15s ease}
 .stsay:hover,.wc-say:hover{background:var(--accent-soft)}
+.stsay svg,.wc-say svg{display:block}
 .syls{display:flex;gap:2px}
 .syl{padding:3px 7px;border-radius:7px;font-size:15px}
 .syl:disabled{cursor:default}

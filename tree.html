@@ -31,6 +31,8 @@
   --s1:#C89470; --s2:#A9B95C; --s3:#5DBB87; --s4:#5BB3C2; --s5:#D684AC; --s6:#E0B456; color-scheme:dark}
 
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:0 64px}
 .wrap{max-width:1180px;margin:0 auto}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;font-weight:500;letter-spacing:-.01em}
@@ -207,7 +209,7 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
 .miles b{color:var(--ink);font-weight:600}
 .legend2{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}
 .legend2 i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--wc);margin-right:6px;vertical-align:-1px}
-.wk{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;scroll-margin-top:calc(var(--navh,0px) + 16px)}
+#plan .wk, .wrap .wk{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;scroll-margin-top:calc(var(--navh,0px) + 16px)}
 .wk.now{border-color:var(--wc);box-shadow:0 0 0 1px var(--wc)}
 .wk.flash{animation:flash2 1.4s ease}
 @keyframes flash2{0%{box-shadow:0 0 0 3px var(--wc)}100%{box-shadow:0 0 0 0 transparent}}
@@ -792,8 +794,15 @@ function goWeek(n,instant){
   if(PAGE==="tree"){location.href="/plan#w-"+n;return}
   const sec=document.getElementById("w-"+n); if(!sec)return;
   sec.querySelector("details").open=true;
-  sec.scrollIntoView({behavior:instant||matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
-  sec.classList.remove("flash"); void sec.offsetWidth; sec.classList.add("flash");
+  requestAnimationFrame(()=>{
+    const nav=document.querySelector(".sitenav"), navH=nav?nav.offsetHeight:52;
+    const targetY=sec.getBoundingClientRect().top+window.scrollY-navH-16;
+    window.scrollTo({
+      top:Math.max(0,targetY),
+      behavior:instant||matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"
+    });
+    sec.classList.remove("flash"); void sec.offsetWidth; sec.classList.add("flash");
+  });
 }
 function updatePlan(){
   if(!PLAN)return;

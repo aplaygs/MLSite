@@ -6,138 +6,312 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Раздел English: обзор. Те же токены, что у ML; синий акцент ставит nav.js (data-section="en"). */
+/* Раздел English: обзор и план уровня A2.
+   Те же токены и вёрстка, что у дерева ML (1180px, Unbounded, Onest, JetBrains Mono); пастельная сине-абрикосовая тема. */
 :root{
-  --bg:#F2F4F8; --surface:#FFFFFF; --ink:#151B2B; --muted:#5B6478; --line:#D9DEE8; --soft:#E8ECF4;
-  --accent:#2F5FD0; --accent-soft:rgba(47,95,208,.15); --warm:#B7862A; --plum:#9A4C72; --teal:#2A7584; --red:#B4483A;
+  --bg:#EEF3FA; --surface:#FFFFFF; --ink:#1A2335; --muted:#5D6982; --line:#D7E0EE; --soft:#E3EBF7;
+  --accent:#3A6AD4; --accent-soft:rgba(58,106,212,.13); --accent-ink:#FFFFFF;
+  --warm:#C9802A; --sun:#FBE6C4; --sun-soft:#FDF3E3; --sun-ink:#8A520E;
+  --teal:#2A7584; --teal-soft:rgba(42,117,132,.13);
+  --plum:#9A4C72; --plum-soft:rgba(154,76,114,.13);
+  --terra:#8F6040; --terra-soft:rgba(143,96,64,.13);
+  --indigo:#5A68A5; --indigo-soft:rgba(90,104,165,.13);
+  --red:#B4483A;
   --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
   --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0D111B; --surface:#141A28; --ink:#E4E8F2; --muted:#949CB0; --line:#262E40; --soft:#1B2232;
-  --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}}
+  --bg:#0F1522; --surface:#161E2E; --ink:#E4EAF5; --muted:#98A3BA; --line:#283349; --soft:#1D2739;
+  --accent:#8EB0F7; --accent-soft:rgba(142,176,247,.16); --accent-ink:#0C1528;
+  --warm:#F2BE78; --sun:rgba(242,190,120,.2); --sun-soft:rgba(242,190,120,.09); --sun-ink:#F5CF97;
+  --teal:#5BB3C2; --teal-soft:rgba(91,179,194,.16);
+  --plum:#D684AC; --plum-soft:rgba(214,132,172,.16);
+  --terra:#C89470; --terra-soft:rgba(200,148,112,.16);
+  --indigo:#9FAAE3; --indigo-soft:rgba(159,170,227,.16);
+  --red:#E07A6A; color-scheme:dark;
+}}
 :root[data-theme="dark"]{
-  --bg:#0D111B; --surface:#141A28; --ink:#E4E8F2; --muted:#949CB0; --line:#262E40; --soft:#1B2232;
-  --warm:#E0B456; --plum:#D684AC; --teal:#5BB3C2; --red:#E07A6A; color-scheme:dark}
+  --bg:#0F1522; --surface:#161E2E; --ink:#E4EAF5; --muted:#98A3BA; --line:#283349; --soft:#1D2739;
+  --accent:#8EB0F7; --accent-soft:rgba(142,176,247,.16); --accent-ink:#0C1528;
+  --warm:#F2BE78; --sun:rgba(242,190,120,.2); --sun-soft:rgba(242,190,120,.09); --sun-ink:#F5CF97;
+  --teal:#5BB3C2; --teal-soft:rgba(91,179,194,.16);
+  --plum:#D684AC; --plum-soft:rgba(214,132,172,.16);
+  --terra:#C89470; --terra-soft:rgba(200,148,112,.16);
+  --indigo:#9FAAE3; --indigo-soft:rgba(159,170,227,.16);
+  --red:#E07A6A; color-scheme:dark;
+}
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.55;padding-inline:16px;padding-block:0 72px}
-.wrap{max-width:1040px;margin:0 auto}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:0 72px}
+.wrap{max-width:1180px;margin:0 auto}
 h1,h2,h3{font-family:var(--f-display);font-weight:500;letter-spacing:-.01em;margin:0;text-wrap:balance}
 p{margin:0}
 a{color:var(--accent)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
 .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .muted{color:var(--muted)}
-header.top{padding-block:36px 8px;display:grid;gap:12px}
-header.top h1{font-size:clamp(30px,5.6vw,48px);font-weight:700;line-height:1.05}
+
+/* Шапка */
+header.top{padding-block:36px 12px;display:grid;gap:10px}
+header.top h1{font-size:clamp(30px,5vw,46px);font-weight:700;line-height:1.08}
 header.top p{color:var(--muted);max-width:68ch}
-section.block{padding-block:44px 0;display:grid;gap:14px;scroll-margin-top:70px}
-section.block>h2{font-size:clamp(21px,3.2vw,28px)}
+
+/* Главный блок Hero: колесо навыков слева, панель управления справа (как в ML) */
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:32px;align-items:center;padding-block:12px 32px}
+@media (max-width:920px){.hero{grid-template-columns:1fr}}
+
+/* SVG Колесо навыков English */
+.wheel-wrap{display:grid;justify-items:center;position:relative}
+.wheel{width:100%;max-width:540px;height:auto;display:block;margin:0 auto;overflow:visible}
+.wheel .sector{cursor:pointer;transition:transform .25s cubic-bezier(.2,.8,.3,1),filter .2s ease;transform-origin:270px 270px}
+.wheel .sector:hover,.wheel .sector:focus,.wheel .sector.hl{transform:scale(1.025);filter:drop-shadow(0 4px 12px rgba(26,35,53,.1))}
+.wheel-base{stroke-width:1.2;transition:stroke-width .2s}
+.wlabel{font-family:var(--f-body);font-weight:600;font-size:12.5px;fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round;text-anchor:middle}
+.wpct{font-family:var(--f-mono);font-size:10.5px;fill:var(--muted);paint-order:stroke;stroke:var(--bg);stroke-width:2.5px;text-anchor:middle}
+.c-num{font-family:var(--f-display);font-size:32px;font-weight:700;fill:var(--ink);text-anchor:middle}
+.c-cap{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;fill:var(--muted);text-transform:uppercase;text-anchor:middle}
+.c-sub{font-family:var(--f-mono);font-size:11.5px;font-weight:600;fill:var(--accent);text-anchor:middle}
+.ring-t{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;fill:var(--muted)}
+@media (prefers-reduced-motion:reduce){.wheel .sector{transition:none}}
+
+/* Панель справа (как в ML) */
+.panel{display:grid;gap:18px;min-width:0}
+.kpi-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px 22px;display:grid;gap:12px;box-shadow:0 6px 20px rgba(26,35,53,.03)}
+.kpi-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kpi-val{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.kpi-val .big{font-family:var(--f-display);font-size:38px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink)}
+.kpi-val .big small{font-size:18px;color:var(--muted);font-weight:500}
+.kpi-val .sub{font-size:13px;color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .4s ease}
+
+/* Быстрые ссылки недели */
+.week-acts{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:4px}
+.btn-open{display:inline-flex;align-items:center;gap:6px;font:600 13px var(--f-body);background:var(--accent);color:var(--surface,#fff);text-decoration:none;padding:8px 16px;border-radius:999px;transition:all .15s}
+.btn-open:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.l-pills{display:flex;gap:6px;flex-wrap:wrap}
+.lp{font:500 12px var(--f-mono);text-decoration:none;color:var(--ink);background:var(--soft);border:1px solid var(--line);padding:5px 10px;border-radius:999px;transition:all .15s}
+.lp:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.lp.done{border-color:var(--teal);color:var(--teal)}
+
+/* Полоса 15 недель */
+.weeks-strip{display:grid;gap:6px}
+.strip-head{display:flex;align-items:center;justify-content:space-between;font-size:12px}
+.wpills{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;width:100%}
+.wp{font:600 12px var(--f-mono);text-decoration:none;height:32px;display:grid;place-items:center;border-radius:8px;background:var(--surface);border:1px solid var(--line);color:var(--ink);transition:all .15s;min-width:0}
+.wp:hover{border-color:var(--accent);transform:translateY(-1px)}
+.wp.now{background:var(--accent);border-color:var(--accent);color:var(--surface,#fff);font-weight:700}
+.wp.rev{background:var(--sun-soft);border-color:var(--warm);color:var(--warm)}
+.wp.ok{border-color:var(--teal);color:var(--teal)}
+@media (max-width:1020px){.wpills{grid-template-columns:repeat(8,minmax(0,1fr))}}
+
+/* Плашка тренажёра */
+.w-banner{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 16px;color:var(--ink);text-decoration:none;transition:all .15s ease}
+.w-banner:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 14px rgba(58,106,212,.08)}
+.wb-ico{width:42px;height:42px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.wb-svg{display:block}
+.wb-info{display:grid;gap:1px;flex:1}
+.wb-info b{font:600 14px var(--f-display)}
+.wb-info span{font-size:12.5px;color:var(--muted)}
+.wb-go{font:600 12.5px var(--f-mono);color:var(--accent)}
+
+/* Разбивка навыков (как ярусы дерева) */
+.skills-block{display:grid;gap:8px}
+.srow{display:grid;grid-template-columns:130px 1fr 64px;gap:10px;align-items:center;font-size:13px}
+.srow b{font-weight:600}
+.srow .n{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.srow .bar i{background:var(--sc,var(--accent))}
+
+/* Панель инструментов (Toolbar) */
+.tools-bar{position:sticky;top:calc(var(--navh,0px) + env(safe-area-inset-top,0px));z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding-block:10px;margin-bottom:8px}
+.btn-f{font:500 13px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer;transition:all .15s}
+.btn-f:hover{border-color:var(--accent)}
+.btn-f[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface,#fff)}
+.tools-bar .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-left:auto}
+@media (max-width:700px){.tools-bar .legend{display:none}}
+.leg-item{display:inline-flex;align-items:center;gap:4px}
+.leg-dot{width:8px;height:8px;border-radius:50%;background:var(--lc)}
+
+/* Разделы страницы */
+section.block{padding-block:40px 0;display:grid;gap:14px;scroll-margin-top:70px}
+section.block>h2{font-size:clamp(22px,3.2vw,28px)}
 section.block>p{color:var(--muted);max-width:72ch}
 
 /* Этапы A2 → B1 → B2 */
-.road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;position:relative}
+.road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:760px){.road{grid-template-columns:1fr}}
-.stage{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:10px;align-content:start;position:relative;overflow:hidden}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:10px;align-content:start;position:relative}
 .stage.now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
-.stage .lv{font:700 34px/1 var(--f-display);color:var(--accent)}
+.stage .lv{font:700 36px/1 var(--f-display);color:var(--accent)}
 .stage.next .lv{color:var(--muted)}
-.stage .when{font:500 12.5px var(--f-mono);color:var(--muted)}
-.stage ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px}
-.stage .tag{justify-self:start;font:500 11px var(--f-mono);padding:3px 9px;border-radius:999px;border:1px solid var(--accent);color:var(--accent)}
+.stage .when{font:500 12px var(--f-mono);color:var(--muted)}
+.stage ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13.5px}
+.stage .tag{justify-self:start;font:600 11px var(--f-mono);padding:3px 10px;border-radius:999px;border:1px solid var(--accent);color:var(--accent)}
 .stage.next .tag{border-color:var(--line);color:var(--muted)}
 
 /* Ритм недели */
 .rhythm{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
-@media (max-width:860px){.rhythm{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.rc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:6px;align-content:start}
-.rc .n{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
-.rc b{font:500 15px var(--f-display)}
-.rc p{font-size:13.5px;color:var(--muted)}
+@media (max-width:920px){.rhythm{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:540px){.rhythm{grid-template-columns:1fr}}
+.rc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
+.rc .n{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.rc b{font:600 15px var(--f-display)}
+.rc p{font-size:13px;color:var(--muted)}
 .rc.t .n{color:var(--warm)} .rc.d .n{color:var(--teal)}
 
-/* Недели плана A2 */
-.weeks{display:grid;gap:8px}
-.wk{background:var(--surface);border:1px solid var(--line);border-radius:14px;transition:border-color .15s}
-.wk:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
-.wk>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:12px 16px}
-.wk>summary::-webkit-details-marker{display:none}
-.wnum{font:700 14px var(--f-display);width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--accent);color:var(--surface)}
-.wk.rev .wnum{background:var(--warm)}
-.wk h3{font-size:15.5px}
-.wk .sub{font-size:13px;color:var(--muted)}
-.wk .dt{font:500 12px var(--f-mono);color:var(--muted);white-space:nowrap}
-.wk .chev{color:var(--muted);transition:transform .2s;margin-left:8px}
-.wk[open] .chev{transform:rotate(90deg)}
-.ls{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:4px;align-content:start;font-size:13.5px}
-.ls .k{font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
-.ls.t .k{color:var(--warm)}
-.ls b{font-weight:600}
-.ls span{color:var(--muted)}
-
-/* Инструменты и решения */
-.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
-.tool{display:grid;gap:6px;padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--ink);text-decoration:none;transition:border-color .15s,transform .15s}
-a.tool:hover{border-color:var(--accent);transform:translateY(-1px)}
-.tool b{font:500 15px var(--f-display)}
-.tool span{font-size:13.5px;color:var(--muted)}
-.tool.soon{border-style:dashed;opacity:.75}
-.q{display:grid;gap:8px}
-.q li{margin-left:18px}
-
-/* Показатели, карточки уроков, темы с галочками */
-.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:6px}
-@media (max-width:700px){.kpis{grid-template-columns:1fr}}
-.kp{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:4px;align-content:start;color:var(--ink);text-decoration:none}
-.kp .k{font-size:12.5px;color:var(--muted)}
-.kp .v{font:700 28px/1 var(--f-display);font-variant-numeric:tabular-nums}
-.kp .v small{font-size:15px;color:var(--muted);font-weight:500}
-.kp .bar{height:5px;border-radius:3px;background:var(--soft);overflow:hidden;margin-top:6px}
-.kp .bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .4s ease}
-.kp .go{font-size:13px;text-decoration:none;font-weight:500}
-.kpl{transition:border-color .15s,transform .15s}.kpl:hover{border-color:var(--accent);transform:translateY(-1px)}
+/* Список недель плана A2 */
+.weeks{display:grid;gap:10px}
+.wk{background:var(--surface);border:1px solid var(--line);border-radius:16px;transition:border-color .15s;scroll-margin-top:calc(var(--navh,0px) + 60px)}
+.wk:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
 .wk.now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.wk.flash{animation:flash2 1.4s ease}
+@keyframes flash2{0%{box-shadow:0 0 0 3px var(--accent);border-color:var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+.wk>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:6px 16px;align-items:center;padding:14px 18px}
+.wk>summary::-webkit-details-marker{display:none}
+.wnum{font:700 14px var(--f-display);width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--accent);color:var(--surface,#fff)}
+.wk.rev .wnum{background:var(--warm)}
+.wk h3{font-size:16px}
 .wk h3 .ru{font:400 13.5px var(--f-body);color:var(--muted)}
-.chip{font:500 11px var(--f-mono);padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-left:6px}
-.chip.now{border-color:var(--accent);color:var(--accent)} .chip.ok{border-color:var(--teal);color:var(--teal)} .chip.late{border-color:var(--red);color:var(--red)}
-.wbody{padding:2px 16px 16px;display:grid;gap:14px}
+.wk .sub{font-size:13px;color:var(--muted);margin-top:2px}
+.wk .dt{font:500 12px var(--f-mono);color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.wk .chev{color:var(--muted);transition:transform .2s;font-size:14px}
+.wk[open] .chev{transform:rotate(90deg)}
+
+.chip{font:600 11px var(--f-mono);padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-left:6px}
+.chip.now{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.chip.ok{border-color:var(--teal);color:var(--teal);background:var(--teal-soft)}
+.chip.late{border-color:var(--red);color:var(--red);background:rgba(180,72,58,.1)}
+
+.wbody{padding:2px 18px 18px;display:grid;gap:16px}
 .lcs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 @media (max-width:760px){.lcs{grid-template-columns:1fr 1fr}}
-.lc{display:grid;gap:3px;align-content:start;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-decoration:none;transition:border-color .15s,transform .15s}
-a.lc:hover{border-color:var(--accent);transform:translateY(-1px)}
-.lc .k{font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
-.lc b{font:500 14px var(--f-display);line-height:1.3}
+.lc{display:grid;gap:3px;align-content:start;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-decoration:none;transition:all .15s}
+a.lc:hover{border-color:var(--accent);transform:translateY(-1px);background:var(--soft)}
+.lc .k{font:600 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.lc.t .k{color:var(--warm)}
+.lc b{font:600 13.5px var(--f-display);line-height:1.3}
 .lc .m{font-size:12px;color:var(--muted)}
 .lc.soon{border-style:dashed;opacity:.75}
-.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 22px}
+
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 24px}
 @media (max-width:760px){.cols{grid-template-columns:1fr}}
-.col h4{margin:0 0 6px;font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.col h4{margin:0 0 8px;font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
 .col ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
-.it{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:4px 6px;margin-inline:-6px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1.4}
+.it{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;align-items:start;padding:5px 7px;margin-inline:-7px;border-radius:8px;cursor:pointer;font-size:14px;line-height:1.4;transition:background .15s}
 .it:hover{background:var(--soft)}
 .it input{position:absolute;opacity:0;width:1px;height:1px}
 .box{width:16px;height:16px;margin-top:1px;border:1.5px solid var(--muted);border-radius:4px;display:grid;place-items:center}
 .it input:checked+.box{background:var(--accent);border-color:var(--accent)}
-.it input:checked+.box::after{content:"";width:8px;height:4px;border:2px solid var(--surface);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.it input:checked+.box::after{content:"";width:8px;height:4px;border:2px solid var(--surface,#fff);border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .it input:checked~.tx .t{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
-.it input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
-.kd{font:500 10.5px var(--f-mono);color:var(--kc);margin-left:6px;white-space:nowrap}
+.kd{font:600 10.5px var(--f-mono);color:var(--kc);margin-left:6px;white-space:nowrap}
 .tx .d{font:10.5px var(--f-mono);color:var(--muted);margin-left:4px}
-.wfoot{font-size:13px;border-top:1px dashed var(--line);padding-top:10px}
-.wfoot a{text-decoration:none}
-footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
+.wfoot{font-size:13px;border-top:1px dashed var(--line);padding-top:12px;display:flex;align-items:center;justify-content:space-between}
+.wfoot a{text-decoration:none;font-weight:500}
+
+/* Инструменты раздела */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.tool{display:grid;gap:6px;padding:18px;border-radius:16px;background:var(--surface);border:1px solid var(--line);color:var(--ink);text-decoration:none;transition:all .15s}
+a.tool:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 6px 18px rgba(26,35,53,.04)}
+.tool b{font:600 15px var(--f-display)}
+.tool span{font-size:13px;color:var(--muted)}
+.tool.soon{border-style:dashed;opacity:.8}
+
+footer{padding-block:48px 0;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:40px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style></head><body>
+</style>
+</head>
+<body>
 <script src="/assets/nav.js"></script>
 <div class="wrap">
   <header class="top">
     <div class="eyebrow">English · с A2 до B2</div>
     <h1>Английский для жизни и работы</h1>
     <p>Свой план вместо привязки к занятиям: грамматика по порядку уровней, слова каждый день, живая речь и аудирование. Цель — уверенный A2, затем B1 для работы и путешествий и B2, чтобы смотреть фильмы и проходить собеседования на английском. Основа уровня A2 — учебник Cambridge Empower A2.</p>
-    <div class="kpis" id="kpis"></div>
   </header>
 
+  <!-- Главный блок Hero: Интерактивное колесо навыков + Панель управления -->
+  <section class="hero" id="hero" aria-label="Обзор навыков и прогресса">
+    <!-- Слева: Колесо навыков English -->
+    <div class="wheel-wrap">
+      <svg class="wheel" id="wheelSvg" viewBox="0 0 540 540" aria-label="Интерактивное колесо навыков уровня A2">
+        <!-- SVG строится динамически скриптом drawWheel() -->
+      </svg>
+    </div>
+
+    <!-- Справа: Панель управления -->
+    <div class="panel">
+      <!-- Карточка текущей недели -->
+      <div class="kpi-card" id="curWeekCard">
+        <div class="kpi-head">
+          <span class="eyebrow" id="curWeekHead">НЕДЕЛЯ 1 ПЛАНА · 12–18 ОКТЯБРЯ</span>
+          <span class="chip now" id="curWeekChip">сейчас</span>
+        </div>
+        <div class="kpi-val">
+          <span class="big" id="curWeekVal">0<small id="curWeekTotal"> / 10</small></span>
+          <span class="sub">тем пройдено на этой неделе</span>
+        </div>
+        <div class="bar"><i id="curWeekBar" style="width:0%"></i></div>
+        <div class="week-acts">
+          <a class="btn-open" id="curWeekBtn" href="#w-1">Открыть неделю 1 →</a>
+          <div class="l-pills" id="curLessonPills"></div>
+        </div>
+      </div>
+
+      <!-- Полоса всех 15 недель -->
+      <div class="weeks-strip">
+        <div class="strip-head">
+          <span class="eyebrow">ВСЕ 15 НЕДЕЛЬ · НАЖМИ, ЧТОБЫ ПЕРЕЙТИ</span>
+        </div>
+        <div class="wpills" id="stripPills"></div>
+      </div>
+
+      <!-- Плашка тренажёра слов -->
+      <a class="w-banner" href="/words" title="Открыть тренажёр слов с интервальным повторением">
+        <span class="wb-ico" aria-hidden="true">
+          <svg class="wb-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2.5" y="6.5" width="14" height="14" rx="3" stroke="currentColor" opacity="0.45"/>
+            <rect x="7.5" y="3.5" width="14" height="14" rx="3" fill="var(--surface)" stroke="currentColor"/>
+            <line x1="11" y1="8" x2="18" y2="8" stroke="currentColor" stroke-width="2"/>
+            <line x1="11" y1="12" x2="15.5" y2="12" stroke="currentColor" opacity="0.6" stroke-width="2"/>
+          </svg>
+        </span>
+        <div class="wb-info">
+          <b>Тренажёр слов</b>
+          <span id="wordsBannerSub">Интервальное повторение (Лейтнер) · 10–15 минут в день</span>
+        </div>
+        <span class="wb-go">Тренировать →</span>
+      </a>
+
+      <!-- Прогресс по 6 навыкам -->
+      <div class="skills-block">
+        <div class="strip-head" style="margin-bottom:2px">
+          <span class="eyebrow">ПРОГРЕСС ПО НАВЫКАМ УРОВНЯ A2</span>
+        </div>
+        <div id="skillRows"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Панель фильтров недели (Toolbar) -->
+  <div class="tools-bar" role="toolbar" aria-label="Фильтры плана">
+    <button class="btn-f" data-filter="all" type="button" aria-pressed="true">Все недели</button>
+    <button class="btn-f" data-filter="now" type="button" aria-pressed="false">Текущая неделя</button>
+    <button class="btn-f" data-filter="ready" type="button" aria-pressed="false">Готовые уроки</button>
+    <button class="btn-f" data-filter="review" type="button" aria-pressed="false">Повторение</button>
+    <div class="legend" aria-hidden="true">
+      <span class="leg-item"><i class="leg-dot" style="--lc:var(--accent)"></i>Грамматика</span>
+      <span class="leg-item"><i class="leg-dot" style="--lc:var(--teal)"></i>Слова</span>
+      <span class="leg-item"><i class="leg-dot" style="--lc:var(--plum)"></i>Звуки</span>
+      <span class="leg-item"><i class="leg-dot" style="--lc:var(--warm)"></i>Речь</span>
+      <span class="leg-item"><i class="leg-dot" style="--lc:var(--terra)"></i>Письмо</span>
+    </div>
+  </div>
+
+  <!-- Раздел: Дорога A2 → B1 → B2 -->
   <section class="block" id="road">
     <div class="eyebrow">Дорога</div>
     <h2>Три этапа</h2>
@@ -146,12 +320,13 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
       <div class="stage now"><span class="tag">сейчас</span><span class="lv">A2</span><span class="when">12.10.2026 → 24.01.2027 · 15 недель</span>
         <ul><li>Вся базовая грамматика: be, present simple и continuous, past simple, present perfect, going to, can, have to, should, сравнения</li><li>Около 800–1000 частых слов</li><li>Простые разговоры: о себе, работе, еде, городе, поездке</li><li>Основа: Empower A2, юнит в неделю</li></ul></div>
       <div class="stage next"><span class="tag">потом</span><span class="lv">B1</span><span class="when">февраль 2027 → осень 2027</span>
-        <ul><li>Past continuous и past perfect, будущее время, условные предложения 0–2, пассив, косвенная речь, used to</li><li>Английский для IT: рассказ о себе и проекте, чтение документации</li><li>Сериалы с английскими субтитрами</li><li>Основа: Empower B1 или Murphy «English Grammar in Use» — решим к февралю</li></ul></div>
+        <ul><li>Past continuous и past perfect, будущее время, условные предложения 0–2, пассив, косвенная речь, used to</li><li>Английский для IT: рассказ о себе и проекте, чтение документации</li><li>Сериалы с английскими субтитрами</li><li>Основа: Empower B1 или Murphy «English Grammar in Use»</li></ul></div>
       <div class="stage next"><span class="tag">дальше</span><span class="lv">B2</span><span class="when">2028</span>
         <ul><li>Третье и смешанные условные, модальные в прошедшем, wish, сложные времена</li><li>Собеседование на английском, техническое письмо</li><li>Фильмы и книги без перевода</li></ul></div>
     </div>
   </section>
 
+  <!-- Раздел: Ритм недели -->
   <section class="block" id="week">
     <div class="eyebrow">Ритм</div>
     <h2>Неделя: три урока, тест и слова каждый день</h2>
@@ -163,76 +338,299 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted)}
       <div class="rc t"><span class="n">Тест · ~25 мин</span><b>Тест недели</b><p>Вставь слово, выбери форму, найди ошибку, переведи. Около 20% вопросов — из прошлых недель.</p></div>
       <div class="rc d"><span class="n">Каждый день · 10–15 мин</span><b>Слова</b><p>Тренажёр с интервальным повторением: слова уроков попадают туда сами (после твоего «да»).</p></div>
     </div>
-    <p class="muted" style="font-size:13.5px">Итого около 4–4,5 часа в неделю рядом с ML. Тяжёлая неделя — уроки 2 и 3 можно сдвинуть, слова не пропускать.</p>
   </section>
 
+  <!-- Раздел: План A2 по неделям -->
   <section class="block" id="a2">
     <div class="eyebrow">План уровня A2</div>
     <h2>15 недель по Empower A2</h2>
-    <p>Юнит учебника — неделя, плюс три недели повторения: после шестого юнита, на Новый год и итог уровня. Галочки — те же, что в файлах недель в Obsidian (<code>65_Английский/План</code>): отметил здесь — появилось там, и наоборот.</p>
-    <div class="weeks" id="weeks"><p class="muted">Загружаю план…</p></div>
-    <p class="muted" id="sync" role="status" style="font-size:13px"></p>
+    <p>Юнит учебника — неделя, плюс три недели повторения: после шестого юнита, на Новый год и итог уровня. Галочки синхронизированы с файлами недель в Obsidian (<code>65_Английский/План</code>).</p>
+    <div class="weeks" id="weeks"><p class="muted">Загружаю план недели…</p></div>
+    <p class="muted" id="sync" role="status" style="font-size:13px;margin-top:6px"></p>
   </section>
 
+  <!-- Раздел: Инструменты раздела -->
   <section class="block" id="tools">
     <div class="eyebrow">Инструменты раздела</div>
     <h2>Что уже есть и что появится</h2>
-    <div class="tools">
-      <a class="tool" href="/words"><b>Тренажёр слов</b><span>Карточки с интервальным повторением. Сейчас — слова из словаря Obsidian.</span></a>
+    <div class="tools-grid">
+      <a class="tool" href="/words"><b>Тренажёр слов</b><span>Карточки с интервальным повторением (Лейтнер). Синхронно со словарём в Obsidian.</span></a>
       <a class="tool" href="#a2"><b>План по неделям</b><span>15 недель уровня A2 с галочками, синхронно с файлами недель в Obsidian.</span></a>
-      <div class="tool soon"><b>Уроки и тесты</b><span>Шкала времён, конструктор предложений, озвучка фраз в браузере. Уроки появляются на карточках недель по мере готовности.</span></div>
-      <div class="tool soon"><b>Дерево тем</b><span>Грамматика, слова, произношение, чтение и аудирование, говорение, письмо, английский для IT — с уровнями A2, B1, B2.</span></div>
+      <a class="tool" href="/lessons/e01-1.html"><b>Интерактивные уроки</b><span>Готова неделя 1: шкала времён, конструктор, озвучка в браузере, конспекты для телефона.</span></a>
+      <div class="tool soon"><b>Дерево навыков English</b><span>Большая карта грамматики, лексики и IT-английского по уровням A2, B1 и B2.</span></div>
     </div>
   </section>
 
-  <footer>Раздел English на той же платформе, что и ML: одна навигация, один дизайн и правила (GUIDE.md), общий код уроков и тестов. Данные и файлы Obsidian — свои.</footer>
+  <footer>Раздел English на той же платформе, что и ML: общая навигация, дизайн-система, единый код уроков и тестов. Данные и конспекты хранятся в твоём хранилище Obsidian.</footer>
 </div>
+
 <script>
-/* План английского из /api/en/plan: недели → 3 урока → темы с галочками (синхронно с 65_Английский/План). */
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const KIND={"Грамматика":"var(--accent)","Слова":"var(--teal)","Произношение":"var(--plum)","Речь":"var(--warm)","Письмо":"var(--warm)","Повторение":"var(--muted)"};
-let P=null,done={};
+
+const SKILLS=[
+  {key:"Грамматика",label:"Грамматика",en:"Grammar",color:"var(--accent)"},
+  {key:"Слова",label:"Словарь",en:"Vocabulary",color:"var(--teal)"},
+  {key:"Произношение",label:"Звуки",en:"Pronunciation",color:"var(--plum)"},
+  {key:"Речь",label:"Живая речь",en:"Speaking",color:"var(--warm)"},
+  {key:"Письмо",label:"Письмо",en:"Writing",color:"var(--terra)"},
+  {key:"Повторение",label:"Повторение",en:"Review",color:"var(--indigo)"}
+];
+const KIND_COLOR=Object.fromEntries(SKILLS.map(s=>[s.key,s.color]));
+
+let P=null, done={}, currentFilter="all";
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
 const tops=w=>w.lessons.flatMap(l=>l.topics);
-function kpis(){
-  const all=P.weeks.flatMap(tops), k=all.filter(t=>done[t.id]).length, t=today(), cur=P.weeks.find(w=>w.start<=t&&t<=w.end);
-  const ck=cur?tops(cur).filter(x=>done[x.id]).length:0, cn=cur?tops(cur).length:0;
-  $("kpis").innerHTML=`<div class="kp"><span class="k">${cur?`Неделя ${cur.n} · ${esc(cur.span)}`:"Неделя"}</span><span class="v">${ck}<small> / ${cn}</small></span><div class="bar"><i style="width:${cn?ck/cn*100:0}%"></i></div>${cur?`<a class="go" href="#w-${cur.n}">к неделе →</a>`:""}</div>
-    <div class="kp"><span class="k">Уровень ${esc(P.level)} целиком</span><span class="v">${k}<small> / ${all.length}</small></span><div class="bar"><i style="width:${k/all.length*100}%"></i></div><span class="k">${esc(P.book)}</span></div>
-    <a class="kp kpl" href="/words"><span class="k">Каждый день</span><span class="v" style="font-size:20px">Слова →</span><span class="k">10–15 минут в тренажёре</span></a>`;
+
+/* Отрисовка интерактивного колеса навыков SVG */
+function drawWheel(skillCounts, doneTotal, allTotal){
+  const svg=$("wheelSvg");
+  const cx=270, cy=270, r0=94, r1=222;
+  const pct=allTotal?Math.round((doneTotal/allTotal)*100):0;
+
+  // 6 секторов (по 60 градусов), небольшой зазор в 3 градуса
+  const sectors=SKILLS.map((sk,i)=>{
+    const midAngle=-90 + i*60;
+    const a1=(midAngle - 27)*(Math.PI/180);
+    const a2=(midAngle + 27)*(Math.PI/180);
+
+    const st=skillCounts[sk.key]||{done:0,all:1};
+    const ratio=st.all?Math.min(1,st.done/st.all):0;
+    const rProg=r0 + (r1 - r0)*ratio;
+
+    // Внешняя дуга базы
+    const p0x=cx+r0*Math.cos(a1), p0y=cy+r0*Math.sin(a1);
+    const p1x=cx+r1*Math.cos(a1), p1y=cy+r1*Math.sin(a1);
+    const p2x=cx+r1*Math.cos(a2), p2y=cy+r1*Math.sin(a2);
+    const p3x=cx+r0*Math.cos(a2), p3y=cy+r0*Math.sin(a2);
+    const dBase=`M ${p0x.toFixed(1)} ${p0y.toFixed(1)} L ${p1x.toFixed(1)} ${p1y.toFixed(1)} A ${r1} ${r1} 0 0 1 ${p2x.toFixed(1)} ${p2y.toFixed(1)} L ${p3x.toFixed(1)} ${p3y.toFixed(1)} A ${r0} ${r0} 0 0 0 ${p0x.toFixed(1)} ${p0y.toFixed(1)} Z`;
+
+    // Дуга прогресса
+    let dProg="";
+    if(ratio>0.01){
+      const pr1x=cx+rProg*Math.cos(a1), pr1y=cy+rProg*Math.sin(a1);
+      const pr2x=cx+rProg*Math.cos(a2), pr2y=cy+rProg*Math.sin(a2);
+      dProg=`M ${p0x.toFixed(1)} ${p0y.toFixed(1)} L ${pr1x.toFixed(1)} ${pr1y.toFixed(1)} A ${rProg} ${rProg} 0 0 1 ${pr2x.toFixed(1)} ${pr2y.toFixed(1)} L ${p3x.toFixed(1)} ${p3y.toFixed(1)} A ${r0} ${r0} 0 0 0 ${p0x.toFixed(1)} ${p0y.toFixed(1)} Z`;
+    }
+
+    const midRad=midAngle*(Math.PI/180);
+    const lx=cx + 158*Math.cos(midRad);
+    const ly=cy + 158*Math.sin(midRad);
+
+    return `<g class="sector" data-key="${sk.key}" tabindex="0" role="button" aria-label="${sk.label}: ${st.done} из ${st.all}">
+      <path class="wheel-base" d="${dBase}" style="fill:${sk.color};stroke:${sk.color}" fill-opacity="0.12" stroke-opacity="0.32" />
+      ${dProg?`<path class="wheel-prog" d="${dProg}" style="fill:${sk.color}" fill-opacity="0.75" />`:""}
+      <text class="wlabel" x="${lx.toFixed(1)}" y="${(ly-2).toFixed(1)}">${sk.label}</text>
+      <text class="wpct" x="${lx.toFixed(1)}" y="${(ly+13).toFixed(1)}">${st.done} / ${st.all}</text>
+    </g>`;
+  }).join("");
+
+  svg.innerHTML=`<defs>
+    <filter id="hubShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(26,35,53,0.08)"/>
+    </filter>
+  </defs>
+  <!-- Внешний декоративный трек -->
+  <circle cx="${cx}" cy="${cy}" r="236" fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 6" opacity="0.6"/>
+  <!-- Секторы колеса -->
+  ${sectors}
+  <!-- Центральный хаб -->
+  <g class="hub" filter="url(#hubShadow)">
+    <circle cx="${cx}" cy="${cy}" r="82" fill="var(--surface)" stroke="var(--line)" stroke-width="1.5" />
+    <text class="c-num" x="${cx}" y="${cy-6}">${pct}%</text>
+    <text class="c-cap" x="${cx}" y="${cy+14}">УРОВЕНЬ A2</text>
+    <text class="c-sub" x="${cx}" y="${cy+30}">${doneTotal} / ${allTotal} ТЕМ</text>
+  </g>`;
+
+  // Клик по сектору колеса подсвечивает темы
+  svg.querySelectorAll(".sector").forEach(s=>{
+    s.onclick=()=>{
+      const k=s.dataset.key;
+      document.querySelectorAll(`.it`).forEach(it=>{
+        const isK=it.querySelector(`.kd`)?.textContent===k;
+        it.style.backgroundColor=isK?"var(--accent-soft)":"";
+      });
+      setTimeout(()=>{document.querySelectorAll(`.it`).forEach(it=>it.style.backgroundColor="")},1800);
+    };
+  });
 }
+
+function updateHero(){
+  const all=P.weeks.flatMap(tops);
+  const totalDone=all.filter(t=>done[t.id]).length;
+  const t=today();
+  const cur=P.weeks.find(w=>w.start<=t&&t<=w.end) || P.weeks[0];
+  const curTopics=cur?tops(cur):[];
+  const curDone=curTopics.filter(x=>done[x.id]).length;
+  const curAll=curTopics.length||1;
+
+  // Подсчёт по 6 навыкам
+  const skillCounts={};
+  SKILLS.forEach(sk=>{skillCounts[sk.key]={done:0,all:0}});
+  all.forEach(tp=>{
+    const k=skillCounts[tp.kind]?tp.kind:"Грамматика";
+    skillCounts[k].all++;
+    if(done[tp.id]) skillCounts[k].done++;
+  });
+
+  // Отрисовка SVG колеса
+  drawWheel(skillCounts, totalDone, all.length);
+
+  // Карточка текущей недели
+  if(cur){
+    $("curWeekHead").textContent=`НЕДЕЛЯ ${cur.n} ПЛАНА · ${cur.span||""}`;
+    $("curWeekVal").innerHTML=`${curDone}<small id="curWeekTotal"> / ${curAll}</small>`;
+    $("curWeekBar").style.width=`${Math.round((curDone/curAll)*100)}%`;
+    $("curWeekBtn").href=`#w-${cur.n}`;
+    $("curWeekBtn").textContent=`Открыть неделю ${cur.n} →`;
+
+    // Пилюли уроков текущей недели
+    const curL=(P.lessons||[]).filter(l=>l.week===cur.n);
+    const pillsHTML=[1,2,3].map(n=>{
+      const l=curL.find(x=>x.n===n);
+      const lTops=(cur.lessons.find(x=>x.n===n)||{}).topics||[];
+      const lDone=lTops.filter(x=>done[x.id]).length;
+      const href=l&&l.ready?`/lessons/${encodeURIComponent(l.file)}`:`#w-${cur.n}`;
+      return `<a class="lp${lDone===lTops.length&&lTops.length?" done":""}" href="${href}">Урок ${n} · ${lDone}/${lTops.length}</a>`;
+    });
+    const curTest=(P.tests||{})[String(cur.n)];
+    const tl=curL.find(x=>x.n===4);
+    pillsHTML.push(`<a class="lp" href="${tl&&tl.ready?`/lessons/${encodeURIComponent(tl.file)}`:`#w-${cur.n}`}">Тест ${curTest?`· ${curTest.best}%`:""}</a>`);
+    $("curLessonPills").innerHTML=pillsHTML.join("");
+  }
+
+  // Полоска 15 недель
+  $("stripPills").innerHTML=P.weeks.map(w=>{
+    const wTops=tops(w), wK=wTops.filter(x=>done[x.id]).length;
+    const isNow=w.n===cur.n, isRev=w.kind==="review", isOk=wK===wTops.length&&wTops.length>0;
+    const cls=["wp",isNow?"now":"",isRev?"rev":"",isOk?"ok":""].filter(Boolean).join(" ");
+    return `<a class="${cls}" href="#w-${w.n}" title="Неделя ${w.n}: ${esc(w.title)}">${w.n}</a>`;
+  }).join("");
+
+  // Строки навыков в панели
+  $("skillRows").innerHTML=SKILLS.map(sk=>{
+    const st=skillCounts[sk.key]||{done:0,all:0};
+    const r=st.all?Math.round((st.done/st.all)*100):0;
+    return `<div class="srow" style="--sc:${sk.color}">
+      <b>${sk.label}</b>
+      <div class="bar"><i style="width:${r}%"></i></div>
+      <span class="n">${st.done} из ${st.all}</span>
+    </div>`;
+  }).join("");
+}
+
 function weekHTML(w){
   const ts=tops(w), k=ts.filter(t=>done[t.id]).length, t=today(), now=w.start<=t&&t<=w.end, past=w.end<t;
   const L=(P.lessons||[]).filter(l=>l.week===w.n);
   const chip=now?'<span class="chip now">сейчас</span>':past?(k===ts.length?'<span class="chip ok">пройдена</span>':`<span class="chip late">хвосты: ${ts.length-k}</span>`):'<span class="chip">впереди</span>';
   const T=(P.tests||{})[String(w.n)];
-  const card=(n,title)=>{const l=L.find(x=>x.n===n);return l&&l.ready?`<a class="lc" href="/lessons/${encodeURIComponent(l.file)}"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc(l.title||title)}</b><span class="m">${n===4&&T?`лучший результат ${T.best}% · попыток ${T.attempts}`:n===4?"пройти →":"открыть →"}</span></a>`
-    :`<div class="lc soon"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc((l&&l.title)||title)}</b><span class="m">${l&&l.focus?esc(l.focus):"скоро"}</span></div>`};
-  return `<details class="wk${w.kind==="review"?" rev":""}${now?" now":""}" id="w-${w.n}"${now?" open":""}>
+  const card=(n,title)=>{
+    const l=L.find(x=>x.n===n);
+    return l&&l.ready?`<a class="lc" href="/lessons/${encodeURIComponent(l.file)}"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc(l.title||title)}</b><span class="m">${n===4&&T?`лучший результат ${T.best}% · попыток ${T.attempts}`:n===4?"пройти →":"открыть →"}</span></a>`
+      :`<div class="lc soon"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc((l&&l.title)||title)}</b><span class="m">${l&&l.focus?esc(l.focus):"скоро"}</span></div>`;
+  };
+
+  return `<details class="wk${w.kind==="review"?" rev":""}${now?" now":""}" id="w-${w.n}" data-kind="${w.kind||""}" data-hasready="${L.some(l=>l.ready)}" ${now?"open":""}>
     <summary><span class="wnum">${w.n}</span><div><h3>${esc(w.title)} <span class="ru">— ${esc(w.ru)}</span></h3><div class="sub">${w.unit?"Empower A2 · юнит "+w.unit:"повторение"} · ${k} / ${ts.length} ${chip}</div></div><span class="dt">${esc(w.span)}<span class="chev" aria-hidden="true">›</span></span></summary>
     <div class="wbody">
       <div class="lcs">${w.lessons.map(l=>card(l.n,l.title)).join("")}${card(4,"Тест после трёх уроков")}</div>
-      <div class="cols">${w.lessons.map(l=>`<div class="col"><h4>Урок ${l.n} · ${esc(l.title)}</h4><ul>${l.topics.map(t=>`<li><label class="it"><input type="checkbox" data-id="${t.id}"${done[t.id]?" checked":""}><span class="box" aria-hidden="true"></span><span class="tx"><span class="t">${esc(t.title)}</span><span class="kd" style="--kc:${KIND[t.kind]||"var(--muted)"}">${esc(t.kind)}</span>${done[t.id]?`<span class="d">${done[t.id].slice(8)}.${done[t.id].slice(5,7)}</span>`:""}</span></label></li>`).join("")}</ul></div>`).join("")}</div>
-      <div class="wfoot"><a href="obsidian://open?vault=${encodeURIComponent(P.vault)}&file=${encodeURIComponent(w.file.replace(/\.md$/,""))}">открыть неделю в Obsidian</a></div>
+      <div class="cols">${w.lessons.map(l=>`<div class="col"><h4>Урок ${l.n} · ${esc(l.title)}</h4><ul>${l.topics.map(t=>`<li><label class="it"><input type="checkbox" data-id="${t.id}"${done[t.id]?" checked":""}><span class="box" aria-hidden="true"></span><span class="tx"><span class="t">${esc(t.title)}</span><span class="kd" style="--kc:${KIND_COLOR[t.kind]||"var(--muted)"}">${esc(t.kind)}</span>${done[t.id]?`<span class="d">${done[t.id].slice(8)}.${done[t.id].slice(5,7)}</span>`:""}</span></label></li>`).join("")}</ul></div>`).join("")}</div>
+      <div class="wfoot">
+        <a href="obsidian://open?vault=${encodeURIComponent(P.vault)}&file=${encodeURIComponent(w.file.replace(/\.md$/,""))}">открыть неделю в Obsidian ↗</a>
+        <span class="muted" style="font-size:12px">${ts.length} тем · ~4 часа</span>
+      </div>
     </div></details>`;
 }
-function render(){kpis();$("weeks").innerHTML=P.weeks.map(weekHTML).join("")}
-function jump(){const m=location.hash.match(/^#w-(\d+)$/);if(!m)return;const el=$("w-"+m[1]);if(!el)return;el.open=true;
-  el.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})}
-async function load(){
-  try{P=await (await fetch("/api/en/plan")).json();done=P.done||{};render();$("sync").textContent="Связь с Obsidian есть";
-    (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(jump,80))}
-  catch(e){$("weeks").innerHTML='<p class="muted">Сервер не отвечает: открой сайт ссылкой из Obsidian.</p>'}
+
+function renderWeeks(){
+  const t=today();
+  let list=[...P.weeks];
+  if(currentFilter==="now") list=list.filter(w=>w.start<=t&&t<=w.end);
+  else if(currentFilter==="review") list=list.filter(w=>w.kind==="review");
+  else if(currentFilter==="ready"){
+    const readyWeeks=new Set((P.lessons||[]).filter(l=>l.ready).map(l=>l.week));
+    list=list.filter(w=>readyWeeks.has(w.n));
+  }
+  $("weeks").innerHTML=list.map(weekHTML).join("");
 }
+
+function render(){
+  updateHero();
+  renderWeeks();
+}
+
+function goWeek(n,instant){
+  const el=$("w-"+n); if(!el)return;
+  el.open=true;
+  requestAnimationFrame(()=>{
+    const nav=document.querySelector(".sitenav"), navH=nav?nav.offsetHeight:52;
+    const targetY=el.getBoundingClientRect().top+window.scrollY-navH-20;
+    window.scrollTo({
+      top:Math.max(0,targetY),
+      behavior:instant||matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"
+    });
+    el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  });
+}
+
+function jump(){
+  const m=location.hash.match(/^#w-(\d+)$/); if(!m)return;
+  goWeek(+m[1]);
+}
+
+document.addEventListener("click",e=>{
+  const a=e.target.closest("a[href*='#w-']"); if(!a)return;
+  const href=a.getAttribute("href");
+  const m=href.match(/#w-(\d+)$/);
+  if(m){
+    const curPath=location.pathname.replace(/\/$/,"");
+    const aPath=a.pathname.replace(/\/$/,"");
+    if(!aPath||aPath===curPath){
+      e.preventDefault();
+      history.pushState(null,"",`#w-${m[1]}`);
+      goWeek(+m[1]);
+    }
+  }
+});
+
+async function load(){
+  try{
+    P=await (await fetch("/api/en/plan")).json();
+    done=P.done||{};
+    render();
+    $("sync").textContent="✓ Связь с Obsidian активна (галочки синхронизируются)";
+    (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(jump,80));
+  }catch(e){
+    $("weeks").innerHTML='<p class="muted">Сервер не отвечает: запусти <code>python3 .agents/scripts/apps.py serve</code></p>';
+  }
+}
+
+// Изменение галочек темы
 $("weeks").addEventListener("change",async e=>{
   const cb=e.target; if(!cb.matches("input[data-id]"))return;
   const id=cb.dataset.id, body=cb.checked?{set:{[id]:today()}}:{unset:[id]};
-  try{const r=await fetch("/api/en/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    if(!r.ok)throw 0; done=(await r.json()).done||{}; const open=[...document.querySelectorAll(".wk[open]")].map(x=>x.id);
-    render(); open.forEach(i=>{const el=$(i);if(el)el.open=true}); $("sync").textContent="Сохранено в файле недели в Obsidian";}
-  catch(err){cb.checked=!cb.checked;$("sync").textContent="Не сохранилось: сервер не отвечает"}
+  try{
+    const r=await fetch("/api/en/tree",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(!r.ok)throw 0;
+    done=(await r.json()).done||{};
+    const openIds=[...document.querySelectorAll(".wk[open]")].map(x=>x.id);
+    render();
+    openIds.forEach(i=>{const el=$(i);if(el)el.open=true});
+    $("sync").textContent="✓ Сохранено в файле недели в Obsidian";
+  }catch(err){
+    cb.checked=!cb.checked;
+    $("sync").textContent="Не сохранилось: сервер не отвечает";
+  }
 });
+
+// Фильтры Toolbar
+document.querySelector(".tools-bar").addEventListener("click",e=>{
+  const b=e.target.closest(".btn-f"); if(!b)return;
+  document.querySelectorAll(".btn-f").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  currentFilter=b.dataset.filter;
+  renderWeeks();
+});
+
 addEventListener("hashchange",jump);
 load();
 </script>

@@ -11,11 +11,14 @@
                                       n — сколько слов заменить (по умолчанию 1), also — другие номера, которые тоже засчитываются; fix:"" — слово лишнее.
      exStress(el, items)             — ударный слог: {w:"Japanese", syl:["Ja","pa","nese"], s:2}.
      exSort(el, {groups, items})     — разложить по группам: groups [{k, label}], items [{w, g, say?, why?}] — по одной карточке.
+                                      Первую карточку слушают кликом по слову (при загрузке страницы звука нет), дальше — само (auto:false — выключить).
      wordCards(el, words)            — карточки слов: {en, ipa?, ru, ex?, exRu?}; клик — перевернуть, 🔊 — послушать.
    У каждого упражнения — счёт «3 / 6», кнопки «Проверить» и «Заново». Ответы сравниваются без учёта регистра, ’ и точки в конце. */
 const EN_NORM=s=>String(s).toLowerCase().replace(/[’‘`´]/g,"'").replace(/\s+([.,!?])/g,"$1").replace(/[.!?]+$/,"").replace(/\s+/g," ").trim();
 const enEsc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const enShuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+const EN_SPK_SVG='<svg class="ico-spk" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
 
 /* ---------- голос ---------- */
 let EN_VOICE=null;
@@ -24,13 +27,19 @@ function enPickVoice(){
   /* В macOS среди английских голосов есть «шуточные» (Bells, Bad News, Zarvox…) — их пропускаем. */
   const FUN=/Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Junior|Ralph|Fred|Kathy|Princess|Deranged|Hysterical|Pipe|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
   const v=speechSynthesis.getVoices().filter(x=>/^en[-_]/.test(x.lang)&&!FUN.test(x.name));
-  EN_VOICE=v.find(x=>x.lang==="en-GB"&&/Daniel|Serena|Kate|Google UK/i.test(x.name))||v.find(x=>x.lang==="en-GB")
-    ||v.find(x=>/Samantha|Karen|Moira|Tessa|Google US/i.test(x.name))||v[0]||null;
+  EN_VOICE=v.find(x=>x.lang==="en-GB"&&/natural|neural|premium|enhanced/i.test(x.name))
+    ||v.find(x=>x.lang==="en-GB"&&/google uk|serena|oliver|stephanie|martha/i.test(x.name))
+    ||v.find(x=>x.lang==="en-GB"&&/daniel|kate|george/i.test(x.name))
+    ||v.find(x=>x.lang==="en-GB")
+    ||v.find(x=>/natural|neural|premium|enhanced/i.test(x.name)&&/^en[-_]/.test(x.lang))
+    ||v.find(x=>/google us|samantha|ava|allison|tom|moira|tessa/i.test(x.name))
+    ||v[0]||null;
 }
 if("speechSynthesis" in window){enPickVoice();speechSynthesis.onvoiceschanged=enPickVoice}
 function say(text,rate=0.9){
   if(!("speechSynthesis" in window))return false;
   const u=new SpeechSynthesisUtterance(String(text).replace(/_+/g," "));
+  if(!EN_VOICE)enPickVoice();
   if(EN_VOICE)u.voice=EN_VOICE; u.lang=EN_VOICE?EN_VOICE.lang:"en-GB"; u.rate=rate;
   speechSynthesis.cancel(); speechSynthesis.speak(u); return true;
 }
@@ -64,7 +73,7 @@ function exGap(el,items,opt={}){
       const [a,b]=it.s.split(/_{3,}/);
       const slot=it.opts?`<span class="gchips" role="group">${(opt.keep?it.opts:enShuffle(it.opts)).map(o=>`<button type="button" class="gchip" data-i="${i}" data-v="${enEsc(o)}">${enEsc(o)}</button>`).join("")}</span>`
         :`<input class="gin" data-i="${i}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Пропуск ${i+1}" size="${Math.max(4,...[].concat(it.a).map(x=>x.length))}">`;
-      return `<li data-i="${i}"><div class="gl">${it.say?`<button type="button" class="stsay" data-say="${enEsc(it.say)}" aria-label="Послушать">🔊</button> `:""}${enEsc(a)}${it.opts?'<span class="gslot">___</span>':slot}${enEsc(b??"")}${it.ru?`<span class="gru">${enEsc(it.ru)}</span>`:""}</div>${it.opts?slot:""}<div class="gwhy" hidden></div></li>`;
+      return `<li data-i="${i}"><div class="gl">${it.say?`<button type="button" class="stsay" data-say="${enEsc(it.say)}" aria-label="Послушать">${EN_SPK_SVG}</button> `:""}${enEsc(a)}${it.opts?'<span class="gslot">___</span>':slot}${enEsc(b??"")}${it.ru?`<span class="gru">${enEsc(it.ru)}</span>`:""}</div>${it.opts?slot:""}<div class="gwhy" hidden></div></li>`;
     }).join("");
     upd(0);
   }
@@ -153,7 +162,7 @@ function exStress(el,items){
   let done={};
   function draw(){
     done={};
-    body.innerHTML=items.map((it,i)=>`<div class="st" data-i="${i}"><button type="button" class="stsay" data-say="${enEsc(it.w)}" aria-label="Послушать ${enEsc(it.w)}">🔊</button>
+    body.innerHTML=items.map((it,i)=>`<div class="st" data-i="${i}"><button type="button" class="stsay" data-say="${enEsc(it.w)}" aria-label="Послушать ${enEsc(it.w)}">${EN_SPK_SVG}</button>
       <span class="syls">${it.syl.map((s,k)=>`<button type="button" class="syl" data-k="${k}">${enEsc(s)}</button>`).join("")}</span><span class="stm"></span></div>`).join("");
     upd(0);
   }
@@ -172,17 +181,18 @@ function exStress(el,items){
 /* ---------- разложить по группам: по одной карточке ---------- */
 function exSort(el,{groups,items,auto=true}){
   const body=document.createElement("div"); body.className="sorter"; el.append(body);
-  let order=[],i=0,right=0,log=[];
-  function draw(){order=enShuffle(items.map((_,k)=>k));i=0;right=0;log=[];render();upd(0)}
+  let order=[],i=0,right=0,log=[],started=false;
+  function draw(){order=enShuffle(items.map((_,k)=>k));i=0;right=0;log=[];started=false;render();upd(0)}
   function render(){
     if(i>=order.length){body.innerHTML=`<div class="srt-end">Готово: ${right} из ${items.length}. ${right===items.length?"Без ошибок.":"Ошибки — ниже, нажми, чтобы послушать."}</div>${lg()}`;return}
     const it=items[order[i]];
-    body.innerHTML=`<div class="srt-card"><span class="srt-n">${i+1} / ${items.length}</span><button type="button" class="srt-w" data-say="${enEsc(it.say||it.w)}">${enEsc(it.w)} <span aria-hidden="true">🔊</span></button>
+    body.innerHTML=`<div class="srt-card"><span class="srt-n">${i+1} / ${items.length}</span><button type="button" class="srt-w" data-say="${enEsc(it.say||it.w)}">${enEsc(it.w)} ${EN_SPK_SVG}</button>
       <div class="srt-g">${groups.map((g,k)=>`<button type="button" class="btn srt-b" data-g="${k}">${g.label}</button>`).join("")}</div></div>${lg()}`;
-    if(auto)setTimeout(()=>say(it.say||it.w),150);
+    if(auto&&started)setTimeout(()=>say(it.say||it.w),150);
   }
   const lg=()=>log.length?`<div class="srt-log">${log.map(x=>`<span class="say ${x.ok?"ok":"bad"}" data-say="${enEsc(x.it.say||x.it.w)}" title="${enEsc(x.it.why||"")}">${enEsc(x.it.w)} → ${groups[x.it.g].label.replace(/<[^>]+>/g,"")}</span>`).join("")}</div>`:"";
   body.addEventListener("click",e=>{const b=e.target.closest(".srt-b");if(!b)return;const it=items[order[i]],ok=+b.dataset.g===it.g;
+    started=true;
     if(ok)right++; log.unshift({it,ok}); i++; upd(right); render()});
   const upd=enBox(el,items.length,{reset:draw});
   draw();
@@ -194,7 +204,7 @@ function wordCards(el,words){
   el.insertAdjacentHTML("beforeend",`<div class="btns wc-mode" role="group" aria-label="Режим карточек">
     <button class="btn" type="button" data-m="all" aria-pressed="true">Всё видно</button><button class="btn" type="button" data-m="en">Вспомни перевод</button><button class="btn" type="button" data-m="ru">Вспомни английское</button></div>
     <div class="wcards">${words.map(w=>`<div class="wc" tabindex="0" role="button" aria-label="${enEsc(w.en)}">
-      <div class="wc-en"><b>${enEsc(w.en)}</b><button type="button" class="wc-say" data-say="${enEsc(w.en)}" aria-label="Послушать">🔊</button></div>
+      <div class="wc-en"><b>${enEsc(w.en)}</b><button type="button" class="wc-say" data-say="${enEsc(w.en)}" aria-label="Послушать">${EN_SPK_SVG}</button></div>
       ${w.ipa?`<div class="wc-ipa">/${enEsc(w.ipa)}/</div>`:""}<div class="wc-ru">${enEsc(w.ru)}</div>
       ${w.ex?`<div class="wc-ex"><span class="say" data-say="${enEsc(w.ex)}">${enEsc(w.ex)}</span>${w.exRu?`<span class="muted"> — ${enEsc(w.exRu)}</span>`:""}</div>`:""}</div>`).join("")}</div>`);
   const box=el.querySelector(".wcards");

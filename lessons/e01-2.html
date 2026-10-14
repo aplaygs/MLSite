@@ -190,7 +190,7 @@
       <tr><td><b>/ʌ/</b> ловушка</td><td>короткое «а», хотя пишется o</td><td><span class="say">mother</span>, <span class="say">brother</span>, <span class="say">son</span>, <span class="say">Monday</span>, <span class="say">London</span>, <span class="say">come</span>, <span class="say">one</span></td></tr>
     </tbody></table></div>
   <div class="callout mem"><b class="h">Подсказки по написанию</b><p><b>o + согласная + e</b> (home, phone, close) и <b>o в конце</b> (no, go, photo) — обычно /əʊ/. <b>o + согласная в конце</b> (hot, job, shop) — обычно /ɒ/. <b>-old</b> (old, cold, told) — /əʊ/. Исключения: do, to, who — /uː/ («у»); mother, son, love, come — /ʌ/. Сомневаешься — послушай слово здесь или в словаре.</p></div>
-  <div class="ex" id="ex4b"><div class="ex-h"><span class="eyebrow">Упражнение 10 · какой звук</span><p>Слово прозвучит. Выбери звук.</p></div></div>
+  <div class="ex" id="ex4b"><div class="ex-h"><span class="eyebrow">Упражнение 10 · какой звук</span><p>Нажми на слово, чтобы послушать, и выбери звук. Дальше слова зазвучат сами.</p></div></div>
 
   <div class="topic-check" data-for="en.01.2.4">
     <label class="tp"><input type="checkbox" data-id="en.01.2.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>ударение в словах; долгий и краткий o</b></span></label>
@@ -365,7 +365,7 @@
     ["Are you married?","No, I'm not."],["Who is your best friend?","My best friend is Ilya. He's very funny."],["How are you today?","I'm fine, thanks. A bit tired. And you?"]];
   let i=0;
   function draw(sayIt){
-    $("iv").innerHTML=`<div class="iv-q"><span class="n">${i+1}</span><span class="q say" data-say="${Q[i][0]}">${Q[i][0]}</span><button class="btn" type="button" data-say="${Q[i][0]}">🔊 ещё раз</button>
+    $("iv").innerHTML=`<div class="iv-q"><span class="n">${i+1}</span><span class="q say" data-say="${Q[i][0]}">${Q[i][0]}</span><button class="btn" type="button" data-say="${Q[i][0]}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>ещё раз</button>
       <details><summary>Ответил вслух? Посмотри образец</summary><p><span class="say">${Q[i][1]}</span></p></details></div>`;
     $("ivState").textContent=`${i+1} / ${Q.length}`; $("ivPrev").disabled=i===0; $("ivNext").textContent=i===Q.length-1?"Сначала ↺":"Следующий вопрос →";
     if(sayIt)say(Q[i][0]);

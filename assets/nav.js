@@ -5,9 +5,10 @@
    переход на место (#w-2, #t-…) — плавная прокрутка, её делает сама страница. window.siteReady оставлен для совместимости. */
 (function () {
   const st0 = document.createElement("style");
-  st0.textContent = `@keyframes pagein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.wrap{animation:pagein .18s ease-out both}
-@media (prefers-reduced-motion:reduce){.wrap{animation:none}}`;
+  /* View Transitions не используем (GUIDE: давали задержку при переходе) */
+  st0.textContent = `@keyframes pageIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.wrap{animation:pageIn .18s cubic-bezier(0.16,1,0.3,1) both}
+@media (prefers-reduced-motion:reduce){.wrap{animation:none}html{scroll-behavior:auto!important}}`;
   /* Раздел English: пастельная тема — голубая основа и бледно-абрикосовый акцент (--sun: подсветки, --warm: ключевое).
      Все страницы берут цвета из токенов, поэтому перекрашиваются сами — и уроки, и тренажёр слов. */
   const path = location.pathname;
@@ -24,24 +25,27 @@
   if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
   const CSS = `
 :root{--navh:52px}
-html{scroll-padding-top:calc(var(--navh) + 8px)}
+html{scroll-padding-top:calc(var(--navh) + 8px);scroll-behavior:smooth}
 .sitenav{position:sticky;top:0;z-index:30;margin-inline:-16px;padding-inline:16px;background:color-mix(in srgb,var(--bg) 86%,transparent);
   -webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
 .sitenav .in{max-width:1180px;margin:0 auto;height:var(--navh);display:flex;align-items:center;gap:6px}
 /* Переключатель разделов ML · English */
 .sitenav .sw{display:flex;padding:3px;margin-right:10px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
-.sitenav .sw a{font:600 12.5px var(--f-body,system-ui);color:var(--muted);text-decoration:none;padding:5px 12px;border-radius:999px;transition:background-color .18s,color .18s}
+.sitenav .sw a{font:600 12.5px var(--f-body,system-ui);color:var(--muted);text-decoration:none;padding:5px 12px;border-radius:999px;display:inline-flex;align-items:center;transition:background-color .18s cubic-bezier(0.16,1,0.3,1),color .18s,transform .12s,box-shadow .18s}
 .sitenav .sw a:hover{color:var(--ink)}
-.sitenav .sw a[aria-current="true"]{background:var(--accent);color:var(--surface,#fff)}
+.sitenav .sw a:active{transform:scale(.94)}
+.sitenav .sw a[aria-current="true"]{background:var(--accent);color:var(--surface,#fff);box-shadow:0 1px 4px rgba(0,0,0,.08);animation:swPop .22s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes swPop{from{transform:scale(0.92);opacity:.85}to{transform:none;opacity:1}}
 .sitenav .brand{display:flex;align-items:center;gap:8px;margin-right:10px;text-decoration:none;color:var(--ink);font:700 14px var(--f-display,system-ui);letter-spacing:-.01em;white-space:nowrap}
 .sitenav .brand i{width:12px;height:12px;border-radius:50% 0;background:var(--accent);transform:rotate(-45deg)}
-.sitenav .lk{position:relative;text-decoration:none;color:var(--muted);font:500 14px var(--f-body,system-ui);padding:7px 12px;border-radius:999px;transition:color .15s,background-color .15s}
+.sitenav .lk{position:relative;text-decoration:none;color:var(--muted);font:500 14px var(--f-body,system-ui);padding:7px 12px;border-radius:999px;display:inline-flex;align-items:center;transition:color .15s,background-color .15s,transform .12s}
 .sitenav .lk:hover{color:var(--ink);background:var(--soft)}
+.sitenav .lk:active{transform:scale(.94)}
 .sitenav .lk[aria-current="page"]{color:var(--ink);background:var(--surface);box-shadow:0 0 0 1px var(--line) inset}
-.sitenav .lk[aria-current="page"]::after{content:"";position:absolute;left:12px;right:12px;bottom:3px;height:2px;border-radius:2px;background:var(--accent)}
-.sitenav .wk{margin-left:auto;text-decoration:none;font:500 12.5px var(--f-mono,ui-monospace);color:var(--surface);background:var(--accent);padding:6px 12px;border-radius:999px;white-space:nowrap;transition:filter .15s,transform .15s}
-.sitenav .wk:hover{filter:brightness(1.08)} .sitenav .wk:active{transform:scale(.97)}
-@media (max-width:560px){.sitenav .brand span{display:none}.sitenav .lk{padding:7px 9px;font-size:13.5px}.sitenav .wk{padding:6px 10px}}
+.sitenav .lk[aria-current="page"]::after{content:"";position:absolute;left:12px;right:12px;bottom:3px;height:2px;border-radius:2px;background:var(--accent);transition:all .18s ease}
+.sitenav .nav-wk, .sitenav .wk{margin:0 0 0 auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;text-decoration:none;font:500 12.5px var(--f-mono,ui-monospace);color:var(--surface,#fff)!important;background:var(--accent)!important;border:0!important;box-shadow:none!important;height:32px;padding:0 14px;border-radius:999px;white-space:nowrap;line-height:1;box-sizing:border-box;transition:filter .15s,transform .15s}
+.sitenav .nav-wk:hover, .sitenav .wk:hover{filter:brightness(1.08)} .sitenav .nav-wk:active, .sitenav .wk:active{transform:scale(.96)}
+@media (max-width:560px){.sitenav .brand span{display:none}.sitenav .lk{padding:7px 9px;font-size:13.5px}.sitenav .nav-wk, .sitenav .wk{padding:0 10px;height:30px;font-size:12px}}
 @media (prefers-reduced-motion:reduce){.sitenav *{transition:none!important}}`;
   const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
   const path = location.pathname.replace(/\/$/, "");
@@ -54,12 +58,30 @@ html{scroll-padding-top:calc(var(--navh) + 8px)}
   nav.className = "sitenav"; nav.setAttribute("aria-label", "Разделы сайта");
   nav.innerHTML = `<div class="in"><div class="sw" role="group" aria-label="Раздел"><a href="/tree"${EN ? "" : ' aria-current="true"'}>ML</a><a href="/en"${EN ? ' aria-current="true"' : ""}>English</a></div>`
     + LINKS.map(([h, t]) => `<a class="lk" href="${h}"${h === cur ? ' aria-current="page"' : ""}>${t}</a>`).join("")
-    + `<a class="wk" id="navWeek" href="/plan" hidden>Неделя</a></div>`;
+    + `<a class="nav-wk" id="navWeek" href="/plan" hidden>Неделя</a></div>`;
   /* панель встаёт первой в <body>; в уроках скрипт стоит ещё в <head> — тогда ждём, пока появится body */
-  const fit = () => { const w = document.querySelector(".wrap"); if (w) nav.querySelector(".in").style.maxWidth = getComputedStyle(w).maxWidth; };
-  const mount = () => { document.body.prepend(nav); fit(); };
-  if (document.body) { mount(); if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fit); }
+  const mount = () => { document.body.prepend(nav); };
+  if (document.body) { mount(); }
   else document.addEventListener("DOMContentLoaded", mount);
+
+  /* Для кнопки недели: если уже на этой же странице — плавно прокручиваем без перезагрузки */
+  nav.addEventListener("click", e => {
+    const a = e.target.closest("a#navWeek");
+    if (!a) return;
+    const curPath = location.pathname.replace(/\/$/, "");
+    const aPath = a.pathname.replace(/\/$/, "");
+    if (aPath === curPath && a.hash) {
+      const m = a.hash.match(/^#w-(\d+)$/);
+      if (m && typeof window.goWeek === "function") {
+        e.preventDefault();
+        window.goWeek(+m[1]);
+        history.pushState(null, "", a.hash);
+      }
+    }
+  });
+
+
+
   fetch(EN ? "/api/en/plan" : "/api/plan").then(r => r.json()).then(p => {
     const d = new Date(), t = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const w = (p.weeks || []).find(x => x.start <= t && t <= x.end); if (!w) return;

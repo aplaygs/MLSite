@@ -80,7 +80,7 @@ function initQuiz(cfg) {
       <div class="qz-card">
         <div class="qz-tag"><span>Урок ${cfg.week}.${l.n}</span><span class="k">${esc(q.refTitle)}</span><span>${{one: "один ответ", many: "несколько ответов", num: "числом", open: "своими словами", text: "впиши ответ"}[q.type]}</span></div>
         <div class="qz-q">${q.q}</div>
-        ${q.say ? `<button class="qz-say" id="qzSay" type="button">🔊 Послушать</button>` : ""}
+        ${q.say ? `<button class="qz-say" id="qzSay" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>Послушать</button>` : ""}
         ${q.code ? `<pre>${esc(q.code)}</pre>` : ""}
         ${body}
         <div id="qzRes"></div>
