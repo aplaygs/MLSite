@@ -1,0 +1,511 @@
+<title>Урок 2.2 · Вопросы с do/does</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/en.css">
+<style>
+/* Только для этого урока: «перевёртыш 2» (-s перепрыгивает в does) и интервью. */
+.flip{display:grid;gap:14px}
+.flip-line{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;min-height:64px;padding:14px;background:var(--bg);border-radius:14px;cursor:pointer}
+.flip-line .w{font:600 clamp(20px,4.2vw,28px) var(--f-display);padding:4px 10px;border-radius:10px;will-change:transform}
+.flip-line .w.st{padding-right:0}
+.flip-line .w.e{background:var(--sun);color:var(--sun-ink)}
+.flip-line .w.e.end{margin-left:-8px;padding:4px 5px;border-radius:7px}
+.flip-line .w.s{color:var(--accent)}
+.flip-line .w.q{background:var(--accent-soft);color:var(--accent)}
+.flip-line .w.p{color:var(--muted);padding:4px 0}
+.flip-ans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.flip-ans{grid-template-columns:1fr}}
+.flip-ans div{background:var(--bg);border-radius:12px;padding:10px 12px;font-size:15.5px;display:grid;gap:2px}
+.flip-ans div.wide{grid-column:1/-1}
+.flip-ans div>b{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.flip-ans .no-c{font-size:13.5px;color:var(--red)}
+.iv{display:grid;gap:10px}
+.iv-q{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--bg);border-radius:12px;padding:12px 14px}
+.iv-q .n{font:500 12px var(--f-mono);color:var(--muted)}
+.iv-q .q{font:600 18px var(--f-body);flex:1;min-width:180px}
+.iv-q details{flex-basis:100%;font-size:14.5px}
+.iv-q details summary{cursor:pointer;color:var(--accent);font-size:13.5px}
+</style>
+
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e02-1.html">← Урок 1 · Present simple</a><span class="mid">урок 2 из 3</span><a href="/en#w-2">Урок 3 · Просьбы и анкета — скоро →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · Work and study · урок 2 из 3 · 3 темы · ~60 минут</div>
+  <h1>Вопросы с do/does, учёба и звук -s</h1>
+  <p>Как спросить в present simple: <span class="say">Do you work?</span> <span class="say">Where does she live?</span> — и коротко ответить: <span class="say">Yes, I do.</span> Русская привычка задавать вопрос только голосом здесь ломается сильнее всего: нужен помощник <b>do / does</b>. Дальше — слова про учёбу и как сказать «когда». И звук: окончание -s звучит тремя способами, а <span class="say">Do you</span> в живой речи сливается в одно слово.</p>
+  <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Вопросы с do/does</a><a href="#t2">Учёба и время</a><a href="#t3">Звук -s и do you</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 3 · Грамматика</div>
+  <h2>Present simple: вопросы с do/does и короткие ответы</h2>
+  <p class="tldr">Вопрос — это <b>Do / Does + кто + глагол без -s</b>: <span class="say">Do you work?</span> <span class="say">Does she work?</span> С вопросительным словом оно встаёт в самое начало: <span class="say">Where does she work?</span> Отвечают тем же помощником: <span class="say">Yes, she does.</span></p>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · перевёртыш 2</span><span class="muted mono" id="flState"></span></div>
+    <div class="btns" role="group" aria-label="Фраза" id="flPick"></div>
+    <div class="flip">
+      <div class="flip-line" id="flLine" title="Нажми, чтобы послушать"></div>
+      <div class="btns" role="group" aria-label="Что сделать" id="flMode" style="justify-content:center"></div>
+      <div class="flip-ans" id="flAns"></div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Возьми фразу с she, he или именем и переверни в вопрос: окончание <b>-s</b> улетает вперёд и становится <b>does</b>, а глагол остаётся голым. С I / you / they -s нет — впереди появляется просто <b>do</b>.</p>
+  </div>
+
+  <h3 style="font-size:17px">Вопрос и короткий ответ</h3>
+  <div class="tbl"><table class="forms">
+    <thead><tr><th>Вопрос</th><th>Да</th><th>Нет</th></tr></thead>
+    <tbody>
+      <tr><td><span class="say">Do you work?</span></td><td><span class="say">Yes, I do.</span></td><td><span class="say">No, I don't.</span></td></tr>
+      <tr><td><span class="say"><span class="k">Does</span> she work?</span></td><td><span class="say">Yes, she does.</span></td><td><span class="say">No, she doesn't.</span></td></tr>
+      <tr><td><span class="say">Do they work?</span></td><td><span class="say">Yes, they do.</span></td><td><span class="say">No, they don't.</span></td></tr>
+      <tr><td><span class="say">Does Ilya work?</span></td><td><span class="say">Yes, he does.</span></td><td><span class="say">No, he doesn't.</span></td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <ul>
+      <li><b>-s по-прежнему одна на предложение.</b> В вопросе она в does, глагол — без неё: <span class="say">Does she work?</span>, а не «Does she works?».</li>
+      <li><b>Ответ — тем же помощником:</b> спросили с do — отвечаешь do / don't. Спросили с be (<span class="say">Are you a student?</span>) — be: <span class="say">Yes, I am.</span> Глагол в коротком ответе не повторяют.</li>
+      <li><b>В ответе — местоимение:</b> <span class="say">Does Ilya study?</span> — <span class="say">Yes, he does.</span> Как в неделе 1.</li>
+    </ul>
+  </div>
+
+  <h3 style="font-size:17px">Вопрос со словом</h3>
+  <p class="prose">Формула: <b>вопросительное слово + do / does + кто + глагол</b>. Порядок тот же, что в вопросе «да-нет», только впереди слово.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Вопрос</th><th>Ответ</th></tr></thead>
+    <tbody>
+      <tr><td><span class="say">Where do you live?</span></td><td><span class="say">In Moscow.</span></td></tr>
+      <tr><td><span class="say">What do you do?</span></td><td><span class="say">I'm a student.</span> — «кем работаешь, чем занимаешься»</td></tr>
+      <tr><td><span class="say">What does she study?</span></td><td><span class="say">Maths.</span></td></tr>
+      <tr><td><span class="say">When does the lecture start?</span></td><td><span class="say">At nine.</span></td></tr>
+      <tr><td><span class="say">What time do you get up?</span></td><td><span class="say">At seven.</span></td></tr>
+    </tbody></table></div>
+  <div class="prose"><p>В <span class="say">What do you do?</span> два do: первое — помощник вопроса, второе — сам глагол «делать». Поэтому и <span class="say">What does she do?</span>: помощник с -s, глагол голый.</p></div>
+
+  <div class="callout ru"><b class="h">Ошибки русскоговорящих</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">You work here?</span><span class="yes"><span class="say">Do you work here?</span></span><span class="n">По-русски вопрос делают голосом. По-английски без do это звучит как удивлённое переспрашивание.</span></div>
+      <div class="pair"><span class="no">Does she works?</span><span class="yes"><span class="say">Does she work?</span></span><span class="n">-s уже в does.</span></div>
+      <div class="pair"><span class="no">Do he live in Moscow?</span><span class="yes"><span class="say">Does he live in Moscow?</span></span><span class="n">he / she / it — does.</span></div>
+      <div class="pair"><span class="no">Where you live?</span><span class="yes"><span class="say">Where do you live?</span></span><span class="n">После вопросительного слова нужен помощник.</span></div>
+      <div class="pair"><span class="no">Are you work here?</span><span class="yes"><span class="say">Do you work here?</span></span><span class="n">Есть глагол work — значит do, а не be.</span></div>
+      <div class="pair"><span class="no">Do you like tea? — Yes, I am.</span><span class="yes"><span class="say">Yes, I do.</span></span><span class="n">Отвечают тем же помощником, что в вопросе.</span></div>
+    </div>
+  </div>
+  <div class="callout mem"><b class="h">Как запомнить</b><p>Вопрос — это <b>помощник впереди</b>. Нет глагола-действия — помощник сам be: <span class="say">Are you a student?</span> Есть глагол — помощник do / does, а глагол остаётся голым: <span class="say">Do you study?</span> И ответ — тем же помощником: <span class="say">Yes, I am.</span> / <span class="say">Yes, I do.</span></p></div>
+
+  <div class="ex" id="ex1a"><div class="ex-h"><span class="eyebrow">Упражнение 1 · собери вопрос</span><p>Переведи. Есть лишние плитки.</p></div></div>
+  <div class="ex" id="ex1b"><div class="ex-h"><span class="eyebrow">Упражнение 2 · короткий ответ</span><p>Выбери ответ. Смотри, с чего начинается вопрос, и на подсказку в скобках.</p></div></div>
+  <div class="ex" id="ex1c"><div class="ex-h"><span class="eyebrow">Упражнение 3 · начало вопроса</span><p>Впиши вопросительное слово и do или does — два слова. Подсказка — в ответе. Enter — проверить и дальше.</p></div></div>
+  <div class="ex" id="ex1d"><div class="ex-h"><span class="eyebrow">Упражнение 4 · найди ошибку</span><p>Нажми на неправильное слово. В одном предложении ошибки нет.</p></div></div>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Сделай вопрос: <i>She speaks English.</i> И два коротких ответа.</summary>
+      <div class="a"><p><span class="say">Does she speak English?</span> — <span class="say">Yes, she does.</span> / <span class="say">No, she doesn't.</span></p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Почему <i>What does she do?</i>, а не <i>What does she does?</i></summary>
+      <div class="a"><p>-s одна на предложение, и она уже в первом does. Второе do — сам глагол «делать», он остаётся голым.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>«Ты студент?» и «Ты учишься?» — как спросить?</summary>
+      <div class="a"><p><span class="say">Are you a student?</span> — глагола нет, значит be. <span class="say">Do you study?</span> — есть глагол study, значит do.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="en.02.2.1">
+    <label class="tp"><input type="checkbox" data-id="en.02.2.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>вопросы с do/does и короткие ответы</b></span></label>
+    <span class="note" data-d="en.02.2.1">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 3 · Слова</div>
+  <h2>Учёба и время: study, revise, take an exam</h2>
+  <p class="tldr">Слова, чтобы рассказать про учёбу: <span class="say">I study computer science.</span> <span class="say">I revise for exams at the weekend.</span> И маленькие слова времени — <b>in, on, at</b>, — где русский «в» превращается в три разных предлога.</p>
+
+  <div class="ex" id="ex2cards"><div class="ex-h"><span class="eyebrow">Слова темы · новые</span><p>Послушай, потом проверь себя в режиме «Вспомни перевод». После урока эти слова можно добавить в тренажёр.</p></div></div>
+
+  <h3 style="font-size:17px">Когда: in, on, at</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Предлог</th><th>С чем</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td><b>in</b></td><td>часть дня, месяц, год</td><td><span class="say">in the morning</span>, <span class="say">in the evening</span>, <span class="say">in January</span></td></tr>
+      <tr><td><b>on</b></td><td>день недели, дата</td><td><span class="say">on Monday</span>, <span class="say">on Mondays</span>, <span class="say">on Friday evening</span></td></tr>
+      <tr><td><b>at</b></td><td>время на часах и несколько исключений</td><td><span class="say">at nine</span>, <span class="say">at night</span>, <span class="say">at the weekend</span></td></tr>
+      <tr><td><b>—</b></td><td>every, this, next: предлога нет</td><td><span class="say">every day</span>, <span class="say">every week</span>, <span class="say">after class</span></td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <ul>
+      <li><span class="say">on Monday</span> — в понедельник. <span class="say">on Mondays</span> (с -s) — именно «по понедельникам», каждую неделю.</li>
+      <li><span class="say">at the weekend</span> — британский вариант, в Америке говорят <span class="say">on the weekend</span>. Оба понятны.</li>
+      <li>День + часть дня — по дню: <span class="say">on Friday evening</span>, а не «in Friday evening».</li>
+    </ul>
+  </div>
+  <div class="callout trap"><b class="h">Ловушки</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">I learn at university.</span><span class="yes"><span class="say">I study at university.</span></span><span class="n"><b>study</b> — учиться где-то, изучать предмет. <b>learn</b> — выучить, узнать, научиться: <span class="say">I learn ten new words a day.</span></span></div>
+      <div class="pair"><span class="no">I pass exams in January. (= сдаю, как получится)</span><span class="yes"><span class="say">I take exams in January.</span></span><span class="n"><b>take an exam</b> — сдавать, идти на экзамен. <b>pass</b> — сдать успешно. <b>fail</b> — провалить.</span></div>
+      <div class="pair"><span class="no">I make my homework.</span><span class="yes"><span class="say">I do my homework.</span></span><span class="n">Работу, домашку, курс — <b>do</b>. Ошибку — <b>make</b>: <span class="say">make a mistake</span>.</span></div>
+      <div class="pair"><span class="no">in the night</span><span class="yes"><span class="say">at night</span></span><span class="n">Ночь — исключение: at, без the.</span></div>
+      <div class="pair"><span class="no">in every day</span><span class="yes"><span class="say">every day</span></span><span class="n">С every предлог не нужен.</span></div>
+    </div>
+  </div>
+
+  <div class="ex" id="ex2a"><div class="ex-h"><span class="eyebrow">Упражнение 5 · in, on, at</span><p>Выбери предлог времени.</p></div></div>
+  <div class="ex" id="ex2b"><div class="ex-h"><span class="eyebrow">Упражнение 6 · study или learn, do или make</span><p>Выбери слово. Подсказки — в ловушках выше.</p></div></div>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>«Я сдаю экзамены в июне» и «Надеюсь, я сдам» — какие глаголы?</summary>
+      <div class="a"><p><span class="say">I take exams in June.</span> — сдавать. <span class="say">I hope I pass.</span> — сдать успешно.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Ночью, по выходным, в пятницу вечером, каждый день — с какими предлогами?</summary>
+      <div class="a"><p><span class="say">at night, at the weekend, on Friday evening, every day</span> — у every предлога нет.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="en.02.2.2">
+    <label class="tp"><input type="checkbox" data-id="en.02.2.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>учёба и время</b></span></label>
+    <span class="note" data-d="en.02.2.2">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="topic" id="t3">
+  <div class="eyebrow">Тема 3 из 3 · Произношение</div>
+  <h2>Окончания -s: /s/, /z/, /ɪz/; слитное do you</h2>
+  <p class="tldr">Буква одна, а звука три: <span class="say">works</span> — /s/, <span class="say">lives</span> — /z/, <span class="say">watches</span> — /ɪz/. Какой — решает последний <b>звук</b> глагола. Правило то же, что у множественного числа: <span class="say">books</span>, <span class="say">jobs</span>, <span class="say">classes</span>.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Звук</th><th>Когда</th><th>Примеры</th></tr></thead>
+    <tbody>
+      <tr><td><b>/s/</b> «с»</td><td>после глухих: p, t, k, f</td><td><span class="say">works</span>, <span class="say">likes</span>, <span class="say">stops</span>, <span class="say">gets</span>, <span class="say">helps</span></td></tr>
+      <tr><td><b>/z/</b> «з»</td><td>после звонких и гласных</td><td><span class="say">lives</span>, <span class="say">plays</span>, <span class="say">goes</span>, <span class="say">studies</span>, <span class="say">reads</span></td></tr>
+      <tr><td><b>/ɪz/</b> «из»</td><td>после s, z, sh, ch, x, ge — шипящих и свистящих</td><td><span class="say">watches</span>, <span class="say">finishes</span>, <span class="say">passes</span>, <span class="say">changes</span></td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <ul>
+      <li>Глухой или звонкий — проверь рукой на горле: на «з» горло дрожит, на «с» — нет. Так же с «п» и «б», «т» и «д».</li>
+      <li>Смотри на звук, а не на букву: <span class="say">likes</span> кончается на букву e, но звук перед -s — /k/, поэтому /s/. В <span class="say">changes</span> на конце звук «дж» — поэтому /ɪz/.</li>
+      <li>Особые: <span class="say">does</span> /dʌz/ — «даз», <span class="say">says</span> /sez/ — «сэз», <span class="say">goes</span> /ɡəʊz/.</li>
+      <li>Самая частая русская ошибка — оглушать /z/ в конце, как в слове «глаз»: «ливс» вместо <span class="say">lives</span>. Тяни звонкое «з».</li>
+    </ul>
+  </div>
+  <div class="ex" id="ex3a"><div class="ex-h"><span class="eyebrow">Упражнение 7 · какой звук у -s</span><p>Нажми на слово, чтобы послушать, и выбери звук окончания. Дальше слова зазвучат сами.</p></div></div>
+
+  <h3 style="font-size:17px">Do you и does he в живой речи</h3>
+  <div class="prose">
+    <ul>
+      <li><b>do, does, you</b> в вопросе безударные и «проглатываются». <span class="say">Do you</span> звучит почти как одно слово /djə/ — «дью» или даже «джэ»: <span class="say">Do you like it?</span> — «Джэ лайк ит?».</li>
+      <li><span class="say">Does he</span> — h пропадает: /dʌziː/, «дази». <span class="say">What do you do?</span> в быстрой речи — «Уоджэ ду?».</li>
+      <li><b>Сильнее всего звучит последнее смысловое слово</b>, часто это глагол: Where do you <b>WORK</b>? What does she <b>DO</b>? Помощник в начале — слабый.</li>
+      <li>Голос браузера читает чётче, чем говорят люди. Слитные формы тренируй сам: повторяй фразы быстро, не выговаривая do и you.</li>
+    </ul>
+  </div>
+  <div class="ex" id="ex3b"><div class="ex-h"><span class="eyebrow">Упражнение 8 · do или does на слух</span><p>Нажми на динамик, послушай вопрос и выбери, чем он начинается.</p></div></div>
+  <div class="ex" id="ex3c"><div class="ex-h"><span class="eyebrow">Упражнение 9 · главное ударение во фразе</span><p>Нажми на слово, которое звучит сильнее всех. Динамик — послушать до ответа.</p></div></div>
+
+  <div class="topic-check" data-for="en.02.2.3">
+    <label class="tp"><input type="checkbox" data-id="en.02.2.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>окончания -s и слитное do you</b></span></label>
+    <span class="note" data-d="en.02.2.3">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · слушай и отвечай</div>
+  <h2>Практика</h2>
+  <p class="tldr">Опрос про учёбу: вопрос прозвучит, ты отвечаешь вслух — коротким ответом и ещё одной фразой. Потом сверяешься с образцом. Такие вопросы задают при знакомстве и на собеседовании на стажировку.</p>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Учебные привычки · 8 вопросов</span><span class="muted mono" id="ivState">1 / 8</span></div>
+    <div class="iv" id="iv"></div>
+    <div class="btns"><button class="btn" type="button" id="ivPrev">← Назад</button><button class="btn" type="button" id="ivNext">Следующий вопрос →</button></div>
+  </div>
+  <div class="prac">
+    <div class="task"><span class="tg work">Говорить · 5 минут</span>
+      <h3>Расспроси про друга</h3>
+      <p>Задай вслух пять вопросов с <b>does</b> про друга или родственника (где живёт, что делает, что учит, когда встаёт, что любит) и сам ответь на них — коротко и полной фразой.</p>
+      <p class="ok">Готово, когда ни разу не сказал «does … works» и в каждом ответе есть he / she.</p>
+      <details><summary>Образец</summary><div class="a">
+        <p><span class="say">Where does Ilya live? He lives in Kazan.</span> <span class="say">What does he do? He's a developer.</span> <span class="say">Does he study? No, he doesn't.</span></p></div></details>
+    </div>
+    <div class="task"><span class="tg rev">Писать · 10 минут</span>
+      <h3>Переведи и проверь себя</h3>
+      <p>1. Где работает твоя сестра? 2. Ты делаешь домашнее задание по вечерам? — Да. 3. Когда начинается семестр? 4. Он учится в университете? — Нет, он работает. 5. Что ты изучаешь? — Машинное обучение.</p>
+      <details><summary>Ответы</summary><div class="a">
+        <p>1. <span class="say">Where does your sister work?</span> 2. <span class="say">Do you do your homework in the evening? — Yes, I do.</span> 3. <span class="say">When does the term start?</span> 4. <span class="say">Does he study at university? — No, he doesn't. He works.</span> 5. <span class="say">What do you study? — Machine learning.</span></p></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в плане</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда сделал упражнения темы без ошибок или с одной. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Вопрос:</b> <span class="say">Do you work?</span> · <span class="say">Does she work?</span> — помощник впереди, глагол без -s.</li>
+      <li><b>Короткий ответ — тем же помощником:</b> <span class="say">Yes, I do.</span> / <span class="say">No, she doesn't.</span> На вопрос с be — be.</li>
+      <li><b>Со словом:</b> слово + do / does + кто + глагол: <span class="say">Where do you live?</span> <span class="say">What does she do?</span></li>
+      <li><b>be или do:</b> <span class="say">Are you a student?</span> — нет глагола; <span class="say">Do you study?</span> — есть глагол.</li>
+      <li><b>Учёба:</b> study (учиться) / learn (выучить); take an exam (сдавать) / pass (сдать) / fail; do homework; revise; lecture, term, subject, degree, course, notes, timetable.</li>
+      <li><b>Время:</b> in the morning, in January · on Monday(s), on Friday evening · at nine, at night, at the weekend · every day — без предлога.</li>
+      <li><b>-s звучит:</b> /s/ works · /z/ lives, plays · /ɪz/ watches, passes, changes. Не оглушай /z/.</li>
+      <li><b>В речи:</b> Do you → /djə/, does he → «дази»; сильнее всего — последнее смысловое слово.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+    <p class="muted" style="font-size:13.5px">Конспект этого урока уже лежит в Obsidian: <code>65_Английский/Уроки</code>.</p>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b>
+    <p>Закрой урок. Вслух: сделай вопросы из пяти утверждений (два с I / you, три с he / she) и ответь коротко «да» и «нет». Задай себе пять вопросов про учёбу со словами where, what, when. Произнеси: works, lives, watches, passes, does. Где запнулся — туда и возвращаешься.</p>
+  </div>
+  <p><a class="btn" href="/en#w-2" style="text-decoration:none">К неделе 2 в плане →</a></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+# 🇬🇧 Урок 2.2 · Вопросы с do/does, учёба и звук -s
+
+## Вопросы с do/does и короткие ответы
+Вопрос: **Do / Does + кто + глагол без -s**. -s одна на предложение — в вопросе она в does.
+
+| Вопрос | Да | Нет |
+| :--- | :--- | :--- |
+| Do you work? | Yes, I do. | No, I don't. |
+| Does she work? | Yes, she does. | No, she doesn't. |
+| Do they work? | Yes, they do. | No, they don't. |
+| Does Ilya work? | Yes, he does. | No, he doesn't. |
+
+- Ответ — тем же помощником: на *Do you…?* — *Yes, I do*; на *Are you…?* — *Yes, I am*.
+- В ответе — местоимение: *Does Ilya study? — Yes, he does.*
+- Со словом: **слово + do / does + кто + глагол** — *Where do you live? What does she study? When does the lecture start?*
+- *What do you do?* — «кем работаешь»: первое do — помощник, второе — глагол «делать».
+
+> [!warning] Ошибки русскоговорящих
+> - ~~You work here?~~ → *Do you work here?*
+> - ~~Does she works?~~ → *Does she work?*
+> - ~~Do he live in Moscow?~~ → *Does he live in Moscow?*
+> - ~~Where you live?~~ → *Where do you live?*
+> - ~~Are you work here?~~ → *Do you work here?*
+> - ~~Do you like tea? — Yes, I am.~~ → *Yes, I do.*
+
+## Учёба и время
+- study — учиться, изучать (*I study at university*) · learn — выучить, узнать (*I learn ten new words a day*)
+- take an exam — сдавать · pass — сдать · fail — провалить · revise — повторять к экзамену
+- do homework (не make) · make a mistake
+- lecture, timetable, term, degree, subject, course, notes (*take notes*)
+
+| Предлог | С чем | Пример |
+| :--- | :--- | :--- |
+| in | часть дня, месяц, год | in the morning, in January |
+| on | день недели, дата | on Monday(s), on Friday evening |
+| at | время, исключения | at nine, at night, at the weekend |
+| — | every, this, next | every day, after class |
+
+> [!warning] Ловушки
+> - ~~I learn at university~~ → *I study at university.*
+> - ~~I make my homework~~ → *I do my homework.*
+> - ~~in the night~~ → *at night* · ~~in every day~~ → *every day*
+
+## Звук -s и слитное do you
+- /s/ после глухих p, t, k, f — *works, likes, stops*
+- /z/ после звонких и гласных — *lives, plays, goes, studies*
+- /ɪz/ после s, z, sh, ch, x, ge — *watches, finishes, passes, changes*
+- Особые: *does* «даз», *says* «сэз». То же правило у множественного: *books, jobs, classes*.
+- *Do you* в речи — /djə/, «джэ»; *does he* — «дази». Сильнее всего — последнее смысловое слово: *Where do you WORK?*
+
+## Проверь себя
+> [!question]- Сделай вопрос и короткие ответы: «She speaks English»
+> *Does she speak English? — Yes, she does. / No, she doesn't.*
+
+> [!question]- Исправь: «Where you live?», «Does he works?», «What does she does?»
+> *Where do you live? Does he work? What does she do?*
+
+> [!question]- «Ты студент?» и «Ты учишься?»
+> *Are you a student? Do you study?*
+
+> [!question]- Предлоги: ночью, по выходным, в пятницу вечером, в 9, каждый день
+> *at night, at the weekend, on Friday evening, at nine, every day*
+
+> [!question]- Как звучит -s: works, lives, watches, plays, passes
+> *works /s/, lives /z/, watches /ɪz/, plays /z/, passes /ɪz/*
+</script>
+
+<script src="/assets/lesson.js"></script>
+<script src="/assets/en.js"></script>
+<script>
+/* ---------- тема 1: перевёртыш 2 ----------
+   FLIP по data-r: окончание -s (r="e") в вопросе превращается в Does и летит вперёд,
+   дополнение (r="c") в вопросе со словом превращается в where / what / when. */
+(function flipLab(){
+  const P=[
+    {s:"She",stem:"work",e:"s",bare:"work",c:"in an office",wh:"Where",ru:"Она работает в офисе.",y:"Yes, she does.",n:"No, she doesn't.",ans:"In an office."},
+    {s:"You",stem:"live",e:"",bare:"live",c:"in Moscow",wh:"Where",ru:"Ты живёшь в Москве.",y:"Yes, I do.",n:"No, I don't.",ans:"In Moscow."},
+    {s:"Vlad",name:1,stem:"stud",e:"ies",bare:"study",c:"machine learning",wh:"What",ru:"Влад изучает машинное обучение.",y:"Yes, he does.",n:"No, he doesn't.",ans:"Machine learning."},
+    {s:"They",stem:"play",e:"",bare:"play",c:"football",wh:"What",ru:"Они играют в футбол.",y:"Yes, they do.",n:"No, they don't.",ans:"Football."},
+    {s:"Anna",name:1,stem:"ha",e:"s",bare:"have",c:"a dog",wh:"What",ru:"У Анны есть собака.",y:"Yes, she does.",n:"No, she doesn't.",ans:"A dog."},
+    {s:"The lecture",stem:"start",e:"s",bare:"start",c:"at nine",wh:"When",ru:"Лекция начинается в девять.",y:"Yes, it does.",n:"No, it doesn't.",ans:"At nine."},
+    {s:"Your parents",stem:"work",e:"",bare:"work",c:"in Kazan",wh:"Where",ru:"Твои родители работают в Казани.",y:"Yes, they do.",n:"No, they don't.",ans:"In Kazan."}
+  ];
+  const MODES=["Утверждение","Вопрос да / нет","Вопрос со словом"];
+  let k=0,m=0;
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function render(anim){
+    const p=P[k], line=$("flLine"), third=!!p.e, aux=third?"Does":"Do", sub=p.name?p.s:p.s[0].toLowerCase()+p.s.slice(1);
+    const first=anim?new Map([...line.querySelectorAll(".w")].map(el=>[el.dataset.r,el.getBoundingClientRect()])):null;
+    /* [роль для FLIP, текст, класс] */
+    let order,said;
+    if(m===0){order=[["s",p.s,"s"],["v",p.stem,third?"v st":"v"]].concat(third?[["e",p.e,"e end"]]:[],[["c",p.c,"c"],["p",".","p"]]);said=`${p.s} ${p.stem}${p.e} ${p.c}.`}
+    else if(m===1){order=[["e",aux,"e"],["s",sub,"s"],["v",p.bare,"v"],["c",p.c,"c"],["p","?","p"]];said=`${aux} ${sub} ${p.bare} ${p.c}?`}
+    else{order=[["c",p.wh,"q"],["e",aux.toLowerCase(),"e"],["s",sub,"s"],["v",p.bare,"v"],["p","?","p"]];said=`${p.wh} ${aux.toLowerCase()} ${sub} ${p.bare}?`}
+    line.innerHTML=order.map(([r,t,c])=>`<span class="w ${c}" data-r="${r}">${t}</span>`).join("");
+    line.dataset.say=said;
+    if(first&&!reduce)line.querySelectorAll(".w").forEach(el=>{const a=first.get(el.dataset.r),b=el.getBoundingClientRect();
+      if(a)el.animate([{transform:`translate(${a.left-b.left}px,${a.top-b.top}px)`},{transform:"none"}],{duration:420,easing:"cubic-bezier(.2,.8,.2,1)"});
+      else el.animate([{opacity:0,transform:"translateY(-10px) scale(.7)"},{opacity:1,transform:"none"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"})});
+    const verbS=p.stem+p.e;
+    let ans;
+    if(m===0)ans=`<div class="wide"><b>По-русски</b><span>${p.ru} → «${p.ru.replace(/\.$/,"")}?» — вопрос только голосом. По-английски нужен помощник: нажми «Вопрос».</span></div>`;
+    else if(m===1)ans=`<div><b>Да</b><span class="say">${p.y}</span></div><div><b>Нет</b><span class="say">${p.n}</span></div>
+      <div class="wide"><b>Что случилось</b><span>${third?`-s улетела из <i>${verbS}</i> вперёд и стала <b>Does</b>; глагол остался голым: <i>${p.bare}</i>.${p.bare==="have"?" has → have.":""}`:`-s не было — впереди просто <b>Do</b>, глагол не меняется.`}</span>
+      ${third?`<span class="no-c">✗ ${aux} ${sub} ${verbS} ${p.c}? — -s дважды.</span>`:`<span class="no-c">✗ ${p.s} ${p.bare} ${p.c}? — без do это не вопрос, а удивление.</span>`}</div>`;
+    else ans=`<div><b>Ответ</b><span class="say">${p.ans}</span></div><div><b>Формула</b><span>${p.wh} + ${aux.toLowerCase()} + ${sub} + ${p.bare}</span></div>
+      <div class="wide"><span class="no-c">✗ ${p.wh} ${sub} ${m===2&&third?verbS:p.bare}? — после ${p.wh.toLowerCase()} нужен ${aux.toLowerCase()}.</span></div>`;
+    $("flAns").innerHTML=ans;
+    $("flState").textContent=`${third?"he / she / it":"I / you / we / they"} · ${MODES[m].toLowerCase()}`;
+    document.querySelectorAll("#flPick .btn").forEach((b,i)=>b.setAttribute("aria-pressed",i===k));
+    document.querySelectorAll("#flMode .btn").forEach((b,i)=>b.setAttribute("aria-pressed",i===m));
+  }
+  $("flPick").innerHTML=P.map((p,i)=>`<button class="btn" type="button" data-k="${i}">${p.s} ${p.stem}${p.e}…</button>`).join("");
+  $("flMode").innerHTML=MODES.map((t,i)=>`<button class="btn" type="button" data-m="${i}">${t}</button>`).join("");
+  $("flPick").onclick=e=>{const b=e.target.closest(".btn");if(b){k=+b.dataset.k;m=0;render(false)}};
+  $("flMode").onclick=e=>{const b=e.target.closest(".btn");if(!b||+b.dataset.m===m)return;m=+b.dataset.m;render(true);if(m)say($("flLine").dataset.say)};
+  render(false);
+})();
+
+/* ---------- практика: опрос про учёбу ---------- */
+(function interview(){
+  const Q=[["What do you do?","I'm a student. I study machine learning."],["Where do you study?","I study at university."],
+    ["What subjects do you like?","I like maths and programming."],["When do you study?","I study in the evening and at the weekend."],
+    ["Do you work?","No, I don't. I'm a student. / Yes, I do. I work part-time."],["Do you do your homework every day?","Yes, I do. / No, I don't. Not every day."],
+    ["Does your best friend study?","Yes, he does. He studies maths. / No, she doesn't. She works."],["What do you do at the weekend?","I meet friends and I revise for exams."]];
+  let i=0;
+  function draw(sayIt){
+    $("iv").innerHTML=`<div class="iv-q"><span class="n">${i+1}</span><span class="q say" data-say="${Q[i][0]}">${Q[i][0]}</span><button class="btn" type="button" data-say="${Q[i][0]}">${EN_SPK_SVG} ещё раз</button>
+      <details><summary>Ответил вслух? Посмотри образец</summary><p><span class="say">${Q[i][1]}</span></p></details></div>`;
+    $("ivState").textContent=`${i+1} / ${Q.length}`; $("ivPrev").disabled=i===0; $("ivNext").textContent=i===Q.length-1?"Сначала ↺":"Следующий вопрос →";
+    if(sayIt)say(Q[i][0]);
+  }
+  $("ivNext").onclick=()=>{i=(i+1)%Q.length;draw(true)}; $("ivPrev").onclick=()=>{if(i>0){i--;draw(true)}};
+  draw(false);
+})();
+
+/* ---------- упражнения: тема 1 ---------- */
+exBuild($("ex1a"),[
+  {ru:"Ты работаешь?",w:"Do you work ?",extra:["Are","works"]},
+  {ru:"Она живёт в Москве?",w:"Does she live in Moscow ?",extra:["lives","Is"]},
+  {ru:"Где ты учишься?",w:"Where do you study ?",extra:["does","studies"]},
+  {ru:"Кем работает твой брат?",w:"What does your brother do ?",extra:["is","works"]},
+  {ru:"Когда начинается урок?",w:"When does the lesson start ?",extra:["starts","is"]},
+  {ru:"Твои родители говорят по-английски?",w:"Do your parents speak English ?",extra:["Does","speaks"]}
+]);
+exGap($("ex1b"),[
+  {s:"Do you like coffee? (да) — ___",opts:["Yes, I do.","Yes, I like.","Yes, I am."],a:"Yes, I do.",full:"Do you like coffee? Yes, I do.",why:"спросили с do — отвечаешь do, глагол не повторяют"},
+  {s:"Does she work at weekends? (нет) — ___",opts:["No, she doesn't.","No, she don't.","No, she isn't."],a:"No, she doesn't.",full:"Does she work at weekends? No, she doesn't."},
+  {s:"Do your parents live in Moscow? (да) — ___",opts:["Yes, they do.","Yes, they does.","Yes, they live."],a:"Yes, they do.",full:"Do your parents live in Moscow? Yes, they do."},
+  {s:"Does Ilya study English? (нет) — ___",opts:["No, he doesn't.","No, Ilya doesn't.","No, he not."],a:"No, he doesn't.",full:"Does Ilya study English? No, he doesn't.",why:"в ответе — местоимение"},
+  {s:"Are you a student? (да) — ___",opts:["Yes, I am.","Yes, I do.","Yes, I'm."],a:"Yes, I am.",full:"Are you a student? Yes, I am.",why:"вопрос с be — и ответ с be"},
+  {s:"Do you and Anna study together? (да) — ___",opts:["Yes, we do.","Yes, I do.","Yes, they do."],a:"Yes, we do.",full:"Do you and Anna study together? Yes, we do.",why:"ты и Анна — мы"},
+  {s:"Does your phone have a good camera? (да) — ___",opts:["Yes, it does.","Yes, it has.","Yes, it is."],a:"Yes, it does.",full:"Does your phone have a good camera? Yes, it does.",why:"вопрос с does — ответ does"}
+],{keep:true});
+exGap($("ex1c"),[
+  {s:"___ you live? — In Moscow.",a:"Where do",full:"Where do you live? — In Moscow."},
+  {s:"___ she do? — She's a nurse.",a:"What does",full:"What does she do? — She's a nurse.",why:"«кем работает»: does + do"},
+  {s:"___ the film start? — At eight.",a:["When does","What time does"],full:"When does the film start? — At eight.",why:"film — одна вещь, как it"},
+  {s:"___ your parents work? — In a hospital.",a:"Where do",full:"Where do your parents work? — In a hospital.",why:"parents — много, как they"},
+  {s:"___ he study? — Computer science.",a:"What does",full:"What does he study? — Computer science."},
+  {s:"___ you go to the gym? — On Mondays and Fridays.",a:"When do",full:"When do you go to the gym? — On Mondays and Fridays."}
+]);
+exSpot($("ex1d"),[
+  {s:"Does she works in a bank?",bad:2,fix:"work",why:"-s уже в does"},
+  {s:"Do he live in Moscow?",bad:0,fix:"Does",why:"he — does"},
+  {s:"Where you live?",bad:1,also:[0],fix:"do you",why:"после вопросительного слова нужен помощник do"},
+  {s:"Are you work from home?",bad:0,fix:"Do",why:"work — глагол, значит do, а не be"},
+  {s:"What does she does?",bad:3,fix:"do?",why:"-s уже в первом does; второе do — сам глагол, он голый"},
+  {s:"Do you like tea? Yes, I am.",bad:6,fix:"do.",why:"спросили с do — отвечают do"},
+  {s:"Where does your sister work?",bad:-1},
+  {s:"What you do?",bad:1,also:[0],fix:"do you",why:"после what нужен помощник: What do you do?"}
+]);
+
+/* ---------- тема 2 ---------- */
+wordCards($("ex2cards"),[
+  {en:"study",ipa:"ˈstʌd.i",ru:"учиться, изучать",ex:"I study machine learning.",exRu:"Я изучаю машинное обучение."},
+  {en:"learn",ipa:"lɜːn",ru:"выучить, узнать, научиться",ex:"I learn ten new words a day."},
+  {en:"revise",ipa:"rɪˈvaɪz",ru:"повторять (к экзамену)",ex:"I revise for exams at the weekend."},
+  {en:"take an exam",ipa:"teɪk ən ɪɡˈzæm",ru:"сдавать экзамен",ex:"We take exams in January."},
+  {en:"pass",ipa:"pɑːs",ru:"сдать (успешно)",ex:"She always passes her exams."},
+  {en:"fail",ipa:"feɪl",ru:"провалить, не сдать",ex:"I don't want to fail the test."},
+  {en:"homework",ipa:"ˈhəʊm.wɜːk",ru:"домашнее задание",ex:"I do my homework after class."},
+  {en:"lecture",ipa:"ˈlek.tʃə",ru:"лекция",ex:"The lecture starts at nine."},
+  {en:"timetable",ipa:"ˈtaɪmˌteɪ.bəl",ru:"расписание",ex:"Where's our timetable?"},
+  {en:"term",ipa:"tɜːm",ru:"семестр, четверть",ex:"The new term starts in September."},
+  {en:"degree",ipa:"dɪˈɡriː",ru:"степень, высшее образование",ex:"She has a degree in maths."},
+  {en:"subject",ipa:"ˈsʌb.dʒɪkt",ru:"предмет (в учёбе)",ex:"What's your favourite subject?"},
+  {en:"course",ipa:"kɔːs",ru:"курс (обучения)",ex:"I do an online English course."},
+  {en:"notes",ipa:"nəʊts",ru:"записи, конспект",ex:"I take notes in every lecture."}
+]);
+exGap($("ex2a"),[
+  {s:"I study ___ the evening.",opts:["in","on","at"],a:"in"},
+  {s:"We have lectures ___ Mondays.",opts:["in","on","at"],a:"on"},
+  {s:"She works ___ night.",opts:["in","on","at"],a:"at",why:"ночь — исключение: at night"},
+  {s:"I meet my friends ___ the weekend.",opts:["in","on","at"],a:"at"},
+  {s:"The lecture starts ___ nine.",opts:["in","on","at"],a:"at",why:"время на часах — at"},
+  {s:"He goes to the gym ___ Friday evening.",opts:["in","on","at"],a:"on",why:"день + часть дня — по дню: on"},
+  {s:"I do my homework ___ the afternoon.",opts:["in","on","at"],a:"in"},
+  {s:"Our exams are ___ January.",opts:["in","on","at"],a:"in",why:"месяц — in"}
+],{keep:true});
+exGap($("ex2b"),[
+  {s:"I ___ computer science at university.",opts:["study","learn"],a:"study",why:"учиться где-то, изучать предмет — study"},
+  {s:"I want to ___ twenty new words this week.",opts:["learn","study"],a:"learn",why:"выучить — learn"},
+  {s:"Do you ___ your homework every day?",opts:["do","make"],a:"do"},
+  {s:"We ___ exams in January and June.",opts:["take","pass"],a:"take",why:"сдавать (идти на экзамен) — take; pass — сдать успешно"},
+  {s:"You ___ the exam if you get 60% or more.",opts:["pass","take"],a:"pass",why:"сдать успешно — pass"},
+  {s:"I always ___ mistakes in long words.",opts:["make","do"],a:"make",why:"ошибку — make"}
+],{keep:true});
+
+/* ---------- тема 3 ---------- */
+exSort($("ex3a"),{groups:[{label:"/s/ works"},{label:"/z/ lives"},{label:"/ɪz/ watches"}],items:[
+  {w:"likes",g:0,why:"перед -s звук /k/ — глухой"},{w:"stops",g:0},{w:"gets",g:0},{w:"helps",g:0},{w:"works",g:0},
+  {w:"plays",g:1,why:"после гласного звука — /z/"},{w:"goes",g:1},{w:"studies",g:1},{w:"reads",g:1},{w:"lives",g:1},
+  {w:"finishes",g:2},{w:"passes",g:2},{w:"changes",g:2,why:"на конце звук «дж» — /ɪz/"},{w:"teaches",g:2}
+]});
+exGap($("ex3b"),[
+  {say:"Does she live here?",s:"___ …?",opts:["Do","Does"],a:"Does",full:"Does she live here?"},
+  {say:"Do you like it?",s:"___ …?",opts:["Do","Does"],a:"Do",full:"Do you like it?"},
+  {say:"Does he work at night?",s:"___ …?",opts:["Do","Does"],a:"Does",full:"Does he work at night?",why:"does he сливается в «дази»"},
+  {say:"Do they study English?",s:"___ …?",opts:["Do","Does"],a:"Do",full:"Do they study English?"},
+  {say:"Does it start at nine?",s:"___ …?",opts:["Do","Does"],a:"Does",full:"Does it start at nine?"},
+  {say:"Do we have a lecture today?",s:"___ …?",opts:["Do","Does"],a:"Do",full:"Do we have a lecture today?"}
+],{keep:true});
+exStress($("ex3c"),[
+  {w:"Where do you work?",syl:["Where","do","you","work?"],s:3},
+  {w:"What does she do?",syl:["What","does","she","do?"],s:3},
+  {w:"When does it start?",syl:["When","does","it","start?"],s:3},
+  {w:"What do you study?",syl:["What","do","you","study?"],s:3},
+  {w:"Does she drive?",syl:["Does","she","drive?"],s:2},
+  {w:"How do you spell it?",syl:["How","do","you","spell","it?"],s:3}
+]);
+
+initLesson({topics:[["en.02.2.1","Present simple: вопросы с do/does и короткие ответы"],["en.02.2.2","Учёба и время: study, revise, take an exam"],["en.02.2.3","Окончания -s: /s/, /z/, /ɪz/; слитное do you"]]});
+</script>
