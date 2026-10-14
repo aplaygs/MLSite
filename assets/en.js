@@ -13,6 +13,8 @@
      exSort(el, {groups, items})     — разложить по группам: groups [{k, label}], items [{w, g, say?, why?}] — по одной карточке.
                                       Первую карточку слушают кликом по слову (при загрузке страницы звука нет), дальше — само (auto:false — выключить).
      wordCards(el, words)            — карточки слов: {en, ipa?, ru, ex?, exRu?}; клик — перевернуть, 🔊 — послушать.
+     takeAway(el, {lesson, words, rules}) — блок «В повторение»: слова (формат wordCards) и правила урока
+                                      {id, q, a, ex?:[…], wrong?, right?} с галочками → колоды /words и /rules (/api/decks).
    У каждого упражнения — счёт «3 / 6», кнопки «Проверить» и «Заново». Ответы сравниваются без учёта регистра, ’ и точки в конце. */
 const EN_NORM=s=>String(s).toLowerCase().replace(/[’‘`´]/g,"'").replace(/\s+([.,!?])/g,"$1").replace(/[.!?]+$/,"").replace(/\s+/g," ").trim();
 const enEsc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -212,6 +214,54 @@ function wordCards(el,words){
     box.dataset.m=b.dataset.m; box.querySelectorAll(".wc").forEach(c=>c.classList.remove("open"))});
   box.addEventListener("click",e=>{if(e.target.closest("[data-say],.say"))return;const c=e.target.closest(".wc");if(c)c.classList.toggle("open")});
   box.addEventListener("keydown",e=>{const c=e.target.closest(".wc");if(c&&(e.key==="Enter"||e.key===" ")){e.preventDefault();c.classList.toggle("open")}});
+}
+
+/* ---------- в повторение: Влад сам выбирает, что из урока пойдёт в колоды ---------- */
+function takeAway(el,{lesson,words=[],rules=[]}){
+  const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname), src=`урок ${lesson}`;
+  const W=words.map(w=>({key:w.en.toLowerCase(),item:{word:w.en,ipa:w.ipa||"",translation:w.ru,example:w.ex||"",example_ru:w.exRu||"",source:src},
+    t:`${enEsc(w.en)}<small>${enEsc(w.ru)}</small>`}));
+  const R=rules.map(r=>({key:r.id,item:{id:r.id,q:r.q,a:r.a,examples:r.ex||[],wrong:r.wrong||"",right:r.right||"",source:src},
+    t:`${enEsc(r.q)}<small>${enEsc(r.a)}</small>`}));
+  el.insertAdjacentHTML("beforeend",`<div class="tk">${[["words","Слова",W],["rules","Правила",R]].filter(x=>x[2].length).map(([d,h,L])=>`
+    <div class="tk-col" data-d="${d}"><div class="tk-h"><b>${h} · ${L.length}</b><button class="btn tk-all" type="button">выбрать новые</button></div>
+    <ul>${L.map((x,i)=>`<li data-i="${i}"><label><input type="checkbox" data-i="${i}"><span class="t">${x.t}</span><span class="tk-st"></span></label></li>`).join("")}</ul></div>`).join("")}</div>
+    <div class="tk-foot"><button class="btn go tk-go" type="button" disabled>Добавить выбранное</button><span class="tk-msg" role="status"></span></div>`);
+  const L={words:W,rules:R}, msg=el.querySelector(".tk-msg"), go=el.querySelector(".tk-go");
+  let state={words:{},rules:{}};  /* ключ → "in" (в колоде) | "ar" (в архиве) */
+  const count=()=>el.querySelectorAll(".tk-col input:checked:not(:disabled)").length;
+  const upd=()=>{const n=count();go.disabled=!n||!LOCAL;go.textContent=n?`Добавить выбранное · ${n}`:"Добавить выбранное"};
+  function paint(){
+    for(const d of ["words","rules"])el.querySelectorAll(`.tk-col[data-d="${d}"] li`).forEach(li=>{
+      const x=L[d][+li.dataset.i], s=state[d][x.key], inp=li.querySelector("input"), st=li.querySelector(".tk-st");
+      li.classList.toggle("have",s==="in"); inp.disabled=s==="in"||!LOCAL; if(s==="in")inp.checked=true;
+      st.className="tk-st"+(s?" "+s:""); st.textContent=s==="in"?"в колоде":s==="ar"?"в архиве":"";
+    });
+    el.querySelectorAll(".tk ul").forEach(ul=>ul.append(...[...ul.children].filter(li=>li.classList.contains("have"))));  /* новое — сверху */
+    upd();
+  }
+  async function load(){
+    for(const d of ["words","rules"]){if(!L[d].length)continue;
+      const r=await fetch("/api/decks/"+d).then(r=>r.json());
+      state[d]=Object.fromEntries(r.cards.map(c=>[d==="words"?c.word.toLowerCase():c.id,c.archived?"ar":"in"]));}
+    paint();
+  }
+  el.addEventListener("change",upd);
+  el.querySelectorAll(".tk-all").forEach(b=>b.onclick=()=>{const col=b.closest(".tk-col");
+    const boxes=[...col.querySelectorAll("input:not(:disabled)")], on=boxes.some(i=>!i.checked);boxes.forEach(i=>i.checked=on);upd()});
+  go.onclick=async()=>{
+    go.disabled=true; let added=0,back=0;
+    try{for(const d of ["words","rules"]){
+        const items=[...el.querySelectorAll(`.tk-col[data-d="${d}"] input:checked:not(:disabled)`)].map(i=>L[d][+i.dataset.i].item);
+        if(!items.length)continue;
+        const r=await fetch("/api/decks/"+d,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op:"add",items})}).then(r=>{if(!r.ok)throw new Error("сервер");return r.json()});
+        added+=r.added.length; back+=r.restored.length;}
+      await load();
+      msg.innerHTML=`Готово: ${added?`добавлено ${added}`:""}${added&&back?", ":""}${back?`возвращено из архива ${back}`:""}. Повторять — <a href="/words">слова</a> и <a href="/rules">правила</a>.`;
+    }catch(e){msg.textContent="Не получилось сохранить: сервер не отвечает.";upd()}
+  };
+  if(!LOCAL){msg.textContent="Добавлять в колоды можно на компьютере, где запущен сервер.";paint();return}
+  load().catch(()=>{msg.textContent="Нет связи с сервером — колоды недоступны.";});
 }
 
 /* Нет голоса в браузере — честно говорим об этом один раз. */

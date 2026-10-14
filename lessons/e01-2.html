@@ -36,7 +36,7 @@
   <p>Как спросить и ответить с <b>be</b>: <span class="say">Are you married?</span> — <span class="say">No, I'm not.</span> Вопросы с <b>where, what, who, how old</b> — порядок слов в них ломает русская привычка. Прилагательные, чтобы описать людей. И звук: ударение в словах и три разных «о», которые русское ухо слышит как одно.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
   <nav class="toc" aria-label="Темы урока">
-    <a href="#t1">Вопросы с be</a><a href="#t2">where, what, who</a><a href="#t3">Какой человек</a><a href="#t4">Ударение и «о»</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+    <a href="#t1">Вопросы с be</a><a href="#t2">where, what, who</a><a href="#t3">Какой человек</a><a href="#t4">Ударение и «о»</a><a href="#practice">Практика</a><a href="#take">В повторение</a><a href="#sheet">Шпаргалка</a>
   </nav>
 </header>
 
@@ -219,6 +219,13 @@
       <p>Напиши на бумаге шесть вопросов: три с where / what / how old и три «да-нет» с be. Проверь порядок слов по формуле.</p>
     </div>
   </div>
+</section>
+
+<!-- ============ take ============ -->
+<section class="topic" id="take">
+  <div class="eyebrow">После урока</div>
+  <h2>В повторение</h2>
+  <p class="tldr">Отметь, что хочешь повторять дальше: слова уйдут в <a href="/words">тренажёр слов</a>, правила — в <a href="/rules">правила на заучку</a>. Повторение по интервалам, в Obsidian — «Словарь» и «Правила на заучку». Лишнее потом можно убрать в архив.</p>
 </section>
 
 <!-- ============ topics ============ -->
@@ -421,7 +428,7 @@ exGap($("ex2c"),[
   {s:"___ — My name's Anna.",a:["What's your name?","What is your name?"],full:"What's your name? — My name's Anna."},
   {s:"___ — I'm fine, thanks.",a:["How are you?"],full:"How are you? — I'm fine, thanks."}
 ]);
-wordCards($("ex3cards"),[
+const WORDS=[
   {en:"kind",ipa:"kaɪnd",ru:"добрый",ex:"She's very kind.",exRu:"Она очень добрая."},
   {en:"friendly",ipa:"ˈfrend.li",ru:"дружелюбный",ex:"People here are friendly."},
   {en:"funny",ipa:"ˈfʌn.i",ru:"смешной, весёлый",ex:"My brother is really funny."},
@@ -434,7 +441,8 @@ wordCards($("ex3cards"),[
   {en:"pleasant",ipa:"ˈplez.ənt",ru:"приятный",ex:"He's very pleasant."},
   {en:"famous",ipa:"ˈfeɪ.məs",ru:"знаменитый",ex:"She's a famous singer."},
   {en:"well-known",ipa:"ˌwelˈnəʊn",ru:"известный",ex:"It's a well-known company."}
-]);
+];
+wordCards($("ex3cards"),WORDS);
 exGap($("ex3a"),[
   {s:"He's ___ clever — he's top of the class.",opts:["very","a bit","not very"],a:"very"},
   {s:"I'm ___ shy with new people.",opts:["a bit","very much","quite a"],a:"a bit"},
@@ -456,6 +464,87 @@ exStress($("ex4a"),[
 exSort($("ex4b"),{groups:[{label:"/ɒ/ hot"},{label:"/əʊ/ phone"},{label:"/ʌ/ mother"}],items:[
   {w:"job",g:0},{w:"sorry",g:0},{w:"doctor",g:0},{w:"shop",g:0},{w:"go",g:1},{w:"home",g:1},{w:"old",g:1},{w:"photo",g:1},{w:"Poland",g:1},
   {w:"son",g:2},{w:"Monday",g:2},{w:"London",g:2},{w:"brother",g:2},{w:"come",g:2}
+]});
+
+takeAway($("take"),{lesson:"1.2",words:WORDS,rules:[
+{
+"id": "en.01.2.r1",
+"q": "Как сделать вопрос с be?",
+"a": "be встаёт перед подлежащим. Только голосом, как в русском, — нельзя.",
+"ex": [
+"Are you from Spain?",
+"Is he married?"
+],
+"wrong": "You are from Russia?",
+"right": "Are you from Russia?"
+},
+{
+"id": "en.01.2.r2",
+"q": "Короткий ответ «да» с be — можно сокращать?",
+"a": "Нет: краткую форму в конце фразы не ставят. В «нет» — можно. В ответе — местоимение, а не имя.",
+"ex": [
+"Yes, I am.",
+"No, I'm not.",
+"Is Anna your sister? Yes, she is."
+],
+"wrong": "Yes, I'm.",
+"right": "Yes, I am."
+},
+{
+"id": "en.01.2.r3",
+"q": "Порядок слов в вопросе с where / what / how old",
+"a": "Вопросительное слово + am / is / are + подлежащее + остальное. Предлог — в конце.",
+"ex": [
+"Where are you from?",
+"How old is your brother?"
+],
+"wrong": "Where you are from?",
+"right": "Where are you from?"
+},
+{
+"id": "en.01.2.r4",
+"q": "Как спросить возраст и имя?",
+"a": "How old are you? — I'm twenty. What's your name? (не How is your name).",
+"ex": [
+"How old are you?",
+"What's your name?"
+],
+"wrong": "How many years you have?",
+"right": "How old are you?"
+},
+{
+"id": "en.01.2.r5",
+"q": "Где стоит прилагательное и меняется ли оно?",
+"a": "Перед существительным или после be. Не меняется ни по числу, ни по роду. Без существительного — без a.",
+"ex": [
+"She's a kind person.",
+"She's kind.",
+"kind people"
+],
+"wrong": "They are kinds.",
+"right": "They're kind."
+},
+{
+"id": "en.01.2.r6",
+"q": "very, quite, a bit, not very — что когда?",
+"a": "very — очень, quite — довольно, a bit — немного (обычно про плохое), not very — вежливо про плохое.",
+"ex": [
+"I'm a bit shy.",
+"He isn't very friendly."
+],
+"wrong": "She's a bit kind.",
+"right": "She's quite kind."
+},
+{
+"id": "en.01.2.r7",
+"q": "Три звука буквы o",
+"a": "/ɒ/ короткое — hot, job · /əʊ/ «оу» — no, phone, old · /ʌ/ как «а» — mother, son, Monday, London.",
+"ex": [
+"job",
+"phone",
+"Monday"
+]
+}
 ]});
 
 initLesson({topics:[["en.01.2.1","be: вопросы и короткие ответы"],["en.01.2.2","Вопросительные слова: what, where, who, how old"],["en.01.2.3","Прилагательные для описания людей"],["en.01.2.4","Ударение в словах; долгий и краткий o"]]});

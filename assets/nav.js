@@ -12,7 +12,7 @@
   /* Раздел English: пастельная тема — голубая основа и бледно-абрикосовый акцент (--sun: подсветки, --warm: ключевое).
      Все страницы берут цвета из токенов, поэтому перекрашиваются сами — и уроки, и тренажёр слов. */
   const path = location.pathname;
-  const EN = path === "/en" || path.startsWith("/en/") || path === "/words" || /^\/lessons\/e\d/.test(path);
+  const EN = path === "/en" || path.startsWith("/en/") || path === "/words" || path === "/rules" || /^\/lessons\/e\d/.test(path);
   document.documentElement.dataset.section = EN ? "en" : "ml";
   st0.textContent += `
 :root[data-section="en"]{--bg:#EEF3FA;--surface:#FFFFFF;--ink:#1A2335;--muted:#5D6982;--line:#D7E0EE;--soft:#E3EBF7;--accent:#3A6AD4;--accent-soft:rgba(58,106,212,.13);--accent-ink:#FFFFFF;--warm:#C9802A;--sun:#FBE6C4;--sun-soft:#FDF3E3;--sun-ink:#8A520E;--miss:#C9802A;--miss-soft:#FBE6C4}
@@ -50,10 +50,10 @@ html{scroll-padding-top:calc(var(--navh) + 8px);scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){.sitenav *{transition:none!important}}`;
   const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
   const path = location.pathname.replace(/\/$/, "");
-  /* Раздел: ML или English. Английский — /en…, тренажёр /words и уроки английского /lessons/e… */
+  /* Раздел: ML или English. Английский — /en…, колоды /words и /rules и уроки английского /lessons/e… */
   const EN = document.documentElement.dataset.section === "en";
-  const LINKS = EN ? [["/en", "Обзор"], ["/words", "Слова"]] : [["/tree", "Дерево"], ["/plan", "План"], ["/hire", "Отборы"]];
-  const cur = EN ? (path === "/words" ? "/words" : "/en")
+  const LINKS = EN ? [["/en", "Обзор"], ["/words", "Слова"], ["/rules", "Правила"]] : [["/tree", "Дерево"], ["/plan", "План"], ["/hire", "Отборы"]];
+  const cur = EN ? (path === "/words" || path === "/rules" ? path : "/en")
     : path === "/plan" || path.startsWith("/lessons/") ? "/plan" : path === "/hire" ? "/hire" : path === "/tree" ? "/tree" : "";
   const nav = document.createElement("nav");
   nav.className = "sitenav"; nav.setAttribute("aria-label", "Разделы сайта");

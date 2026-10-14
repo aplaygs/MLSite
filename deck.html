@@ -1,0 +1,472 @@
+<!doctype html><html lang=ru><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Колода</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#EEF3FA; --surface:#FFFFFF; --ink:#1A2335; --muted:#5D6982; --line:#D7E0EE; --soft:#E3EBF7;
+  --accent:#3A6AD4; --accent-soft:rgba(58,106,212,.13); --accent-ink:#FFFFFF;
+  --warm:#C9802A; --sun:#FBE6C4; --sun-soft:#FDF3E3; --sun-ink:#8A520E;
+  --teal:#2A7584; --teal-soft:rgba(42,117,132,.12);
+  --miss:#C9802A; --miss-soft:rgba(201,128,42,.14);
+  --ok-soft:rgba(58,106,212,.12);
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1522; --surface:#161E2E; --ink:#E4EAF5; --muted:#98A3BA; --line:#283349; --soft:#1D2739;
+  --accent:#8EB0F7; --accent-soft:rgba(142,176,247,.16); --accent-ink:#0C1528;
+  --warm:#F2BE78; --sun:rgba(242,190,120,.2); --sun-soft:rgba(242,190,120,.09); --sun-ink:#F5CF97;
+  --teal:#5BB3C2; --teal-soft:rgba(91,179,194,.16);
+  --miss:#F2BE78; --miss-soft:rgba(242,190,120,.18);
+  --ok-soft:rgba(142,176,247,.16); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0F1522; --surface:#161E2E; --ink:#E4EAF5; --muted:#98A3BA; --line:#283349; --soft:#1D2739;
+  --accent:#8EB0F7; --accent-soft:rgba(142,176,247,.16); --accent-ink:#0C1528;
+  --warm:#F2BE78; --sun:rgba(242,190,120,.2); --sun-soft:rgba(242,190,120,.09); --sun-ink:#F5CF97;
+  --teal:#5BB3C2; --teal-soft:rgba(91,179,194,.16);
+  --miss:#F2BE78; --miss-soft:rgba(242,190,120,.18);
+  --ok-soft:rgba(142,176,247,.16); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.55;padding-inline:16px;padding-block:0 64px;margin:0}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:24px}
+h1,h2,h3{font-family:var(--f-display);margin:0;font-weight:500;letter-spacing:-.01em;text-wrap:balance}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+
+/* Шапка */
+header.top{padding-block:32px 8px;display:grid;gap:10px}
+header.top h1{font-size:clamp(28px,5vw,44px);font-weight:700;line-height:1.08}
+header.top p{color:var(--muted);max-width:68ch;margin:0}
+
+/* KPI карточки */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:960px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:540px){.kpis{grid-template-columns:1fr}}
+.kp{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:grid;gap:6px;align-content:start}
+.kp .k{font-size:12.5px;color:var(--muted)}
+.kp .v{font:700 32px/1 var(--f-display);font-variant-numeric:tabular-nums;color:var(--ink)}
+.kp .v small{font-size:16px;color:var(--muted);font-weight:500}
+.kp .sub{font-size:12.5px;color:var(--muted)}
+.kp-boxes{display:flex;gap:4px;margin-top:4px}
+.kp-box{flex:1;background:var(--soft);border-radius:6px;padding:4px 2px;text-align:center;font:500 10.5px var(--f-mono);color:var(--muted)}
+.kp-box.has{background:var(--accent-soft);color:var(--accent);font-weight:700}
+
+/* Сетка: 2 колонки (тренажёр слева, словарь справа) */
+.workspace{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,0.85fr);gap:24px;align-items:start}
+@media (max-width:920px){.workspace{grid-template-columns:1fr}}
+
+/* Левая колонка: карточка */
+.trainer-panel{display:grid;gap:14px}
+.controls-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.modes{display:flex;padding:3px;background:var(--soft);border:1px solid var(--line);border-radius:999px}
+.chip{font:600 13px var(--f-body);color:var(--muted);background:transparent;border:0;border-radius:999px;padding:6px 14px;cursor:pointer;transition:all .18s}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);box-shadow:0 2px 6px rgba(58,106,212,.2)}
+.keys-hint{font:500 12px var(--f-body);color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
+.keys-hint kbd{font-family:var(--f-body);font-size:10.5px;font-weight:600;padding:1px 5px;border-radius:4px;background:var(--soft);border:1px solid var(--line);color:var(--ink);line-height:1.2}
+
+/* Карточка */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;min-height:320px;padding:32px 28px;display:grid;align-content:center;justify-items:center;gap:16px;text-align:center;box-shadow:0 12px 36px rgba(26,35,53,.05);position:relative;transition:transform .15s ease,box-shadow .15s ease}
+.box-meter{display:flex;align-items:center;gap:6px;background:var(--soft);padding:4px 10px;border-radius:999px}
+.box-dots{display:flex;gap:4px}
+.box-dots i{width:8px;height:8px;border-radius:50%;background:var(--line);display:block;transition:background .2s}
+.box-dots i.on{background:var(--accent)}
+.box-lbl{font:500 11.5px var(--f-mono);color:var(--muted)}
+
+.word-area{display:inline-flex;align-items:center;justify-content:center;gap:12px;max-width:100%}
+.front-word{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,5.5vw,42px);line-height:1.2;color:var(--ink);letter-spacing:-.01em;overflow-wrap:anywhere;display:inline-flex;align-items:center}
+.say-btn{background:var(--soft);border:1px solid var(--line);border-radius:50%;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s ease,background-color .15s ease,border-color .15s ease,box-shadow .15s ease;color:var(--accent);padding:0;flex-shrink:0;vertical-align:middle}
+.say-btn:hover{background:var(--accent);border-color:var(--accent);color:var(--surface,#fff);transform:scale(1.08);box-shadow:0 4px 14px rgba(58,106,212,.25)}
+.say-btn:active{transform:scale(.94)}
+.say-btn svg{display:block}
+.say-btn-sm{width:32px;height:32px}
+.say-btn-sm svg{width:16px;height:16px}
+.ipa-tag{font-family:var(--f-mono);font-size:15px;color:var(--muted);letter-spacing:.02em}
+
+/* Оборотная сторона */
+.back{display:grid;gap:14px;max-width:52ch;border-top:1px dashed var(--line);padding-top:16px;width:100%;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* Перевод и форматирование определений */
+.tr-box{width:100%;display:grid;gap:8px}
+.tr-list{display:grid;gap:8px;text-align:left;width:100%;padding:4px 0}
+.tr-list.front{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:0 2px 10px rgba(58,106,212,.06)}
+.tr-item{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:baseline;font-size:16px;line-height:1.45;color:var(--ink)}
+.tr-num{font-family:var(--f-mono);font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);width:22px;height:22px;border-radius:6px;display:inline-grid;place-items:center;user-select:none;flex-shrink:0}
+.tr-text{font-weight:500;overflow-wrap:anywhere}
+.tr-text em{font-style:italic;color:var(--accent);font-weight:600}
+.tr-text code{font-family:var(--f-mono);font-size:13px;background:var(--soft);padding:1px 5px;border-radius:4px}
+.tr-single{font-size:21px;font-weight:600;color:var(--ink);line-height:1.35;text-wrap:balance;text-align:center;padding:4px 0}
+.tr-single em{font-style:italic;color:var(--accent)}
+.tr-single code{font-family:var(--f-mono);font-size:15px;background:var(--soft);padding:2px 6px;border-radius:4px}
+.tr-single.front{font-size:clamp(20px,4.2vw,28px);font-family:var(--f-body);font-weight:600;color:var(--ink);text-align:center;max-width:480px;line-height:1.35}
+
+.front-ru-box{display:grid;gap:10px;justify-items:center;width:100%;max-width:520px}
+.front-ru-hint{font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+
+.revealed-en{display:inline-flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-size:26px;font-weight:700;color:var(--ink);font-family:var(--f-display)}
+.rw-word{font-weight:700}
+
+.back .ex{font-size:14px;color:var(--muted);line-height:1.5;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:12px 16px;text-align:left;width:100%}
+.back .ex i{color:var(--ink);font-style:normal;font-weight:500;display:block}
+.back .ex-ru{color:var(--muted);font-size:13px;margin-top:4px}
+.back .ex em{font-style:italic;color:var(--accent);font-weight:600}
+
+/* Кнопки действий */
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{font:600 15px/1 var(--f-body);border:1px solid transparent;border-radius:14px;padding:15px 18px;cursor:pointer;min-height:52px;transition:all .15s cubic-bezier(0.16,1,0.3,1);display:inline-flex;align-items:center;justify-content:center;gap:8px;user-select:none}
+.btn:active{transform:scale(.98)}
+.btn.show{grid-column:1/-1;background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 14px rgba(58,106,212,.24)}
+.btn.show:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 6px 18px rgba(58,106,212,.3)}
+.btn.miss{background:var(--miss-soft);color:var(--miss);border:1px solid rgba(201,128,42,.28)}
+.btn.miss:hover{background:rgba(201,128,42,.22);transform:translateY(-1px)}
+.btn.hit{background:var(--ok-soft);color:var(--accent);border:1px solid rgba(58,106,212,.28)}
+.btn.hit:hover{background:rgba(58,106,212,.2);transform:translateY(-1px)}
+
+.k-kbd{font-family:var(--f-body);font-size:12px;font-weight:600;line-height:1;padding:3px 7px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;border:1px solid currentColor;opacity:.85;letter-spacing:.02em;background:rgba(0,0,0,.04)}
+.btn.show .k-kbd{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);color:#fff;opacity:1}
+
+.card-done{display:grid;gap:12px;justify-items:center;padding:20px}
+.card-done .done-ico{width:60px;height:60px;border-radius:18px;background:var(--accent-soft);color:var(--accent);display:inline-flex;align-items:center;justify-content:center}
+.card-done b{font-family:var(--f-display);font-size:24px}
+.sync-foot{font:500 12px var(--f-mono);color:var(--muted);text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* Правая колонка: словарь */
+.dict-panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:grid;gap:14px;align-content:start}
+.dict-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.dict-head h3{font-size:17px;font-weight:600}
+.dict-count{font:600 12px var(--f-mono);color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:999px}
+.search-box{position:relative}
+.search-in{width:100%;font:500 14px var(--f-body);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px 9px 36px;outline:none;transition:border-color .15s}
+.search-in:focus{border-color:var(--accent)}
+.search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+
+.dict-filters{display:flex;gap:4px;flex-wrap:wrap}
+.f-chip{font:500 12px var(--f-mono);background:var(--soft);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:4px 10px;cursor:pointer;transition:all .15s}
+.f-chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+
+.word-list{display:grid;gap:4px;max-height:480px;overflow-y:auto;padding-right:4px}
+.word-list::-webkit-scrollbar{width:6px}
+.word-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.w-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid transparent;transition:all .15s;align-items:center}
+.w-row:hover{border-color:var(--line);background:var(--soft)}
+.w-main{display:grid;gap:2px}
+.w-word{font-weight:600;font-size:14.5px;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.w-say{background:transparent;border:0;cursor:pointer;padding:4px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);transition:all .15s ease;flex-shrink:0;vertical-align:middle}
+.w-say:hover{background:var(--accent-soft);color:var(--accent)}
+.w-say svg{display:block}
+.w-ipa{font:400 12px var(--f-mono);color:var(--muted)}
+.w-tr{font-size:13px;color:var(--muted)}
+.w-tr em{font-style:italic;color:var(--ink);font-weight:500}
+.w-meta{text-align:right;display:grid;gap:4px;justify-items:end}
+.w-box-tag{font:600 11px var(--f-mono);padding:2px 7px;border-radius:6px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.w-box-tag.due{background:var(--miss-soft);color:var(--miss);border-color:rgba(201,128,42,.3)}
+.w-box-tag.learned{background:var(--teal-soft);color:var(--teal);border-color:rgba(42,117,132,.3)}
+.w-due{font:500 11px var(--f-mono);color:var(--muted)}
+
+.empty{color:var(--muted);text-align:center;font-size:14.5px;padding:24px 12px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Колода правил */
+.rule-src{font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:3px 10px;border-radius:999px}
+.rule-q{font:600 clamp(20px,4vw,27px)/1.3 var(--f-body);color:var(--ink);max-width:30ch;text-wrap:balance}
+.rule-a{font-size:17px;line-height:1.55;text-align:left;width:100%}
+.rule-a em{font-style:italic;color:var(--accent);font-weight:600}
+.rule-ex{display:grid;gap:6px;text-align:left;width:100%}
+.rule-ex button{font:500 15px var(--f-body);text-align:left;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:8px 12px;color:var(--ink);cursor:pointer;display:flex;gap:8px;align-items:center}
+.rule-ex button:hover{border-color:var(--accent)}
+.rule-ex button span.ru{color:var(--muted);font-size:13px;margin-left:auto}
+.rule-pair{display:grid;gap:4px;text-align:left;width:100%;font-size:15px}
+.rule-pair .no{color:var(--miss);text-decoration:line-through}
+.rule-pair .yes{color:var(--accent);font-weight:600}
+.w-rule-a{font-size:13px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* Добавить и убрать */
+.add-btn{font:600 13px var(--f-body);background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
+.add-form{display:grid;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px}
+.add-form[hidden]{display:none}
+.add-form label{display:grid;gap:4px;font:500 12px var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.add-form input,.add-form textarea{font:15px var(--f-body);padding:8px 11px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:0;width:100%}
+.add-form textarea{min-height:64px;resize:vertical}
+.add-form input:focus,.add-form textarea:focus{outline:none;border-color:var(--accent)}
+.add-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:540px){.add-row{grid-template-columns:1fr}}
+.add-act{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.add-act button{font:600 14px var(--f-body);border-radius:10px;padding:9px 16px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.add-act button.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.add-msg{font-size:13px;color:var(--muted)}
+.w-act{font:500 12px var(--f-body);background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:3px 8px;cursor:pointer}
+.w-act:hover{border-color:var(--miss);color:var(--miss)}
+.w-act.back{color:var(--accent)} .w-act.back:hover{border-color:var(--accent)}
+.w-row.arch{opacity:.72}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:30;max-width:calc(100% - 32px)}
+.toast[hidden]{display:none}
+.toast button{font:600 13px var(--f-body);background:transparent;border:1px solid currentColor;color:inherit;border-radius:8px;padding:4px 10px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<script src="/assets/nav.js"></script>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow" id="hEye">English · колода</div>
+    <h1 id="hTitle">Колода</h1>
+    <p id="hDesc"></p>
+  </header>
+
+  <div class="kpis" aria-live="polite">
+    <div class="kp"><span class="k">К повторению сегодня</span><span class="v" id="sDue">0</span><span class="sub" id="sDueSub"></span></div>
+    <div class="kp"><span class="k">Выучено (уровень 4–5)</span><span class="v" id="sLearned">0</span><span class="sub">интервал 14–30 дней</span></div>
+    <div class="kp"><span class="k">Всего в колоде</span><span class="v" id="sTotal">0</span><span class="sub" id="sTotalSub"></span></div>
+    <div class="kp"><span class="k">Интервалы повторения</span>
+      <div class="kp-boxes"></div>
+      <span class="sub">сколько карточек на каком уровне</span></div>
+  </div>
+
+  <div class="workspace">
+    <div class="trainer-panel">
+      <div class="controls-bar">
+        <div class="modes" role="group" aria-label="Направление" id="modes">
+          <button class="chip" id="mEn" type="button" aria-pressed="true">English → Русский</button>
+          <button class="chip" id="mRu" type="button" aria-pressed="false">Русский → English</button>
+        </div>
+        <span class="keys-hint"><kbd>Пробел</kbd> ответ · <kbd>1</kbd> не помню · <kbd>2</kbd> помню · <kbd>S</kbd> звук</span>
+      </div>
+      <section class="card" id="card" aria-live="polite"><div class="empty">Загружаю колоду…</div></section>
+      <div class="actions" id="actions"></div>
+      <div class="sync-foot" id="sync"><span>Загрузка…</span></div>
+    </div>
+
+    <div class="dict-panel">
+      <div class="dict-head">
+        <h3 id="listTitle">В колоде</h3>
+        <span style="display:flex;gap:8px;align-items:center"><span class="dict-count" id="dictCount">0</span><button class="add-btn" id="addToggle" type="button" aria-expanded="false">＋ Добавить</button></span>
+      </div>
+      <form class="add-form" id="addForm" hidden autocomplete="off"></form>
+      <div class="search-box">
+        <svg class="search-ico" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-in" id="search" type="search" placeholder="Поиск…" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="dict-filters" id="filters" role="group" aria-label="Фильтр">
+        <button class="f-chip" data-f="all" type="button" aria-pressed="true">Все</button>
+        <button class="f-chip" data-f="due" type="button" aria-pressed="false">На сегодня</button>
+        <button class="f-chip" data-f="learned" type="button" aria-pressed="false">Выученные</button>
+        <button class="f-chip" data-f="arch" type="button" aria-pressed="false" id="fArch">Убранные</button>
+      </div>
+      <div class="word-list" id="list" role="list"><div class="empty">Загрузка…</div></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" hidden><span id="toastMsg"></span><button type="button" id="toastBtn">Вернуть</button></div>
+
+<script>
+/* Колода на повторение: /words — слова, /rules — правила. Данные и запись — /api/decks/<колода> (decks.py).
+   Интервалы Лейтнера: уровень 1..5 → 1, 3, 7, 14, 30 дней. «Не помню» — снова уровень 1 и ещё раз сегодня. */
+const DECK=location.pathname.startsWith("/rules")?"rules":"words";
+const CONF={
+  words:{title:"Тренажёр слов",eye:"English · слова",unit:["слово","слова","слов"],list:"Слова в колоде",
+    desc:"Интервальное повторение: что помнишь, приходит реже, что забываешь — чаще (1, 3, 7, 14 и 30 дней). Слова добавляются из уроков (блок «В повторение» в конце) или вручную. Ненужное убирай — оно уйдёт в архив, его можно вернуть.",
+    search:"Поиск слова или перевода…"},
+  rules:{title:"Правила на заучку",eye:"English · грамматика",unit:["правило","правила","правил"],list:"Правила в колоде",
+    desc:"Правила, которые трудно запомнить. Читаешь вопрос, отвечаешь вслух, открываешь ответ и честно оцениваешь себя. Повторение по тем же интервалам, что у слов. Правила добавляются из уроков или вручную.",
+    search:"Поиск по вопросу или правилу…"}
+}[DECK];
+const INTERVALS=[0,1,3,7,14,30];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+const addDays=(iso,n)=>{const d=new Date(iso+"T12:00:00");d.setDate(d.getDate()+n);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+const ruDate=iso=>{const [,m,d]=(iso||"").split("-");return d&&m?`${d}.${m}`:""};
+const plural=(n,[a,b,c])=>{const m=n%10,h=n%100;return m===1&&h!==11?a:m>=2&&m<=4&&(h<12||h>14)?b:c};
+const fmt=s=>esc(s).replace(/\*([^*]+)\*/g,"<em>$1</em>").replace(/`([^`]+)`/g,"<code>$1</code>");
+const SPK=(w=20)=>`<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
+
+/* ---------- голос (британский, без «шуточных» голосов macOS) ---------- */
+let VOICE=null;
+function pickVoice(){
+  if(!("speechSynthesis" in window))return;
+  const FUN=/Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Junior|Ralph|Fred|Kathy|Princess|Deranged|Hysterical|Pipe|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
+  const v=speechSynthesis.getVoices().filter(x=>/^en[-_]/.test(x.lang)&&!FUN.test(x.name));
+  VOICE=v.find(x=>x.lang==="en-GB"&&/natural|neural|premium|enhanced/i.test(x.name))||v.find(x=>x.lang==="en-GB"&&/google uk|serena|oliver|stephanie|martha|daniel|kate/i.test(x.name))
+    ||v.find(x=>x.lang==="en-GB")||v.find(x=>/samantha|ava|allison|google us/i.test(x.name))||v[0]||null;
+}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function say(t,rate=0.9){if(!("speechSynthesis" in window)||!t)return;const u=new SpeechSynthesisUtterance(String(t));if(!VOICE)pickVoice();
+  if(VOICE)u.voice=VOICE;u.lang=VOICE?VOICE.lang:"en-GB";u.rate=rate;speechSynthesis.cancel();speechSynthesis.speak(u)}
+
+/* ---------- состояние ---------- */
+let all=[],prog={},queue=[],current=null,revealed=false,mode="en",practice=false,online=false;
+let filter="all",query="",saving=false,again=false,tmr=null;
+const live=()=>all.filter(c=>!c.archived);
+const cardOf=id=>prog[id]||{box:0,due:todayISO(),seen:0,ok:0};
+const isDue=id=>!prog[id]||prog[id].due<=todayISO();
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const sayText=c=>c?(DECK==="words"?c.word:(c.examples[0]?.en||"")):"";
+function buildQueue(){queue=shuffle(live().filter(c=>isDue(c.id)).map(c=>c.id))}
+
+function stats(){
+  const L=live(),due=L.filter(c=>isDue(c.id)).length,lrn=L.filter(c=>(prog[c.id]?.box||0)>=4).length,arch=all.length-L.length;
+  $("sDue").textContent=due;$("sDueSub").textContent=due?`${plural(due,CONF.unit)} ждут повторения`:"на сегодня всё повторено";
+  $("sLearned").innerHTML=`${lrn}<small> / ${L.length}</small>`;$("sTotal").textContent=L.length;
+  $("sTotalSub").textContent=arch?`ещё ${arch} в архиве`:"без убранных";
+  $("dictCount").textContent=`${L.length} ${plural(L.length,CONF.unit)}`;$("fArch").textContent=arch?`Убранные · ${arch}`:"Убранные";
+  const n={1:0,2:0,3:0,4:0,5:0};L.forEach(c=>{const b=prog[c.id]?.box||0;if(b)n[b]++});
+  document.querySelector(".kp-boxes").innerHTML=[1,2,3,4,5].map(b=>`<div class="kp-box${n[b]?" has":""}">${INTERVALS[b]}д: ${n[b]}</div>`).join("");
+}
+const dots=box=>`<div class="box-meter"><div class="box-dots" aria-label="уровень ${box} из 5">${[1,2,3,4,5].map(i=>`<i class="${i<=box?"on":""}"></i>`).join("")}</div><span class="box-lbl">Уровень ${box} · ${box?INTERVALS[box]+" дн.":"новое"}</span></div>`;
+
+/* ---------- карточка ---------- */
+function frontWord(c){
+  if(mode==="en")return `<div class="word-area"><div class="front-word">${esc(c.word)}</div><button class="say-btn" data-say="${esc(c.word)}" type="button" aria-label="Послушать">${SPK()}</button></div>${c.ipa?`<div class="ipa-tag">[${esc(c.ipa)}]</div>`:""}`;
+  return `<div class="front-ru-box"><span class="front-ru-hint">Вспомни по-английски</span><div class="tr-single front">${fmt(c.translation)}</div></div>`;
+}
+function backWord(c){
+  let h=mode==="en"?`<div class="tr-single">${fmt(c.translation)}</div>`
+    :`<div class="revealed-en"><span>${esc(c.word)}</span><button class="say-btn say-btn-sm" data-say="${esc(c.word)}" type="button" aria-label="Послушать">${SPK(16)}</button>${c.ipa?`<span class="ipa-tag">[${esc(c.ipa)}]</span>`:""}</div>`;
+  if(c.example)h+=`<div class="ex"><i>${fmt(c.example)}</i>${c.example_ru?`<div class="ex-ru">${fmt(c.example_ru)}</div>`:""}</div>`;
+  return h;
+}
+const frontRule=c=>`${c.source?`<span class="rule-src">${esc(c.source)}</span>`:""}<div class="rule-q">${fmt(c.q)}</div><div class="muted" style="font-size:13.5px">Ответь вслух, потом открой.</div>`;
+function backRule(c){
+  let h=`<div class="rule-a">${fmt(c.a)}</div>`;
+  if(c.examples.length)h+=`<div class="rule-ex">${c.examples.map(e=>`<button type="button" data-say="${esc(e.en)}">${SPK(14)}<span>${fmt(e.en)}</span>${e.ru?`<span class="ru">${esc(e.ru)}</span>`:""}</button>`).join("")}</div>`;
+  if(c.wrong&&c.right)h+=`<div class="rule-pair"><span class="no">✗ ${esc(c.wrong)}</span><span class="yes">✓ ${esc(c.right)}</span></div>`;
+  return h;
+}
+function render(){
+  stats();
+  const card=$("card"),act=$("actions");
+  if(!live().length){
+    card.innerHTML=`<div class="empty">${online?`Колода пуста. Добавь ${DECK==="words"?"слова":"правила"} из урока (блок «В повторение» в конце) или кнопкой «＋ Добавить».`:"Нет связи с сервером: запусти apps.py."}</div>`;act.innerHTML="";current=null;return;
+  }
+  if(!queue.length){
+    const nextDue=live().map(c=>prog[c.id]?.due).filter(d=>d&&d>todayISO()).sort()[0];
+    card.innerHTML=`<div class="card-done"><div class="done-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <b>На сегодня всё!</b><div class="muted">${nextDue?`Следующее повторение — ${ruDate(nextDue)}.`:"Всё повторено."}</div></div>`;
+    act.innerHTML=`<button class="btn show" id="bAgain" type="button">Пройти всю колоду ещё раз (без учёта)</button>`;
+    $("bAgain").onclick=()=>{queue=shuffle(live().map(c=>c.id));practice=true;next()};current=null;return;
+  }
+  current=all.find(c=>c.id===queue[0]);
+  const c=current;
+  let h=dots(cardOf(c.id).box)+(DECK==="words"?frontWord(c):frontRule(c));
+  if(revealed)h+=`<div class="back">${DECK==="words"?backWord(c):backRule(c)}</div>`;
+  card.innerHTML=h;
+  act.innerHTML=revealed?`<button class="btn miss" id="bMiss" type="button">Не помню <kbd class="k-kbd">1</kbd></button><button class="btn hit" id="bHit" type="button">Помню <kbd class="k-kbd">2</kbd></button>`
+    :`<button class="btn show" id="bShow" type="button">Показать ответ <kbd class="k-kbd">Пробел</kbd></button>`;
+  if(revealed){$("bMiss").onclick=()=>answer(false);$("bHit").onclick=()=>answer(true)}
+  else $("bShow").onclick=reveal;
+}
+function reveal(){revealed=true;render();$("bHit")?.focus({preventScroll:true})}
+function next(){revealed=false;render()}
+function answer(ok){
+  if(!current)return;const id=current.id;
+  if(!practice){const c={...cardOf(id)};c.seen=(c.seen||0)+1;
+    if(ok){c.ok=(c.ok||0)+1;c.box=Math.min(5,(c.box||0)+1);c.due=addDays(todayISO(),INTERVALS[c.box])}else{c.box=1;c.due=todayISO()}
+    c.last=todayISO();prog={...prog,[id]:c};persist()}
+  queue.shift();if(!ok)queue.push(id);if(!queue.length)practice=false;next();
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b&&!e.target.closest(".w-row .w-act"))say(b.dataset.say)});
+
+/* ---------- список ---------- */
+function renderList(){
+  const q=query.toLowerCase().trim();
+  let L=filter==="arch"?all.filter(c=>c.archived):live();
+  if(filter==="due")L=L.filter(c=>isDue(c.id));else if(filter==="learned")L=L.filter(c=>(prog[c.id]?.box||0)>=4);
+  if(q)L=L.filter(c=>(DECK==="words"?[c.word,c.translation]:[c.q,c.a,c.source]).join(" ").toLowerCase().includes(q));
+  L.sort((a,b)=>DECK==="words"?a.word.localeCompare(b.word):(a.source||"").localeCompare(b.source||"",undefined,{numeric:true})||a.q.localeCompare(b.q));
+  $("list").innerHTML=L.map(c=>{
+    const p=prog[c.id],due=!c.archived&&isDue(c.id),lrn=(p?.box||0)>=4;
+    const main=DECK==="words"
+      ?`<div class="w-word">${esc(c.word)} <button class="w-say" data-say="${esc(c.word)}" type="button" aria-label="Послушать">${SPK(14)}</button>${c.ipa?` <span class="w-ipa">[${esc(c.ipa)}]</span>`:""}</div><div class="w-tr">${fmt(c.translation)}</div>`
+      :`<div class="w-word">${fmt(c.q)}</div><div class="w-rule-a">${fmt(c.a)}</div>`;
+    const meta=c.archived?`<button class="w-act back" data-id="${esc(c.id)}" data-op="restore" type="button">Вернуть</button>`
+      :`<span class="w-box-tag${due?" due":lrn?" learned":""}">Ур. ${p?.box||0}</span><span class="w-due">${due?"сегодня":p?.due?ruDate(p.due):"новое"}</span><button class="w-act" data-id="${esc(c.id)}" data-op="archive" type="button" title="Убрать из повторения (можно вернуть)">Убрать</button>`;
+    return `<div class="w-row${c.archived?" arch":""}" role="listitem"><div class="w-main">${main}${c.source?`<div class="w-due">${esc(c.source)}</div>`:""}</div><div class="w-meta">${meta}</div></div>`;
+  }).join("")||`<div class="empty">${q?"Ничего не найдено":filter==="arch"?"Архив пуст.":"Пока пусто."}</div>`;
+}
+$("list").addEventListener("click",e=>{const b=e.target.closest(".w-act");if(b)setArchived(b.dataset.id,b.dataset.op==="archive")});
+$("search").addEventListener("input",e=>{query=e.target.value;renderList()});
+$("filters").addEventListener("click",e=>{const b=e.target.closest(".f-chip");if(!b)return;
+  document.querySelectorAll(".f-chip").forEach(x=>x.setAttribute("aria-pressed",x===b));filter=b.dataset.f;renderList()});
+
+/* ---------- сервер ---------- */
+const API="/api/decks/"+DECK;
+const setSync=t=>$("sync").innerHTML=`<span>${esc(t)}</span>`;
+async function post(body){const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());return r.json()}
+function persist(){renderList();if(!online){setSync("Нет связи с сервером — прогресс не сохранится");return}
+  clearTimeout(tmr);tmr=setTimeout(flush,600);setSync("Сохраняю…")}
+async function flush(){if(saving){again=true;return}saving=true;
+  try{await post({op:"progress",cards:prog});setSync(`✓ Сохранено · ${new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})}`)}
+  catch(e){setSync("Ошибка сохранения: "+(e.message||e))}
+  saving=false;if(again){again=false;flush()}}
+function applyCards(cards){all=cards;queue=queue.filter(id=>live().some(c=>c.id===id));render();renderList()}
+
+let toastT=null;
+function toast(msg,undo){$("toastMsg").textContent=msg;$("toastBtn").hidden=!undo;$("toastBtn").onclick=()=>{$("toast").hidden=true;undo&&undo()};
+  $("toast").hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>$("toast").hidden=true,6000)}
+async function setArchived(id,arch){
+  if(!online)return toast("Нет связи с сервером");
+  const c=all.find(x=>x.id===id),name=c?(c.word||c.q):id;
+  try{const r=await post({op:arch?"archive":"restore",id});applyCards(r.cards);
+    if(!arch&&!queue.includes(id)&&isDue(id))queue.push(id),render();
+    toast(arch?`«${name.slice(0,40)}» убрано в архив`:`«${name.slice(0,40)}» снова в колоде`,arch?()=>setArchived(id,false):null)}
+  catch(e){toast("Не получилось: "+(e.message||e))}
+}
+
+/* ---------- добавить вручную ---------- */
+const FORM=DECK==="words"
+  ?`<div class="add-row"><label>Слово или фраза *<input name="word" required></label><label>Перевод *<input name="translation" required></label></div>
+    <div class="add-row"><label>Транскрипция<input name="ipa" placeholder="без скобок"></label><label>Пример по-английски<input name="example"></label></div>
+    <label>Перевод примера<input name="example_ru"></label>`
+  :`<label>Вопрос к себе *<input name="q" required placeholder="Когда у глагола -s?"></label>
+    <label>Правило *<textarea name="a" required placeholder="Коротко, своими словами. *курсив* — для английских слов."></textarea></label>
+    <label>Примеры — каждый с новой строки<textarea name="examples" placeholder="She works in a bank."></textarea></label>
+    <div class="add-row"><label>Ошибка (как неправильно)<input name="wrong"></label><label>Как правильно<input name="right"></label></div>`;
+$("addForm").innerHTML=FORM+`<div class="add-act"><button class="go" type="submit">Добавить в колоду</button><button type="button" id="addCancel">Отмена</button><span class="add-msg" id="addMsg" role="status"></span></div>`;
+const toggleForm=open=>{$("addForm").hidden=!open;$("addToggle").setAttribute("aria-expanded",open);if(open)$("addForm").querySelector("input").focus()};
+$("addToggle").onclick=()=>toggleForm($("addForm").hidden);
+$("addCancel").onclick=()=>toggleForm(false);
+$("addForm").onsubmit=async e=>{
+  e.preventDefault();if(!online){$("addMsg").textContent="Нет связи с сервером";return}
+  const f=Object.fromEntries(new FormData($("addForm")));
+  const item=DECK==="words"?{...f,source:"вручную"}:{q:f.q,a:f.a,wrong:f.wrong,right:f.right,source:"вручную",examples:(f.examples||"").split("\n").map(s=>s.trim()).filter(Boolean)};
+  try{const r=await post({op:"add",items:[item]});applyCards(r.cards);
+    const id=r.added[0]||r.restored[0];
+    if(id){if(!queue.includes(id))queue.push(id);render();$("addForm").reset();$("addMsg").textContent=r.added.length?"Добавлено ✓":"Было в архиве — вернул ✓";$("addForm").querySelector("input").focus()}
+    else $("addMsg").textContent=r.skipped[0]?.why==="уже в колоде"?"Уже есть в колоде":"Не добавлено: "+(r.skipped[0]?.why||"");
+  }catch(err){$("addMsg").textContent="Ошибка: "+(err.message||err)}
+};
+
+/* ---------- режим, клавиши, старт ---------- */
+function setMode(m){mode=m;$("mEn").setAttribute("aria-pressed",m==="en");$("mRu").setAttribute("aria-pressed",m==="ru");try{localStorage.setItem("words.mode",m)}catch(e){}next()}
+$("mEn").onclick=()=>setMode("en");$("mRu").onclick=()=>setMode("ru");
+document.addEventListener("keydown",e=>{
+  if(e.target.closest("input,textarea,button")&&e.key!=="Escape")return;
+  if((e.key===" "||e.key==="Enter")&&!revealed&&current){e.preventDefault();reveal()}
+  else if(revealed&&(e.key==="1"||e.key==="ArrowLeft"))answer(false);
+  else if(revealed&&(e.key==="2"||e.key==="ArrowRight"))answer(true);
+  else if(/^[sSыЫ]$/.test(e.key)&&current)say(sayText(current));
+});
+async function boot(){
+  document.title=CONF.title;$("hTitle").textContent=CONF.title;$("hEye").textContent=CONF.eye;$("hDesc").textContent=CONF.desc;
+  $("listTitle").textContent=CONF.list;$("search").placeholder=CONF.search;
+  if(DECK==="rules")$("modes").style.display="none";
+  else try{const m=localStorage.getItem("words.mode");if(m==="en"||m==="ru")mode=m;setMode(mode)}catch(e){}
+  try{const d=await fetch(API).then(r=>{if(!r.ok)throw 0;return r.json()});
+    all=d.cards||[];prog=d.progress||{};online=true;buildQueue();setSync(`Колода из хранилища · ${live().length} ${plural(live().length,CONF.unit)}`);
+    if(new URLSearchParams(location.search).has("add"))toggleForm(true);
+  }catch(e){setSync("Нет связи с сервером: запусти apps.py")}
+  render();renderList();
+}
+boot();
+</script>
+</body></html>

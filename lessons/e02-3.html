@@ -45,7 +45,7 @@
   <p>То, что нужно в первый же день в другой стране или на стажировке: попросить кофе, пароль от Wi-Fi или помощь — вежливо, а не «Give me». Заполнить анкету так, чтобы дату не перепутали и фамилию прочитали. И главное повторение недели: <b>be</b> или <b>do</b> — до автоматизма, на скорость.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
   <nav class="toc" aria-label="Темы урока">
-    <a href="#t1">Просьбы</a><a href="#t2">Анкета</a><a href="#t3">be или do</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+    <a href="#t1">Просьбы</a><a href="#t2">Анкета</a><a href="#t3">be или do</a><a href="#practice">Практика</a><a href="#take">В повторение</a><a href="#sheet">Шпаргалка</a>
   </nav>
 </header>
 
@@ -247,6 +247,13 @@
     </div>
   </div>
   <div class="callout mem"><b class="h">Дальше</b><p>После урока — <a href="/lessons/e02-test.html">тест недели 2</a>: 24 вопроса по трём урокам и повторение недели 1, с аудированием. Слова недели — в <a href="/words">тренажёр</a>, 10–15 минут в день.</p></div>
+</section>
+
+<!-- ============ take ============ -->
+<section class="topic" id="take">
+  <div class="eyebrow">После урока</div>
+  <h2>В повторение</h2>
+  <p class="tldr">Отметь, что хочешь повторять дальше: слова уйдут в <a href="/words">тренажёр слов</a>, правила — в <a href="/rules">правила на заучку</a>. Повторение по интервалам, в Obsidian — «Словарь» и «Правила на заучку». Лишнее потом можно убрать в архив.</p>
 </section>
 
 <!-- ============ topics ============ -->
@@ -568,6 +575,79 @@ exGap($("ex3c"),[
   {s:"I ___ tired. (not)",a:["'m not","am not"],full:"I'm not tired."},
   {s:"What ___ your friends do?",a:"do",full:"What do your friends do?",why:"friends — много: do"}
 ]);
+
+takeAway($("take"),{lesson:"2.3",words:[
+  {en:"Can I have a coffee, please?",ru:"Можно мне кофе?"},
+  {en:"Here you are.",ru:"Вот, держи (протягивая вещь)."},
+  {en:"You're welcome.",ru:"Не за что."},
+  {en:"Anything else?",ru:"Что-нибудь ещё?"},
+  {en:"That's all, thanks.",ru:"Это всё, спасибо."},
+  {en:"How much is it?",ru:"Сколько это стоит?"},
+  {en:"take away",ru:"с собой (еда, напиток)",ex:"Take away, please."},
+  {en:"bill",ipa:"bɪl",ru:"счёт (в кафе)",ex:"Could I have the bill, please?"},
+  {en:"date of birth",ru:"дата рождения",ex:"Date of birth: 15 March 2005"},
+  {en:"nationality",ipa:"ˌnæʃ.əˈnæl.ə.ti",ru:"национальность (в анкете)",ex:"Nationality: Russian"},
+  {en:"occupation",ipa:"ˌɒk.jəˈpeɪ.ʃən",ru:"род занятий",ex:"Occupation: student"},
+  {en:"signature",ipa:"ˈsɪɡ.nə.tʃə",ru:"подпись",ex:"Signature here, please."},
+  {en:"postcode",ipa:"ˈpəʊst.kəʊd",ru:"почтовый индекс",ex:"What's your postcode?"},
+  {en:"intern",ipa:"ˈɪn.tɜːn",ru:"стажёр",ex:"Are you the new intern?"}
+],rules:[
+{
+"id": "en.02.3.r1",
+"q": "Как вежливо попросить вещь?",
+"a": "Can I have…, please? · вежливее Could I have…? · I'd like…, please. Не «Give me» и не «I want».",
+"ex": [
+"Can I have a coffee, please?",
+"Could I have the bill, please?"
+],
+"wrong": "Give me a coffee.",
+"right": "Can I have a coffee, please?"
+},
+{
+"id": "en.02.3.r2",
+"q": "Русское «пожалуйста» — три перевода",
+"a": "Прошу — please. На, возьми — Here you are. Не за что — You're welcome.",
+"ex": [
+"Here you are.",
+"You're welcome."
+]
+},
+{
+"id": "en.02.3.r3",
+"q": "Как попросить человека что-то сделать?",
+"a": "Can you / Could you + глагол? Could — мягче.",
+"ex": [
+"Could you help me, please?",
+"Can you say that again?"
+]
+},
+{
+"id": "en.02.3.r4",
+"q": "Как писать дату в анкете?",
+"a": "Число, месяц словом, год: 13 October 2026. 05/06 в Британии — 5 июня, в США — 6 мая. Месяцы — с большой буквы.",
+"ex": [
+"13 October 2026"
+]
+},
+{
+"id": "en.02.3.r5",
+"q": "Адрес, национальность и род занятий в анкете",
+"a": "Номер дома — перед улицей: 5 Lenin Street. Nationality — прилагательное: Russian. Occupation — без a/an: student.",
+"wrong": "Lenin Street 5",
+"right": "5 Lenin Street"
+},
+{
+"id": "en.02.3.r6",
+"q": "be или do — как решить?",
+"a": "Есть глагол-действие? Нет — am / is / are. Есть — do / does в вопросе и отрицании. tired, married, interested — это be.",
+"ex": [
+"Are you tired?",
+"Do you work?"
+],
+"wrong": "Do you tired?",
+"right": "Are you tired?"
+}
+]});
 
 initLesson({topics:[["en.02.3.1","Попросить что-то и ответить: Can I have…?"],["en.02.3.2","Заполнить анкету: правописание"],["en.02.3.3","Повторение: be против do/does — главная путаница"]]});
 </script>

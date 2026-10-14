@@ -134,3 +134,23 @@ li.ok .sword,li.bad .sword{pointer-events:none}
 .dl .tx{background:var(--bg);border-radius:4px 14px 14px 14px;padding:8px 12px;font-size:15.5px}
 .dl .tx .ru{display:block;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.wc,.gchip,.tile,.sword,.syl{transition:none}}
+
+/* В повторение: слова и правила урока → колоды /words и /rules */
+.tk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.tk{grid-template-columns:1fr}}
+.tk-col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:8px;align-content:start}
+.tk-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tk-h b{font:500 12px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tk ul{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-height:420px;overflow-y:auto}
+.tk li label{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:8px;align-items:start;padding:7px 8px;border-radius:10px;cursor:pointer}
+.tk li label:hover{background:var(--bg)}
+.tk li input{margin:3px 0 0;accent-color:var(--accent);width:16px;height:16px}
+.tk .t{font:400 15px/1.35 var(--f-body);letter-spacing:0;text-transform:none;color:var(--ink)}
+.tk .t small{display:block;color:var(--muted);font-size:13px}
+.tk .tk-st{font:500 11px var(--f-mono);color:var(--muted);white-space:nowrap;padding-top:3px}
+.tk .tk-st.in{color:var(--accent)} .tk .tk-st.ar{color:var(--sun-ink)}
+.tk li.have label{cursor:default;opacity:.7}
+.tk-foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.tk-foot .btn.go{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
+.tk-foot .btn.go:disabled{opacity:.45;cursor:default}
+.tk-msg{font-size:14px;color:var(--muted)}

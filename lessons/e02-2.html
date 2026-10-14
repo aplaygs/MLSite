@@ -40,7 +40,7 @@
   <p>Как спросить в present simple: <span class="say">Do you work?</span> <span class="say">Where does she live?</span> — и коротко ответить: <span class="say">Yes, I do.</span> Русская привычка задавать вопрос только голосом здесь ломается сильнее всего: нужен помощник <b>do / does</b>. Дальше — слова про учёбу и как сказать «когда». И звук: окончание -s звучит тремя способами, а <span class="say">Do you</span> в живой речи сливается в одно слово.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
   <nav class="toc" aria-label="Темы урока">
-    <a href="#t1">Вопросы с do/does</a><a href="#t2">Учёба и время</a><a href="#t3">Звук -s и do you</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+    <a href="#t1">Вопросы с do/does</a><a href="#t2">Учёба и время</a><a href="#t3">Звук -s и do you</a><a href="#practice">Практика</a><a href="#take">В повторение</a><a href="#sheet">Шпаргалка</a>
   </nav>
 </header>
 
@@ -237,6 +237,13 @@
         <p>1. <span class="say">Where does your sister work?</span> 2. <span class="say">Do you do your homework in the evening? — Yes, I do.</span> 3. <span class="say">When does the term start?</span> 4. <span class="say">Does he study at university? — No, he doesn't. He works.</span> 5. <span class="say">What do you study? — Machine learning.</span></p></div></details>
     </div>
   </div>
+</section>
+
+<!-- ============ take ============ -->
+<section class="topic" id="take">
+  <div class="eyebrow">После урока</div>
+  <h2>В повторение</h2>
+  <p class="tldr">Отметь, что хочешь повторять дальше: слова уйдут в <a href="/words">тренажёр слов</a>, правила — в <a href="/rules">правила на заучку</a>. Повторение по интервалам, в Obsidian — «Словарь» и «Правила на заучку». Лишнее потом можно убрать в архив.</p>
 </section>
 
 <!-- ============ topics ============ -->
@@ -449,7 +456,7 @@ exSpot($("ex1d"),[
 ]);
 
 /* ---------- тема 2 ---------- */
-wordCards($("ex2cards"),[
+const WORDS=[
   {en:"study",ipa:"ˈstʌd.i",ru:"учиться, изучать",ex:"I study machine learning.",exRu:"Я изучаю машинное обучение."},
   {en:"learn",ipa:"lɜːn",ru:"выучить, узнать, научиться",ex:"I learn ten new words a day."},
   {en:"revise",ipa:"rɪˈvaɪz",ru:"повторять (к экзамену)",ex:"I revise for exams at the weekend."},
@@ -464,7 +471,8 @@ wordCards($("ex2cards"),[
   {en:"subject",ipa:"ˈsʌb.dʒɪkt",ru:"предмет (в учёбе)",ex:"What's your favourite subject?"},
   {en:"course",ipa:"kɔːs",ru:"курс (обучения)",ex:"I do an online English course."},
   {en:"notes",ipa:"nəʊts",ru:"записи, конспект",ex:"I take notes in every lecture."}
-]);
+];
+wordCards($("ex2cards"),WORDS);
 exGap($("ex2a"),[
   {s:"I study ___ the evening.",opts:["in","on","at"],a:"in"},
   {s:"We have lectures ___ Mondays.",opts:["in","on","at"],a:"on"},
@@ -506,6 +514,74 @@ exStress($("ex3c"),[
   {w:"Does she drive?",syl:["Does","she","drive?"],s:2},
   {w:"How do you spell it?",syl:["How","do","you","spell","it?"],s:3}
 ]);
+
+takeAway($("take"),{lesson:"2.2",words:WORDS,rules:[
+{
+"id": "en.02.2.r1",
+"q": "Как задать вопрос, если есть глагол?",
+"a": "Do / Does + кто + глагол без -s. Does — для he, she, it.",
+"ex": [
+"Do you work?",
+"Does she live here?"
+],
+"wrong": "Does she works?",
+"right": "Does she work?"
+},
+{
+"id": "en.02.2.r2",
+"q": "Короткий ответ на вопрос с do",
+"a": "Тем же помощником, глагол не повторяют: Yes, I do. / No, she doesn't. На вопрос с be — be.",
+"ex": [
+"Do you like it? Yes, I do."
+],
+"wrong": "Do you like tea? Yes, I am.",
+"right": "Yes, I do."
+},
+{
+"id": "en.02.2.r3",
+"q": "Вопрос со словом в present simple",
+"a": "Слово + do / does + кто + глагол. После вопросительного слова помощник обязателен.",
+"ex": [
+"Where do you live?",
+"What does she do?"
+],
+"wrong": "Where you live?",
+"right": "Where do you live?"
+},
+{
+"id": "en.02.2.r4",
+"q": "in, on или at со временем?",
+"a": "in — часть дня, месяц, год · on — день недели, дата · at — время на часах, at night, at the weekend · с every предлога нет.",
+"ex": [
+"in the morning",
+"on Mondays",
+"at nine",
+"at night"
+],
+"wrong": "in the night",
+"right": "at night"
+},
+{
+"id": "en.02.2.r5",
+"q": "study или learn? take или pass? do или make?",
+"a": "study — учиться, изучать предмет; learn — выучить, узнать. take an exam — сдавать; pass — сдать успешно. Домашку — do, ошибку — make.",
+"ex": [
+"I study at university.",
+"We take exams in January.",
+"I do my homework."
+]
+},
+{
+"id": "en.02.2.r6",
+"q": "Как звучит окончание -s?",
+"a": "/s/ после глухих p, t, k, f (works) · /z/ после звонких и гласных (lives, plays) · /ɪz/ после s, sh, ch, x, ge (watches, changes).",
+"ex": [
+"works",
+"lives",
+"watches"
+]
+}
+]});
 
 initLesson({topics:[["en.02.2.1","Present simple: вопросы с do/does и короткие ответы"],["en.02.2.2","Учёба и время: study, revise, take an exam"],["en.02.2.3","Окончания -s: /s/, /z/, /ɪz/; слитное do you"]]});
 </script>

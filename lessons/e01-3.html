@@ -38,7 +38,7 @@
   <p>То, что нужно в первый же день в другой стране или на созвоне: продиктовать фамилию и почту, записать телефон, переспросить, если не понял. Потом — профиль о себе без ошибок в заглавных буквах. И повторение be во всех формах: эту неделю он должен «щёлкать» сам.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
   <nav class="toc" aria-label="Темы урока">
-    <a href="#t1">Алфавит и «повторите»</a><a href="#t2">Профиль</a><a href="#t3">be: всё вместе</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+    <a href="#t1">Алфавит и «повторите»</a><a href="#t2">Профиль</a><a href="#t3">be: всё вместе</a><a href="#practice">Практика</a><a href="#take">В повторение</a><a href="#sheet">Шпаргалка</a>
   </nav>
 </header>
 
@@ -178,6 +178,13 @@
     </div>
   </div>
   <div class="callout mem"><b class="h">Дальше</b><p>После урока — <a href="/lessons/e01-test.html">тест недели 1</a>: 24 вопроса по трём урокам, с аудированием. А слова недели — в <a href="/words">тренажёр</a>, 10–15 минут в день.</p></div>
+</section>
+
+<!-- ============ take ============ -->
+<section class="topic" id="take">
+  <div class="eyebrow">После урока</div>
+  <h2>В повторение</h2>
+  <p class="tldr">Отметь, что хочешь повторять дальше: слова уйдут в <a href="/words">тренажёр слов</a>, правила — в <a href="/rules">правила на заучку</a>. Повторение по интервалам, в Obsidian — «Словарь» и «Правила на заучку». Лишнее потом можно убрать в архив.</p>
 </section>
 
 <!-- ============ topics ============ -->
@@ -423,6 +430,70 @@ exSpot($("ex3d"),[
   {s:"i'm russian.",bad:0,n:2,also:[1],fix:"I'm Russian.",why:"I и национальность — с большой"},
   {s:"Anna loves his job.",bad:2,fix:"her",why:"владелец — Анна"}
 ]);
+
+takeAway($("take"),{lesson:"1.3",words:[
+  {en:"Sorry, can you say that again?",ru:"Простите, можно ещё раз?"},
+  {en:"How do you spell that?",ru:"Как это пишется по буквам?"},
+  {en:"Could you speak more slowly, please?",ru:"Не могли бы вы говорить помедленнее?"},
+  {en:"spell",ipa:"spel",ru:"называть по буквам",ex:"Can you spell your surname?"},
+  {en:"surname",ipa:"ˈsɜː.neɪm",ru:"фамилия",ex:"What's your surname?"},
+  {en:"dot",ipa:"dɒt",ru:"точка (в почте и адресе сайта)",ex:"anna dot lee at mail dot ru"},
+  {en:"underscore",ipa:"ˈʌn.də.skɔː",ru:"нижнее подчёркивание _",ex:"k underscore white at gmail dot com"},
+  {en:"double",ipa:"ˈdʌb.əl",ru:"двойной (две одинаковые буквы или цифры)",ex:"double L, double seven"}
+],rules:[
+{
+"id": "en.01.3.r1",
+"q": "Как продиктовать почту?",
+"a": "@ — at, точка — dot, дефис — dash, _ — underscore. Две одинаковые буквы — double: double L.",
+"ex": [
+"anna dot lee at mail dot ru"
+]
+},
+{
+"id": "en.01.3.r2",
+"q": "Как продиктовать телефон?",
+"a": "По одной цифре; 0 — oh; две одинаковые подряд — double.",
+"ex": [
+"oh seven nine, double four, six one"
+]
+},
+{
+"id": "en.01.3.r3",
+"q": "Как вежливо переспросить?",
+"a": "Sorry, can you say that again? · How do you spell that? · Could you speak more slowly, please? «What?» и «Repeat!» звучат грубо.",
+"ex": [
+"Sorry, can you say that again?",
+"How do you spell that?"
+],
+"wrong": "What?",
+"right": "Sorry, can you say that again?"
+},
+{
+"id": "en.01.3.r4",
+"q": "Что пишется с большой буквы?",
+"a": "I, имена, страны, национальности и языки, дни недели и месяцы. Профессии и времена года — с маленькой.",
+"ex": [
+"I speak English on Mondays."
+],
+"wrong": "i'm russian.",
+"right": "I'm Russian."
+},
+{
+"id": "en.01.3.r5",
+"q": "Буквы, которые путают: E и I, G и J, A и R",
+"a": "E — «ии», I — «ай»; G — «джи», J — «джей»; A — «эй», R — «а»."
+},
+{
+"id": "en.01.3.r6",
+"q": "be целиком: I, you, she — +, −, вопрос",
+"a": "I'm / I'm not / Am I? · you're / you aren't / Are you? · she's / she isn't / Is she?",
+"ex": [
+"Am I late?",
+"Are you OK?",
+"Is she at home?"
+]
+}
+]});
 
 initLesson({topics:[["en.01.3.1","Спросить и дать информацию, переспросить"],["en.01.3.2","Онлайн-профиль: заглавные буквы и пунктуация"],["en.01.3.3","Повторение: be во всех формах"]]});
 </script>

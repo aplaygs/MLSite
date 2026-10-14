@@ -28,7 +28,7 @@
   <p>Главный глагол английского — <span class="say en">be</span>: <span class="say en">am</span>, <span class="say en">is</span>, <span class="say en">are</span>. В русском его почти не слышно («Я студент», «Он дома»), поэтому именно его русскоговорящие пропускают чаще всего. Здесь — как он устроен, где обязателен и на чём ошибаются. Плюс слова «мой, его, их», артикли <span class="say en">a / an</span>, множественное число и страны с национальностями.</p>
   <p class="audio-note">Любую английскую фразу с точечным подчёркиванием можно <b>послушать</b>: нажми на неё. Нажми ещё раз сразу — прочитает медленнее.</p>
   <nav class="toc" aria-label="Темы урока">
-    <a href="#t1">be: + и −</a><a href="#t2">my, his, a/an, -s</a><a href="#t3">Страны</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+    <a href="#t1">be: + и −</a><a href="#t2">my, his, a/an, -s</a><a href="#t3">Страны</a><a href="#practice">Практика</a><a href="#take">В повторение</a><a href="#sheet">Шпаргалка</a>
   </nav>
 </header>
 
@@ -255,6 +255,13 @@
   </div>
 </section>
 
+<!-- ============ take ============ -->
+<section class="topic" id="take">
+  <div class="eyebrow">После урока</div>
+  <h2>В повторение</h2>
+  <p class="tldr">Отметь, что хочешь повторять дальше: слова уйдут в <a href="/words">тренажёр слов</a>, правила — в <a href="/rules">правила на заучку</a>. Повторение по интервалам, в Obsidian — «Словарь» и «Правила на заучку». Лишнее потом можно убрать в архив.</p>
+</section>
+
 <!-- ============ topics ============ -->
 <section class="topic" id="topics">
   <div class="eyebrow">Отметки в плане</div>
@@ -465,7 +472,7 @@ exSpot($("ex2d"),[
   {s:"It's a university, not an college.",bad:4,fix:"a",why:"college начинается с согласного звука"},
   {s:"People is friendly here.",bad:1,fix:"are",why:"people — множественное число"}
 ]);
-wordCards($("ex3cards"),[
+const WORDS=[
   {en:"Russia — Russian",ru:"Россия — русский",ex:"I'm from Russia. I'm Russian.",exRu:"Я из России. Я русский."},
   {en:"Britain — British",ipa:"ˈbrɪt.ɪʃ",ru:"Великобритания — британец",ex:"Our teacher is British."},
   {en:"the USA — American",ipa:"əˈmer.ɪ.kən",ru:"США — американец",ex:"They're from the USA."},
@@ -478,7 +485,8 @@ wordCards($("ex3cards"),[
   {en:"Turkey — Turkish",ru:"Турция — турецкий",ex:"We're in Turkey on holiday."},
   {en:"Brazil — Brazilian",ipa:"brəˈzɪl.i.ən",ru:"Бразилия — бразилец",ex:"Brazilian coffee is good."},
   {en:"Greece — Greek",ru:"Греция — греческий",ex:"Greek salad, please."}
-]);
+];
+wordCards($("ex3cards"),WORDS);
 exSort($("ex3a"),{groups:[{label:"-an / -ian"},{label:"-ish"},{label:"-ese"},{label:"своя форма"}],items:[
   {w:"Russia",g:0,why:"Russian"},{w:"Italy",g:0,why:"Italian"},{w:"Germany",g:0,why:"German"},{w:"Brazil",g:0,why:"Brazilian"},
   {w:"Spain",g:1,why:"Spanish"},{w:"Poland",g:1,why:"Polish"},{w:"Britain",g:1,why:"British"},
@@ -490,6 +498,97 @@ exGap($("ex3b"),[
   {s:"I'm from Russia. I'm ___.",a:"Russian"},{s:"We're from the UK. We're ___.",a:"British"},{s:"He's from France. He's ___.",a:"French"},
   {s:"She's from China. She's ___.",a:"Chinese"},{s:"My friend is from Brazil. He's ___.",a:"Brazilian"}
 ]);
+
+takeAway($("take"),{lesson:"1.1",words:WORDS,rules:[
+{
+"id": "en.01.1.r1",
+"q": "Когда нужен be (am / is / are)?",
+"a": "Когда в предложении нет другого глагола: кто, какой, где, откуда, сколько лет, состояние. По-русски на этом месте пусто.",
+"ex": [
+"I'm a student.",
+"She's at home.",
+"I'm twenty."
+],
+"wrong": "I from Russia.",
+"right": "I'm from Russia."
+},
+{
+"id": "en.01.1.r2",
+"q": "am, is или are — как выбрать?",
+"a": "По подлежащему: I — am; he, she, it и один человек или вещь — is; you, we, they и «много» — are. You — всегда are.",
+"ex": [
+"My sister is a nurse.",
+"My parents are at work.",
+"You are right."
+],
+"wrong": "My friends is nice.",
+"right": "My friends are nice."
+},
+{
+"id": "en.01.1.r3",
+"q": "Можно ли be вместе с другим глаголом?",
+"a": "Нет. Если есть глагол-действие (work, agree, like), be не ставят.",
+"ex": [
+"I agree.",
+"He works in IT."
+],
+"wrong": "I'm agree.",
+"right": "I agree."
+},
+{
+"id": "en.01.1.r4",
+"q": "Как сказать «мне 20» и «мне холодно»?",
+"a": "Через be: I'm + число; I'm + cold / hungry / tired.",
+"ex": [
+"I'm twenty.",
+"I'm cold."
+],
+"wrong": "I have twenty years.",
+"right": "I'm twenty."
+},
+{
+"id": "en.01.1.r5",
+"q": "his или her? Как перевести «свой»?",
+"a": "По владельцу, а не по тому, чем он владеет: у мужчины — his, у женщины — her. «Свой» тоже переводится по владельцу.",
+"ex": [
+"Anna loves her brother.",
+"Vlad calls his mum."
+],
+"wrong": "Anna lives with his parents.",
+"right": "Anna lives with her parents."
+},
+{
+"id": "en.01.1.r6",
+"q": "a или an?",
+"a": "По первому звуку, а не по букве: перед гласным звуком — an, перед согласным — a. Перед профессией артикль обязателен.",
+"ex": [
+"an hour",
+"a university",
+"She's an engineer."
+],
+"wrong": "She is a engineer.",
+"right": "She's an engineer."
+},
+{
+"id": "en.01.1.r7",
+"q": "its или it's?",
+"a": "its — «его / её» у вещи. it's = it is. Если можно сказать «it is» — пиши с апострофом.",
+"ex": [
+"It's cold today.",
+"The city is famous for its parks."
+]
+},
+{
+"id": "en.01.1.r8",
+"q": "Страна или национальность после from?",
+"a": "from + страна; национальность — без from. Обе с большой буквы. С the — только the UK и the USA.",
+"ex": [
+"I'm from Russia. I'm Russian."
+],
+"wrong": "I'm from Russian.",
+"right": "I'm from Russia."
+}
+]});
 
 initLesson({topics:[["en.01.1.1","be: утверждение и отрицание"],["en.01.1.2","my, your, his, her; a/an и множественное число"],["en.01.1.3","Страны и национальности"]]});
 </script>

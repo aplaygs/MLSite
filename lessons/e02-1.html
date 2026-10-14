@@ -37,7 +37,7 @@
   <p>Первое настоящее время с «настоящими» глаголами: <span class="say">I work</span>, <span class="say">she works</span>, <span class="say">he doesn't work</span>. Им рассказывают о работе, учёбе, привычках и фактах — то есть почти обо всём, о чём говорят при знакомстве и на собеседовании. Здесь же главная путаница русскоговорящих: когда <b>be</b> (неделя 1), а когда <b>do</b>. Во второй теме — профессии и как сказать, где и кем ты работаешь.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
   <nav class="toc" aria-label="Темы урока">
-    <a href="#t1">Present simple: + и −</a><a href="#t2">Работа и профессии</a><a href="#practice">Практика</a><a href="#sheet">Шпаргалка</a>
+    <a href="#t1">Present simple: + и −</a><a href="#t2">Работа и профессии</a><a href="#practice">Практика</a><a href="#take">В повторение</a><a href="#sheet">Шпаргалка</a>
   </nav>
 </header>
 
@@ -218,6 +218,13 @@
         <p>1. <span class="say">My brother doesn't live with our parents.</span> 2. <span class="say">She works as a nurse in a big hospital.</span> 3. <span class="say">I'm not a student. I work from home.</span> 4. <span class="say">We don't watch TV, but we like films.</span> 5. <span class="say">Vlad studies machine learning and works a lot.</span></p></div></details>
     </div>
   </div>
+</section>
+
+<!-- ============ take ============ -->
+<section class="topic" id="take">
+  <div class="eyebrow">После урока</div>
+  <h2>В повторение</h2>
+  <p class="tldr">Отметь, что хочешь повторять дальше: слова уйдут в <a href="/words">тренажёр слов</a>, правила — в <a href="/rules">правила на заучку</a>. Повторение по интервалам, в Obsidian — «Словарь» и «Правила на заучку». Лишнее потом можно убрать в архив.</p>
 </section>
 
 <!-- ============ topics ============ -->
@@ -422,7 +429,7 @@ exBuild($("ex1f"),[
 ]);
 
 /* ---------- тема 2 ---------- */
-wordCards($("ex2cards"),[
+const WORDS=[
   {en:"actor",ipa:"ˈæk.tər",ru:"актёр",ex:"He's an actor. He doesn't work in the morning."},
   {en:"businessman",ipa:"ˈbɪz.nɪs.mæn",ru:"бизнесмен, предприниматель",ex:"My uncle is a businessman. He works in Moscow."},
   {en:"businesswoman",ipa:"ˈbɪz.nɪsˌwʊm.ən",ru:"деловая женщина",ex:"She is a businesswoman and she travels a lot."},
@@ -442,7 +449,8 @@ wordCards($("ex2cards"),[
   {en:"shop assistant",ipa:"ˈʃɒp əˌsɪs.tənt",ru:"продавец-консультант",ex:"She's a shop assistant in a clothes shop."},
   {en:"taxi driver",ipa:"ˈtæk.si ˌdraɪ.vər",ru:"таксист",ex:"He's a taxi driver. He drives at night."},
   {en:"tour guide",ipa:"ˈtʊə ˌɡaɪd",ru:"экскурсовод, гид",ex:"The tour guide speaks three languages."}
-]);
+];
+wordCards($("ex2cards"),WORDS);
 exGap($("ex2a"),[
   {s:"She works ___ a hospital.",opts:["in","for","as"],a:"in"},
   {s:"I work ___ home on Fridays.",opts:["from","in","at"],a:"from"},
@@ -463,6 +471,89 @@ exBuild($("ex2c"),[
   {ru:"Она работает из дома.",w:"She works from home .",extra:["work","at"]},
   {ru:"Он не работает по выходным.",w:"He doesn't work at weekends .",alt:["He does not work at weekends ."],extra:["don't","works"]}
 ]);
+
+takeAway($("take"),{lesson:"2.1",words:WORDS.concat([
+  {en:"work from home",ru:"работать из дома, удалённо",ex:"I work from home on Fridays."},
+  {en:"work for",ru:"работать на (компанию)",ex:"He works for a big IT company."},
+  {en:"work as",ru:"работать кем-то",ex:"She works as a tour guide."},
+  {en:"work long hours",ru:"много работать, допоздна",ex:"Doctors often work long hours."},
+  {en:"full-time",ipa:"ˌfʊlˈtaɪm",ru:"на полный день",ex:"My mum works full-time."},
+  {en:"part-time",ipa:"ˌpɑːtˈtaɪm",ru:"на неполный день, подработка",ex:"I work part-time and study."}
+]),rules:[
+{
+"id": "en.02.1.r1",
+"q": "Когда present simple?",
+"a": "То, что бывает всегда, регулярно или вообще: работа, учёба, привычки, расписание, факты. Не «прямо сейчас».",
+"ex": [
+"I work in IT.",
+"The lesson starts at nine."
+]
+},
+{
+"id": "en.02.1.r2",
+"q": "Когда у глагола -s?",
+"a": "С he, she, it и одним человеком или вещью: she works. С I, you, we, they и «много» — без -s.",
+"ex": [
+"My sister works in a bank.",
+"My parents live in Kazan."
+],
+"wrong": "He work in a bank.",
+"right": "He works in a bank."
+},
+{
+"id": "en.02.1.r3",
+"q": "Как добавить -s: study, watch, play, have?",
+"a": "Обычно +s · после s, sh, ch, x, o — +es · согласная + y → ies · гласная + y → +s · have → has.",
+"ex": [
+"studies",
+"watches",
+"plays",
+"has"
+]
+},
+{
+"id": "en.02.1.r4",
+"q": "Как построить отрицание в present simple?",
+"a": "don't / doesn't + глагол без -s. -s одна на предложение: если doesn't — глагол голый.",
+"ex": [
+"I don't like coffee.",
+"She doesn't work on Fridays."
+],
+"wrong": "She doesn't works.",
+"right": "She doesn't work."
+},
+{
+"id": "en.02.1.r5",
+"q": "be или do в утверждении и отрицании?",
+"a": "Нет глагола-действия — am / is / are. Есть — сам глагол, а в отрицании don't / doesn't. Вместе — никогда.",
+"ex": [
+"I'm not a student.",
+"I don't study."
+],
+"wrong": "I'm work from home.",
+"right": "I work from home."
+},
+{
+"id": "en.02.1.r6",
+"q": "Работать кем, где, на кого — какие предлоги?",
+"a": "as + a/an + профессия (кем) · in + место · for или at + компания · from home · with + кто или что.",
+"ex": [
+"She works as a nurse.",
+"He works for a big company.",
+"I work from home."
+],
+"wrong": "I work like a manager.",
+"right": "I work as a manager."
+},
+{
+"id": "en.02.1.r7",
+"q": "What do you do? и What are you doing? — разница",
+"a": "What do you do? — кем работаешь, чем занимаешься. What are you doing? — что делаешь прямо сейчас.",
+"ex": [
+"What do you do? I'm a student."
+]
+}
+]});
 
 initLesson({topics:[["en.02.1.1","Present simple: утверждение и отрицание, -s у he/she/it"],["en.02.1.2","Профессии и место работы"]]});
 </script>
