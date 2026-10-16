@@ -13,7 +13,8 @@
      Все страницы берут цвета из токенов, поэтому перекрашиваются сами — и уроки, и тренажёр слов. */
   const path = location.pathname;
   const EN = path === "/en" || path.startsWith("/en/") || path === "/words" || path === "/rules" || /^\/lessons\/e\d/.test(path);
-  document.documentElement.dataset.section = EN ? "en" : "ml";
+  const HUB = path === "/" || path === "";  /* «Сегодня» — своя тональность, цвета задаёт сама страница */
+  document.documentElement.dataset.section = HUB ? "hub" : EN ? "en" : "ml";
   st0.textContent += `
 :root[data-section="en"]{--bg:#EEF3FA;--surface:#FFFFFF;--ink:#1A2335;--muted:#5D6982;--line:#D7E0EE;--soft:#E3EBF7;--accent:#3A6AD4;--accent-soft:rgba(58,106,212,.13);--accent-ink:#FFFFFF;--warm:#C9802A;--sun:#FBE6C4;--sun-soft:#FDF3E3;--sun-ink:#8A520E;--miss:#C9802A;--miss-soft:#FBE6C4}
 @media (prefers-color-scheme:dark){:root[data-section="en"]:not([data-theme="light"]){--bg:#0F1522;--surface:#161E2E;--ink:#E4EAF5;--muted:#98A3BA;--line:#283349;--soft:#1D2739;--accent:#8EB0F7;--accent-soft:rgba(142,176,247,.16);--accent-ink:#0C1528;--warm:#F2BE78;--sun:rgba(242,190,120,.2);--sun-soft:rgba(242,190,120,.09);--sun-ink:#F5CF97;--miss:#F2BE78;--miss-soft:rgba(242,190,120,.2)}}
@@ -32,6 +33,7 @@ html{scroll-padding-top:calc(var(--navh) + 8px);scroll-behavior:smooth}
 /* Переключатель разделов ML · English */
 .sitenav .home{display:inline-grid;place-items:center;width:34px;height:34px;flex:none;border-radius:50%;color:var(--muted);border:1px solid var(--line);background:var(--surface,#fff);transition:color .15s,border-color .15s}
 .sitenav .home:hover{color:var(--accent);border-color:var(--accent)}
+.sitenav .home[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink,#fff)}
 .sitenav .sw{display:flex;padding:3px;margin-right:10px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
 .sitenav .sw a{font:600 12.5px var(--f-body,system-ui);color:var(--muted);text-decoration:none;padding:5px 12px;border-radius:999px;display:inline-flex;align-items:center;transition:background-color .18s cubic-bezier(0.16,1,0.3,1),color .18s,transform .12s,box-shadow .18s}
 .sitenav .sw a:hover{color:var(--ink)}
@@ -53,15 +55,15 @@ html{scroll-padding-top:calc(var(--navh) + 8px);scroll-behavior:smooth}
   const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
   const path = location.pathname.replace(/\/$/, "");
   /* Раздел: ML или English. Английский — /en…, колоды /words и /rules и уроки английского /lessons/e… */
-  const EN = document.documentElement.dataset.section === "en";
-  const LINKS = EN ? [["/en", "Обзор"], ["/words", "Слова"], ["/rules", "Правила"]] : [["/tree", "Дерево"], ["/plan", "План"], ["/hire", "Отборы"]];
+  const EN = document.documentElement.dataset.section === "en", HUB = document.documentElement.dataset.section === "hub";
+  const LINKS = HUB ? [["/words", "Слова"], ["/rules", "Правила"]] : EN ? [["/en", "Обзор"], ["/words", "Слова"], ["/rules", "Правила"]] : [["/tree", "Дерево"], ["/plan", "План"], ["/hire", "Отборы"]];
   const cur = EN ? (path === "/words" || path === "/rules" ? path : "/en")
     : path === "/plan" || path.startsWith("/lessons/") ? "/plan" : path === "/hire" ? "/hire" : path === "/tree" ? "/tree" : "";
   const nav = document.createElement("nav");
   nav.className = "sitenav"; nav.setAttribute("aria-label", "Разделы сайта");
-  nav.innerHTML = `<div class="in"><a class="home" href="/" title="Сегодня — план на день" aria-label="Сегодня"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></a><div class="sw" role="group" aria-label="Раздел"><a href="/tree"${EN ? "" : ' aria-current="true"'}>ML</a><a href="/en"${EN ? ' aria-current="true"' : ""}>English</a></div>`
+  nav.innerHTML = `<div class="in"><a class="home" href="/" title="Сегодня — план на день" aria-label="Сегодня"${HUB ? ' aria-current="page"' : ""}><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></a><div class="sw" role="group" aria-label="Раздел"><a href="/tree"${EN || HUB ? "" : ' aria-current="true"'}>ML</a><a href="/en"${EN ? ' aria-current="true"' : ""}>English</a></div>`
     + LINKS.map(([h, t]) => `<a class="lk" href="${h}"${h === cur ? ' aria-current="page"' : ""}>${t}</a>`).join("")
-    + `<a class="nav-wk" id="navWeek" href="/plan" hidden>Неделя</a></div>`;
+    + (HUB ? "" : `<a class="nav-wk" id="navWeek" href="/plan" hidden>Неделя</a>`) + `</div>`;
   /* панель встаёт первой в <body>; в уроках скрипт стоит ещё в <head> — тогда ждём, пока появится body */
   const mount = () => { document.body.prepend(nav); };
   if (document.body) { mount(); }
@@ -85,7 +87,7 @@ html{scroll-padding-top:calc(var(--navh) + 8px);scroll-behavior:smooth}
 
 
 
-  fetch(EN ? "/api/en/plan" : "/api/plan").then(r => r.json()).then(p => {
+  if (!HUB) fetch(EN ? "/api/en/plan" : "/api/plan").then(r => r.json()).then(p => {
     const d = new Date(), t = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const w = (p.weeks || []).find(x => x.start <= t && t <= x.end); if (!w) return;
     const a = document.getElementById("navWeek"); a.hidden = false; a.href = `${EN ? "/en" : "/plan"}#w-${w.n}`; a.textContent = `Неделя ${w.n} →`;
