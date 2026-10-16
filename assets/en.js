@@ -15,7 +15,8 @@
      wordCards(el, words)            — карточки слов: {en, ipa?, ru, ex?, exRu?}; клик — перевернуть, 🔊 — послушать.
      takeAway(el, {lesson, words, rules}) — блок «В повторение»: слова (формат wordCards) и правила урока
                                       {id, q, a, ex?:[…], wrong?, right?} с галочками → колоды /words и /rules (/api/decks).
-   У каждого упражнения — счёт «3 / 6», кнопки «Проверить» и «Заново». Ответы сравниваются без учёта регистра, ’ и точки в конце. */
+   У каждого упражнения — счёт «3 / 6», кнопки «Проверить» и «Заново». Ответы сравниваются без учёта регистра, ’ и точки в конце.
+   Ответы сохраняются (assets/work.js, ключ ex:<id блока>): урок открыли снова — ответы и счёт на месте; «Заново» их стирает. */
 const EN_NORM=s=>String(s).toLowerCase().replace(/[’‘`´]/g,"'").replace(/\s+([.,!?])/g,"$1").replace(/[.!?]+$/,"").replace(/\s+/g," ").trim();
 const enEsc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const enShuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -64,13 +65,22 @@ function enBox(el,total,{check,reset,extra=""}={}){
   el.querySelector(".ex-reset").onclick=reset;
   return k=>{sc.textContent=`${k} / ${total}`;el.classList.toggle("ex-done",k===total);sc.classList.toggle("full",k===total)};
 }
+/* Сохранение ответов упражнения: restore(state) повторяет ответы молча, когда загрузится сохранённое (work.js). */
+let EN_QUIET=false;
+const enSay=t=>{if(!EN_QUIET)say(t)};
+function enKeep(el,restore){
+  const on=typeof WORK!=="undefined"&&!!el.id, key="ex:"+el.id;
+  /* setTimeout — восстановить после того, как упражнение нарисовано (без сервера сохранённое готово сразу) */
+  if(on)WORK.ready(()=>setTimeout(()=>{const st=WORK.get(key);if(!st)return;EN_QUIET=true;try{restore(st)}catch(e){console.error(e)}finally{EN_QUIET=false}}));
+  return {save:v=>{if(on&&!EN_QUIET)WORK.put(key,v)},clear:()=>{if(on)WORK.put(key,null)}};
+}
 
 /* ---------- пропуски ---------- */
 function exGap(el,items,opt={}){
   const body=document.createElement("ol"); body.className="gaps"; el.append(body);
-  let done={};
+  let done={},ans={};
   function draw(){
-    done={};
+    done={};ans={};
     body.innerHTML=items.map((it,i)=>{
       const [a,b]=it.s.split(/_{3,}/);
       const slot=it.opts?`<span class="gchips" role="group">${(opt.keep?it.opts:enShuffle(it.opts)).map(o=>`<button type="button" class="gchip" data-i="${i}" data-v="${enEsc(o)}">${enEsc(o)}</button>`).join("")}</span>`
@@ -88,15 +98,22 @@ function exGap(el,items,opt={}){
     const why=li.querySelector(".gwhy"); why.hidden=false;
     why.innerHTML=`${ok?"✓":"✗ Правильно:"} <span class="say" data-say="${enEsc(full)}">${enEsc(full)}</span>${it.why?` — ${it.why}`:""}`;
     const slot=li.querySelector(".gslot"); if(slot){slot.textContent=v;slot.classList.add("filled")}
-    if(ok)say(full);
-    done[i]=ok; upd(Object.values(done).filter(Boolean).length);
+    if(ok)enSay(full);
+    done[i]=ok; ans[i]=v; upd(Object.values(done).filter(Boolean).length);
+    keep.save({a:ans,n:Object.keys(ans).length,t:items.length});
   }
+  function pickChip(b){b.parentElement.querySelectorAll(".gchip").forEach(x=>{x.disabled=true;x.classList.toggle("pick",x===b)});judge(+b.dataset.i,b.dataset.v)}
   body.addEventListener("click",e=>{const b=e.target.closest(".gchip");if(!b)return;const i=+b.dataset.i;
     if(done[i]!==undefined)return;
-    b.parentElement.querySelectorAll(".gchip").forEach(x=>{x.disabled=true;x.classList.toggle("pick",x===b)});judge(i,b.dataset.v)});
+    pickChip(b)});
   body.addEventListener("keydown",e=>{const inp=e.target.closest(".gin");if(!inp||e.key!=="Enter")return;e.preventDefault();
     if(inp.value.trim()){judge(+inp.dataset.i,inp.value);const nx=body.querySelectorAll(".gin")[[...body.querySelectorAll(".gin")].indexOf(inp)+1];if(nx)nx.focus()}});
-  const upd=enBox(el,items.length,{check:items.some(x=>!x.opts)?()=>body.querySelectorAll(".gin").forEach(inp=>{if(inp.value.trim())judge(+inp.dataset.i,inp.value)}):null,reset:draw});
+  const upd=enBox(el,items.length,{check:items.some(x=>!x.opts)?()=>body.querySelectorAll(".gin").forEach(inp=>{if(inp.value.trim())judge(+inp.dataset.i,inp.value)}):null,reset:()=>{draw();keep.clear()}});
+  const keep=enKeep(el,st=>Object.entries(st.a||{}).forEach(([i,v])=>{
+    if(!items[i])return;
+    if(items[i].opts){const b=[...body.querySelectorAll(`.gchip[data-i="${i}"]`)].find(x=>x.dataset.v===v);if(b)pickChip(b)}
+    else{const inp=body.querySelector(`.gin[data-i="${i}"]`);if(inp){inp.value=v;judge(+i,v)}}
+  }));
   draw();
 }
 
@@ -123,80 +140,105 @@ function exBuild(el,items){
       const v=EN_NORM(phrase()), good=[it.w,...(it.alt||[])].some(x=>EN_NORM(x)===v);
       bd.classList.toggle("ok",good); bd.classList.toggle("bad",!good);
       msg.textContent=good?"✓ Верно":(line.children.length?"Не так. Посмотри на порядок слов и лишние плитки.":"Нажимай на слова, чтобы собрать фразу.");
-      if(good){say(it.w.replace(/ ([.,!?])/g,"$1"));ok[i]=1;upd(Object.keys(ok).length)}
+      if(good){enSay(it.w.replace(/ ([.,!?])/g,"$1"));ok[i]=1;upd(Object.keys(ok).length);keep.save({ok:Object.keys(ok).map(Number),n:Object.keys(ok).length,t:items.length})}
     }
     if(e.target.closest(".bshow")){
       msg.innerHTML=`Ответ: <span class="say" data-say="${enEsc(it.w.replace(/ ([.,!?])/g,"$1"))}">${enEsc(it.w.replace(/ ([.,!?])/g,"$1"))}</span>${it.why?` — ${it.why}`:""}`;
     }
   });
-  const upd=enBox(el,items.length,{reset:draw});
+  const upd=enBox(el,items.length,{reset:()=>{draw();keep.clear()}});
+  const keep=enKeep(el,st=>(st.ok||[]).forEach(i=>{
+    const bd=body.querySelector(`.bd[data-i="${i}"]`); if(!bd||!items[i])return;
+    const line=bd.querySelector(".bline");
+    items[i].w.split(" ").forEach(w=>{const t=[...bd.querySelectorAll(".btiles .tile")].find(x=>x.textContent===w);if(t)line.append(t)});
+    bd.classList.add("ok"); bd.querySelector(".bmsg").textContent="✓ Верно"; ok[i]=1; upd(Object.keys(ok).length);
+  }));
   draw();
 }
 
 /* ---------- найди ошибку ---------- */
 function exSpot(el,items){
   const body=document.createElement("ol"); body.className="spots"; el.append(body);
-  let done={};
+  let done={},picks={};
   function draw(){
-    done={};
+    done={};picks={};
     body.innerHTML=items.map((it,i)=>`<li data-i="${i}"><div class="sw">${it.s.split(" ").map((w,k)=>`<button type="button" class="sword" data-k="${k}">${enEsc(w)}</button>`).join(" ")}
       ${items.some(x=>x.bad===-1)?'<button type="button" class="sword none" data-k="-1">ошибки нет</button>':""}</div><div class="gwhy" hidden></div></li>`).join("");
     upd(0);
   }
   body.addEventListener("click",e=>{
-    const b=e.target.closest(".sword"); if(!b)return; const li=b.closest("li"), i=+li.dataset.i, it=items[i];
-    if(done[i]!==undefined)return;
-    const k=+b.dataset.k, ok=k===it.bad||(it.also||[]).includes(k); done[i]=ok;
+    const b=e.target.closest(".sword"); if(!b)return; const li=b.closest("li"), i=+li.dataset.i;
+    if(done[i]===undefined)pick(li,i,b);
+  });
+  function pick(li,i,b){
+    const it=items[i], k=+b.dataset.k, ok=k===it.bad||(it.also||[]).includes(k); done[i]=ok; picks[i]=k;
     li.classList.add(ok?"ok":"bad"); b.classList.add(ok?"right":"wrong");
     if(it.bad>=0)li.querySelector(`.sword[data-k="${it.bad}"]`).classList.add("right");
     const words=it.s.split(" "); if(it.bad>=0)words.splice(it.bad,it.n||1,it.fix); const fixed=words.filter(Boolean).join(" ");
     const why=li.querySelector(".gwhy"); why.hidden=false;
     why.innerHTML=`${ok?"✓":"✗"} ${it.bad>=0?`Правильно: <span class="say" data-say="${enEsc(fixed)}">${enEsc(fixed)}</span>`:"Здесь всё верно."}${it.why?` — ${it.why}`:""}`;
     upd(Object.values(done).filter(Boolean).length);
-  });
-  const upd=enBox(el,items.length,{reset:draw});
+    keep.save({p:picks,n:Object.keys(picks).length,t:items.length});
+  }
+  const upd=enBox(el,items.length,{reset:()=>{draw();keep.clear()}});
+  const keep=enKeep(el,st=>Object.entries(st.p||{}).forEach(([i,k])=>{
+    const li=body.querySelector(`li[data-i="${i}"]`), b=li&&li.querySelector(`.sword[data-k="${k}"]`); if(b&&done[i]===undefined)pick(li,+i,b);
+  }));
   draw();
 }
 
 /* ---------- ударение ---------- */
 function exStress(el,items){
   const body=document.createElement("div"); body.className="stress"; el.append(body);
-  let done={};
+  let done={},picks={};
   function draw(){
-    done={};
+    done={};picks={};
     body.innerHTML=items.map((it,i)=>`<div class="st" data-i="${i}"><button type="button" class="stsay" data-say="${enEsc(it.w)}" aria-label="Послушать ${enEsc(it.w)}">${EN_SPK_SVG}</button>
       <span class="syls">${it.syl.map((s,k)=>`<button type="button" class="syl" data-k="${k}">${enEsc(s)}</button>`).join("")}</span><span class="stm"></span></div>`).join("");
     upd(0);
   }
   body.addEventListener("click",e=>{
-    const b=e.target.closest(".syl"); if(!b)return; const st=b.closest(".st"), i=+st.dataset.i, it=items[i];
-    if(done[i]!==undefined)return;
-    const ok=+b.dataset.k===it.s; done[i]=ok; st.classList.add(ok?"ok":"bad");
+    const b=e.target.closest(".syl"); if(!b)return; const st=b.closest(".st"), i=+st.dataset.i;
+    if(done[i]===undefined)pick(st,i,+b.dataset.k);
+  });
+  function pick(st,i,k){
+    const it=items[i], ok=k===it.s; done[i]=ok; picks[i]=k; st.classList.add(ok?"ok":"bad");
     st.querySelectorAll(".syl").forEach((x,k)=>{x.disabled=true;if(k===it.s)x.classList.add("on")});
     st.querySelector(".stm").textContent=ok?"✓":"✗ ударение — "+it.syl[it.s].toUpperCase();
-    say(it.w); upd(Object.values(done).filter(Boolean).length);
-  });
-  const upd=enBox(el,items.length,{reset:draw});
+    enSay(it.w); upd(Object.values(done).filter(Boolean).length);
+    keep.save({p:picks,n:Object.keys(picks).length,t:items.length});
+  }
+  const upd=enBox(el,items.length,{reset:()=>{draw();keep.clear()}});
+  const keep=enKeep(el,s=>Object.entries(s.p||{}).forEach(([i,k])=>{
+    const st=body.querySelector(`.st[data-i="${i}"]`); if(st&&done[i]===undefined&&items[i]&&+k<items[i].syl.length)pick(st,+i,+k);
+  }));
   draw();
 }
 
 /* ---------- разложить по группам: по одной карточке ---------- */
 function exSort(el,{groups,items,auto=true}){
   const body=document.createElement("div"); body.className="sorter"; el.append(body);
-  let order=[],i=0,right=0,log=[],started=false;
-  function draw(){order=enShuffle(items.map((_,k)=>k));i=0;right=0;log=[];started=false;render();upd(0)}
+  let order=[],i=0,right=0,log=[],started=false,picks=[];
+  function draw(){order=enShuffle(items.map((_,k)=>k));i=0;right=0;log=[];picks=[];started=false;render();upd(0)}
   function render(){
     if(i>=order.length){body.innerHTML=`<div class="srt-end">Готово: ${right} из ${items.length}. ${right===items.length?"Без ошибок.":"Ошибки — ниже, нажми, чтобы послушать."}</div>${lg()}`;return}
     const it=items[order[i]];
     body.innerHTML=`<div class="srt-card"><span class="srt-n">${i+1} / ${items.length}</span><button type="button" class="srt-w" data-say="${enEsc(it.say||it.w)}">${enEsc(it.w)} ${EN_SPK_SVG}</button>
       <div class="srt-g">${groups.map((g,k)=>`<button type="button" class="btn srt-b" data-g="${k}">${g.label}</button>`).join("")}</div></div>${lg()}`;
-    if(auto&&started)setTimeout(()=>say(it.say||it.w),150);
+    if(auto&&started&&!EN_QUIET)setTimeout(()=>say(it.say||it.w),150);
   }
   const lg=()=>log.length?`<div class="srt-log">${log.map(x=>`<span class="say ${x.ok?"ok":"bad"}" data-say="${enEsc(x.it.say||x.it.w)}" title="${enEsc(x.it.why||"")}">${enEsc(x.it.w)} → ${groups[x.it.g].label.replace(/<[^>]+>/g,"")}</span>`).join("")}</div>`:"";
-  body.addEventListener("click",e=>{const b=e.target.closest(".srt-b");if(!b)return;const it=items[order[i]],ok=+b.dataset.g===it.g;
-    started=true;
-    if(ok)right++; log.unshift({it,ok}); i++; upd(right); render()});
-  const upd=enBox(el,items.length,{reset:draw});
+  function choose(g){const it=items[order[i]],ok=g===it.g;started=true;if(ok)right++;log.unshift({it,ok});i++;picks.push(g);upd(right)}
+  body.addEventListener("click",e=>{const b=e.target.closest(".srt-b");if(!b||i>=order.length)return;choose(+b.dataset.g);render();
+    keep.save({order,p:picks,n:picks.length,t:items.length})});
+  const upd=enBox(el,items.length,{reset:()=>{draw();keep.clear()}});
+  const keep=enKeep(el,st=>{
+    const o=st.order||[];
+    if(o.length!==items.length||new Set(o).size!==o.length||o.some(k=>!items[k]))return;
+    order=o.slice();i=0;right=0;log=[];picks=[];
+    (st.p||[]).slice(0,items.length).forEach(g=>choose(+g));
+    started=false;render();
+  });
   draw();
 }
 
