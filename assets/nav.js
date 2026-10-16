@@ -30,6 +30,8 @@ html{scroll-padding-top:calc(var(--navh) + 8px);scroll-behavior:smooth}
   -webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
 .sitenav .in{max-width:1180px;margin:0 auto;height:var(--navh);display:flex;align-items:center;gap:6px}
 /* Переключатель разделов ML · English */
+.sitenav .home{display:inline-grid;place-items:center;width:34px;height:34px;flex:none;border-radius:50%;color:var(--muted);border:1px solid var(--line);background:var(--surface,#fff);transition:color .15s,border-color .15s}
+.sitenav .home:hover{color:var(--accent);border-color:var(--accent)}
 .sitenav .sw{display:flex;padding:3px;margin-right:10px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
 .sitenav .sw a{font:600 12.5px var(--f-body,system-ui);color:var(--muted);text-decoration:none;padding:5px 12px;border-radius:999px;display:inline-flex;align-items:center;transition:background-color .18s cubic-bezier(0.16,1,0.3,1),color .18s,transform .12s,box-shadow .18s}
 .sitenav .sw a:hover{color:var(--ink)}
@@ -46,7 +48,7 @@ html{scroll-padding-top:calc(var(--navh) + 8px);scroll-behavior:smooth}
 .sitenav .nav-wk, .sitenav .wk{margin:0 0 0 auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;text-decoration:none;font:500 12.5px var(--f-mono,ui-monospace);color:var(--surface,#fff)!important;background:var(--accent)!important;border:0!important;box-shadow:none!important;height:32px;padding:0 14px;border-radius:999px;white-space:nowrap;line-height:1;box-sizing:border-box;transition:filter .15s,transform .15s}
 .sitenav .nav-wk:hover, .sitenav .wk:hover{filter:brightness(1.08)} .sitenav .nav-wk:active, .sitenav .wk:active{transform:scale(.96)}
 @media (max-width:560px){.sitenav .brand span{display:none}.sitenav .lk{padding:7px 9px;font-size:13.5px}.sitenav .nav-wk, .sitenav .wk{padding:0 10px;height:30px;font-size:12px}}
-@media (max-width:440px){.sitenav .nav-wk{display:none!important}}
+@media (max-width:440px){.sitenav .nav-wk{display:none!important}.sitenav .in{gap:2px}.sitenav .home{width:30px;height:30px;margin-right:4px}.sitenav .sw{margin-right:4px}.sitenav .sw a{padding:5px 9px;font-size:12px}.sitenav .lk{padding:6px 7px;font-size:13px}}
 @media (prefers-reduced-motion:reduce){.sitenav *{transition:none!important}}`;
   const st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
   const path = location.pathname.replace(/\/$/, "");
@@ -57,7 +59,7 @@ html{scroll-padding-top:calc(var(--navh) + 8px);scroll-behavior:smooth}
     : path === "/plan" || path.startsWith("/lessons/") ? "/plan" : path === "/hire" ? "/hire" : path === "/tree" ? "/tree" : "";
   const nav = document.createElement("nav");
   nav.className = "sitenav"; nav.setAttribute("aria-label", "Разделы сайта");
-  nav.innerHTML = `<div class="in"><div class="sw" role="group" aria-label="Раздел"><a href="/tree"${EN ? "" : ' aria-current="true"'}>ML</a><a href="/en"${EN ? ' aria-current="true"' : ""}>English</a></div>`
+  nav.innerHTML = `<div class="in"><a class="home" href="/" title="Сегодня — план на день" aria-label="Сегодня"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></a><div class="sw" role="group" aria-label="Раздел"><a href="/tree"${EN ? "" : ' aria-current="true"'}>ML</a><a href="/en"${EN ? ' aria-current="true"' : ""}>English</a></div>`
     + LINKS.map(([h, t]) => `<a class="lk" href="${h}"${h === cur ? ' aria-current="page"' : ""}>${t}</a>`).join("")
     + `<a class="nav-wk" id="navWeek" href="/plan" hidden>Неделя</a></div>`;
   /* панель встаёт первой в <body>; в уроках скрипт стоит ещё в <head> — тогда ждём, пока появится body */

@@ -7,6 +7,7 @@
                                       say → кнопка 🔊 перед заданием (диктант), full → что показать и прочитать после ответа,
                                       exact → важен регистр первой буквы (English, Monday, I).
      exBuild(el, items)              — собрать фразу из плиток: {ru:"Она не замужем.", w:"She isn't married .", alt?:[…], extra?:["not"]}.
+                                      Плитки запасных вариантов alt выкладываются сами — засчитывается любой правильный.
      exSpot(el, items)               — найди ошибку: {s:"She are from Spain.", bad:1, fix:"is", why}. bad — номер слова (с 0), -1 — ошибки нет;
                                       n — сколько слов заменить (по умолчанию 1), also — другие номера, которые тоже засчитываются; fix:"" — слово лишнее.
      exStress(el, items)             — ударный слог: {w:"Japanese", syl:["Ja","pa","nese"], s:2}.
@@ -125,13 +126,21 @@ function exGap(el,items,opt={}){
 }
 
 /* ---------- собрать фразу ---------- */
+/* Плитки: фраза, лишние слова и недостающие плитки запасных вариантов (alt) — чтобы любой правильный вариант можно было собрать. */
+function enTiles(it){
+  const w=it.w.split(" "), bag={}; w.concat(it.extra||[]).forEach(t=>bag[t]=(bag[t]||0)+1);
+  const add=[];
+  for(const alt of it.alt||[]){const need={};alt.split(" ").forEach(t=>need[t]=(need[t]||0)+1);
+    for(const t in need)while((bag[t]||0)<need[t]){bag[t]=(bag[t]||0)+1;add.push(t)}}
+  return w.concat(it.extra||[],add);
+}
 function exBuild(el,items){
   const body=document.createElement("div"); body.className="builds"; el.append(body);
   const ok={};
   function draw(){
     Object.keys(ok).forEach(k=>delete ok[k]);
     body.innerHTML=items.map((it,i)=>{
-      const tiles=enShuffle(it.w.split(" ").concat(it.extra||[]));
+      const tiles=enShuffle(enTiles(it));
       return `<div class="bd" data-i="${i}"><div class="bru">${enEsc(it.ru)}</div><div class="bline" aria-label="Твоя фраза"></div>
         <div class="btiles">${tiles.map((t,k)=>`<button type="button" class="tile" data-k="${k}">${enEsc(t)}</button>`).join("")}</div>
         <div class="bact"><button type="button" class="btn bcheck">Проверить</button><button type="button" class="btn bshow">Ответ</button><span class="bmsg"></span></div></div>`}).join("");
