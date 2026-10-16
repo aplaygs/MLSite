@@ -39,9 +39,16 @@ function enPickVoice(){
     ||v[0]||null;
 }
 if("speechSynthesis" in window){enPickVoice();speechSynthesis.onvoiceschanged=enPickVoice}
+/* Что голос читать не должен: стрелки (→ читается «right arrow»), «/» между вариантами («slash»), значки ✓ ✗,
+   русские подсказки — «(да)», «Тебе говорят…» английский голос коверкает. Остаётся только английский. */
+const enSpeakable=t=>String(t)
+  .replace(/_+/g," ").replace(/\([^)]*[А-Яа-яЁё][^)]*\)/g," ")
+  .replace(/[А-Яа-яЁё][А-Яа-яЁё\s,.:;!?()-]*/g," ").replace(/[«»"“”]/g,"")
+  .replace(/\s*[→←⇄↔↗↘↑↓⟶]\s*/g,", ").replace(/\s+\/\s+/g,". ").replace(/[✓✗✔✘•·]/g," ")
+  .replace(/\s+([,.!?])/g,"$1").replace(/([,.!?])(?:\s*[,.])+/g,"$1").replace(/^[\s,.:;—–-]+/,"").replace(/\s{2,}/g," ").trim();
 function say(text,rate=0.9){
   if(!("speechSynthesis" in window))return false;
-  const u=new SpeechSynthesisUtterance(String(text).replace(/_+/g," "));
+  const u=new SpeechSynthesisUtterance(enSpeakable(text));
   if(!EN_VOICE)enPickVoice();
   if(EN_VOICE)u.voice=EN_VOICE; u.lang=EN_VOICE?EN_VOICE.lang:"en-GB"; u.rate=rate;
   speechSynthesis.cancel(); speechSynthesis.speak(u); return true;
