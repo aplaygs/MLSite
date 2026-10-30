@@ -1,0 +1,76 @@
+/* Короткие уроки ML (формат с 30.10.2026): шаги по 5–10 минут, простые слова → термин, проверка сразу.
+   Подключать после lesson.css. Цвета — токены из lesson.css. */
+
+/* Шапка: план урока — шаги с отметкой «пройдено» */
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.steps a{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 6px;transition:border-color .15s,background-color .15s}
+.steps a:hover{border-color:var(--accent)}
+.steps a i{font:600 11px var(--f-mono);font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--muted);transition:background-color .2s,color .2s}
+.steps a.done i{background:var(--accent);color:var(--surface)}
+.steps a.done i::before{content:"✓"} .steps a.done i span{display:none}
+
+/* Шаг урока */
+section.step{padding-block:44px 8px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px;scroll-margin-top:calc(var(--navh,0px) + 12px)}
+section.step>*{min-width:0}
+.step-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.step-h .num{font:700 13px var(--f-mono);color:var(--surface);background:var(--accent);border-radius:8px;padding:3px 8px;flex-shrink:0}
+.step-h h2{font-size:clamp(21px,3.4vw,27px);flex:1 1 300px}
+.step-h .min{font:500 12px var(--f-mono);color:var(--muted);white-space:nowrap}
+.why{font-size:15px;color:var(--muted);border-left:3px solid var(--warm);padding-left:12px;max-width:68ch}
+.why b{color:var(--ink)}
+.plain{font-size:17px;line-height:1.6;max-width:66ch;display:grid;gap:10px}
+.plain p{margin:0}
+.plain ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.cmds{display:grid;gap:6px}
+.cmd{display:grid;grid-template-columns:minmax(150px,auto) minmax(0,1fr);gap:4px 14px;align-items:baseline;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.cmd code{font:500 14px var(--f-mono);color:var(--accent);white-space:nowrap}
+.cmd span{font-size:15px}
+@media (max-width:560px){.cmd{grid-template-columns:1fr}}
+.term-chip{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;font-size:14.5px;background:var(--soft);border-radius:10px;padding:9px 12px}
+.term-chip>b{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+.remember{display:flex;gap:10px;align-items:baseline;font-weight:500;background:color-mix(in srgb,var(--accent) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));border-radius:12px;padding:10px 14px}
+.remember::before{content:"Запомни";font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);flex-shrink:0}
+.deep{font-size:14px;color:var(--muted)}
+.deep a{font-weight:500}
+
+/* Упражнение: общая рамка и счёт (как в уроках английского) */
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:12px;transition:border-color .25s}
+.ex.ex-done{border-color:var(--accent)}
+.ex>.ex-h{display:flex;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;align-items:baseline}
+.ex>.ex-h .eyebrow{color:var(--accent)}
+.ex-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:10px}
+.ex-score{font:600 13px var(--f-mono);color:var(--muted);margin-right:auto;font-variant-numeric:tabular-nums}
+.ex-score.full{color:var(--accent)} .ex-score.full::after{content:" · всё верно"}
+
+/* Быстрая проверка: вопрос и варианты */
+.chk{display:grid;gap:8px}
+.chk+.chk{border-top:1px dashed var(--line);padding-top:12px}
+.chk .q{font-weight:500}
+.chk .q code{overflow-wrap:anywhere}
+.chk .opts{display:grid;gap:6px}
+.chk .opt{text-align:left;font:15px var(--f-body);color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;transition:border-color .15s,background-color .15s}
+.chk .opt:hover:not(:disabled){border-color:var(--accent)}
+.chk .opt:disabled{cursor:default}
+.chk .opt.right{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+.chk .opt.wrong{border-color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--surface))}
+.chk .fb{font-size:14.5px;color:var(--muted)}
+.chk .fb b{color:var(--ink)}
+
+/* Тренажёр терминала */
+.tsim{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:14px}
+@media (max-width:720px){.tsim{grid-template-columns:1fr}}
+.tsim .scr{background:#16191D;color:#D8DEE4;border-radius:12px;padding:12px 14px;font:13.5px/1.55 var(--f-mono);min-height:240px;max-height:340px;overflow:auto;cursor:text}
+.tsim .scr .ln{white-space:pre-wrap;overflow-wrap:anywhere}
+.tsim .scr .pr{color:#7FD1A0} .tsim .scr .er{color:#F2A08F} .tsim .scr .dir{color:#8EB8F7} .tsim .scr .mt{color:#8A939E}
+.tsim .inp{display:flex;gap:8px;align-items:baseline}
+.tsim .inp input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#F2F5F7;font:13.5px var(--f-mono);padding:0}
+.tsim .tasks{display:grid;gap:6px;align-content:start;list-style:none;margin:0;padding:0}
+.tsim .tasks li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;font-size:14.5px;padding:7px 9px;border-radius:9px;border:1px solid transparent}
+.tsim .tasks li i{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--muted);margin-top:2px;display:grid;place-items:center;font:700 10px var(--f-mono);font-style:normal;color:var(--surface)}
+.tsim .tasks li.cur{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.tsim .tasks li.ok{color:var(--muted)}
+.tsim .tasks li.ok i{background:var(--accent);border-color:var(--accent)}
+.tsim .tasks li.ok i::before{content:"✓"}
+.tsim .tasks .hint{grid-column:2;font:12.5px var(--f-mono);color:var(--muted)}
+.tsim .tasks .hint button{font:inherit;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline dotted}
+@media (prefers-reduced-motion:reduce){.chk .opt,.steps a i{transition:none}}

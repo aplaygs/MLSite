@@ -1,0 +1,334 @@
+<title>Урок 1.4 · Git и отладчик</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/ml.css">
+<style>
+/* Только для этого урока: пошаговый отладчик. */
+.dbg{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:14px}
+@media (max-width:720px){.dbg{grid-template-columns:1fr}}
+.dbg .code{background:var(--soft);border-radius:12px;padding:10px 0;font:13.5px/1.7 var(--f-mono);overflow-x:auto}
+.dbg .code div{padding:0 14px 0 6px;white-space:pre;display:flex;gap:10px}
+.dbg .code .no{color:var(--muted);width:20px;text-align:right;flex-shrink:0;cursor:pointer;position:relative}
+.dbg .code .no.bp::before{content:"";position:absolute;left:-2px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--red)}
+.dbg .code .cur{background:color-mix(in srgb,var(--warm) 28%,transparent)}
+.dbg .vars{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:6px;align-content:start;font:13.5px var(--f-mono)}
+.dbg .vars b{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.dbg .vars .ch{color:var(--warm);font-weight:600}
+</style>
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w01-3a.html">← Урок 1.3 · Рабочий стол</a><span class="mid">урок 4 из 4</span><a href="/lessons/w01-test.html">Тест недели 1 →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 1 · урок 4 из 4 · ~50 минут</div>
+  <h1>Git, отладчик и как тренироваться</h1>
+  <p>В прошлом уроке ты завёл проект. Теперь — как работать в нём без страха. Git сохраняет каждую версию, и любую ошибку можно откатить. Отладчик показывает, где именно код врёт. В конце — как готовиться к алгоритмической секции и когда открываются наборы на стажировки.</p>
+  <nav class="steps" aria-label="Шаги урока">
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Сохранения</a><a href="#s2"><i><span>2</span></i>Ветки</a><a href="#s3"><i><span>3</span></i>GitHub</a><a href="#s4"><i><span>4</span></i>Отладчик</a><a href="#s5"><i><span>5</span></i>Тренировки и сроки</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+  </nav>
+</header>
+
+<!-- ============ 0 ============ -->
+<section class="step" id="s0">
+  <div class="step-h"><span class="num">0</span><h2>Разминка: прошлый урок</h2><span class="min">2 мин</span></div>
+  <div id="exWarm"></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="step" id="s1">
+  <div class="step-h"><span class="num">1</span><h2>Git — точки сохранения, как в игре</h2><span class="min">10 мин</span></div>
+  <p class="why"><b>Зачем:</b> без git любая правка — шаг без страховки. С ним можно сломать что угодно и вернуться. Им пользуется любая команда, и на собеседовании его знание просто подразумевают.</p>
+  <div class="plain">
+    <p>В игре ты сохраняешься перед боссом. В git то же самое: <b>коммит</b> — точка сохранения всего проекта, с подписью, что поменялось.</p>
+    <p>Сохранение идёт в два шага. Сначала отбираешь, что войдёт в сохранение (<code>git add</code>). Потом сохраняешь с подписью (<code>git commit</code>). Зачем два шага: поменял три файла, а сохранить хочешь только один — остальные доделаешь потом.</p>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>git init</code><span>начать следить за папкой (один раз)</span></div>
+    <div class="cmd"><code>git status</code><span>что изменилось и что уже отобрано — смотри его постоянно</span></div>
+    <div class="cmd"><code>git add файл</code><span>отобрать файл в сохранение; <code>git add .</code> — всё</span></div>
+    <div class="cmd"><code>git commit -m "что сделал"</code><span>сохранить с подписью</span></div>
+    <div class="cmd"><code>git log --oneline</code><span>список сохранений</span></div>
+  </div>
+  <div id="simGit"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>репозиторий</b> — папка под присмотром git; <b>индекс</b> (staging) — «отобрано в сохранение»; <b>коммит</b> — само сохранение.</span></div>
+  <p class="remember">status → add → commit. Подпись — что сделал: «add data loader», а не «правки».</p>
+  <div class="topic-check" data-for="tools.git.0">
+    <label class="tp"><input type="checkbox" data-id="tools.git.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>init, add, commit, status, log</b></span></label>
+    <span class="note" data-d="tools.git.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="step" id="s2">
+  <div class="step-h"><span class="num">2</span><h2>Ветки: пробовать, не ломая рабочее</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> хочешь попробовать новую модель, а рабочая версия должна оставаться рабочей. Ветка — параллельная копия истории для эксперимента.</p>
+  <div class="plain">
+    <p>Главная ветка — <code>main</code>: здесь то, что работает. Для новой задачи делаешь ветку, коммитишь в неё сколько угодно. Получилось — <b>сливаешь</b> обратно в main. Не получилось — просто бросаешь ветку, main не задет.</p>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>git switch -c new-model</code><span>создать ветку и перейти в неё</span></div>
+    <div class="cmd"><code>git switch main</code><span>вернуться в main</span></div>
+    <div class="cmd"><code>git branch</code><span>список веток, звёздочка — где ты</span></div>
+    <div class="cmd"><code>git merge new-model</code><span>влить ветку в текущую (стоять надо в main)</span></div>
+  </div>
+  <div id="simBranch"></div>
+  <div id="exBranch"></div>
+  <div class="topic-check" data-for="tools.git.1">
+    <label class="tp"><input type="checkbox" data-id="tools.git.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Ветки: branch, switch, merge</b></span></label>
+    <span class="note" data-d="tools.git.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="step" id="s3">
+  <div class="step-h"><span class="num">3</span><h2>GitHub: облако для твоих сохранений</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> GitHub — копия репозитория в интернете. Так работают в команде, и по нему тебя оценивают на отборе: проекты в резюме — это ссылки на GitHub.</p>
+  <div class="plain">
+    <p>Git живёт у тебя на компьютере. GitHub — тот же репозиторий на сервере. Между ними три действия:</p>
+    <ul>
+      <li><b>clone</b> — скачать чужой (или свой) репозиторий целиком, с историей;</li>
+      <li><b>push</b> — отправить свои новые коммиты на GitHub;</li>
+      <li><b>pull</b> — забрать чужие новые коммиты к себе.</li>
+    </ul>
+    <p>Правило команды: перед работой — <code>pull</code>, после — <code>push</code>. Если коллега успел отправить что-то раньше, git не даст сделать push, пока ты не заберёшь его изменения.</p>
+  </div>
+  <div id="simRemote"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>remote</b> — удалённая копия, обычно с именем <code>origin</code>; <b>локальный</b> репозиторий — тот, что у тебя.</span></div>
+  <div class="topic-check" data-for="tools.git.4">
+    <label class="tp"><input type="checkbox" data-id="tools.git.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>remote, push, pull, clone</b></span></label>
+    <span class="note" data-d="tools.git.4">отметка в дереве</span>
+  </div>
+  <p class="deep">Хочешь глубже: <a href="/lessons/w01-3.html#w2">git подробно</a> — справочник из старого урока.</p>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="step" id="s4">
+  <div class="step-h"><span class="num">4</span><h2>Отладчик: остановить код и посмотреть</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> код не падает, но выдаёт неправильное число. print-ами можно искать час. Отладчик за минуту покажет, в какой строке значения пошли не туда.</p>
+  <div class="plain">
+    <p>Отладчик — это <b>пауза</b> в программе. Ставишь точку остановки на строке. Код доходит до неё и замирает. Дальше идёшь по одной строке и смотришь, как меняются переменные.</p>
+    <p>Функция ниже должна считать средний балл. Для [80, 90, 70] ждём 80, а она выдаёт 23.3. Нажимай «Шаг» и смотри справа на <code>total</code>: где она перестаёт расти, там и ошибка.</p>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · пройди код по шагам</span><span class="muted mono" id="dbgState"></span></div>
+    <div class="dbg"><div class="code" id="dbgCode"></div><div class="vars" id="dbgVars"></div></div>
+    <div class="btns"><button class="btn" id="dbgStep">Шаг ↓</button><button class="btn" id="dbgReset">Заново</button></div>
+    <p class="verdict" id="dbgMsg" aria-live="polite"></p>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>клик слева от строки</code><span>точка остановки (красная точка) в VS Code</span></div>
+    <div class="cmd"><code>F5</code><span>запустить с отладчиком</span></div>
+    <div class="cmd"><code>F10 · step over</code><span>следующая строка</span></div>
+    <div class="cmd"><code>F11 · step into</code><span>зайти внутрь вызванной функции</span></div>
+    <div class="cmd"><code>Watch</code><span>следить за выражением, например <code>len(scores)</code></span></div>
+  </div>
+  <div id="exDbg"></div>
+  <div class="topic-check" data-for="tools.ide.0">
+    <label class="tp"><input type="checkbox" data-id="tools.ide.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Отладчик в VS Code</b></span></label>
+    <span class="note" data-d="tools.ide.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="step" id="s5">
+  <div class="step-h"><span class="num">5</span><h2>Как тренироваться и когда подаваться</h2><span class="min">6 мин</span></div>
+  <p class="why"><b>Зачем:</b> на отборах в большие компании почти всегда есть секция с алгоритмическими задачами. Её не берут знаниями — её берут регулярной тренировкой.</p>
+  <div class="plain">
+    <p><b>Какой список задач.</b> Решать «всё подряд» на LeetCode бессмысленно. Бери один готовый список:</p>
+    <ul>
+      <li><b>LeetCode 75</b> — официальный учебный план LeetCode, 75 задач. Хорош для старта.</li>
+      <li><b>NeetCode 150</b> — 150 задач, сгруппированы по приёмам (хеш-таблица, два указателя, окно…), к каждой есть видеоразбор.</li>
+    </ul>
+    <p><b>Как решать одну задачу:</b></p>
+    <ul>
+      <li>25 минут сам — на бумаге идея, потом код.</li>
+      <li>Не вышло — смотри только идею решения, не код. Пиши сам.</li>
+      <li>Через 3 дня реши эту же задачу снова, не подглядывая.</li>
+      <li>Темп: одна задача в день лучше, чем десять в выходные.</li>
+    </ul>
+    <p><b>Когда подаваться.</b> На летние стажировки в крупных компаниях наборы обычно идут осенью и зимой, у некоторых — весной. Точные даты по компаниям собраны на странице <a href="/hire">«Отборы»</a>. Перенеси их в календарь с напоминанием за неделю.</p>
+  </div>
+  <div id="exTrain"></div>
+  <div class="topic-check multi" data-for="algo.int.2,career.apply.6">
+    <div class="topic-check-h"><span class="eyebrow">Отметки в дереве · 2 темы</span><span class="note"></span></div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="algo.int.2"><span class="bx" aria-hidden="true"></span><span><b>LeetCode 75 или NeetCode 150</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="career.apply.6"><span class="bx" aria-hidden="true"></span><span><b>Сроки отборов в календаре</b></span></label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="step" id="practice">
+  <div class="step-h"><span class="num">✎</span><h2>Сделай сам</h2><span class="min">15 мин</span></div>
+  <div class="prac">
+    <div class="task"><span class="tg work">Работа · 15 минут</span>
+      <h3>Твой sandbox на GitHub</h3>
+      <ol>
+        <li>В папке <code>~/projects/sandbox</code> из прошлого урока сделай <code>git init</code>.</li>
+        <li>Создай файл <code>.gitignore</code> со строкой <code>.venv/</code> — чтобы окружение не попало в git.</li>
+        <li>Закоммить <code>.gitignore</code> и <code>requirements.txt</code>.</li>
+        <li>На github.com создай пустой репозиторий <code>sandbox</code> и отправь туда коммит.</li>
+      </ol>
+      <p class="ok">Готово, когда на странице репозитория на GitHub видны два файла, а папки <code>.venv</code> там нет.</p>
+      <details><summary>Команды</summary><div class="a">
+<pre>cd ~/projects/sandbox
+git init
+echo ".venv/" &gt; .gitignore
+git add .gitignore requirements.txt
+git commit -m "chore: init sandbox"
+git branch -M main
+git remote add origin https://github.com/ТВОЙ_ЛОГИН/sandbox.git
+git push -u origin main</pre>
+        <p>При первом push GitHub попросит войти. Проще всего поставить GitHub CLI (<code>brew install gh</code>) и один раз выполнить <code>gh auth login</code>.</p></div></details></div>
+    <div class="task"><span class="tg lc">LeetCode · 1 задача сегодня</span>
+      <h3>Начни список</h3>
+      <p>Выбери LeetCode 75 или NeetCode 150 и реши первую задачу на хеш-таблицу: 1. Two Sum — по правилу «25 минут сам».</p>
+      <p class="ok">Готово, когда решение принято, и ты можешь вслух объяснить, почему оно за O(n).</p></div>
+  </div>
+</section>
+
+<!-- ============ итог ============ -->
+<section class="step" id="topics">
+  <div class="step-h"><h2>Итог</h2></div>
+  <div class="sheet">
+    <ol>
+      <li><b>Коммит</b> — точка сохранения: <code>git status</code> → <code>git add</code> → <code>git commit -m "что сделал"</code>; история — <code>git log --oneline</code>.</li>
+      <li><b>Ветка</b> — эксперимент без риска: <code>git switch -c имя</code>, потом в main <code>git merge имя</code>.</li>
+      <li><b>GitHub</b>: <code>clone</code> — скачать, <code>pull</code> — забрать чужое, <code>push</code> — отправить своё. Перед работой pull, после — push.</li>
+      <li><b>Отладчик</b>: точка остановки → шаг за шагом → смотри переменные. F10 — следующая строка, F11 — внутрь функции.</li>
+      <li><b>Тренировка</b>: один список (LeetCode 75 или NeetCode 150), 25 минут сам, повтор через 3 дня. Сроки наборов — в календарь.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+---
+type: конспект
+tags: [git, отладчик, leetcode, неделя-1]
+---
+# Git, отладчик и как тренироваться — урок 1.4
+
+## Git
+- Коммит — точка сохранения. git status → git add файл (или .) → git commit -m "что сделал". История: git log --oneline.
+- Два шага (add, потом commit) — чтобы сохранять не всё подряд, а то, что готово.
+
+## Ветки
+- git switch -c имя — новая ветка для эксперимента; git switch main — назад; git merge имя — влить (стоя в main).
+
+## GitHub
+- clone — скачать; pull — забрать чужие коммиты; push — отправить свои. Перед работой pull, после — push.
+- remote origin — копия на GitHub. git push отказывает, если там есть чужие новые коммиты: сначала pull.
+
+## Отладчик (VS Code)
+- Точка остановки — клик слева от строки; F5 — запуск; F10 — следующая строка; F11 — внутрь функции; Watch — следить за выражением.
+
+## Тренировка и сроки
+- Один список: LeetCode 75 или NeetCode 150. 25 минут сам → идея → сам → повтор через 3 дня. Одна задача в день.
+- Наборы на летние стажировки — обычно осень–зима. Даты — на странице «Отборы», в календарь.
+</script>
+<script src="/assets/lesson.js"></script>
+<script src="/assets/ml.js"></script>
+<script>
+const G = s => s.git;
+const commits = s => s.git ? Object.keys(s.git.commits).length : 0;
+
+mlCheck($("exWarm"), [
+  {q: "Ты включил окружение. Как это понять по терминалу?", opts: ["В начале строки появилось (.venv)", "Терминал стал зелёным", "Никак — надо спросить pip"], a: 0,
+   why: "(.venv) в начале строки — значит, pip install ставит библиотеки в этот проект."},
+  {q: "Нужно найти, где в проекте используется функция <code>train_model</code>. Какая команда?", opts: ["grep -rn train_model .", 'find . -name "train_model"', "cd train_model"], a: 0,
+   why: "Ищем текст внутри файлов — grep. find ищет файлы по имени."}
+]);
+
+termSim($("simGit"), {start: "~/projects/oulad-risk", tasks: [
+  {t: "Начни следить за проектом: создай репозиторий", hint: "git init", ok: s => !!G(s)},
+  {t: "Посмотри статус — что git видит", hint: "git status", ok: s => s.cmd === "git status" && /Untracked/.test(s.out)},
+  {t: "Отбери в сохранение только README.md", hint: "git add README.md", ok: s => G(s) && "README.md" in G(s).index},
+  {t: "Сохрани с подписью", hint: 'git commit -m "docs: add readme"', ok: s => commits(s) >= 1},
+  {t: "Отбери всё остальное и сохрани вторым коммитом", hint: "git add .", ok: s => commits(s) >= 2},
+  {t: "Посмотри историю сохранений", hint: "git log --oneline", ok: s => /^git log/.test(s.cmd) && commits(s) >= 2}
+]});
+
+termSim($("simBranch"), {start: "~/projects/oulad-risk", prep: ["cd ~/projects/oulad-risk", "git init", "git add .", 'git commit -m "init project"'], tasks: [
+  {t: "Создай ветку new-model и перейди в неё", hint: "git switch -c new-model", ok: s => G(s) && G(s).branch === "new-model"},
+  {t: "Добавь строку в src/train.py — эксперимент", hint: 'echo "# try catboost" >> src/train.py', ok: s => G(s) && /catboost/.test(s.fs.projects["oulad-risk"].src["train.py"])},
+  {t: "Закоммить эксперимент в ветке", hint: 'git add . (потом git commit -m "feat: try catboost")', ok: s => G(s) && G(s).heads["new-model"] && G(s).heads["new-model"] !== G(s).heads.main},
+  {t: "Вернись в main — строки про catboost там нет (проверь cat src/train.py)", hint: "git switch main", ok: s => G(s) && G(s).branch === "main" && G(s).heads["new-model"] !== G(s).heads.main},
+  {t: "Эксперимент удался — влей ветку в main", hint: "git merge new-model", ok: s => G(s) && G(s).branch === "main" && G(s).heads.main === G(s).heads["new-model"]}
+]});
+mlCheck($("exBranch"), [
+  {q: "Ты в ветке <code>new-model</code> и хочешь влить её в main. Что делаешь?", opts: ["git switch main, потом git merge new-model", "git merge main прямо в new-model", "git push new-model"], a: 0,
+   why: "merge вливает указанную ветку в ту, где ты стоишь. Чтобы обновить main — встань в main."},
+  {q: "Эксперимент в ветке провалился. Что будет с main?", opts: ["Ничего: main не менялся, ветку можно просто бросить", "main тоже сломан", "git удалит main"], a: 0,
+   why: "В этом и смысл веток: рабочая версия не страдает от экспериментов."}
+]);
+
+termSim($("simRemote"), {
+  cloneRepo: [{msg: "init: notes", snap: {"README.md": "# ml-notes\nКонспекты по ML\n"}}, {msg: "docs: week 1", snap: {"README.md": "# ml-notes\nКонспекты по ML\n", "week1.md": "Неделя 1: фундамент\n"}}],
+  colleagueMsg: "docs: Аня добавила ссылку на датасет",
+  start: "~/projects",
+  prep: ["cd ~/projects/oulad-risk", "git init", "git add .", 'git commit -m "init project"', "git remote add origin https://github.com/vlad/oulad-risk", "git push", 'git __colleague {"README.md": "# oulad-risk\\nПрогноз: какие студенты рискуют не закончить курс.\\nДанные: https://analyse.kmi.open.ac.uk/open_dataset\\n"}'],
+  tasks: [
+    {t: "Склонируй учебный репозиторий https://github.com/vlad/ml-notes", hint: "git clone https://github.com/vlad/ml-notes", ok: s => !!s.fs.projects["ml-notes"]},
+    {t: "Перейди в проект oulad-risk", hint: "cd oulad-risk", ok: s => s.cwd.endsWith("/oulad-risk")},
+    {t: "Коллега Аня уже что-то отправила. Забери её изменения", hint: "git pull", ok: s => G(s) && G(s).root.endsWith("oulad-risk") && /analyse\.kmi/.test(s.fs.projects["oulad-risk"]["README.md"])},
+    {t: "Добавь свою строку в README.md и закоммить", hint: 'echo "Автор: Влад" >> README.md', ok: s => G(s) && G(s).root.endsWith("oulad-risk") && /Влад/.test(JSON.stringify(G(s).commits[G(s).heads.main].snap))},
+    {t: "Отправь свой коммит на GitHub", hint: "git push", ok: s => G(s) && G(s).remote && G(s).remote.heads.main === G(s).heads.main && /Влад/.test(JSON.stringify(G(s).commits[G(s).heads.main].snap))}
+  ]});
+
+/* ---------- отладчик ---------- */
+(function debuggerLab() {
+  const CODE = ["def average(scores):", "    total = 0", "    for s in scores:", "        total = s", "    return total / len(scores)", "", "print(average([80, 90, 70]))"];
+  const STEPS = [
+    {line: 7, vars: {}, msg: "Программа дошла до вызова average([80, 90, 70]). Жми «Шаг»."},
+    {line: 2, vars: {scores: "[80, 90, 70]"}, msg: "Зашли в функцию. scores — наш список."},
+    {line: 3, vars: {scores: "[80, 90, 70]", total: "0"}, ch: "total", msg: "total = 0 — начинаем копить сумму."},
+    {line: 4, vars: {scores: "[80, 90, 70]", total: "0", s: "80"}, ch: "s", msg: "Первый балл: s = 80."},
+    {line: 3, vars: {scores: "[80, 90, 70]", total: "80", s: "80"}, ch: "total", msg: "total стал 80. Пока всё логично."},
+    {line: 4, vars: {scores: "[80, 90, 70]", total: "80", s: "90"}, ch: "s", msg: "Второй балл: s = 90. Сейчас total должен стать 170."},
+    {line: 3, vars: {scores: "[80, 90, 70]", total: "90", s: "90"}, ch: "total", msg: "Стоп: total = 90, а не 170. Сумма не копится — строка 4 заменяет total, а не прибавляет к нему.", bug: true},
+    {line: 4, vars: {scores: "[80, 90, 70]", total: "90", s: "70"}, ch: "s", msg: "Третий балл: s = 70."},
+    {line: 5, vars: {scores: "[80, 90, 70]", total: "70", s: "70"}, ch: "total", msg: "total = 70 — только последний балл."},
+    {line: 7, vars: {result: "23.33"}, ch: "result", msg: "70 / 3 = 23.33. Ошибка в строке 4: нужно total += s. Тогда будет 240 / 3 = 80."}
+  ];
+  let i = 0;
+  function draw() {
+    const st = STEPS[i];
+    $("dbgCode").innerHTML = CODE.map((l, k) => `<div class="${k + 1 === st.line ? "cur" : ""}"><span class="no${k === 3 ? " bp" : ""}">${k + 1}</span><span>${l.replace(/&/g, "&amp;").replace(/</g, "&lt;") || " "}</span></div>`).join("");
+    const v = Object.entries(st.vars);
+    $("dbgVars").innerHTML = `<b>Переменные</b>` + (v.length ? v.map(([k, x]) => `<span class="${k === st.ch ? "ch" : ""}">${k} = ${x}</span>`).join("") : `<span class="muted">пока нет</span>`);
+    $("dbgMsg").textContent = st.msg;
+    $("dbgState").textContent = `шаг ${i + 1} из ${STEPS.length} · строка ${st.line}`;
+    $("dbgStep").disabled = i === STEPS.length - 1;
+  }
+  $("dbgStep").onclick = () => { if (i < STEPS.length - 1) { i++; draw(); } };
+  $("dbgReset").onclick = () => { i = 0; draw(); };
+  draw();
+})();
+mlCheck($("exDbg"), [
+  {q: "Как исправить функцию average?", opts: ["В строке 4 написать total += s", "В строке 2 написать total = 1", "В строке 5 делить на len(scores) − 1"], a: 0,
+   why: "+= прибавляет к накопленному. Ошибка такого типа не роняет программу — её и ловят отладчиком."},
+  {q: "В строке вызывается другая твоя функция, и ты хочешь посмотреть, что происходит внутри неё. Какая кнопка?", opts: ["F11 — step into", "F10 — step over", "F5 — запустить заново"], a: 0,
+   why: "Step into заходит внутрь вызова, step over выполняет его целиком и идёт к следующей строке."}
+]);
+mlCheck($("exTrain"), [
+  {q: "25 минут не получается решить задачу. Что дальше?", opts: ["Посмотреть только идею решения и написать код самому, через 3 дня повторить", "Скопировать готовый код и идти к следующей", "Сидеть до победы, хоть 3 часа"], a: 0,
+   why: "Идея без кода оставляет главную работу тебе, а повтор через 3 дня закрепляет приём."},
+  {q: "Когда обычно открываются наборы на летние стажировки в крупных компаниях?", opts: ["Осенью и зимой, у некоторых — весной", "Только в июне", "Круглый год в один день"], a: 0,
+   why: "Поэтому готовиться и следить за сроками нужно заранее. Даты по компаниям — на странице «Отборы»."}
+]);
+
+initLesson({topics: [["tools.git.0", "init, add, commit, status, log"], ["tools.git.1", "Ветки: branch, switch, merge"], ["tools.git.4", "remote, push, pull, clone"], ["tools.ide.0", "Отладчик в VS Code"], ["algo.int.2", "LeetCode 75 или NeetCode 150"], ["career.apply.6", "Сроки отборов в календаре"]]});
+setTimeout(mlSteps, 600);
+</script>
+<script src="/assets/asks.js" defer></script>

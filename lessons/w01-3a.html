@@ -1,0 +1,295 @@
+<title>Урок 1.3 · Рабочий стол</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/ml.css">
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w01-2.html">← Урок 1.2 · Python изнутри</a><span class="mid">урок 3 из 4</span><a href="/lessons/w01-3b.html">Урок 1.4 · Git и отладчик →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 1 · урок 3 из 4 · ~45 минут</div>
+  <h1>Рабочий стол: терминал, поиск и своё окружение</h1>
+  <p>Первый день на стажировке выглядит так: тебе дают ноутбук и ссылку на проект. Нужно открыть его, найти нужный файл и запустить — и ничего не сломать. Этому и посвящён урок. Пять коротких шагов, в каждом — один тренажёр или пара вопросов. В конце повторишь всё у себя за 15 минут.</p>
+  <nav class="steps" aria-label="Шаги урока">
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Где я</a><a href="#s2"><i><span>2</span></i>Файлы</a><a href="#s3"><i><span>3</span></i>Поиск</a><a href="#s4"><i><span>4</span></i>Окружение</a><a href="#s5"><i><span>5</span></i>Список библиотек</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+  </nav>
+</header>
+
+<!-- ============ 0 ============ -->
+<section class="step" id="s0">
+  <div class="step-h"><span class="num">0</span><h2>Разминка: вспомни прошлый урок</h2><span class="min">2 мин</span></div>
+  <p class="why">Две темы из урока про хеш-таблицы ты уже отметил. Два вопроса — проверить, что держится в голове.</p>
+  <div id="exWarm"></div>
+  <div class="topic-check multi" data-for="algo.ds.1,algo.pat.0">
+    <div class="topic-check-h"><span class="eyebrow">Уже пройдено</span><span class="note"></span></div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="algo.ds.1"><span class="bx" aria-hidden="true"></span><span><b>Хеш-таблица</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="algo.pat.0"><span class="bx" aria-hidden="true"></span><span><b>Хеширование: Two Sum и похожие</b></span></label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="step" id="s1">
+  <div class="step-h"><span class="num">1</span><h2>Где я: терминал — это чат с компьютером</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> на серверах, где обучают модели, нет мышки и окон — только терминал. И на собеседовании спросят хотя бы базовые команды.</p>
+  <div class="plain">
+    <p>Терминал — окно, в котором ты пишешь команду, а компьютер отвечает текстом. Как в чате.</p>
+    <p>Главное, что надо понять: <b>ты всегда «стоишь» в какой-то папке</b>. Как в Finder, только без картинок. Все команды работают относительно этой папки.</p>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>pwd</code><span>где я сейчас — полный путь к папке</span></div>
+    <div class="cmd"><code>ls</code><span>что лежит в этой папке</span></div>
+    <div class="cmd"><code>cd projects</code><span>зайти в папку projects</span></div>
+    <div class="cmd"><code>cd ..</code><span>выйти на уровень вверх</span></div>
+    <div class="cmd"><code>cd ~</code><span>вернуться домой, в свою папку пользователя</span></div>
+  </div>
+  <div id="simNav"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>текущая папка</b> (working directory) — где ты стоишь; <b>путь</b> — адрес файла: полный <code>/Users/vlad/projects</code> или от текущей папки <code>projects/oulad-risk</code>.</span></div>
+  <p class="remember">pwd — где я, ls — что тут, cd — перейти. Потерялся — pwd.</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="step" id="s2">
+  <div class="step-h"><span class="num">2</span><h2>Файлы: создать, скопировать, перенести, удалить</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> скачал данные — их надо положить в проект. Разложил неправильно — переложить. Это пять команд, которые ты будешь набирать каждый день.</p>
+  <div class="cmds">
+    <div class="cmd"><code>mkdir reports</code><span>создать папку</span></div>
+    <div class="cmd"><code>cp откуда куда</code><span>скопировать (оригинал остаётся)</span></div>
+    <div class="cmd"><code>mv откуда куда</code><span>перенести или переименовать (оригинала больше нет)</span></div>
+    <div class="cmd"><code>rm файл</code><span>удалить файл; папку — <code>rm -r папка</code></span></div>
+    <div class="cmd"><code>cat файл</code><span>показать, что внутри файла</span></div>
+  </div>
+  <div class="callout trap"><b class="h">Осторожно</b><p><code>rm</code> удаляет сразу, без корзины. Отменить нельзя. Поэтому перед <code>rm -r</code> всегда смотри <code>pwd</code> и <code>ls</code>: точно ли ты там, где думаешь.</p></div>
+  <div id="simFiles"></div>
+  <div id="exFiles"></div>
+  <div class="topic-check" data-for="tools.term.0">
+    <label class="tp"><input type="checkbox" data-id="tools.term.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Навигация и файлы</b></span></label>
+    <span class="note" data-d="tools.term.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="step" id="s3">
+  <div class="step-h"><span class="num">3</span><h2>Найти нужное: find и grep</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> в чужом проекте сотни файлов. Тимлид говорит: «посмотри, где мы читаем данные». Листать всё руками — час. Командой — секунда.</p>
+  <div class="plain">
+    <p>Два вида поиска — запомни их через почту:</p>
+    <ul>
+      <li><b>find</b> ищет коробку по надписи на ней — <b>файл по имени</b>. «Все файлы, которые заканчиваются на .csv».</li>
+      <li><b>grep</b> ищет фразу внутри писем — <b>текст внутри файлов</b>. «Где в коде написано read_csv».</li>
+    </ul>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>find . -name "*.csv"</code><span>все CSV в этой папке и вложенных; точка — «отсюда», звёздочка — «что угодно»</span></div>
+    <div class="cmd"><code>grep -rn read_csv .</code><span>где встречается read_csv; <code>-r</code> — во всех вложенных папках, <code>-n</code> — с номером строки</span></div>
+  </div>
+  <div id="simFind"></div>
+  <div id="exFind"></div>
+  <div class="topic-check" data-for="tools.term.2">
+    <label class="tp"><input type="checkbox" data-id="tools.term.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Поиск: grep, find</b></span></label>
+    <span class="note" data-d="tools.term.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="step" id="s4">
+  <div class="step-h"><span class="num">4</span><h2>Своё окружение: у каждого проекта свой рюкзак</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> без этого проекты ломают друг друга. Это первое, что делают в любом новом проекте, и частый вопрос на собеседовании: «зачем нужен venv?».</p>
+  <div class="plain">
+    <p>Python на компьютере один, а проектов много. Старому проекту нужен pandas 1.5, новому — 2.2. Если ставить всё в один общий Python, обновил для нового — сломался старый.</p>
+    <p>Решение — <b>у каждого проекта свой рюкзак с библиотеками</b>: папка <code>.venv</code> внутри проекта. Включил её — <code>pip install</code> кладёт библиотеки только в этот рюкзак. Другие проекты не задеты.</p>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>python3 -m venv .venv</code><span>создать рюкзак (один раз на проект)</span></div>
+    <div class="cmd"><code>source .venv/bin/activate</code><span>надеть его — в начале строки появится <code>(.venv)</code></span></div>
+    <div class="cmd"><code>pip install pandas</code><span>поставить библиотеку в этот проект</span></div>
+    <div class="cmd"><code>deactivate</code><span>снять рюкзак</span></div>
+  </div>
+  <div id="simVenv"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>виртуальное окружение</b> (virtual environment, venv) — изолированный набор библиотек проекта. <b>Зависимости</b> — библиотеки, без которых проект не работает.</span></div>
+  <div id="exVenv"></div>
+  <div class="topic-check" data-for="tools.env.0">
+    <label class="tp"><input type="checkbox" data-id="tools.env.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>venv: зачем изолировать зависимости</b></span></label>
+    <span class="note" data-d="tools.env.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="step" id="s5">
+  <div class="step-h"><span class="num">5</span><h2>Список библиотек: requirements.txt</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> коллега скачал твой проект. Какие библиотеки ему ставить и каких версий? Ответ — один файл. Без него проект «работает только у тебя».</p>
+  <div class="plain">
+    <p>Рюкзак <code>.venv</code> тяжёлый и свой на каждом компьютере, его не пересылают. Пересылают <b>список покупок</b> — файл <code>requirements.txt</code>: какие библиотеки и каких точно версий.</p>
+    <p>Ты сохраняешь список, коллега по нему ставит у себя ровно то же.</p>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>pip freeze &gt; requirements.txt</code><span>записать всё, что стоит в окружении, в файл; <code>&gt;</code> — «вывод не на экран, а в файл»</span></div>
+    <div class="cmd"><code>pip install -r requirements.txt</code><span>коллега: поставить всё по списку</span></div>
+  </div>
+  <div class="plain"><p>Внутри файла строки вида <code>pandas==2.2.3</code>. Два знака равно — <b>именно эта версия</b>. Без версии через полгода поставится новая — и код может сломаться, хотя ты ничего не менял.</p></div>
+  <div id="simReq"></div>
+  <div id="exReq"></div>
+  <div class="topic-check" data-for="tools.env.1">
+    <label class="tp"><input type="checkbox" data-id="tools.env.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>requirements.txt</b></span></label>
+    <span class="note" data-d="tools.env.1">отметка в дереве</span>
+  </div>
+  <p class="deep">Хочешь глубже: <a href="/lessons/w01-3.html#w1">терминал подробно</a> · <a href="/lessons/w01-3.html#w3">venv и версии подробно</a> — это старый длинный урок, теперь он справочник.</p>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="step" id="practice">
+  <div class="step-h"><span class="num">✎</span><h2>Сделай сам — на настоящем компьютере</h2><span class="min">15 мин</span></div>
+  <p class="why">Тренажёр — разминка. Закрепляется только руками. Открой «Терминал» (Cmd + Пробел → «Терминал»).</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Работа · 15 минут</span>
+      <h3>Заготовка проекта на твоём Mac</h3>
+      <ol>
+        <li>Создай папку <code>~/projects/sandbox</code> и зайди в неё.</li>
+        <li>Создай окружение, включи его, поставь <code>pandas</code>.</li>
+        <li>Сохрани <code>requirements.txt</code> и посмотри его через <code>cat</code>.</li>
+        <li>Найди через <code>find</code> все файлы <code>.py</code> в своей папке <code>~/Downloads</code>.</li>
+      </ol>
+      <p class="ok">Готово, когда в начале строки видно <code>(.venv)</code>, а в <code>requirements.txt</code> есть строка с <code>pandas==</code>.</p>
+      <details><summary>Все команды подряд</summary><div class="a">
+<pre>mkdir -p ~/projects/sandbox &amp;&amp; cd ~/projects/sandbox
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pandas
+pip freeze &gt; requirements.txt
+cat requirements.txt
+find ~/Downloads -name "*.py"</pre>
+        <p><code>mkdir -p</code> не ругается, если папка уже есть, и создаёт промежуточные папки. <code>&amp;&amp;</code> — «если первое получилось, сделай второе».</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="step" id="topics">
+  <div class="step-h"><h2>Итог</h2></div>
+  <div class="sheet">
+    <ol>
+      <li><b>pwd · ls · cd</b> — где я, что тут, перейти. <code>cd ..</code> — вверх, <code>cd ~</code> — домой.</li>
+      <li><b>mkdir · cp · mv · rm</b> — создать, скопировать, перенести, удалить. <code>rm</code> без корзины, папки — с <code>-r</code>.</li>
+      <li><b>find</b> — файл по имени, <b>grep -rn</b> — текст внутри файлов.</li>
+      <li><b>venv</b> — у каждого проекта свои библиотеки: <code>python3 -m venv .venv</code> → <code>source .venv/bin/activate</code>.</li>
+      <li><b>requirements.txt</b> — список с точными версиями (<code>==</code>): <code>pip freeze &gt;</code> сохранить, <code>pip install -r</code> поставить. В git кладут список, а не <code>.venv</code>.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+---
+type: конспект
+tags: [терминал, venv, неделя-1]
+---
+# Рабочий стол: терминал, поиск и своё окружение — урок 1.3
+
+## Где я
+- pwd — где я; ls — что тут (ls -a — со скрытыми); cd папка — зайти; cd .. — вверх; cd ~ — домой.
+- Путь полный: /Users/vlad/projects; от текущей папки: projects/oulad-risk.
+
+## Файлы
+- mkdir — создать папку; cp — скопировать; mv — перенести или переименовать; rm — удалить (без корзины!), папку — rm -r; cat — показать файл.
+
+## Поиск
+- find . -name "*.csv" — файлы по имени.
+- grep -rn read_csv . — текст внутри файлов, с номером строки.
+
+## venv
+- У каждого проекта свои библиотеки: python3 -m venv .venv → source .venv/bin/activate → pip install … → deactivate.
+- .venv не кладут в git.
+
+## requirements.txt
+- pip freeze > requirements.txt — сохранить; pip install -r requirements.txt — поставить по списку.
+- pandas==2.2.3 — точная версия, чтобы через полгода ничего не сломалось.
+</script>
+<script src="/assets/lesson.js"></script>
+<script src="/assets/ml.js"></script>
+<script>
+const inDir = (s, tail) => s.cwd.endsWith(tail);
+const has = (s, path) => { let n = s.fs; for (const x of path.split("/")) { if (!n || typeof n !== "object") return false; n = n[x]; } return n !== undefined; };
+
+mlCheck($("exWarm"), [
+  {q: "Почему поиск по ключу в словаре Python быстрый — обычно один шаг, даже если ключей миллион?",
+   opts: ["По ключу считается номер ячейки (хеш) — туда и смотрим, не перебирая всё", "Словарь хранит ключи по алфавиту и ищет делением пополам", "Python держит словари на видеокарте"], a: 0,
+   why: "Хеш-функция превращает ключ в номер ячейки. Перебора нет — поэтому в среднем O(1)."},
+  {q: "Two Sum: найти два числа с суммой target. Какая идея даёт один проход?",
+   opts: ["Идём по списку и для каждого числа проверяем, видели ли уже target − число (словарь «число → индекс»)", "Перебрать все пары двумя циклами", "Отсортировать и взять два самых больших"], a: 0,
+   why: "Словарь «что уже видели» превращает внутренний цикл в проверку за O(1). Итого O(n) вместо O(n²)."}
+]);
+
+termSim($("simNav"), {tasks: [
+  {t: "Узнай, в какой папке ты сейчас", hint: "pwd", ok: s => s.cmd === "pwd"},
+  {t: "Посмотри, что в ней лежит", hint: "ls", ok: s => /^ls\b/.test(s.cmd) && s.cwd === "/Users/vlad"},
+  {t: "Зайди в папку проекта projects/oulad-risk", hint: "cd projects/oulad-risk", ok: s => inDir(s, "/projects/oulad-risk")},
+  {t: "Загляни в папку src и посмотри её файлы", hint: "ls src", ok: s => /^ls\b/.test(s.cmd) && /load\.py/.test(s.out)},
+  {t: "Поднимись на уровень вверх — в projects", hint: "cd ..", ok: s => s.cwd === "/Users/vlad/projects"}
+]});
+
+termSim($("simFiles"), {start: "~/projects/oulad-risk", tasks: [
+  {t: "Создай папку reports", hint: "mkdir reports", ok: s => has(s, "projects/oulad-risk/reports")},
+  {t: "Скопируй ~/Downloads/studentInfo.csv в data/raw", hint: "cp ~/Downloads/studentInfo.csv data/raw", ok: s => has(s, "projects/oulad-risk/data/raw/studentInfo.csv") && has(s, "Downloads/studentInfo.csv")},
+  {t: "Перенеси (не копируй) ~/Downloads/courses.csv в data/raw", hint: "mv ~/Downloads/courses.csv data/raw", ok: s => has(s, "projects/oulad-risk/data/raw/courses.csv") && !has(s, "Downloads/courses.csv")},
+  {t: "Посмотри, что внутри data/raw/courses.csv", hint: "cat data/raw/courses.csv", ok: s => /^cat\b/.test(s.cmd) && /code_module/.test(s.out)},
+  {t: "Удали папку reports — она оказалась не нужна", hint: "rm -r reports", ok: s => !has(s, "projects/oulad-risk/reports") && /^rm\b/.test(s.cmd)}
+]});
+mlCheck($("exFiles"), [
+  {q: "Ты сделал <code>mv data.csv old.csv</code>. Что произошло?", opts: ["Файл переименован: data.csv больше нет, есть old.csv", "Появилась копия old.csv, data.csv на месте", "Ошибка: mv только для папок"], a: 0,
+   why: "mv — перенести. Перенос в ту же папку под другим именем и есть переименование."},
+  {q: "<code>rm -r data</code> по ошибке. Как вернуть?", opts: ["Никак: rm удаляет без корзины", "Из корзины Finder", "Командой undo"], a: 0,
+   why: "Поэтому перед rm -r — pwd и ls. А данные проекта всегда можно скачать заново, если есть скрипт загрузки."}
+]);
+
+termSim($("simFind"), {start: "~/projects/oulad-risk", tasks: [
+  {t: "Найди все CSV-файлы в проекте", hint: 'find . -name "*.csv"', ok: s => /^find\b/.test(s.cmd) && /assessments\.csv/.test(s.out)},
+  {t: "Найди, в каких файлах читают данные — где написано read_csv", hint: "grep -rn read_csv .", ok: s => /^grep\b/.test(s.cmd) && /load\.py/.test(s.out) && /01_eda/.test(s.out)},
+  {t: "Найди все .py-файлы в своей папке projects (не только в этом проекте)", hint: 'find ~/projects -name "*.py"', ok: s => /^find\b/.test(s.cmd) && /task1\.py/.test(s.out)}
+]});
+mlCheck($("exFind"), [
+  {q: "Нужно найти, в каком файле объявлена функция <code>load_students</code>. Что наберёшь?", opts: ["grep -rn load_students .", 'find . -name "load_students"', "ls load_students"], a: 0,
+   why: "Это текст внутри файла — значит grep. find ищет только по именам файлов."},
+  {q: "Нужно найти все ноутбуки <code>.ipynb</code> в проекте.", opts: ['find . -name "*.ipynb"', "grep -rn ipynb .", "cat *.ipynb"], a: 0,
+   why: "Ищем файлы по имени — find. grep нашёл бы строки, где слово ipynb встречается внутри файлов."}
+]);
+
+termSim($("simVenv"), {start: "~/projects/oulad-risk", tasks: [
+  {t: "Создай окружение .venv в проекте", hint: "python3 -m venv .venv", ok: s => has(s, "projects/oulad-risk/.venv")},
+  {t: "Убедись, что оно появилось: ls -a показывает и скрытые папки", hint: "ls -a", ok: s => /^ls\b.*-a/.test(s.cmd) && /\.venv/.test(s.out)},
+  {t: "Включи окружение", hint: "source .venv/bin/activate", ok: s => !!s.venv},
+  {t: "Поставь pandas — уже внутри окружения", hint: "pip install pandas", ok: s => !!s.venv && !!s.pkgs.pandas},
+  {t: "Посмотри, что теперь стоит", hint: "pip list", ok: s => /^pip3? list/.test(s.cmd) && !!s.venv}
+]});
+mlCheck($("exVenv"), [
+  {q: "Почему папку <code>.venv</code> не кладут в git?", opts: ["Она тяжёлая и своя на каждом компьютере — коллега создаст свою по списку библиотек", "git не умеет хранить папки с точкой", "Там лежат пароли"], a: 0,
+   why: "В git кладут рецепт (requirements.txt), а не готовое блюдо. .venv — в .gitignore."},
+  {q: "Ты забыл включить окружение и сделал <code>pip install pandas</code>. Что случилось?", opts: ["pandas встал в общий Python компьютера, а не в проект", "Ничего не поставилось", "pip сам включил окружение"], a: 0,
+   why: "Без activate pip ставит в общий Python. Признак, что окружение включено, — (.venv) в начале строки."}
+]);
+
+termSim($("simReq"), {start: "~/projects/oulad-risk", prep: ["cd ~/projects/oulad-risk", "python3 -m venv .venv", "source .venv/bin/activate", "pip install pandas"], tasks: [
+  {t: "Сохрани список библиотек в requirements.txt", hint: "pip freeze > requirements.txt", ok: s => has(s, "projects/oulad-risk/requirements.txt")},
+  {t: "Посмотри, что в нём", hint: "cat requirements.txt", ok: s => /^cat\b/.test(s.cmd) && /pandas==/.test(s.out)},
+  {t: "Ты коллега: сними окружение (deactivate) и снова включи — как будто склонировал проект", hint: "deactivate", ok: s => s.cmd === "deactivate"},
+  {t: "Включи окружение и поставь всё по списку", hint: "source .venv/bin/activate", ok: s => !!s.venv && /^pip3? install -r/.test(s.cmd)}
+]});
+mlCheck($("exReq"), [
+  {q: "В requirements.txt строка <code>pandas</code> без версии. Чем это плохо?", opts: ["Через полгода поставится новая версия, и код может сломаться без твоих изменений", "Ничем, так даже лучше — всегда свежее", "pip не поставит библиотеку без версии"], a: 0,
+   why: "pandas==2.2.3 воспроизводит ровно то, что работало у тебя."},
+  {q: "Коллега склонировал проект. Какой порядок команд правильный?", opts: ["python3 -m venv .venv → source .venv/bin/activate → pip install -r requirements.txt", "pip install -r requirements.txt → python3 -m venv .venv", "pip freeze → source .venv/bin/activate"], a: 0,
+   why: "Сначала рюкзак, потом надеть, потом сложить в него библиотеки по списку."}
+]);
+
+initLesson({topics: [["algo.ds.1", "Хеш-таблица"], ["algo.pat.0", "Хеширование: Two Sum и похожие"], ["tools.term.0", "Навигация и файлы"], ["tools.term.2", "Поиск: grep, find"], ["tools.env.0", "venv: зачем изолировать зависимости"], ["tools.env.1", "requirements.txt"]]});
+setTimeout(mlSteps, 600);
+</script>
+<script src="/assets/asks.js" defer></script>
