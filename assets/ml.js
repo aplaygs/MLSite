@@ -5,6 +5,7 @@
                             (cfg.cloneRepo — [{msg, snap}] для clone; служебная «git __colleague {json}» — коллега пушит коммит).
                             Файлы — общие для всех тренажёров урока (TERM_FS), у каждого тренажёра своя копия.
                             state: {cwd, fs, venv, pkgs, cmd, out, git — репозиторий текущей папки, repos} — проверка задания смотрит на него после каждой команды.
+     mlSort(el, {groups:[{k,label}], items:[{w, g, why?, hint?}], title?}) — разложить по группам, карточки по одной.
      mlSteps()            — план урока в шапке (.steps a[href="#sN"]): шаг пройден, когда все его упражнения решены.
    Ответы и сделанные задания сохраняются (work.js, ключ ex:<id>): открыл урок снова — счёт на месте. */
 
@@ -46,6 +47,28 @@ function mlCheck(el, items) {
   el.addEventListener("click", e => {
     const b = e.target.closest(".opt");
     if (b) { const i = +b.closest(".chk").dataset.i; if (ans[i] === undefined) { ans[i] = +b.dataset.k; mlSave(id, {a: ans, n: items.filter((it, j) => ans[j] === it.a).length, t: items.length}); show(); } }
+    if (e.target.closest("[data-reset]")) { ans = {}; mlSave(id, null); show(); }
+  });
+  mlReady(() => { const s = mlLoad(id); if (s && s.a) ans = s.a; show(); });
+}
+
+/* ---------- разложить по группам: карточки по одной ---------- */
+function mlSort(el, {groups, items, title}) {
+  el.classList.add("ex");
+  const id = el.id;
+  el.innerHTML = `<div class="ex-h"><span class="eyebrow">${title || "Разложи по местам"}</span></div><div class="srt"></div>
+    <div class="ex-foot"><span class="ex-score">0 / ${items.length}</span><button class="btn" data-reset>Заново</button></div>`;
+  const box = el.querySelector(".srt");
+  let ans = {};
+  function show() {
+    const i = items.findIndex((_, k) => ans[k] === undefined);
+    const done = items.map((it, k) => ans[k] !== undefined ? `<div class="srt-done ${ans[k] === it.g ? "ok" : "no"}"><code>${mlEsc(it.w)}</code> → ${mlEsc(groups.find(g => g.k === ans[k]).label)}${ans[k] === it.g ? "" : ` · правильно: <b>${mlEsc(groups.find(g => g.k === it.g).label)}</b>`}${it.why ? `<span>${it.why}</span>` : ""}</div>` : "").join("");
+    box.innerHTML = (i >= 0 ? `<div class="srt-card"><span class="muted">Куда это?</span><code class="srt-w">${mlEsc(items[i].w)}</code>${items[i].hint ? `<span class="muted" style="font-size:13.5px">${items[i].hint}</span>` : ""}<div class="btns">${groups.map(g => `<button class="btn" data-g="${g.k}" data-i="${i}">${mlEsc(g.label)}</button>`).join("")}</div></div>` : "") + `<div class="srt-list">${done}</div>`;
+    mlScore(el, items.filter((it, k) => ans[k] === it.g).length, items.length);
+  }
+  el.addEventListener("click", e => {
+    const b = e.target.closest("[data-g]");
+    if (b) { ans[+b.dataset.i] = b.dataset.g; mlSave(id, {a: ans, n: items.filter((it, k) => ans[k] === it.g).length, t: items.length}); show(); }
     if (e.target.closest("[data-reset]")) { ans = {}; mlSave(id, null); show(); }
   });
   mlReady(() => { const s = mlLoad(id); if (s && s.a) ans = s.a; show(); });
@@ -217,7 +240,13 @@ function termSim(el, cfg) {
   }
 
   /* ---------- git в тренажёре: коммиты — снимки файлов, ветки — указатели, remote — копия указателей ---------- */
-  function files(root) { const o = {}, n = node(root); walk(root, n, (p, f) => { if (typeof f === "string" && !/\/(\.git|\.venv)(\/|$)/.test(p.slice(root.length))) o[p.slice(root.length + 1)] = f; }); return o; }
+  function ignoreRules(root) { const gi = node(root + "/.gitignore"); return typeof gi === "string" ? gi.split("\n").map(x => x.trim()).filter(x => x && !x.startsWith("#")) : []; }
+  function ignored(rel, rules) { /* упрощённый .gitignore: «папка/», «*.csv», «.env», «data/raw/» */
+    return rules.some(r => { const dir = r.endsWith("/"), pat = r.replace(/^\//, "").replace(/\/$/, ""), re = new RegExp("^" + pat.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^/]*") + "$");
+      const parts = rel.split("/"); if (dir) return parts.slice(0, -1).some((_, i) => re.test(parts.slice(0, i + 1).join("/")) || re.test(parts[i]));
+      return re.test(rel) || re.test(parts.at(-1)) || parts.slice(0, -1).some((_, i) => re.test(parts.slice(0, i + 1).join("/"))); }); }
+  function files(root, all) { const o = {}, n = node(root), rules = all ? [] : ignoreRules(root); walk(root, n, (p, f) => { const rel = p.slice(root.length + 1);
+    if (typeof f === "string" && !/\/\.git(\/|$)/.test(p.slice(root.length)) && !ignored(rel, rules)) o[rel] = f; }); return o; }
   function repo() { return S.repos.find(r => S.cwd === r.root || S.cwd.startsWith(r.root + "/")) || null; }
   const snap = (G, b) => { const id = G.heads[b ?? G.branch]; return id ? JSON.parse(JSON.stringify(G.commits[id].snap)) : {}; };
   const same = (x, y) => JSON.stringify(Object.entries(x).sort()) === JSON.stringify(Object.entries(y).sort());

@@ -1,0 +1,324 @@
+<title>Урок 2.1 · Проект как на работе</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/ml.css">
+<style>
+/* Только для этого урока: дерево папок и проверка подписи коммита. */
+.ptree{font:13.5px/1.75 var(--f-mono);background:var(--soft);border-radius:12px;padding:12px 14px;overflow-x:auto;white-space:pre}
+.ptree .c{color:var(--muted)} .ptree .d{color:var(--accent);font-weight:500}
+.lint{display:grid;gap:8px}
+.lint input{font:14px var(--f-mono);padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:100%}
+.lint input:focus{outline:none;border-color:var(--accent)}
+.lint ul{margin:0;padding-left:0;list-style:none;display:grid;gap:4px;font-size:14.5px}
+.lint li.ok::before{content:"✓ ";color:var(--accent);font-weight:700}
+.lint li.no::before{content:"✗ ";color:var(--red);font-weight:700}
+</style>
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/plan#w-2">← Неделя 2 в плане</a><span class="mid">урок 1 из 5</span><span class="muted">Урок 2.2 · Читаем данные — скоро</span></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · урок 1 из 5 · ~55 минут</div>
+  <h1>Проект как на работе</h1>
+  <p>На неделе 1 ты научился сохранять работу в git. Теперь — как устроить проект, чтобы тимлид или рекрутер открыл его и за минуту понял: человек умеет работать. Шесть шагов: папки, README, что не класть в git, где хранить пароли, как фиксировать версии и как подписывать коммиты. В конце соберёшь так свой проект по данным OULAD.</p>
+  <nav class="steps" aria-label="Шаги урока">
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Папки</a><a href="#s2"><i><span>2</span></i>README</a><a href="#s3"><i><span>3</span></i>.gitignore</a><a href="#s4"><i><span>4</span></i>Пароли</a><a href="#s5"><i><span>5</span></i>Версии</a><a href="#s6"><i><span>6</span></i>Коммиты</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+  </nav>
+</header>
+
+<!-- ============ 0 ============ -->
+<section class="step" id="s0">
+  <div class="step-h"><span class="num">0</span><h2>Разминка: git из прошлого урока</h2><span class="min">2 мин</span></div>
+  <div id="exWarm"></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="step" id="s1">
+  <div class="step-h"><span class="num">1</span><h2>У каждой вещи своя полка</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> проект, где всё свалено в одну папку, нельзя ни продолжить, ни показать. Порядок в папках — первое, что видно по ссылке на GitHub.</p>
+  <div class="plain">
+    <p>Почти все ML-проекты раскладывают одинаково. Выучишь один раз — и в любом чужом проекте будешь знать, где что лежит.</p>
+  </div>
+<div class="ptree"><span class="d">oulad-risk/</span>
+├── README.md          <span class="c"># витрина: что за проект и как запустить</span>
+├── requirements.txt   <span class="c"># список библиотек (урок 1.3)</span>
+├── .gitignore         <span class="c"># что не класть в git (шаг 3)</span>
+├── <span class="d">data/raw/</span>          <span class="c"># данные как скачали — руками не трогаем</span>
+├── <span class="d">data/processed/</span>    <span class="c"># данные после обработки кодом</span>
+├── <span class="d">notebooks/</span>         <span class="c"># черновики и исследования: 01_eda.ipynb</span>
+├── <span class="d">src/oulad_risk/</span>    <span class="c"># код проекта: загрузка, признаки, обучение</span>
+├── <span class="d">tests/</span>             <span class="c"># проверки кода</span>
+└── <span class="d">models/</span>            <span class="c"># обученные модели</span></div>
+  <div class="plain"><p>Главное правило: <b>ноутбук — для исследований, код — в src/</b>. Если функция понадобилась во втором ноутбуке, её переносят в src и импортируют.</p></div>
+  <div id="exTree"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>структура проекта</b>; папка с кодом и файлом <code>__init__.py</code> внутри — <b>пакет</b> (package), его можно импортировать: <code>from oulad_risk import load</code>.</span></div>
+  <p class="remember">data/raw — не трогаем, notebooks — черновики, src — код, models — результаты.</p>
+  <div class="topic-check" data-for="python.eng.0">
+    <label class="tp"><input type="checkbox" data-id="python.eng.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Структура проекта</b></span></label>
+    <span class="note" data-d="python.eng.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="step" id="s2">
+  <div class="step-h"><span class="num">2</span><h2>README — витрина проекта</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> на отборе на проект смотрят 1–2 минуты. Почти всё это время уходит на первый экран README.</p>
+  <div class="plain">
+    <p>README — первое, что показывает GitHub. Хороший README отвечает на пять вопросов, сверху вниз:</p>
+    <ul>
+      <li><b>Что за задача</b> — одной фразой, без «проект по машинному обучению».</li>
+      <li><b>Какой результат</b> — число и с чем сравнивал: «лучше, чем модель, которая всем отвечает одно и то же».</li>
+      <li><b>Какие данные</b> — откуда скачать (сами данные в git не кладут).</li>
+      <li><b>Как запустить</b> — 3–5 команд, которые работают в чистой папке.</li>
+      <li><b>Что где лежит</b> — коротко про папки.</li>
+    </ul>
+  </div>
+  <div id="exReadme"></div>
+  <p class="remember">Первая строка README — задача и результат, а не «учебный проект».</p>
+  <div class="topic-check" data-for="tools.git.9">
+    <label class="tp"><input type="checkbox" data-id="tools.git.9"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>README как витрина проекта</b></span></label>
+    <span class="note" data-d="tools.git.9">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="step" id="s3">
+  <div class="step-h"><span class="num">3</span><h2>.gitignore — чего git не должен видеть</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> данные весят гигабайты, окружение своё на каждом компьютере, пароли — секрет. Всё это в git попасть не должно.</p>
+  <div class="plain">
+    <p><code>.gitignore</code> — обычный текстовый файл в корне проекта. Каждая строка — что git должен не замечать. Например, <code>data/</code> — всю папку целиком, <code>*.csv</code> — все файлы с таким концом, <code>.env</code> — один файл.</p>
+    <p>Обычный набор для ML-проекта: <code>.venv/</code>, <code>data/</code>, <code>models/</code>, <code>.env</code>, <code>__pycache__/</code>, <code>.ipynb_checkpoints/</code>.</p>
+  </div>
+  <div id="simIgnore"></div>
+  <div class="callout trap"><b class="h">Ловушка</b><p>.gitignore работает только для файлов, которые ещё не в git. Если data уже закоммитили, сначала убери её из отслеживания: <code>git rm -r --cached data</code>, потом коммит. Поэтому .gitignore делают первым же коммитом.</p></div>
+  <div class="topic-check" data-for="tools.git.5">
+    <label class="tp"><input type="checkbox" data-id="tools.git.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>.gitignore для данных, моделей и секретов</b></span></label>
+    <span class="note" data-d="tools.git.5">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="step" id="s4">
+  <div class="step-h"><span class="num">4</span><h2>Пароли — в .env, а не в коде</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> ключ от API, случайно попавший на GitHub, находят боты за минуты. Это реальная история, и на код-ревью за такое сразу заворачивают.</p>
+  <div class="plain">
+    <p>Пароли и ключи живут в файле <code>.env</code> рядом с проектом. Он в .gitignore, то есть только на твоём компьютере. Код читает ключ из окружения, а не держит его в тексте.</p>
+    <p>Чтобы коллега знал, что задать у себя, в git кладут <code>.env.example</code> — те же имена, но без значений.</p>
+  </div>
+<pre><span class="cm"># .env — только у тебя, в .gitignore</span>
+KAGGLE_KEY=a1b2c3d4
+
+<span class="cm"># .env.example — в git, без значений</span>
+KAGGLE_KEY=
+
+<span class="cm"># в коде</span>
+import os
+from dotenv import load_dotenv   <span class="cm"># pip install python-dotenv</span>
+load_dotenv()                    <span class="cm"># читает .env в переменные окружения</span>
+key = os.environ["KAGGLE_KEY"]   <span class="cm"># нет ключа — сразу понятная ошибка</span></pre>
+  <div id="exEnv"></div>
+  <p class="remember">Пароль в коде = пароль у всех. Ключ утёк — первым делом отзови его, потом чисти историю.</p>
+  <div class="topic-check" data-for="tools.env.4">
+    <label class="tp"><input type="checkbox" data-id="tools.env.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Секреты в .env, а не в коде</b></span></label>
+    <span class="note" data-d="tools.env.4">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="step" id="s5">
+  <div class="step-h"><span class="num">5</span><h2>Версии: чтобы через полгода всё запустилось</h2><span class="min">6 мин</span></div>
+  <p class="why"><b>Зачем:</b> «у меня работало» — самая частая беда учебных проектов. Причина почти всегда в том, что поставилась другая версия библиотеки.</p>
+  <div class="plain">
+    <p>Номер версии читается так: <code>2.2.3</code> — это <b>большая.средняя.маленькая</b>. Маленькая — исправили ошибки. Средняя — добавили новое, старое работает. Большая — могли что-то сломать.</p>
+    <ul>
+      <li><code>pandas==2.2.3</code> — ровно эта версия. Так пишут в проекте: воспроизводится один в один.</li>
+      <li><code>pandas&gt;=2.2</code> — «эта или новее». Через полгода приедет 3.0, и код может сломаться.</li>
+      <li>Версию самого Python тоже пишут в README: «Python 3.12».</li>
+    </ul>
+  </div>
+  <div id="exVer"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>фиксация версий</b> (pinning); схема «большая.средняя.маленькая» — <b>SemVer</b>, по-английски MAJOR.MINOR.PATCH.</span></div>
+  <div class="topic-check" data-for="tools.env.2">
+    <label class="tp"><input type="checkbox" data-id="tools.env.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Фиксация версий</b></span></label>
+    <span class="note" data-d="tools.env.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="step" id="s6">
+  <div class="step-h"><span class="num">6</span><h2>Коммиты, по которым понятна история</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> история из «fix», «правки», «ещё правки» никому ничего не говорит. По подписям коммитов на отборе видно, работал ли человек в команде.</p>
+  <div class="plain">
+    <p>Договорённость, которой пользуются многие команды: <b>тип: что сделал</b>, по-английски, коротко, в повелительном наклонении.</p>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>feat: add data loader</code><span>новая возможность</span></div>
+    <div class="cmd"><code>fix: handle empty csv</code><span>исправление ошибки</span></div>
+    <div class="cmd"><code>docs: describe dataset</code><span>документация, README</span></div>
+    <div class="cmd"><code>refactor: split train.py</code><span>переписал без изменения поведения</span></div>
+    <div class="cmd"><code>test: check no leakage</code><span>тесты</span></div>
+    <div class="cmd"><code>chore: add gitignore</code><span>служебное: настройки, зависимости</span></div>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · проверь подпись коммита</span></div>
+    <div class="lint"><input id="lintIn" value="fixed stuff" aria-label="Подпись коммита" autocomplete="off" spellcheck="false"><ul id="lintOut"></ul></div>
+  </div>
+  <div class="term-chip"><b>Так это называют</b><span><b>Conventional Commits</b> — эта договорённость; <code>feat(data): …</code> — в скобках можно указать часть проекта.</span></div>
+  <p class="remember">Один коммит — одно изменение. Подпись: тип: что сделал.</p>
+  <div class="topic-check" data-for="tools.git.6">
+    <label class="tp"><input type="checkbox" data-id="tools.git.6"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Conventional Commits</b></span></label>
+    <span class="note" data-d="tools.git.6">отметка в дереве</span>
+  </div>
+  <p class="deep">Хочешь глубже: <a href="/lessons/w02-3.html#t1">структура</a> · <a href="/lessons/w02-3.html#t3">.gitignore подробно</a> · <a href="/lessons/w02-3.html#t6">коммиты</a> — справочник.</p>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="step" id="practice">
+  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: проект oulad-risk</h2><span class="min">20 мин</span></div>
+  <p class="why">Это начало твоего проекта для резюме: по нему ты будешь рассказывать на собеседовании.</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Работа · 20 минут</span>
+      <h3>Скелет проекта на GitHub</h3>
+      <ol>
+        <li>Создай папку <code>~/projects/oulad-risk</code> со структурой из шага 1 (пустые папки — с файлом <code>.gitkeep</code>, иначе git их не увидит).</li>
+        <li>Первым коммитом — <code>.gitignore</code> из шага 3.</li>
+        <li>README с разделами: задача, данные, как запустить (результат пока пустой). Данные — <a href="https://analyse.kmi.open.ac.uk/open_dataset" target="_blank" rel="noopener">OULAD</a>, скачай в <code>data/raw</code>.</li>
+        <li><code>.env.example</code> и <code>requirements.txt</code> с версиями через <code>==</code>.</li>
+        <li>3–4 коммита с подписями по шагу 6, потом push на GitHub.</li>
+      </ol>
+      <p class="ok">Готово, когда на GitHub видны README, .gitignore и папка src, а папок data и .venv там нет.</p>
+      <details><summary>Команды для начала</summary><div class="a">
+<pre>mkdir -p ~/projects/oulad-risk/{data/raw,data/processed,notebooks,src/oulad_risk,tests,models}
+cd ~/projects/oulad-risk
+touch src/oulad_risk/__init__.py tests/.gitkeep notebooks/.gitkeep
+printf ".venv/\ndata/\nmodels/\n.env\n__pycache__/\n.ipynb_checkpoints/\n" &gt; .gitignore
+git init &amp;&amp; git add .gitignore &amp;&amp; git commit -m "chore: add gitignore"</pre>
+        <p><code>{data/raw,notebooks}</code> — фигурные скобки создают несколько папок одной командой. <code>printf</code> с <code>\n</code> пишет несколько строк в файл.</p></div></details></div>
+  </div>
+</section>
+
+<!-- ============ итог ============ -->
+<section class="step" id="topics">
+  <div class="step-h"><h2>Итог</h2></div>
+  <div class="sheet">
+    <ol>
+      <li><b>Папки:</b> data/raw (не трогаем), data/processed, notebooks (черновики), src (код), tests, models.</li>
+      <li><b>README:</b> задача одной фразой → результат с числом → данные → как запустить → что где.</li>
+      <li><b>.gitignore:</b> .venv/, data/, models/, .env, __pycache__/ — первым же коммитом.</li>
+      <li><b>Пароли</b> — в .env (в .gitignore), в git — .env.example без значений, в коде — os.environ.</li>
+      <li><b>Версии:</b> == в проекте; большая.средняя.маленькая; версия Python — в README.</li>
+      <li><b>Коммиты:</b> тип: что сделал (feat, fix, docs, refactor, test, chore). Один коммит — одно изменение.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+---
+type: конспект
+tags: [проект, git, неделя-2]
+---
+# Проект как на работе — урок 2.1
+
+## Папки
+- README.md, requirements.txt, .gitignore; data/raw (как скачали), data/processed, notebooks (черновики), src/пакет (код), tests, models.
+- Ноутбук — для исследований, код — в src. Папка с __init__.py — пакет, её импортируют.
+
+## README
+- Задача одной фразой → результат с числом и сравнением → данные (откуда скачать) → как запустить (3–5 команд) → что где лежит.
+
+## .gitignore
+- .venv/, data/, models/, .env, __pycache__/, .ipynb_checkpoints/. Первым коммитом.
+- Уже закоммиченное не спрячет: git rm -r --cached папка.
+
+## Пароли
+- .env (в .gitignore) + .env.example (в git, без значений). В коде: load_dotenv(); os.environ["KEY"].
+- Ключ утёк — сначала отозвать.
+
+## Версии
+- pandas==2.2.3 — точная версия; >= — риск. MAJOR.MINOR.PATCH (SemVer). Python — в README.
+
+## Коммиты
+- Conventional Commits: feat, fix, docs, refactor, test, chore: «тип: что сделал». Один коммит — одно изменение.
+</script>
+<script src="/assets/lesson.js"></script>
+<script src="/assets/ml.js"></script>
+<script>
+mlCheck($("exWarm"), [
+  {q: "Зачем в git два шага — <code>add</code> и потом <code>commit</code>?", opts: ["Чтобы отобрать в сохранение только готовые изменения, а остальные оставить на потом", "Это одно и то же, просто исторически", "add отправляет на GitHub, commit — сохраняет"], a: 0,
+   why: "add складывает изменения в «отобрано», commit сохраняет отобранное с подписью."},
+  {q: "<code>git push</code> отказывает: «fetch first». Что делать?", opts: ["git pull, потом снова git push", "git push --force", "Удалить репозиторий и склонировать заново"], a: 0,
+   why: "На GitHub есть чужие коммиты, которых нет у тебя. Забери их и отправляй."}
+]);
+
+mlSort($("exTree"), {title: "Разложи файлы по папкам", groups: [{k: "src", label: "src/"}, {k: "nb", label: "notebooks/"}, {k: "raw", label: "data/raw/"}, {k: "proc", label: "data/processed/"}, {k: "models", label: "models/"}, {k: "tests", label: "tests/"}], items: [
+  {w: "studentInfo.csv", hint: "скачал с сайта датасета", g: "raw", why: "Данные как скачали — в raw, руками не правим."},
+  {w: "02_baseline.ipynb", hint: "пробую первую модель", g: "nb", why: "Ноутбук — исследование, черновик."},
+  {w: "features.py", hint: "функции, которые строят признаки", g: "src", why: "Код, который нужен больше одного раза, — в src."},
+  {w: "students_clean.parquet", hint: "таблица после очистки кодом", g: "proc", why: "Результат обработки — в processed: его всегда можно пересоздать из raw."},
+  {w: "catboost_v1.cbm", hint: "обученная модель", g: "models", why: "Обученные модели — в models (и в .gitignore)."},
+  {w: "test_features.py", hint: "проверяет, что признаки без пропусков", g: "tests", why: "Проверки кода — в tests."}
+]});
+
+mlCheck($("exReadme"), [
+  {q: "Какое начало README лучше?", opts: ["«Предсказываю, кто из студентов бросит онлайн-курс, по активности в первые 4 недели»", "«Учебный проект по машинному обучению»", "«Здесь будет описание»"], a: 0,
+   why: "Задача одной фразой сразу говорит, что за проект и зачем. Второе ничего не сообщает."},
+  {q: "Что писать в разделе «Результат»?", opts: ["Метрику и с чем сравнивал, например «лучше бейзлайна, который всем отвечает одно и то же»", "Что модель «работает хорошо»", "Список всех библиотек"], a: 0,
+   why: "Число без сравнения ничего не значит. Сравнение с простейшим вариантом показывает, что модель вообще чему-то научилась."}
+]);
+
+termSim($("simIgnore"), {start: "~/projects/oulad-risk", prep: ["cd ~/projects/oulad-risk", "python3 -m venv .venv", "touch .env"], tasks: [
+  {t: "Начни git в проекте и посмотри статус: видно и data, и .venv, и .env", hint: "git init (потом git status)", ok: s => s.cmd === "git status" && /\.venv/.test(s.out)},
+  {t: "Скажи git не замечать окружение: добавь строку .venv/ в .gitignore", hint: 'echo ".venv/" >> .gitignore', ok: s => /\.venv\//.test(s.fs.projects["oulad-risk"][".gitignore"] || "")},
+  {t: "Добавь туда же data/ и .env", hint: 'echo "data/" >> .gitignore (и так же .env)', ok: s => { const g = s.fs.projects["oulad-risk"][".gitignore"] || ""; return /data\//.test(g) && /^\.env$/m.test(g); }},
+  {t: "Снова git status — data, .venv и .env пропали из списка", hint: "git status", ok: s => s.cmd === "git status" && !/\.venv|data\/|\s\.env/.test(s.out) && /gitignore/.test(s.out)},
+  {t: "Закоммить .gitignore первым коммитом", hint: 'git add .gitignore (потом git commit -m "chore: add gitignore")', ok: s => s.git && Object.values(s.git.commits).some(c => ".gitignore" in c.snap)}
+]});
+
+mlCheck($("exEnv"), [
+  {q: "Ты случайно запушил ключ API на GitHub. Что сделать первым?", opts: ["Отозвать ключ в сервисе и выпустить новый", "Удалить файл новым коммитом — и всё", "Сделать репозиторий приватным"], a: 0,
+   why: "Ключ остаётся в истории и уже мог быть скопирован. Сначала сделать его бесполезным, потом убирать из истории."},
+  {q: "Зачем в git файл <code>.env.example</code>?", opts: ["Чтобы коллега знал, какие переменные задать у себя", "Это резервная копия .env", "Без него load_dotenv не работает"], a: 0,
+   why: "Имена переменных — не секрет. Значения каждый подставляет свои."}
+]);
+
+mlCheck($("exVer"), [
+  {q: "Вышла pandas <b>3.0.0</b>, у тебя <b>2.2.3</b>. Чего ожидать от обновления?", opts: ["Могут сломаться вещи, которые работали: сменилась большая цифра", "Только исправления ошибок", "Ничего не изменится"], a: 0,
+   why: "Большая цифра — изменения, которые могут ломать старый код. Как раз переход pandas 2 → 3 поменял тип строк и поведение копий."},
+  {q: "Что писать в requirements.txt проекта?", opts: ["pandas==2.2.3", "pandas>=2.0", "pandas"], a: 0,
+   why: "Точная версия — проект запустится у любого так же, как у тебя."}
+]);
+
+/* ---------- проверка подписи коммита ---------- */
+(function lint() {
+  const TYPES = ["feat", "fix", "docs", "refactor", "test", "chore", "style", "perf", "build", "ci"];
+  function run() {
+    const m = $("lintIn").value.trim(), mm = m.match(/^([a-z]+)(\([a-z0-9_-]+\))?!?: (.+)$/);
+    const desc = mm ? mm[3] : "";
+    const rules = [
+      [!!mm && TYPES.includes(mm[1]), `начинается с типа и двоеточия: ${TYPES.slice(0, 6).join(", ")}…`],
+      [!!desc && /^[a-z]/.test(desc), "после двоеточия — с маленькой буквы, по-английски"],
+      [!!desc && !/\.$/.test(desc), "без точки в конце"],
+      [!!desc && desc.split(" ").length >= 2, "понятно, что сделано: хотя бы два слова"],
+      [!!desc && !/^(fix(ed)?|stuff|update[sd]?|changes|wip|правки)\b/i.test(desc) && !/stuff|changes|правки/i.test(desc), "не «stuff», «changes», «правки» — конкретика"],
+      [m.length <= 72, "короче 72 символов"]
+    ];
+    $("lintOut").innerHTML = rules.map(([ok, t]) => `<li class="${ok ? "ok" : "no"}">${t}</li>`).join("") +
+      (rules.every(r => r[0]) ? `<li class="ok"><b>Отличная подпись.</b></li>` : `<li class="muted" style="list-style:none">Попробуй: <code>feat: add data loader</code></li>`);
+  }
+  $("lintIn").oninput = run; run();
+})();
+
+initLesson({topics: [["python.eng.0", "Структура проекта"], ["tools.git.9", "README как витрина проекта"], ["tools.git.5", ".gitignore для данных, моделей и секретов"], ["tools.env.4", "Секреты в .env, а не в коде"], ["tools.env.2", "Фиксация версий"], ["tools.git.6", "Conventional Commits"]]});
+setTimeout(mlSteps, 600);
+</script>
+<script src="/assets/asks.js" defer></script>

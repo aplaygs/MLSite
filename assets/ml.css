@@ -74,3 +74,12 @@ section.step>*{min-width:0}
 .tsim .tasks .hint{grid-column:2;font:12.5px var(--f-mono);color:var(--muted)}
 .tsim .tasks .hint button{font:inherit;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline dotted}
 @media (prefers-reduced-motion:reduce){.chk .opt,.steps a i{transition:none}}
+
+/* Разложить по группам */
+.srt{display:grid;gap:10px}
+.srt-card{display:grid;gap:8px;justify-items:start;background:var(--bg);border-radius:12px;padding:12px 14px}
+.srt-w{font:600 16px var(--f-mono);color:var(--ink)}
+.srt-list{display:grid;gap:6px}
+.srt-done{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline;font-size:14.5px;border-left:3px solid var(--accent);padding:4px 10px}
+.srt-done.no{border-left-color:var(--red)}
+.srt-done span{flex-basis:100%;color:var(--muted);font-size:13.5px}
