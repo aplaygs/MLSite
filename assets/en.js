@@ -14,8 +14,9 @@
      exSort(el, {groups, items})     — разложить по группам: groups [{k, label}], items [{w, g, say?, why?}] — по одной карточке.
                                       Первую карточку слушают кликом по слову (при загрузке страницы звука нет), дальше — само (auto:false — выключить).
      wordCards(el, words)            — карточки слов: {en, ipa?, ru, ex?, exRu?}; клик — перевернуть, 🔊 — послушать.
-     takeAway(el, {lesson, words, rules}) — блок «В повторение»: слова (формат wordCards) и правила урока
-                                      {id, q, a, ex?:[…], wrong?, right?} с галочками → колоды /words и /rules (/api/decks).
+     takeAway(el, {lesson, words, rules}) — блок «В Quizlet»: слова (формат wordCards) и правила урока
+                                      {id, q, a, ex?:[…], wrong?, right?} с галочками → строки для импорта в Quizlet (quizlet.js),
+                                      запись в «Словарь» / «Правила на заучку» и отметка «в Quizlet» (/api/decks).
    У каждого упражнения — счёт «3 / 6», кнопки «Проверить» и «Заново». Ответы сравниваются без учёта регистра, ’ и точки в конце.
    Ответы сохраняются (assets/work.js, ключ ex:<id блока>): урок открыли снова — ответы и счёт на месте; «Заново» их стирает. */
 const EN_NORM=s=>String(s).toLowerCase().replace(/[’‘`´]/g,"'").replace(/\s+([.,!?])/g,"$1").replace(/[.!?]+$/,"").replace(/\s+/g," ").trim();
@@ -274,52 +275,58 @@ function wordCards(el,words){
   box.addEventListener("keydown",e=>{const c=e.target.closest(".wc");if(c&&(e.key==="Enter"||e.key===" ")){e.preventDefault();c.classList.toggle("open")}});
 }
 
-/* ---------- в повторение: Влад сам выбирает, что из урока пойдёт в колоды ---------- */
+/* ---------- в Quizlet: Влад сам выбирает, что из урока учить в Quizlet ----------
+   Новое отмечено сразу. «Скопировать для Quizlet» — строки для импорта в буфере (quizlet.js), карточки записываются
+   в «Словарь» / «Правила на заучку» и помечаются «в Quizlet», чтобы в следующий раз не предлагать их снова. */
 function takeAway(el,{lesson,words=[],rules=[]}){
   const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname), src=`урок ${lesson}`;
   const W=words.map(w=>({key:w.en.toLowerCase(),item:{word:w.en,ipa:w.ipa||"",translation:w.ru,example:w.ex||"",example_ru:w.exRu||"",source:src},
-    t:`${enEsc(w.en)}<small>${enEsc(w.ru)}</small>`}));
+    card:{word:w.en,translation:w.ru},t:`${enEsc(w.en)}<small>${enEsc(w.ru)}</small>`}));
   const R=rules.map(r=>({key:r.id,item:{id:r.id,q:r.q,a:r.a,examples:r.ex||[],wrong:r.wrong||"",right:r.right||"",source:src},
-    t:`${enEsc(r.q)}<small>${enEsc(r.a)}</small>`}));
-  el.insertAdjacentHTML("beforeend",`<div class="tk">${[["words","Слова",W],["rules","Правила",R]].filter(x=>x[2].length).map(([d,h,L])=>`
-    <div class="tk-col" data-d="${d}"><div class="tk-h"><b>${h} · ${L.length}</b><button class="btn tk-all" type="button">выбрать новые</button></div>
-    <ul>${L.map((x,i)=>`<li data-i="${i}"><label><input type="checkbox" data-i="${i}"><span class="t">${x.t}</span><span class="tk-st"></span></label></li>`).join("")}</ul></div>`).join("")}</div>
-    <div class="tk-foot"><button class="btn go tk-go" type="button" disabled>Добавить выбранное</button><span class="tk-msg" role="status"></span></div>`);
-  const L={words:W,rules:R}, msg=el.querySelector(".tk-msg"), go=el.querySelector(".tk-go");
-  let state={words:{},rules:{}};  /* ключ → "in" (в колоде) | "ar" (в архиве) */
-  const count=()=>el.querySelectorAll(".tk-col input:checked:not(:disabled)").length;
-  const upd=()=>{const n=count();go.disabled=!n||!LOCAL;go.textContent=n?`Добавить выбранное · ${n}`:"Добавить выбранное"};
-  function paint(){
+    card:{q:r.q,a:r.a,examples:r.ex||[],wrong:r.wrong||"",right:r.right||""},t:`${enEsc(r.q)}<small>${enEsc(r.a)}</small>`}));
+  const L={words:W,rules:R}, NAME={words:"слова",rules:"правила"};
+  el.insertAdjacentHTML("beforeend",`<div class="tk">${[["words","Слова",W],["rules","Правила",R]].filter(x=>x[2].length).map(([d,h,X])=>`
+    <div class="tk-col" data-d="${d}"><div class="tk-h"><b>${h} · ${X.length}</b><button class="btn tk-all" type="button">все / ничего</button></div>
+    <ul>${X.map((x,i)=>`<li data-i="${i}"><label><input type="checkbox" data-i="${i}" checked><span class="t">${x.t}</span><span class="tk-st"></span></label></li>`).join("")}</ul>
+    <div class="tk-foot"><button class="btn go tk-go" type="button" data-d="${d}">Скопировать для Quizlet</button><span class="tk-msg" role="status"></span></div></div>`).join("")}</div>
+    <details class="tk-how"><summary>Как вставить в Quizlet</summary>${QZ.howto("words").replace("</ol>","")}<li>Правила — отдельным набором: язык термина и определения — Russian.</li></ol></details>`);
+  let state={words:{},rules:{}};  /* ключ → дата переноса в Quizlet */
+  const col=d=>el.querySelector(`.tk-col[data-d="${d}"]`);
+  function upd(){for(const d of ["words","rules"]){const c=col(d);if(!c)continue;const n=c.querySelectorAll("input:checked").length,b=c.querySelector(".tk-go");
+    b.disabled=!n;b.textContent=n?`Скопировать для Quizlet · ${n}`:"Скопировать для Quizlet"}}
+  function paint(first){
     for(const d of ["words","rules"])el.querySelectorAll(`.tk-col[data-d="${d}"] li`).forEach(li=>{
-      const x=L[d][+li.dataset.i], s=state[d][x.key], inp=li.querySelector("input"), st=li.querySelector(".tk-st");
-      li.classList.toggle("have",s==="in"); inp.disabled=s==="in"||!LOCAL; if(s==="in")inp.checked=true;
-      st.className="tk-st"+(s?" "+s:""); st.textContent=s==="in"?"в колоде":s==="ar"?"в архиве":"";
+      const x=L[d][+li.dataset.i], q=state[d][x.key], inp=li.querySelector("input"), st=li.querySelector(".tk-st");
+      li.classList.toggle("have",!!q); if(first)inp.checked=!q;
+      st.className="tk-st"+(q?" in":""); st.textContent=q?`в Quizlet ${q.slice(8,10)}.${q.slice(5,7)}`:"";
     });
     el.querySelectorAll(".tk ul").forEach(ul=>ul.append(...[...ul.children].filter(li=>li.classList.contains("have"))));  /* новое — сверху */
     upd();
   }
-  async function load(){
+  async function load(first){
     for(const d of ["words","rules"]){if(!L[d].length)continue;
       const r=await fetch("/api/decks/"+d).then(r=>r.json());
-      state[d]=Object.fromEntries(r.cards.map(c=>[d==="words"?c.word.toLowerCase():c.id,c.archived?"ar":"in"]));}
-    paint();
+      const byKey=Object.fromEntries(r.cards.filter(c=>c.quizlet).map(c=>[d==="words"?c.word.toLowerCase():c.id,c.quizlet]));
+      state[d]=byKey;}
+    paint(first);
   }
   el.addEventListener("change",upd);
-  el.querySelectorAll(".tk-all").forEach(b=>b.onclick=()=>{const col=b.closest(".tk-col");
-    const boxes=[...col.querySelectorAll("input:not(:disabled)")], on=boxes.some(i=>!i.checked);boxes.forEach(i=>i.checked=on);upd()});
-  go.onclick=async()=>{
-    go.disabled=true; let added=0,back=0;
-    try{for(const d of ["words","rules"]){
-        const items=[...el.querySelectorAll(`.tk-col[data-d="${d}"] input:checked:not(:disabled)`)].map(i=>L[d][+i.dataset.i].item);
-        if(!items.length)continue;
-        const r=await fetch("/api/decks/"+d,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op:"add",items})}).then(r=>{if(!r.ok)throw new Error("сервер");return r.json()});
-        added+=r.added.length; back+=r.restored.length;}
-      await load();
-      msg.innerHTML=`Готово: ${added?`добавлено ${added}`:""}${added&&back?", ":""}${back?`возвращено из архива ${back}`:""}. Повторять — <a href="/words">слова</a> и <a href="/rules">правила</a>.`;
-    }catch(e){msg.textContent="Не получилось сохранить: сервер не отвечает.";upd()}
-  };
-  if(!LOCAL){msg.textContent="Добавлять в колоды можно на компьютере, где запущен сервер.";paint();return}
-  load().catch(()=>{msg.textContent="Нет связи с сервером — колоды недоступны.";});
+  el.querySelectorAll(".tk-all").forEach(b=>b.onclick=()=>{const boxes=[...b.closest(".tk-col").querySelectorAll("input")],on=boxes.some(i=>!i.checked);boxes.forEach(i=>i.checked=on);upd()});
+  el.querySelectorAll(".tk-go").forEach(b=>b.onclick=async()=>{
+    const d=b.dataset.d, c=col(d), msg=c.querySelector(".tk-msg");
+    const pick=[...c.querySelectorAll("input:checked")].map(i=>L[d][+i.dataset.i]);
+    const lines=d==="words"?QZ.words(pick.map(x=>x.card)):QZ.rules(pick.map(x=>x.card));
+    const ok=QZ.copy(lines.join("\n"));
+    msg.innerHTML=ok?`✓ Скопировано ${lines.length} ${lines.length%10===1&&lines.length%100!==11?"карточка":lines.length%10>=2&&lines.length%10<=4&&(lines.length%100<12||lines.length%100>14)?"карточки":"карточек"} — <a href="${QZ.URL}" target="_blank" rel="noopener">открой Quizlet ↗</a> и вставь через «Импорт».`
+      :"Не скопировалось — браузер не дал доступ к буферу.";
+    el.querySelector(".tk-how").open=true;
+    if(!LOCAL||!ok)return;
+    try{const r=await fetch("/api/decks/"+d,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op:"add",quizlet:true,items:pick.map(x=>x.item)})});
+      if(!r.ok)throw 0; await load(false);}
+    catch(e){msg.insertAdjacentHTML("beforeend"," <span class=\"muted\">(отметка «в Quizlet» не сохранилась: сервер не отвечает)</span>")}
+  });
+  paint(false);
+  if(LOCAL)load(true).catch(()=>{});
 }
 
 /* Нет голоса в браузере — честно говорим об этом один раз. */

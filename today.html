@@ -178,7 +178,7 @@ const I={
   target:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>',
   book:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg>'
 };
-const TOOLS=[["/words","deck","cards","Слова","колода слов, интервальное повторение"],["/rules","deck","brain","Правила на заучку","то, что трудно запомнить"],
+const TOOLS=[["/words","deck","cards","Слова","для Quizlet: что собрано и что новое"],["/rules","deck","brain","Правила на заучку","для Quizlet: то, что трудно запомнить"],
   ["/plan","ml","cal","План ML","недели до собеседований"],["/tree","ml","tree","Дерево ML","все ветки и темы"],
   ["/hire","ml","target","Отборы","что спрашивают на стажировках"],["/en","en","book","English","план A2 → B2, уроки, тесты"]];
 
@@ -193,7 +193,7 @@ function stepHTML(x,k){
   const s=SEC[x.section]||SEC.deck, pr=x.progress&&x.progress[1]?`<span class="pb"><i style="width:${Math.round(x.progress[0]/x.progress[1]*100)}%"></i></span>`:"";
   const can=P.view!=="future", tip=x.done?"Сделано — нажми, чтобы снять":"Отметить: сделал";
   return `<li class="step ${s.cls}${x.done?" done":""}"><button class="n" type="button" data-key="${esc(x.key)}" data-done="${x.done?1:0}" ${can?"":"disabled"} title="${can?tip:"отметить можно в сам день"}" aria-label="${tip}" aria-pressed="${x.done}"><span class="num">${k}</span><span class="ck">${I.check}</span></button>
-    <a href="${x.href}"><span>${x.label?`<span class="lab">${esc(x.label)}</span>`:""}<b>${esc(x.title)}</b><small>${esc(x.done&&x.kind==="deck"?"на сегодня всё повторено":x.sub)}</small>${pr}</span>
+    <a href="${x.href}"${/^https?:/.test(x.href)?' target="_blank" rel="noopener"':""}><span>${x.label?`<span class="lab">${esc(x.label)}</span>`:""}<b>${esc(x.title)}</b><small>${esc(x.sub)}</small>${pr}</span>
     <span class="t">${x.done?"готово":dur(x.minutes)}${I.chev}</span></a></li>`;
 }
 function weekHTML(s){
@@ -217,8 +217,8 @@ function render(){
   ring(p.done,n);
   $("planH").textContent=p.view==="today"?"План на день":p.view==="future"?"Запланировано":"Что было запланировано";
   if(p.view==="today")$("summary").innerHTML=p.start?`<b>${n-p.done} ${plural(n-p.done,["шаг","шага","шагов"])}</b> на сегодня · примерно <b>${dur(p.minutes_left).replace("~","")}</b>. Сделал шаг — нажми на его номер, он закроется.`
-    :"<b>План на сегодня выполнен.</b> Можно взять урок вперёд или повторить колоды ещё раз.";
-  else if(p.view==="future")$("summary").innerHTML=n?`<b>${n} ${plural(n,["шаг","шага","шагов"])}</b> · примерно <b>${dur(p.minutes_left).replace("~","")}</b>. Колоды слов и правил — каждый день, их тут нет.`:"На этот день план по дням не составлен.";
+    :"<b>План на сегодня выполнен.</b> Можно взять урок вперёд или позаниматься в Quizlet.";
+  else if(p.view==="future")$("summary").innerHTML=n?`<b>${n} ${plural(n,["шаг","шага","шагов"])}</b> · примерно <b>${dur(p.minutes_left).replace("~","")}</b>. Quizlet — каждый день, его тут нет.`:"На этот день план по дням не составлен.";
   else $("summary").innerHTML=n?`Сделано <b>${p.done} из ${n}</b>. Несделанное переехало на следующий день.`:"На этот день плана не было.";
   $("left").textContent=p.view==="past"?"":p.minutes_left?`осталось ${dur(p.minutes_left)}`:n?"всё сделано":"";
   /* неделя по дням */

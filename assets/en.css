@@ -149,7 +149,10 @@ li.ok .sword,li.bad .sword{pointer-events:none}
 .tk .t small{display:block;color:var(--muted);font-size:13px}
 .tk .tk-st{font:500 11px var(--f-mono);color:var(--muted);white-space:nowrap;padding-top:3px}
 .tk .tk-st.in{color:var(--accent)} .tk .tk-st.ar{color:var(--sun-ink)}
-.tk li.have label{cursor:default;opacity:.7}
+.tk li.have label{opacity:.72}
+.tk-col .tk-foot{padding-top:4px;border-top:1px solid var(--line)}
+.tk-how{margin-top:12px;font-size:14.5px}
+.tk-how summary{cursor:pointer;color:var(--accent);font-weight:500}
 .tk-foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .tk-foot .btn.go{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
 .tk-foot .btn.go:disabled{opacity:.45;cursor:default}
