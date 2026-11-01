@@ -36,7 +36,7 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e02-1.html">← Урок 1 · Present simple</a><span class="mid">урок 2 из 5</span><a href="/lessons/e02-3.html">Урок 3 · Просьбы, анкета, be или do →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · Work and study · урок 2 из 5 · 3 темы + разминка · ~70 минут</div>
+  <div class="eyebrow">Неделя 2 · Work and study · урок 2 из 5 · 3 темы + разминка · ~80 минут</div>
   <h1>Вопросы с do/does, учёба и звук -s</h1>
   <p>Как спросить в present simple: <span class="say">Do you work?</span> <span class="say">Where does she live?</span> — и коротко ответить: <span class="say">Yes, I do.</span> Русская привычка задавать вопрос только голосом здесь ломается сильнее всего: нужен помощник <b>do / does</b>. Дальше — слова про учёбу и как сказать «когда». И звук: окончание -s звучит тремя способами, а <span class="say">Do you</span> в живой речи сливается в одно слово.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
@@ -250,7 +250,9 @@
     <div class="iv" id="iv"></div>
     <div class="btns"><button class="btn" type="button" id="ivPrev">← Назад</button><button class="btn" type="button" id="ivNext">Следующий вопрос →</button></div>
   </div>
-  <div class="prac">
+    <div class="ex" id="exRule"><div class="ex-h"><span class="eyebrow">Объясни правило другу · по-русски</span><p>Лучший способ запомнить правило — объяснить его тому, кто не знает. Напиши или скажи вслух своими словами, с примером, потом сравни с эталоном.</p></div></div>
+  <div class="ex" id="exTell"><div class="ex-h"><span class="eyebrow">Перескажи · по-английски</span><p>Пиши по-английски простыми фразами. Ошибся — не страшно: сравни с эталоном и скажи ещё раз вслух уже правильно.</p></div></div>
+<div class="prac">
     <div class="task"><span class="tg work">Говорить · 5 минут</span>
       <h3>Расспроси про друга</h3>
       <p>Задай вслух пять вопросов с <b>does</b> про друга или родственника (где живёт, что делает, что учит, когда встаёт, что любит) и сам ответь на них — коротко и полной фразой.</p>
@@ -383,6 +385,7 @@
 
 <script src="/assets/lesson.js"></script>
 <script src="/assets/en.js"></script>
+<script src="/assets/drill.js"></script>
 <script src="/assets/quizlet.js"></script>
 <script>
 /* ---------- тема 1: перевёртыш 2 ----------
@@ -580,6 +583,10 @@ exGap($("exMe2"),[
   {s:"___",say:"Where do you have lectures?",a:"Where do you have lectures?"},
   {s:"___",say:"Does she take exams in January?",a:"Does she take exams in January?"}
 ]);
+
+/* ---------- объясни и перескажи ---------- */
+explain($("exRule"), [{"q": "Объясни другу, как построить вопрос в present simple — простой и со словом where / what.", "model": "В начало ставлю помощник: Do — для I, you, we, they, Does — для he, she, it. Потом кто, потом глагол без -s: Does she work? Если есть вопросительное слово, оно идёт первым: Where do you live? What does he do? -s переходит в does, поэтому «Does she works» — ошибка.", "points": ["Do / Does в начало", "глагол без -s", "вопросительное слово первым", "-s уже в does"]}, {"q": "Объясни, как коротко ответить на вопрос с do / does и почему нельзя «Yes, I like».", "model": "Отвечают тем же помощником, что в вопросе: Do you like it? — Yes, I do. / No, I don't. Does she work? — Yes, she does. / No, she doesn't. Глагол не повторяют, а be в ответ на вопрос с do не ставят: не «Yes, I am». Вместо имени в ответе — местоимение.", "points": ["тем же помощником", "глагол не повторяют", "не be на вопрос с do", "местоимение вместо имени"]}, {"q": "Объясни три звука окончания -s (works, lives, watches).", "model": "После глухих звуков (k, p, t, f) — /s/: works, stops. После звонких и гласных — /z/: lives, plays, goes. После s, sh, ch, x, ge — /ɪz/, лишний слог: watches, finishes, changes. То же правило у множественного числа.", "points": ["/s/ после глухих", "/z/ после звонких и гласных", "/ɪz/ после s, sh, ch, x — лишний слог", "пример на каждый"]}]);
+explain($("exTell"), [{"q": "Answer like at a job interview: What do you study? Where do you study? Do you work? What do you do at the weekend?", "model": "I study machine learning. I study at university in Moscow. No, I don't work yet. I'm a full-time student. At the weekend I go to the gym and study English.", "points": ["полные ответы, не одно слово", "No, I don't (короткий ответ)", "at the weekend", "глаголы без -s после I"]}, {"q": "Ask a new colleague 5 questions about work and study (do / does, where, what, when).", "model": "What do you do? Where do you work? Do you work from home? When does your team have meetings? Do you study too?", "points": ["Do you …? минимум раз", "вопрос со словом + do", "does для he / she / it / team", "глагол без -s"]}], {lang: "en"});
 
 takeAway($("take"),{lesson:"2.2",words:WORDS,rules:[
 {

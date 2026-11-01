@@ -12,11 +12,11 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s4.html">← Урок 2.4 · ML заново</a><span class="mid">урок 5 из 5</span><a href="/lessons/w02-test.html">Тест недели 2 →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · урок 5 из 5 · ~45 минут + практика 20 минут</div>
+  <div class="eyebrow">Неделя 2 · урок 5 из 5 · ~60 минут + практика 20 минут</div>
   <h1>Файлы и данные: Python и терминал</h1>
   <p>Первое, что делаешь с любыми данными, — открываешь файл. Здесь — как это делают аккуратно: пути через pathlib, файлы через with, форматы json и csv, быстрый взгляд на файл прямо из терминала и сортировка по любому полю. В конце — первая компания из списка «куда подаваться»: Яндекс.</p>
   <nav class="steps" aria-label="Шаги урока">
-    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>pathlib</a><a href="#s2"><i><span>2</span></i>with</a><a href="#s3"><i><span>3</span></i>json и csv</a><a href="#s4"><i><span>4</span></i>Терминал</a><a href="#s5"><i><span>5</span></i>sorted</a><a href="#s6"><i><span>6</span></i>Яндекс</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>pathlib</a><a href="#s2"><i><span>2</span></i>with</a><a href="#s3"><i><span>3</span></i>json и csv</a><a href="#s4"><i><span>4</span></i>Терминал</a><a href="#s5"><i><span>5</span></i>sorted</a><a href="#s6"><i><span>6</span></i>Яндекс</a><a href="#drill"><i><span>★</span></i>Руками</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
   </nav>
 </header>
 
@@ -46,7 +46,8 @@ text = f.read_text(encoding="utf-8")        <span class="cm"># прочитат�
   <div id="ex1"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>pathlib</b> — стандартная библиотека; путь от корня диска — <b>абсолютный</b>, от текущей папки — <b>относительный</b>. Текущая папка программы — <code>Path.cwd()</code>.</span></div>
   <p class="remember">Пути — через Path и /. Папку для результатов — mkdir(parents=True, exist_ok=True).</p>
-    <details class="more"><summary>Подробнее: путь от файла скрипта — главная ловушка ноутбуков и скриптов<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs1"></div>
+<details class="more"><summary>Подробнее: путь от файла скрипта — главная ловушка ноутбуков и скриптов<small> · 3 минуты</small></summary><div class="a">
     <p>Относительный путь <code>Path("data/raw")</code> считается от папки, <b>из которой запустили</b> программу, а не от файла с кодом. Ноутбук в <code>notebooks/</code> видит данные как <code>../data/raw</code>, скрипт, запущенный из корня, — как <code>data/raw</code>. Отсюда вечное FileNotFoundError.</p>
     <pre>ROOT = Path(__file__).resolve().parents[2]    <span class="cm"># src/oulad_risk/summary.py → корень проекта</span>
 RAW = ROOT / "data" / "raw"                     <span class="cm"># работает, откуда бы ни запустили</span></pre>
@@ -78,7 +79,8 @@ with open("reports/log.txt", "a", encoding="utf-8") as f:   <span class="cm"># "
   <div id="ex2"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>контекстный менеджер</b> (context manager) — объект, который умеет «войти» и «выйти» (<code>__enter__</code> и <code>__exit__</code>); <code>with</code> гарантирует выход.</span></div>
   <p class="remember">Файлы — только через with и с encoding="utf-8". "w" стирает файл, "a" дописывает.</p>
-    <details class="more"><summary>Подробнее: большие файлы, свой контекстный менеджер, несколько файлов<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs2"></div>
+<details class="more"><summary>Подробнее: большие файлы, свой контекстный менеджер, несколько файлов<small> · 3 минуты</small></summary><div class="a">
     <ul>
       <li><code>for line in f:</code> читает по одной строке — так можно пройти файл на 10 ГБ, держа в памяти одну строку. <code>f.read()</code> загрузит его целиком.</li>
       <li>Два файла сразу: <code>with open(a) as src, open(b, "w") as dst:</code>.</li>
@@ -126,7 +128,8 @@ with open("reports/summary.json", encoding="utf-8") as f:
   <div id="ex3b"></div>
   <div class="term-chip"><b>Так это называют</b><span>превратить объект в текст — <b>сериализация</b>; обратно — <b>десериализация</b>. CSV — comma-separated values.</span></div>
   <p class="remember">csv.DictReader — строки как словари, но все значения — строки. json: load/dump с файлом, loads/dumps со строкой.</p>
-    <details class="more"><summary>Подробнее: запись csv, точка с запятой из Excel и что json делает с ключами<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs3"></div>
+<details class="more"><summary>Подробнее: запись csv, точка с запятой из Excel и что json делает с ключами<small> · 3 минуты</small></summary><div class="a">
     <pre>with open("reports/top.csv", "w", newline="", encoding="utf-8") as f:   <span class="cm"># newline="" — иначе на Windows пустые строки между записями</span>
     w = csv.DictWriter(f, fieldnames=["id_student", "studied_credits"])
     w.writeheader()
@@ -164,7 +167,8 @@ with open("reports/summary.json", encoding="utf-8") as f:
   <div id="simData"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>пайп</b> (pipe, |) и <b>перенаправление</b> (redirect, &gt; и &gt;&gt;); у каждой программы есть вход — <b>stdin</b> и выход — <b>stdout</b>.</span></div>
   <p class="remember">head, tail, wc -l — первый взгляд на данные. | соединяет команды, &gt; пишет в файл.</p>
-    <details class="more"><summary>Подробнее: less, ключи grep, sort по столбцу и подвох с кавычками<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs4"></div>
+<details class="more"><summary>Подробнее: less, ключи grep, sort по столбцу и подвох с кавычками<small> · 3 минуты</small></summary><div class="a">
     <ul>
       <li><code>less файл</code>: пробел — страница вниз, <code>/Pass</code> — найти, <code>n</code> — следующее совпадение, <code>q</code> — выйти. В отличие от cat, не вываливает весь файл.</li>
       <li><code>grep -i</code> — без учёта регистра, <code>-v</code> — строки <b>без</b> совпадения, <code>-c</code> — сразу число вместо строк, <code>-n</code> — с номерами строк.</li>
@@ -200,7 +204,8 @@ new = sorted(nums)     <span class="cm"># возвращает НОВЫЙ спи
   <div id="ex5"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>lambda</b> — анонимная (безымянная) функция в одну строку; сортировка Python <b>стабильная</b>: равные элементы сохраняют прежний порядок.</span></div>
   <p class="remember">sorted(…, key=…, reverse=True) — новый список. list.sort() — на месте и возвращает None.</p>
-    <details class="more"><summary>Подробнее: itemgetter, min и max с key, сортировка без учёта регистра<small> · 2 минуты</small></summary><div class="a">
+      <div id="exXs5"></div>
+<details class="more"><summary>Подробнее: itemgetter, min и max с key, сортировка без учёта регистра<small> · 2 минуты</small></summary><div class="a">
     <ul>
       <li><code>from operator import itemgetter</code>; <code>sorted(rows, key=itemgetter("score"))</code> — то же, что lambda, чуть быстрее и короче.</li>
       <li>key есть не только у sorted: <code>max(rows, key=lambda r: r["score"])</code> — лучший студент, <code>min(files, key=len)</code>.</li>
@@ -233,6 +238,15 @@ new = sorted(nums)     <span class="cm"># возвращает НОВЫЙ спи
     <span class="note" data-d="career.apply.0">отметка в дереве</span>
   </div>
   <p class="deep">Хочешь глубже: <a href="/lessons/w02-2.html">файлы, исключения и логи — длинный урок-справочник</a>.</p>
+</section>
+
+<!-- ============ закрепление руками ============ -->
+<section class="step" id="drill">
+  <div class="step-h"><span class="num">★</span><h2>Закрепи руками</h2><span class="min">15 мин</span></div>
+  <p class="why"><b>Зачем:</b> прочитать и понять — половина дела. Запоминается то, что сделал сам: предсказал, нашёл ошибку, собрал. Здесь всё, что было в уроке, — в задачах.</p>
+  <div id="drC"></div>
+  <div id="drB"></div>
+  <div id="drP"></div>
 </section>
 
 <!-- ============ practice ============ -->
@@ -348,6 +362,7 @@ tags: [python, терминал, данные, неделя-2]
 </script>
 <script src="/assets/lesson.js"></script>
 <script src="/assets/ml.js"></script>
+<script src="/assets/drill.js"></script>
 <script>
 /* учебный кусок studentInfo.csv для тренажёра (настоящий файл больше: ~32 тысячи строк и 12 столбцов) */
 TERM_FS.projects["oulad-risk"].data.raw["studentInfo.csv"] = [
@@ -398,6 +413,30 @@ mlCheck($("ex5"), [
 mlCheck($("ex6"), [
   {q: "Какой этап обычно первый после анкеты на стажировку Яндекса?", opts: ["Задания в Яндекс Контесте", "Собеседование с HR", "Тестовое на неделю"], a: 0, why: "По разборам прошлых сезонов — сначала Контест с алгоритмами."},
   {q: "Чем лучше всего готовиться к Контесту?", opts: ["Решать алгоритмические задачи: LeetCode, «Тренировки по алгоритмам»", "Учить теорию ML наизусть", "Писать большой проект"], a: 0, why: "Контест — это задачи на алгоритмы и код."}
+]);
+
+/* ---------- объясни своими словами и закрепи руками ---------- */
+explain($("exXs1"), [{"q": "Почему пути собирают через Path, а не строками? Почему ноутбук и скрипт по-разному видят data/raw?", "model": "Path соединяет части знаком / и сам ставит правильный разделитель на любой системе, у него есть удобные свойства: name, stem, suffix, parent, exists, glob. Относительный путь считается от папки, откуда запустили программу, а не от файла с кодом: ноутбук в notebooks видит данные как ../data/raw, скрипт из корня — как data/raw. Надёжно — путь от файла кода: Path(__file__).resolve().parents[...].", "points": ["Path и / — правильно на любой системе", "свойства name / suffix / parent / glob", "относительный путь — от папки запуска", "Path(__file__) — от файла кода"]}]);
+explain($("exXs2"), [{"q": "Зачем <code>with</code> при работе с файлами и чем отличаются режимы \"w\" и \"a\"?", "model": "with — контекстный менеджер: при выходе из блока файл закрывается сам, даже если внутри случилась ошибка. Иначе данные могут не записаться, а открытые файлы копятся. \"w\" перезаписывает файл с нуля, \"a\" дописывает в конец. encoding=\"utf-8\" — всегда, чтобы русский текст не превратился в кракозябры.", "points": ["файл закроется сам, даже при ошибке", "контекстный менеджер", "\"w\" — перезапись, \"a\" — дописать", "encoding=\"utf-8\""]}]);
+explain($("exXs3"), [{"q": "Чем csv отличается от json, и в чём главная ловушка csv.DictReader?", "model": "csv — таблица: строки и одинаковые столбцы. json — любые структуры, в том числе вложенные: настройки, ответы API, отчёты. csv.DictReader отдаёт каждую строку словарём, но все значения — строки, числа нужно переводить через int или float. json.dump / load работают с файлом, dumps / loads — со строкой; ensure_ascii=False — чтобы русский текст был читаемым.", "points": ["csv — таблица, json — вложенные структуры", "DictReader — строки-словари", "все значения строки → int()", "dump/load — файл, dumps/loads — строка"]}]);
+explain($("exXs4"), [{"q": "Как быстро посмотреть на большой файл в терминале и посчитать, сколько каждого значения в столбце?", "model": "head -5 — первые строки, tail -n 3 — последние, wc -l — сколько строк, less — листать, tail -f — следить за логом вживую. Пайп | передаёт вывод одной команды на вход другой: cut -d, -f5 файл | sort | uniq -c — взять 5-й столбец, отсортировать, посчитать одинаковые. > пишет вывод в файл, >> дописывает, 2> — только ошибки.", "points": ["head / tail / wc -l / less", "пайп | — вывод на вход следующей", "cut | sort | uniq -c", "> и >>", "tail -f или 2>"]}]);
+explain($("exXs5"), [{"q": "Как отсортировать студентов по баллу от большего к меньшему и чем sorted отличается от sort?", "model": "sorted(students, key=lambda r: r[\"score\"], reverse=True). key — функция, которая говорит, по чему сравнивать каждый элемент, lambda — короткая функция на месте. sorted возвращает новый список и не трогает старый, list.sort() сортирует на месте и возвращает None — поэтому x = x.sort() теряет список.", "points": ["key=lambda r: r[\"score\"]", "reverse=True", "sorted — новый список", "sort — на месте и None"]}]);
+predict($("drC"), [
+  {code: "from pathlib import Path\np = Path(\"data/raw/studentInfo.csv\")\nprint(p.stem, p.suffix)", a: "studentInfo .csv", why: "stem — имя без расширения, suffix — расширение."},
+  {code: "import json\nprint(json.dumps({1: \"a\", \"ok\": True}))", a: "{\"1\": \"a\", \"ok\": true}", why: "Ключи в json всегда строки, True становится true."},
+  {code: "row = {\"studied_credits\": \"60\"}\nprint(row[\"studied_credits\"] * 2)", a: "6060", why: "Из csv приходят строки: строка × 2 — повтор."},
+  {code: "words = [\"pandas\", \"ml\", \"sql\"]\nprint(sorted(words, key=len))", a: "['ml', 'sql', 'pandas']", why: "По длине: 2, 3, 6."},
+  {code: "a = [3, 1, 2]\nb = a.sort()\nprint(b)", a: "None", why: "sort() возвращает None."}
+]);
+findBug($("drB"), [
+  {task: "После сортировки список пропал.", code: "scores = [70, 95, 80]\nscores = scores.sort()\nprint(scores[0])", bug: 1, fix: "scores.sort()  или  scores = sorted(scores)", why: "sort() возвращает None, и в scores записался None."},
+  {task: "Скрипт должен добавлять строку в лог, а лог каждый раз содержит одну строку.", code: "def log(msg):\n    with open(\"train.log\", \"w\", encoding=\"utf-8\") as f:\n        f.write(msg + \"\\n\")", bug: 1, fix: "open(\"train.log\", \"a\", encoding=\"utf-8\")", why: "\"w\" стирает файл при каждом открытии."},
+  {task: "Топ по кредитам выходит странный: 90 ниже 120, но 60 выше 120.", code: "with open(RAW, encoding=\"utf-8\") as f:\n    rows = list(csv.DictReader(f))\ntop = sorted(rows, key=lambda r: r[\"studied_credits\"], reverse=True)", bug: 2, fix: "key=lambda r: int(r[\"studied_credits\"])", why: "Строки сравниваются по буквам: \"60\" > \"120\", потому что «6» > «1»."}
+]);
+parsons($("drP"), [
+  {task: "Собери скрипт: прочитать csv, посчитать итоги, сохранить json. Одна строка лишняя.",
+   lines: ["import csv, json", "from collections import Counter", "with open(\"data/raw/studentInfo.csv\", encoding=\"utf-8\") as f:", "    rows = list(csv.DictReader(f))", "results = Counter(r[\"final_result\"] for r in rows)", "with open(\"reports/summary.json\", \"w\", encoding=\"utf-8\") as f:", "    json.dump(dict(results), f, ensure_ascii=False, indent=2)"],
+   extra: ["rows = open(\"data/raw/studentInfo.csv\").read()"], why: "Импорты → чтение через with → подсчёт → запись через with."}
 ]);
 
 initLesson({topics: [["python.err.3", "Файлы и pathlib"], ["python.err.2", "Контекстные менеджеры и with"], ["python.err.4", "json и csv"], ["tools.term.1", "Просмотр файлов"], ["tools.term.3", "Пайпы и перенаправления"], ["python.coll.3", "sorted с key=, lambda"], ["career.apply.0", "Яндекс: стажировка и ШАД"]]});

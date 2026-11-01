@@ -23,7 +23,7 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e02-4.html">← Урок 4 · Читаем и пишем</a><span class="mid">урок 5 из 5</span><a href="/lessons/e02-test.html">Тест недели 2 →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · Work and study · урок 5 из 5 · 2 темы + работа над ошибками · ~75 минут</div>
+  <div class="eyebrow">Неделя 2 · Work and study · урок 5 из 5 · 2 темы + работа над ошибками · ~85 минут</div>
   <h1>Повторение и разговор</h1>
   <p>Последний урок недели — нового почти нет. Сначала финальная работа над ошибками теста недели 1. Потом вся неделя в одном месте: present simple, be или do, вопросы и короткие ответы — много упражнений, на слух и на письмо. И главное — разговор: как отвечать не одним словом и задавать встречные вопросы. В конце — тренажёр интервью: вопрос звучит, у тебя 20 секунд на ответ вслух.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
@@ -146,7 +146,9 @@
   <div class="eyebrow">Практика · ~25 минут</div>
   <h2>Практика</h2>
   <p class="tldr">Говорить много — главное в этом уроке. Отмечай «Сделал» — план дня это видит.</p>
-  <div class="prac">
+    <div class="ex" id="exRule"><div class="ex-h"><span class="eyebrow">Объясни правило другу · по-русски</span><p>Лучший способ запомнить правило — объяснить его тому, кто не знает. Напиши или скажи вслух своими словами, с примером, потом сравни с эталоном.</p></div></div>
+  <div class="ex" id="exTell"><div class="ex-h"><span class="eyebrow">Перескажи · по-английски</span><p>Пиши по-английски простыми фразами. Ошибся — не страшно: сравни с эталоном и скажи ещё раз вслух уже правильно.</p></div></div>
+<div class="prac">
     <div class="task"><span class="tg work">Говорить · 5 минут</span>
       <h3>Роль B на митапе</h3>
       <p>Включи диалог «на митапе», нажми «Скрыть реплики B» и говори за Влада сам. Два раза: первый — подглядывая, второй — нет.</p>
@@ -264,6 +266,7 @@
 
 <script src="/assets/lesson.js"></script>
 <script src="/assets/en.js"></script>
+<script src="/assets/drill.js"></script>
 <script src="/assets/quizlet.js"></script>
 <script>
 /* ---------- диалог: озвучка ролей, скрыть реплики B ---------- */
@@ -425,6 +428,10 @@ exBuild($("ex2b"),[
   {ru:"Где работает твоя команда?",w:"Where does your team work ?",extra:["do","works"]},
   {ru:"Это твой первый митап?",w:"Is this your first meetup ?",extra:["Does","Do"]}
 ]);
+
+/* ---------- объясни и перескажи ---------- */
+explain($("exRule"), [{"q": "Объясни всю схему present simple: утверждение, отрицание, вопрос, короткий ответ — для I и для she.", "model": "I work / She works. I don't work / She doesn't work. Do you work? / Does she work? Yes, I do / No, she doesn't. -s одна на предложение: у глагола в утверждении или у does в вопросе и отрицании. Нет глагола-действия — работает be: Are you tired? She isn't at home.", "points": ["+ с -s у she", "− через don't / doesn't", "? через Do / Does", "короткий ответ тем же помощником", "be, когда нет глагола"]}, {"q": "Назови шесть ошибок теста недели 1 и правило к каждой.", "model": "1) I'm agree → I agree: be с глаголом не ставят. 2) People is → People are: people — много. 3) a hour → an hour: a / an по звуку, an IT company, a university. 4) a person very kind → a very kind person. 5) He's a bit friendly → He isn't very friendly: a bit — только с плохими словами. 6) Почта на слух: dot — точка, at — @.", "points": ["be + глагол", "people / parents — are", "a / an по звуку", "a very kind person", "not very / a bit", "dot и at"]}]);
+explain($("exTell"), [{"q": "Answer by the rule «answer + detail + question»: Do you work? What do you study? Do you like Python?", "model": "No, I don't. I'm a full-time student. What about you? I study machine learning. It's interesting, but it isn't easy. Yes, I do. I use it every day. And you?", "points": ["короткий ответ, не голое No", "деталь", "встречный вопрос", "Yes, I do — не Yes, I like"]}, {"q": "Retell the meetup dialogue between Vlad and Emma in 5 sentences.", "model": "Vlad meets Emma at a meetup. Emma is a data scientist and works for a start-up. She builds models for online shops. Vlad is a student and studies machine learning full-time. It's his first meetup, so Emma introduces him to her colleagues.", "points": ["Emma — data scientist, start-up", "models for online shops", "Vlad — student, ML", "first meetup", "глаголы с -s"]}], {lang: "en"});
 
 takeAway($("take"),{lesson:"2.5",words:[
   {en:"What about you?",ru:"А ты? (вернуть вопрос)"},

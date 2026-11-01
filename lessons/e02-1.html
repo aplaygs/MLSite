@@ -33,7 +33,7 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/en#w-2">← Неделя 2 в плане</a><span class="mid">урок 1 из 5</span><a href="/lessons/e02-2.html">Урок 2 · Вопросы с do/does →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · Work and study · урок 1 из 5 · 2 темы + разминка · ~70 минут</div>
+  <div class="eyebrow">Неделя 2 · Work and study · урок 1 из 5 · 2 темы + разминка · ~80 минут</div>
   <h1>Present simple: что я делаю всегда</h1>
   <p>Первое настоящее время с «настоящими» глаголами: <span class="say">I work</span>, <span class="say">she works</span>, <span class="say">he doesn't work</span>. Им рассказывают о работе, учёбе, привычках и фактах — то есть почти обо всём, о чём говорят при знакомстве и на собеседовании. Здесь же главная путаница русскоговорящих: когда <b>be</b> (неделя 1), а когда <b>do</b>. Во второй теме — профессии и как сказать, где и кем ты работаешь.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
@@ -219,7 +219,9 @@
   <div class="ex" id="exMe1"><div class="ex-h"><span class="eyebrow">Про тебя · собери фразу</span><p>Это твоя жизнь по-английски: учёба, зал, планы. Переведи — и потом скажи каждую фразу вслух.</p></div></div>
   <div class="ex" id="exMe2"><div class="ex-h"><span class="eyebrow">Про тебя · диктант</span><p>Нажми 🔊 и запиши фразу целиком. Слушай, есть ли -s в конце глагола. Второй клик сразу — медленнее.</p></div></div>
 
-  <div class="prac">
+    <div class="ex" id="exRule"><div class="ex-h"><span class="eyebrow">Объясни правило другу · по-русски</span><p>Лучший способ запомнить правило — объяснить его тому, кто не знает. Напиши или скажи вслух своими словами, с примером, потом сравни с эталоном.</p></div></div>
+  <div class="ex" id="exTell"><div class="ex-h"><span class="eyebrow">Перескажи · по-английски</span><p>Пиши по-английски простыми фразами. Ошибся — не страшно: сравни с эталоном и скажи ещё раз вслух уже правильно.</p></div></div>
+<div class="prac">
     <div class="task"><span class="tg work">Говорить · 5 минут</span>
       <h3>Мой обычный день</h3>
       <p>Шесть фраз о себе: где живёшь, что учишь, во сколько встаёшь, что любишь, чего не делаешь (два отрицания с don't). Потом четыре фразы о друге или родственнике — с -s.</p>
@@ -349,6 +351,7 @@
 
 <script src="/assets/lesson.js"></script>
 <script src="/assets/en.js"></script>
+<script src="/assets/drill.js"></script>
 <script src="/assets/quizlet.js"></script>
 <script>
 /* ---------- тема 1: машина -s ---------- */
@@ -535,6 +538,10 @@ exGap($("exMe2"),[
   {s:"___",say:"My friend doesn't like early lectures.",a:["My friend doesn't like early lectures","My friend does not like early lectures"]},
   {s:"___",say:"They work for a big IT company.",a:"They work for a big IT company"}
 ]);
+
+/* ---------- объясни и перескажи ---------- */
+explain($("exRule"), [{"q": "Объясни другу, когда в present simple у глагола появляется -s и куда оно девается в отрицании.", "model": "-s появляется, когда делает один человек или одна вещь, кроме I и you: he, she, it, Vlad, my sister — She works. В отрицании -s переходит в doesn't, а глагол остаётся голым: She doesn't work. -s одна на предложение. Пишется по правилам: watch → watches, study → studies, have → has.", "points": ["he / she / it и один человек → -s", "doesn't + голый глагол", "-s одна на предложение", "правописание: -es, -ies, has", "свой пример"]}, {"q": "Объясни, как решить, нужен в предложении be или do.", "model": "Ищу в предложении глагол-действие (work, live, like, study). Нет его — ставлю am / is / are: I'm a student, She isn't at home. Есть — глагол работает сам, а отрицание и вопрос делаю через do / does: I don't work. Вместе be и глагол не ставят: не «I'm work», а I work. Состояния вроде tired, married, twenty — через be.", "points": ["есть ли глагол-действие", "нет — am / is / are", "есть — do / does в отрицании", "не «I'm work»", "tired / married — be"]}]);
+explain($("exTell"), [{"q": "Tell about yourself in 5–6 sentences: who you are, what you study, what you do every week.", "model": "I'm Vlad. I'm a third-year student. I study machine learning. I study English with a tutor twice a week. I go to the gym three times a week. I don't work yet, but I want to work as an ML engineer.", "points": ["I'm … / I'm a student (be)", "минимум 3 глагола без -s (I study, I go…)", "отрицание с don't", "want to work as …", "без «I'm study»"]}, {"q": "Now tell about a friend or a family member (he / she) — 5 sentences. Every verb needs -s or doesn't.", "model": "My friend Ilya is a developer. He works for a big IT company. He lives in Moscow. He goes to the gym on Mondays and Fridays. He doesn't like early meetings.", "points": ["he / she + be в первой фразе", "каждый глагол с -s", "doesn't + голый глагол", "works for / works as / lives in"]}], {lang: "en"});
 
 takeAway($("take"),{lesson:"2.1",words:WORDS.concat([
   {en:"work from home",ru:"работать из дома, удалённо",ex:"I work from home on Fridays."},

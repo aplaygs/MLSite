@@ -30,7 +30,7 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e02-3.html">← Урок 3 · Просьбы, анкета, be или do</a><span class="mid">урок 4 из 5</span><a href="/lessons/e02-5.html">Урок 5 · Повторение и разговор →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · Work and study · урок 4 из 5 · 2 темы + разминка · ~75 минут</div>
+  <div class="eyebrow">Неделя 2 · Work and study · урок 4 из 5 · 2 темы + разминка · ~85 минут</div>
   <h1>Читаем и пишем: работа и учёба</h1>
   <p>Вся грамматика недели — в живых текстах. Три человека рассказывают о своей работе и учёбе, ещё одного — аналитика из Москвы — слушаешь без текста. Потом пишешь своё письмо: «привет, я новенький» для группы или команды. Это урок-практика: правил мало, заданий много.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее. Кнопка 🔊 у текста читает его целиком.</p>
@@ -168,7 +168,9 @@
   <div class="eyebrow">Практика · ~25 минут</div>
   <h2>Практика</h2>
   <p class="tldr">Четыре задания: читать вслух, пересказать услышанное, написать своё и рассказать о другом. Отмечай «Сделал» — план дня это видит.</p>
-  <div class="prac">
+    <div class="ex" id="exRule"><div class="ex-h"><span class="eyebrow">Объясни правило другу · по-русски</span><p>Лучший способ запомнить правило — объяснить его тому, кто не знает. Напиши или скажи вслух своими словами, с примером, потом сравни с эталоном.</p></div></div>
+  <div class="ex" id="exTell"><div class="ex-h"><span class="eyebrow">Перескажи · по-английски</span><p>Пиши по-английски простыми фразами. Ошибся — не страшно: сравни с эталоном и скажи ещё раз вслух уже правильно.</p></div></div>
+<div class="prac">
     <div class="task"><span class="tg int">Читать вслух · 5 минут</span>
       <h3>Тень за диктором</h3>
       <p>Включи текст про Tom (🔊 у текста). Читай вслух вместе с голосом, отставая на полслова. Потом — сам, без звука. Цель — ровно, без пауз на <i>colleagues</i>, <i>meetings</i>, <i>sometimes</i>.</p>
@@ -295,6 +297,7 @@
 
 <script src="/assets/lesson.js"></script>
 <script src="/assets/en.js"></script>
+<script src="/assets/drill.js"></script>
 <script src="/assets/quizlet.js"></script>
 <script>
 /* ---------- аудио: интервью, текст скрыт до конца ---------- */
@@ -482,6 +485,10 @@ exBuild($("ex2d"),[
   {ru:"Мне очень нравятся настольные игры.",w:"I really like board games .",extra:["very","likes"]},
   {ru:"До встречи в понедельник!",w:"See you on Monday !",extra:["in","at"]}
 ]);
+
+/* ---------- объясни и перескажи ---------- */
+explain($("exRule"), [{"q": "Объясни, как читать текст на английском, если половина слов незнакомая.", "model": "Сначала прочитать вопросы — знаешь, что искать. Первый раз прочитать целиком и не останавливаться: кто, где, нравится ли. Второй раз искать детали: время, дни, места. Незнакомое слово угадывать по соседним — shift: «с восьми вечера до восьми утра», значит смена. Словарь — только в конце.", "points": ["сначала вопросы", "первый раз — общий смысл", "второй раз — детали", "слово по соседним"]}, {"q": "Объясни, из каких частей состоит письмо о себе и где ставить also.", "model": "Привет (Hi everyone,) → кто я (My name's…, I'm the new…) → работа и учёба → свободное время → прощание (See you on Monday! Best wishes, имя). 60–100 слов. Связки: and — добавить, but — против. also — перед глаголом (I also work here), но после be (I'm also a student). «Очень нравится» — I really like, не «I very like».", "points": ["пять частей письма", "and / but", "also перед глаголом, после be", "really like, не very like"]}]);
+explain($("exTell"), [{"q": "Retell the three texts: Kate, Tom and Li Na — two sentences about each.", "model": "Kate is a nurse. She works at night in a hospital in Manchester and loves her job. Tom is a software developer. He works from home four days a week. Li Na is a student from China. She studies medicine in Edinburgh and works in a café at the weekend.", "points": ["Kate — nurse, nights", "Tom — developer, from home", "Li Na — student, medicine, café", "глаголы с -s"]}, {"q": "Retell the interview with Max in 5 sentences (he …).", "model": "Max is a data analyst. He works for a bank in Moscow. He starts at ten, so he doesn't get up early. He works from home on Mondays and Tuesdays. He does an online course in machine learning and plays football on Saturdays.", "points": ["data analyst, bank", "starts at ten / doesn't get up early", "from home on Mondays and Tuesdays", "online course in ML", "-s и doesn't"]}], {lang: "en"});
 
 takeAway($("take"),{lesson:"2.4",words:WORDS,rules:[
 {

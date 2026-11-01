@@ -46,11 +46,11 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s1.html">← Урок 2.1 · Проект как на работе</a><span class="mid">урок 2 из 5</span><a href="/lessons/w02-s3.html">Урок 2.3 · Коллекции и словарь →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · урок 2 из 5 · повторение по тесту недели 1 · ~50 минут + практика 15 минут</div>
+  <div class="eyebrow">Неделя 2 · урок 2 из 5 · повторение по тесту недели 1 · ~65 минут + практика 15 минут</div>
   <h1>Python заново: переменные, типы и сравнения</h1>
   <p>В тесте недели 1 урок «Python изнутри» не сработал совсем — и дело не в тебе: он был длинный и плотный. Здесь то же самое, но по-другому: пять коротких шагов, и в каждом ты сначала <b>видишь</b>, что происходит в памяти, потом предсказываешь вывод кода. Термины — только в конце шага.</p>
   <nav class="steps" aria-label="Шаги урока">
-    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Ярлыки</a><a href="#s2"><i><span>2</span></i>Типы</a><a href="#s3"><i><span>3</span></i>== и is</a><a href="#s4"><i><span>4</span></i>Где живёт имя</a><a href="#s5"><i><span>5</span></i>Строки</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Ярлыки</a><a href="#s2"><i><span>2</span></i>Типы</a><a href="#s3"><i><span>3</span></i>== и is</a><a href="#s4"><i><span>4</span></i>Где живёт имя</a><a href="#s5"><i><span>5</span></i>Строки</a><a href="#drill"><i><span>★</span></i>Руками</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
   </nav>
 </header>
 
@@ -82,7 +82,8 @@
   <div id="ex1"></div>
   <div class="term-chip"><b>Так это называют</b><span>имена — <b>ссылки</b> на объекты; список и словарь — <b>изменяемые</b> (mutable), число, строка, кортеж — <b>неизменяемые</b> (immutable). Ловушка с <code>acc=[]</code> — <b>mutable default argument</b>.</span></div>
   <p class="remember">b = a — тот же объект. Нужна копия — a.copy(). Список по умолчанию — None, а внутри новый [].</p>
-    <details class="more"><summary>Подробнее: функция получает тот же список, копия бывает «неглубокой»<small> · 4 минуты</small></summary><div class="a">
+      <div id="exXs1"></div>
+<details class="more"><summary>Подробнее: функция получает тот же список, копия бывает «неглубокой»<small> · 4 минуты</small></summary><div class="a">
     <p><b>В функцию передаётся тот же объект, а не копия.</b> Поэтому функция, которая меняет список на месте, меняет его и у того, кто её вызвал:</p>
     <pre>def add_bonus(scores):
     scores.append(100)          <span class="cm"># меняем на месте</span>
@@ -127,7 +128,8 @@ abs((0.1 + 0.2) - 0.3) &lt; 1e-9  <span class="cm"># то же самое рук
   <div id="ex2"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>числа с плавающей точкой</b> (floating point, стандарт IEEE 754); превращение типов — <b>приведение</b> (casting): <code>int()</code>, <code>float()</code>, <code>str()</code>.</span></div>
   <p class="remember">Дробные через == не сравнивают — только math.isclose. Из CSV всё приходит строками.</p>
-    <details class="more"><summary>Подробнее: округление, int() и bool — тоже число<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs2"></div>
+<details class="more"><summary>Подробнее: округление, int() и bool — тоже число<small> · 3 минуты</small></summary><div class="a">
     <ul>
       <li><code>int("3.5")</code> — ошибка ValueError. Сначала <code>float("3.5")</code>, потом <code>int(...)</code>. <code>int(3.9)</code> — 3: дробная часть отбрасывается, не округляется.</li>
       <li><code>round(2.5)</code> — <b>2</b>, а <code>round(3.5)</code> — <b>4</b>: Python округляет «половинки» к чётному. Для денег и отчётов это бывает неожиданностью. <code>round(x, 2)</code> — до двух знаков.</li>
@@ -161,7 +163,8 @@ if n_missing is not None:     <span class="cm"># правильно: «знач�
   <div id="ex3b"></div>
   <div class="term-chip"><b>Так это называют</b><span>== — <b>равенство</b> (equality), is — <b>тождество</b> (identity); то, что Python считает ложью, — <b>falsy</b>, остальное — <b>truthy</b>.</span></div>
   <p class="remember">None проверяют только через is. «Пустое» и «ноль» — тоже ложь, поэтому if x: — не проверка на None.</p>
-    <details class="more"><summary>Подробнее: почему is иногда «работает» с числами, and / or и all / any<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs3"></div>
+<details class="more"><summary>Подробнее: почему is иногда «работает» с числами, and / or и all / any<small> · 3 минуты</small></summary><div class="a">
     <ul>
       <li><code>a = 256; b = 256; a is b</code> — True, а с 1000 может быть False: маленькие числа Python хранит в одном экземпляре для экономии. Это деталь реализации — <b>числа и строки никогда не сравнивают через is</b>.</li>
       <li>Почему для None именно is: у объекта можно переопределить ==. Например, у массивов NumPy <code>arr == None</code> вернёт массив из True и False, а не один ответ. <code>is</code> переопределить нельзя.</li>
@@ -215,6 +218,7 @@ def make_counter():
   <div class="term-chip"><b>Так это называют</b><span><b>область видимости</b> (scope); порядок поиска — <b>LEGB</b>: Local → Enclosing → Global → Built-in. Функция, которая помнит внешние имена, — <b>замыкание</b> (closure).</span></div>
   <p class="remember">Данные в функцию — через параметры, наружу — через return. global почти никогда не нужен.</p>
     <div class="callout trap"><b class="h">Частые ошибки</b><ul class="oops"><li><span class="no"><code>list = [1, 2, 3]</code></span><span class="yes"><code>nums = [1, 2, 3]</code></span><span class="n">Имя list перекрыло встроенную функцию: list("abc") дальше сломается. То же с sum, max, id, type, input.</span></li><li><span class="no"><code>def f(): total += x</code></span><span class="yes"><code>def f(total, x): return total + x</code></span><span class="n">UnboundLocalError — или используй параметр и return.</span></li><li><span class="no"><code>lambda: i  # в цикле</code></span><span class="yes"><code>lambda i=i: i</code></span><span class="n">Иначе все функции увидят последнее i.</span></li></ul></div>
+  <div id="exXs4"></div>
 <div class="topic-check" data-for="python.base.4">
     <label class="tp"><input type="checkbox" data-id="python.base.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Область видимости</b></span></label>
     <span class="note" data-d="python.base.4">отметка в дереве</span>
@@ -260,7 +264,8 @@ f"{n=}"                                     <span class="cm"># 'n=32593' — у�
   <div id="ex5b"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>срез</b> (slice); у строк, списков и кортежей одинаковый синтаксис. Срез списка — <b>копия</b>: <code>a[:]</code>.</span></div>
   <p class="remember">stop не включается: s[1:5] — это 4 элемента, с 1-го по 4-й. Методы строк возвращают новую строку. Числа в тексте — через f"{x:.2f}".</p>
-    <details class="more"><summary>Подробнее: строки неизменяемые, in, len и форматы чисел<small> · 2 минуты</small></summary><div class="a">
+      <div id="exXs5"></div>
+<details class="more"><summary>Подробнее: строки неизменяемые, in, len и форматы чисел<small> · 2 минуты</small></summary><div class="a">
     <ul>
       <li><code>s[0] = "P"</code> — ошибка: строку нельзя поменять на месте. Только собрать новую: <code>s = "P" + s[1:]</code>.</li>
       <li><code>"ML" in "Learning ML"</code> — True: in у строки ищет подстроку. <code>len(s)</code> — длина.</li>
@@ -274,6 +279,15 @@ f"{n=}"                                     <span class="cm"># 'n=32593' — у�
     <span class="note" data-d="python.base.5">отметка в дереве</span>
   </div>
   <p class="deep">Хочешь глубже: <a href="/lessons/w01-2.html#p1">ярлыки и изменяемость</a> · <a href="/lessons/w01-2.html#p2">is и ==</a> · <a href="/lessons/w01-2.html#p5">область видимости</a> · <a href="/lessons/w01-2.html#p6">строки и f-strings</a> — справочник.</p>
+</section>
+
+<!-- ============ закрепление руками ============ -->
+<section class="step" id="drill">
+  <div class="step-h"><span class="num">★</span><h2>Закрепи руками</h2><span class="min">15 мин</span></div>
+  <p class="why"><b>Зачем:</b> прочитать и понять — половина дела. Запоминается то, что сделал сам: предсказал, нашёл ошибку, собрал. Здесь всё, что было в уроке, — в задачах.</p>
+  <div id="drC"></div>
+  <div id="drB"></div>
+  <div id="drP"></div>
 </section>
 
 <!-- ============ practice ============ -->
@@ -384,6 +398,7 @@ tags: [python, повторение, неделя-2]
 </script>
 <script src="/assets/lesson.js"></script>
 <script src="/assets/ml.js"></script>
+<script src="/assets/drill.js"></script>
 <script>
 /* ---------- карта памяти: имена → объекты по шагам ---------- */
 (function memory() {
@@ -497,6 +512,33 @@ mlCheck($("ex5b"), [
 mlCheck($("ex4b"), [
   {q: "Что выведет код?<pre>def make_counter():\n    n = 0\n    def step():\n        nonlocal n\n        n += 1\n        return n\n    return step\n\nc = make_counter()\nc(); c()\nprint(c())</pre>", opts: ["3", "1", "Ошибку"], a: 0, why: "nonlocal: step меняет n из make_counter, и функция помнит его между вызовами."},
   {q: "Почему после <code>list = [1, 2]</code> строка <code>list(\"abc\")</code> падает?", opts: ["Имя list теперь смотрит на список, а не на встроенную функцию", "Нельзя превращать строку в список", "Так всегда"], a: 0, why: "Своё имя перекрыло встроенное (поиск LEGB находит его раньше Built-in)."}
+]);
+
+/* ---------- объясни своими словами и закрепи руками ---------- */
+explain($("exXs1"), [{"q": "Объясни другу разницу между <code>b = a</code> и <code>b = a.copy()</code> для списка и ловушку <code>def f(acc=[])</code>.", "model": "Имя — ярлык на объекте. b = a вешает второй ярлык на тот же список: append или += через b видно и через a. a.copy() создаёт новый список, изменения b больше не трогают a. Список в def по умолчанию создаётся один раз на все вызовы, поэтому данные прошлых вызовов «прилипают». Правильно: acc=None, а внутри if acc is None: acc = [].", "points": ["b = a — тот же объект, два ярлыка", "copy() — новый объект", "список изменяемый: изменение видно через все ярлыки", "[] в def создаётся один раз", "правильно — None и новый список внутри"]}]);
+explain($("exXs2"), [{"q": "Почему <code>0.1 + 0.2 == 0.3</code> даёт False и как правильно сравнивать дробные? Что делают <code>//</code> и <code>%</code>?", "model": "Компьютер хранит дробные в двоичном виде, и 0.1 в нём нельзя записать точно — получается 0.30000000000000004. Поэтому дробные сравнивают с допуском: math.isclose(a, b). // — целая часть от деления (7 // 2 = 3), % — остаток (7 % 2 = 1).", "points": ["дробные хранятся неточно (двоичная система)", "сравнивать через math.isclose", "// — целая часть", "% — остаток"]}]);
+explain($("exXs3"), [{"q": "Когда использовать <code>is</code>, а когда <code>==</code>? Почему <code>if n_missing:</code> — опасная проверка?", "model": "== сравнивает значения, is — один ли это объект. is нужен только для None: x is None. Ложью считаются 0, 0.0, пустые строки и коллекции, None и False. Поэтому if n_missing: при значении 0 решит, что значения нет. Правильно — if n_missing is not None.", "points": ["== — значения, is — тот же объект", "is — только для None", "ложь: 0, пустое, None", "0 потеряется → is not None"]}]);
+explain($("exXs4"), [{"q": "Объясни, где живут переменные функции и почему <code>count = count + 1</code> внутри функции падает. Зачем global и nonlocal?", "model": "Если внутри функции имени что-то присваивают, оно становится внутренним для всей функции. Прочитать его до присваивания нельзя — отсюда UnboundLocalError. Читать внешнее имя можно, менять — нет. global берёт имя из файла, nonlocal — из внешней функции. Но лучше передавать через параметр и возвращать через return. Ищет Python по порядку LEGB: своя функция, внешняя, файл, встроенные.", "points": ["присваивание делает имя внутренним", "читать внешнее можно, менять — нет", "global — из файла, nonlocal — из внешней функции", "лучше параметр и return", "LEGB"]}]);
+explain($("exXs5"), [{"q": "Как работает срез <code>s[a:b:c]</code>? Назови три метода строк и покажи f-строку с двумя знаками после точки.", "model": "Срез берёт элементы с номера a включительно до b не включая, с шагом c; пропущенное — с начала, до конца, шаг 1; отрицательные номера — с конца. Методы: strip — убрать пробелы по краям, lower — маленькие буквы, split(\",\") — разрезать, join, replace. Строка неизменяемая — методы возвращают новую. f-строка: f\"{acc:.2f}\".", "points": ["a включительно, b не включая, c — шаг", "отрицательные — с конца", "три метода строк", "методы возвращают новую строку", "f\"{x:.2f}\""]}]);
+predict($("drC"), [
+  {code: "a = [1]\nb = a\nb.append(2)\nprint(a)", a: "[1, 2]", why: "Один список, два ярлыка."},
+  {code: "x = 5\ny = x\ny += 1\nprint(x)", a: "5", why: "Число неизменяемое: y перевесился на новое число 6."},
+  {code: "print(17 // 5, 17 % 5)", a: "3 2", why: "Целая часть и остаток."},
+  {code: "print(bool(\"\"), bool(\" \"), bool([0]))", a: "False True True", why: "Пустая строка — ложь, пробел и [0] — не пустые."},
+  {code: "print(\"engineer\"[::-1][:3])", a: "ree", why: "Сначала разворот: reenigne, потом первые три."},
+  {code: "print(\" a,b ,c \".strip().split(\",\"))", a: ["['a', 'b ', 'c']"], why: "strip убрал пробелы только по краям всей строки, пробел перед запятой остался в 'b '."},
+  {code: "acc = 0.8766\nprint(f\"{acc:.1%}\")", a: "87.7%", why: "% умножает на 100, .1 — один знак после точки, с округлением."}
+]);
+findBug($("drB"), [
+  {task: "Функция копит оценки — но у второго студента откуда-то оценки первого.", code: "def add_score(score, scores=[]):\n    scores.append(score)\n    return scores", bug: 0, fix: "def add_score(score, scores=None):  # и внутри: if scores is None: scores = []", why: "Список по умолчанию один на все вызовы."},
+  {task: "Отчёт пишет «пропусков нет», когда их ровно 0, — но и когда число не посчитано. Где ошибка?", code: "n_missing = count_missing(df)  # число или None\nif n_missing:\n    print(\"пропусков:\", n_missing)\nelse:\n    print(\"данных о пропусках нет\")", bug: 1, fix: "if n_missing is not None:", why: "0 — ложь, поэтому при нуле пропусков печатается «данных нет»."},
+  {task: "Проверка в тесте падает, хотя loss печатается как 0.3.", code: "loss = 0.1 + 0.2\nassert loss == 0.3, \"loss не сошёлся\"\nprint(\"ok\")", bug: 1, fix: "assert math.isclose(loss, 0.3)", why: "Дробные сравнивают с допуском."},
+  {task: "Через 20 строк кода падает list(\"abc\"). Почему?", code: "list = [3, 1, 2]\nlist.sort()\nprint(list)\nletters = list(\"abc\")", bug: 0, fix: "nums = [3, 1, 2]", why: "Имя list перекрыло встроенную функцию."}
+]);
+parsons($("drP"), [
+  {task: "Собери функцию safe_mean: среднее списка, для пустого — None. Одна строка лишняя.",
+   lines: ["def safe_mean(values):", "    if not values:", "        return None", "    return sum(values) / len(values)"],
+   extra: ["    if values == None:"], why: "Пустой список — ложь, поэтому if not values ловит именно его."}
 ]);
 
 initLesson({topics: [["python.base.1", "Ярлыки и изменяемость"], ["python.base.0", "Типы данных"], ["python.base.6", "is и ==, истинность"], ["python.base.4", "Область видимости"], ["python.base.5", "Строки, срезы, f-strings"]]});

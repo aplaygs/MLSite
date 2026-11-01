@@ -23,11 +23,11 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/plan#w-2">← Неделя 2 в плане</a><span class="mid">урок 1 из 5</span><a href="/lessons/w02-s2.html">Урок 2.2 · Python заново →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · урок 1 из 5 · ~45 минут + практика 20 минут</div>
+  <div class="eyebrow">Неделя 2 · урок 1 из 5 · ~60 минут + практика 20 минут</div>
   <h1>Проект как на работе</h1>
   <p>На неделе 1 ты научился сохранять работу в git. Теперь — как устроить проект, чтобы тимлид или рекрутер открыл его и за минуту понял: человек умеет работать. Шесть шагов: папки, README, что не класть в git, где хранить пароли, как фиксировать версии и как подписывать коммиты. В конце соберёшь так свой проект по данным OULAD.</p>
   <nav class="steps" aria-label="Шаги урока">
-    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Папки</a><a href="#s2"><i><span>2</span></i>README</a><a href="#s3"><i><span>3</span></i>.gitignore</a><a href="#s4"><i><span>4</span></i>Пароли</a><a href="#s5"><i><span>5</span></i>Версии</a><a href="#s6"><i><span>6</span></i>Коммиты</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Папки</a><a href="#s2"><i><span>2</span></i>README</a><a href="#s3"><i><span>3</span></i>.gitignore</a><a href="#s4"><i><span>4</span></i>Пароли</a><a href="#s5"><i><span>5</span></i>Версии</a><a href="#s6"><i><span>6</span></i>Коммиты</a><a href="#drill"><i><span>★</span></i>Руками</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
   </nav>
 </header>
 
@@ -58,7 +58,8 @@
   <div id="exTree"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>структура проекта</b>; папка с кодом и файлом <code>__init__.py</code> внутри — <b>пакет</b> (package), его можно импортировать: <code>from oulad_risk import load</code>.</span></div>
   <p class="remember">data/raw — не трогаем, notebooks — черновики, src — код, models — результаты.</p>
-    <details class="more"><summary>Подробнее: имена файлов, пакет и что ещё бывает в проекте<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs1"></div>
+<details class="more"><summary>Подробнее: имена файлов, пакет и что ещё бывает в проекте<small> · 3 минуты</small></summary><div class="a">
     <ul>
       <li><b>Ноутбуки нумеруют</b>: <code>01_eda.ipynb</code>, <code>02_baseline.ipynb</code>, <code>03_features.ipynb</code> — по номеру видно порядок работы. Имена — латиницей, маленькими буквами, через подчёркивание, без пробелов.</li>
       <li><b>Папка-пакет.</b> <code>src/oulad_risk/</code> с файлом <code>__init__.py</code> внутри — это пакет. Чтобы импортировать его из ноутбука в <code>notebooks/</code>, проект ставят в окружение командой <code>pip install -e .</code> (нужен файл <code>pyproject.toml</code> — сделаем, когда кода станет больше). Пока можно так: в первой ячейке ноутбука <code>import sys; sys.path.append("../src")</code>.</li>
@@ -88,7 +89,8 @@
   </div>
   <div id="exReadme"></div>
   <p class="remember">Первая строка README — задача и результат, а не «учебный проект».</p>
-    <details class="more"><summary>Подробнее: README целиком — шаблон для oulad-risk<small> · скопируй и заполняй</small></summary><div class="a">
+      <div id="exXs2"></div>
+<details class="more"><summary>Подробнее: README целиком — шаблон для oulad-risk<small> · скопируй и заполняй</small></summary><div class="a">
     <pre># oulad-risk — кто из студентов бросит онлайн-курс
 
 Предсказываю по активности за первые 4 недели, закончит ли студент курс,
@@ -126,7 +128,8 @@ data/raw — исходные данные · notebooks — исследован
   </div>
   <div id="simIgnore"></div>
   <div class="callout trap"><b class="h">Ловушка</b><p>.gitignore работает только для файлов, которые ещё не в git. Если data уже закоммитили, сначала убери её из отслеживания: <code>git rm -r --cached data</code>, потом коммит. Поэтому .gitignore делают первым же коммитом.</p></div>
-    <details class="more"><summary>Подробнее: как читать правила .gitignore<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs3"></div>
+<details class="more"><summary>Подробнее: как читать правила .gitignore<small> · 3 минуты</small></summary><div class="a">
     <ul>
       <li><code># текст</code> — комментарий. <code>*.csv</code> — все csv в любой папке. <code>data/</code> — папка data где угодно. <code>/data/</code> — только в корне проекта.</li>
       <li><code>!data/.gitkeep</code> — восклицательный знак делает исключение: всю data прячем, а пустой файл-заглушку оставляем, чтобы папка была в репозитории.</li>
@@ -162,7 +165,8 @@ load_dotenv()                    <span class="cm"># читает .env в пер�
 key = os.environ["KAGGLE_KEY"]   <span class="cm"># нет ключа — сразу понятная ошибка</span></pre>
   <div id="exEnv"></div>
   <p class="remember">Пароль в коде = пароль у всех. Ключ утёк — первым делом отзови его, потом чисти историю.</p>
-    <details class="more"><summary>Подробнее: python-dotenv и что делать, если ключ утёк<small> · 2 минуты</small></summary><div class="a">
+      <div id="exXs4"></div>
+<details class="more"><summary>Подробнее: python-dotenv и что делать, если ключ утёк<small> · 2 минуты</small></summary><div class="a">
     <ul>
       <li>Библиотека ставится как <code>pip install python-dotenv</code>, а импортируется как <code>dotenv</code> — имена разные, это нормально.</li>
       <li><code>os.environ["KEY"]</code> — нет ключа → сразу ошибка KeyError (хорошо: сразу видно). <code>os.environ.get("KEY", "")</code> — нет ключа → пустая строка, ошибка вылезет позже и непонятно где.</li>
@@ -190,7 +194,8 @@ key = os.environ["KAGGLE_KEY"]   <span class="cm"># нет ключа — сра
   </div>
   <div id="exVer"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>фиксация версий</b> (pinning); схема «большая.средняя.маленькая» — <b>SemVer</b>, по-английски MAJOR.MINOR.PATCH.</span></div>
-    <details class="more"><summary>Подробнее: pip freeze, ~= и проверка «с нуля»<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs5"></div>
+<details class="more"><summary>Подробнее: pip freeze, ~= и проверка «с нуля»<small> · 3 минуты</small></summary><div class="a">
     <ul>
       <li><code>pip freeze &gt; requirements.txt</code> записывает <b>все</b> пакеты окружения с точными версиями, включая зависимости зависимостей. Быстро, но список длинный. Многие пишут руками только главные библиотеки с <code>==</code> — тоже нормально.</li>
       <li><code>pandas~=2.2.3</code> — «совместимая версия»: 2.2.3, 2.2.4 и дальше, но не 2.3. Компромисс между точностью и исправлениями ошибок.</li>
@@ -225,7 +230,8 @@ key = os.environ["KAGGLE_KEY"]   <span class="cm"># нет ключа — сра
   </div>
   <div class="term-chip"><b>Так это называют</b><span><b>Conventional Commits</b> — эта договорённость; <code>feat(data): …</code> — в скобках можно указать часть проекта.</span></div>
   <p class="remember">Один коммит — одно изменение. Подпись: тип: что сделал.</p>
-    <details class="more"><summary>Подробнее: длинное описание, «!» и как поправить последний коммит<small> · 2 минуты</small></summary><div class="a">
+      <div id="exXs6"></div>
+<details class="more"><summary>Подробнее: длинное описание, «!» и как поправить последний коммит<small> · 2 минуты</small></summary><div class="a">
     <ul>
       <li>Подпись — в повелительном наклонении: <code>add loader</code>, а не <code>added loader</code>. Читается как «этот коммит: add loader».</li>
       <li>Нужны подробности — пустая строка после подписи и дальше текст: <code>git commit</code> без <code>-m</code> откроет редактор.</li>
@@ -239,6 +245,14 @@ key = os.environ["KAGGLE_KEY"]   <span class="cm"># нет ключа — сра
     <span class="note" data-d="tools.git.6">отметка в дереве</span>
   </div>
   <p class="deep">Хочешь глубже: <a href="/lessons/w02-3.html#t1">структура</a> · <a href="/lessons/w02-3.html#t3">.gitignore подробно</a> · <a href="/lessons/w02-3.html#t6">коммиты</a> — справочник.</p>
+</section>
+
+<!-- ============ закрепление руками ============ -->
+<section class="step" id="drill">
+  <div class="step-h"><span class="num">★</span><h2>Закрепи руками</h2><span class="min">15 мин</span></div>
+  <p class="why"><b>Зачем:</b> прочитать и понять — половина дела. Запоминается то, что сделал сам: предсказал, нашёл ошибку, собрал. Здесь всё, что было в уроке, — в задачах.</p>
+  <div id="drP"></div>
+  <div id="drB"></div>
 </section>
 
 <!-- ============ practice ============ -->
@@ -319,6 +333,7 @@ tags: [проект, git, неделя-2]
 </script>
 <script src="/assets/lesson.js"></script>
 <script src="/assets/ml.js"></script>
+<script src="/assets/drill.js"></script>
 <script>
 mlCheck($("exWarm"), [
   {q: "Зачем в git два шага — <code>add</code> и потом <code>commit</code>?", opts: ["Чтобы отобрать в сохранение только готовые изменения, а остальные оставить на потом", "Это одно и то же, просто исторически", "add отправляет на GitHub, commit — сохраняет"], a: 0,
@@ -384,6 +399,25 @@ mlCheck($("exVer"), [
   }
   $("lintIn").oninput = run; run();
 })();
+
+/* ---------- объясни своими словами и закрепи руками ---------- */
+explain($("exXs1"), [{"q": "Расскажи другу, как устроены папки проекта oulad-risk и почему ноутбуки отдельно от src.", "model": "data/raw — данные как скачали, руками их не трогаю; data/processed — то, что получилось после обработки кодом, его всегда можно пересоздать. notebooks — черновики и исследования. src/oulad_risk — код, который нужен больше одного раза: загрузка, признаки, обучение; ноутбуки его импортируют. tests — проверки, models — обученные модели. В корне README, requirements.txt и .gitignore.", "points": ["raw не трогаем, processed пересоздаётся кодом", "notebooks — черновики", "src — повторно используемый код, его импортируют", "tests и models", "README, requirements, .gitignore в корне"]}]);
+explain($("exXs2"), [{"q": "Что должно быть в README и в каком порядке? Почему именно так?", "model": "Сверху — задача одной фразой и результат: число и с чем сравнивал. Дальше — данные и откуда их скачать, как запустить (3–5 команд), что где лежит. Порядок такой, потому что на проект на отборе смотрят 1–2 минуты, и главное должно быть на первом экране.", "points": ["задача одной фразой", "результат с числом и сравнением", "данные и где скачать", "как запустить", "на проект смотрят 1–2 минуты — главное сверху"]}]);
+explain($("exXs3"), [{"q": "Объясни, что такое .gitignore и что в него кладут в ML-проекте.", "model": ".gitignore — текстовый файл в корне со списком того, что git не должен замечать. В ML-проекте: .venv (окружение своё у каждого), data и models (тяжёлые, скачиваются или пересоздаются), .env (секреты), __pycache__. Делают первым коммитом: то, что уже закоммичено, он не спрячет — нужен git rm --cached.", "points": ["файл со списком того, что git не замечает", ".venv, data, models, .env, __pycache__", "первым коммитом", "уже закоммиченное — git rm --cached"]}]);
+explain($("exXs4"), [{"q": "Как хранить ключ API в проекте и что делать, если он попал на GitHub?", "model": "Ключ лежит в файле .env, который в .gitignore. В git кладу .env.example с теми же именами, но без значений. В коде — load_dotenv() и os.environ[\"KEY\"]. Если ключ утёк — первым делом отзываю его в сервисе и выпускаю новый, потом чищу историю.", "points": [".env в .gitignore", ".env.example без значений", "os.environ / load_dotenv", "утёк — сначала отозвать ключ"]}]);
+explain($("exXs5"), [{"q": "Зачем фиксировать версии библиотек и что значат три числа в 2.2.3?", "model": "Без версий через полгода установятся новые библиотеки, и код может сломаться — «у меня работало». В requirements пишут ==, точную версию. 2.2.3 — большая.средняя.маленькая: маленькая — исправления, средняя — новое без поломок, большая — может ломать старый код. Версию Python пишут в README.", "points": ["без версий код ломается со временем", "== — точная версия", "большая / средняя / маленькая и что значат", "версия Python в README"]}]);
+explain($("exXs6"), [{"q": "Как подписывать коммиты и зачем это нужно?", "model": "Формат «тип: что сделал», по-английски, коротко, в повелительном наклонении: feat — новое, fix — исправление, docs, refactor, test, chore. Один коммит — одно изменение. По такой истории понятно, что происходило в проекте, и на отборе видно, что человек умеет работать в команде.", "points": ["тип: что сделал", "назвал 3+ типа", "один коммит — одно изменение", "история понятна команде / рекрутеру"]}]);
+parsons($("drP"), [
+  {task: "Создай проект и отправь первый коммит на GitHub. Две строки — лишние.",
+   lines: ["mkdir -p ~/projects/oulad-risk", "cd ~/projects/oulad-risk", "git init", "echo \".venv/\" >> .gitignore", "git add .gitignore", "git commit -m \"chore: add gitignore\"", "git remote add origin https://github.com/you/oulad-risk.git", "git push -u origin main"],
+   extra: ["git add data/", "git push --force"], why: "Сначала .gitignore и первый коммит, потом адрес GitHub и push. -u запоминает, куда отправлять дальше."}
+]);
+findBug($("drB"), [
+  {task: "src/oulad_risk/train.py", code: "import os\nimport pandas as pd\nAPI_KEY = \"sk-a1b2c3d4\"\ndf = pd.read_csv(\"data/raw/studentInfo.csv\")", bug: 2, fix: "API_KEY = os.environ[\"API_KEY\"]", why: "Ключ в коде попадёт в git вместе с файлом."},
+  {task: "requirements.txt", code: "pandas==2.2.3\nscikit-learn>=1.0\nmatplotlib==3.9.2", bug: 1, fix: "scikit-learn==1.5.2", why: "Через полгода >= поставит другую версию."},
+  {task: ".gitignore", code: ".venv/\n.env\n__pycache__/\nnotebooks/", bug: 3, fix: "data/", why: "Ноутбуки — часть проекта, их кладут в git. А вот data в списке не хватает."},
+  {task: "git log --oneline", code: "feat: add data loader\ndocs: describe dataset\nFixed stuff\ntest: check no leakage", bug: 2, fix: "fix: handle empty csv", why: "Без типа и без смысла — по такой подписи непонятно, что изменилось."}
+]);
 
 initLesson({topics: [["python.eng.0", "Структура проекта"], ["tools.git.9", "README как витрина проекта"], ["tools.git.5", ".gitignore для данных, моделей и секретов"], ["tools.env.4", "Секреты в .env, а не в коде"], ["tools.env.2", "Фиксация версий"], ["tools.git.6", "Conventional Commits"]]});
 setTimeout(mlSteps, 600);

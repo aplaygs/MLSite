@@ -41,11 +41,11 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s2.html">← Урок 2.2 · Python заново</a><span class="mid">урок 3 из 5</span><a href="/lessons/w02-s4.html">Урок 2.4 · ML заново →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · урок 3 из 5 · повторение по тесту недели 1 · ~45 минут + практика 25 минут</div>
+  <div class="eyebrow">Неделя 2 · урок 3 из 5 · повторение по тесту недели 1 · ~60 минут + практика 25 минут</div>
   <h1>Python заново: коллекции и словарь изнутри</h1>
   <p>Вторая половина «Python изнутри» и хеш-таблицы из урока 1.3 — по тесту недели 1 они не закрепились. Пять шагов: удобные приёмы с zip и enumerate, готовые инструменты из collections, как словарь находит ключ за один шаг (ты сам положишь ключи в таблицу), почему <code>in</code> по списку бывает в тысячу раз медленнее, и задача Two Sum, которую спрашивают на каждом втором собеседовании.</p>
   <nav class="steps" aria-label="Шаги урока">
-    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>zip и enumerate</a><a href="#s2"><i><span>2</span></i>collections</a><a href="#s3"><i><span>3</span></i>Словарь изнутри</a><a href="#s4"><i><span>4</span></i>list или set</a><a href="#s5"><i><span>5</span></i>Two Sum</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>zip и enumerate</a><a href="#s2"><i><span>2</span></i>collections</a><a href="#s3"><i><span>3</span></i>Словарь изнутри</a><a href="#s4"><i><span>4</span></i>list или set</a><a href="#s5"><i><span>5</span></i>Two Sum</a><a href="#drill"><i><span>★</span></i>Руками</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
   </nav>
 </header>
 
@@ -77,7 +77,8 @@ list(zip(names, scores, strict=True))  <span class="cm"># ValueError — есл�
   <div id="ex1"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>распаковка</b> (unpacking), <code>*rest</code> — «звёздочка собирает остальное». zip и enumerate возвращают <b>итераторы</b> — поэтому печатают через <code>list(...)</code>.</span></div>
   <p class="remember">zip молча обрезает по самому короткому. Нужен номер — enumerate, а не range(len()).</p>
-    <details class="more"><summary>Подробнее: собрать словарь из двух списков, распаковать обратно, items()<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs1"></div>
+<details class="more"><summary>Подробнее: собрать словарь из двух списков, распаковать обратно, items()<small> · 3 минуты</small></summary><div class="a">
     <pre>codes = ["AAA", "BBB"]; lengths = [268, 240]
 dict(zip(codes, lengths))          <span class="cm"># {'AAA': 268, 'BBB': 240} — частый приём</span>
 
@@ -117,7 +118,8 @@ for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
 <span class="cm"># {'ML': ['Аня', 'Оля'], 'SQL': ['Иван']}</span></pre>
   <div id="ex2"></div>
   <p class="remember">Посчитать — Counter. Сгруппировать — defaultdict(list). Очередь — deque.</p>
-    <details class="more"><summary>Подробнее: ещё про Counter, get, setdefault и deque<small> · 4 минуты</small></summary><div class="a">
+      <div id="exXs2"></div>
+<details class="more"><summary>Подробнее: ещё про Counter, get, setdefault и deque<small> · 4 минуты</small></summary><div class="a">
     <ul>
       <li><code>c = Counter(results)</code>: <code>c["Fail"]</code> — сколько Fail; если такого нет — <b>0, а не ошибка</b>. <code>c.update(новые)</code> — досчитать. <code>c1 + c2</code> — сложить два подсчёта. <code>c.total()</code> — сумма всех.</li>
       <li><code>defaultdict(int)</code> — счётчик руками: <code>counts[x] += 1</code> без проверки, есть ли ключ.</li>
@@ -157,7 +159,8 @@ for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
   <div id="ex3"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>хеш-таблица</b>; ключом может быть только <b>хешируемый</b> (hashable) — неизменяемый — объект: число, строка, кортеж. Поиск, вставка, удаление — <b>O(1) в среднем</b>.</span></div>
   <p class="remember">Хеш ключа → номер ячейки → сразу туда. Список ключом быть не может: изменится — изменится хеш.</p>
-    <details class="more"><summary>Подробнее: настоящий хеш, рост таблицы и почему 1 и True — один ключ<small> · 4 минуты</small></summary><div class="a">
+      <div id="exXs3"></div>
+<details class="more"><summary>Подробнее: настоящий хеш, рост таблицы и почему 1 и True — один ключ<small> · 4 минуты</small></summary><div class="a">
     <ul>
       <li>У строк хеш <b>меняется от запуска к запуску</b> Python (защита от атак) — <code>hash("Аня")</code> сегодня и завтра разный. Внутри одного запуска — одинаковый, и этого достаточно.</li>
       <li>Когда таблица заполнена примерно на 2/3, Python создаёт таблицу побольше и переносит все ключи. Это дорого, но бывает редко, поэтому <b>в среднем</b> добавление — O(1). Так же работает append у списка (амортизированная сложность, урок 1.1).</li>
@@ -199,7 +202,8 @@ for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
   <div id="ex4"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>Big O</b> — как растёт время с ростом n: O(1) — не растёт, O(n) — растёт как n, O(n²) — как n·n.</span></div>
   <p class="remember">Много проверок «есть ли» — сначала сделай set: allowed = set(allowed).</p>
-    <details class="more"><summary>Подробнее: операции с множествами и цена построения set<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs4"></div>
+<details class="more"><summary>Подробнее: операции с множествами и цена построения set<small> · 3 минуты</small></summary><div class="a">
     <pre>train_ids = {1, 2, 3, 4}; test_ids = {3, 4, 5}
 train_ids &amp; test_ids     <span class="cm"># {3, 4} — пересечение: эти студенты в обеих выборках = утечка (урок 2.4)!</span>
 train_ids | test_ids     <span class="cm"># {1, 2, 3, 4, 5} — объединение</span>
@@ -239,7 +243,8 @@ train_ids - test_ids     <span class="cm"># {1, 2} — только в train</sp
   <div id="ex5"></div>
   <div class="term-chip"><b>Так это называют</b><span>приём <b>hash map</b> («хеш-мапа») / «запоминай увиденное»; обмен <b>памяти на время</b>: O(n) времени и O(n) памяти вместо O(n²) и O(1).</span></div>
   <p class="remember">Two Sum: один проход, need = target − x, словарь «число → номер». O(n) и O(n).</p>
-    <details class="more"><summary>Подробнее: что ещё спросят про Two Sum<small> · 3 минуты</small></summary><div class="a">
+      <div id="exXs5"></div>
+<details class="more"><summary>Подробнее: что ещё спросят про Two Sum<small> · 3 минуты</small></summary><div class="a">
     <ul>
       <li><b>Повторы:</b> nums = [3, 3], target = 6. Работает, потому что сначала проверяем, потом кладём: на втором 3 первое уже в seen.</li>
       <li><b>Нет ответа:</b> функция вернёт None — скажи это вслух интервьюеру, а не молчи.</li>
@@ -255,6 +260,15 @@ train_ids - test_ids     <span class="cm"># {1, 2} — только в train</sp
     <span class="note" data-d="algo.pat.0">отметка в дереве</span>
   </div>
   <p class="deep">Хочешь глубже: <a href="/lessons/w01-2.html#p9">распаковка, zip, enumerate</a> · <a href="/lessons/w01-2.html#p10">collections</a> · <a href="/lessons/w01-3.html#h1">хеш-таблица подробно</a> · <a href="/lessons/w01-1.html#t10">сложность list, dict, set</a> — справочник.</p>
+</section>
+
+<!-- ============ закрепление руками ============ -->
+<section class="step" id="drill">
+  <div class="step-h"><span class="num">★</span><h2>Закрепи руками</h2><span class="min">15 мин</span></div>
+  <p class="why"><b>Зачем:</b> прочитать и понять — половина дела. Запоминается то, что сделал сам: предсказал, нашёл ошибку, собрал. Здесь всё, что было в уроке, — в задачах.</p>
+  <div id="drC"></div>
+  <div id="drB"></div>
+  <div id="drP"></div>
 </section>
 
 <!-- ============ practice ============ -->
@@ -342,6 +356,7 @@ tags: [python, алгоритмы, повторение, неделя-2]
 </script>
 <script src="/assets/lesson.js"></script>
 <script src="/assets/ml.js"></script>
+<script src="/assets/drill.js"></script>
 <script>
 /* ---------- хеш-таблица руками: учебный хеш, линейное пробирование ---------- */
 (function hashTable() {
@@ -448,6 +463,34 @@ mlCheck($("ex5"), [
   {q: "Two Sum со словарём «число → номер». Сложность по времени и памяти?", opts: ["O(n) и O(n)", "O(n²) и O(1)", "O(n) и O(1)"], a: 0, why: "Один проход, каждая проверка O(1); словарь хранит до n чисел. Вопрос из теста недели 1."},
   {q: "Почему мы сначала проверяем need, а потом кладём x в seen?", opts: ["Чтобы не сложить число само с собой", "Так быстрее", "Порядок не важен"], a: 0, why: "nums = [5], target = 10: если сначала положить 5, то найдём 5 + 5 — одно и то же число дважды."},
   {q: "Решение в лоб двумя циклами — какая сложность?", opts: ["O(n²)", "O(n)", "O(2n)"], a: 0, why: "Для каждого числа перебираем все остальные."}
+]);
+
+/* ---------- объясни своими словами и закрепи руками ---------- */
+explain($("exXs1"), [{"q": "Объясни, что делают <code>enumerate</code> и <code>zip</code>, и где у zip ловушка.", "model": "enumerate идёт по списку и даёт пары (номер, значение) — не нужен range(len()); start=1 — номера с единицы. zip идёт по нескольким спискам сразу и даёт пары элементов. Ловушка: zip молча останавливается на самом коротком списке и теряет хвост; если длины обязаны совпадать — strict=True. Распаковка a, b = b, a меняет значения местами.", "points": ["enumerate — номер и значение", "zip — пары из нескольких списков", "zip обрезает по короткому молча", "strict=True", "распаковка a, b = b, a"]}]);
+explain($("exXs2"), [{"q": "Когда брать Counter, defaultdict(list) и deque? Приведи по примеру из данных.", "model": "Counter — посчитать, сколько раз встречается каждое значение: Counter(results).most_common(3) — три самых частых итога курса. defaultdict(list) — сгруппировать: регион → список id студентов, новый ключ сам получает пустой список. deque — очередь, в которую быстро добавлять и забирать с обоих концов: последние 100 событий.", "points": ["Counter — подсчёт, most_common", "defaultdict(list) — группировка без KeyError", "deque — очередь с двух концов", "примеры из данных"]}]);
+explain($("exXs3"), [{"q": "Что происходит, когда пишешь <code>d[\"Аня\"] = 5</code>? Объясни как на собеседовании.", "model": "Python считает хеш ключа «Аня» и по нему получает номер ячейки во внутренней таблице. Если ячейка свободна — кладёт туда ключ, хеш и значение. Если занята другим ключом — это коллизия: пробует другие ячейки и сравнивает ключи через ==. Когда таблица заполняется примерно на две трети, она увеличивается. Поэтому поиск — O(1) в среднем. Ключ должен быть неизменяемым, иначе хеш поменяется и значение потеряется.", "points": ["хеш → номер ячейки", "коллизия: другая ячейка и сравнение ==", "таблица растёт при заполнении", "O(1) в среднем", "ключ — неизменяемый"]}]);
+explain($("exXs4"), [{"q": "Почему <code>x in list</code> медленная, а <code>x in set</code> быстрая? Когда стоит строить set?", "model": "В списке Python перебирает элементы с начала и сравнивает с каждым — O(n). Множество устроено как хеш-таблица: хеш → сразу нужная ячейка, O(1) в среднем. Построить set стоит O(n), поэтому он окупается, когда проверок много — например, фильтр миллиона строк по списку разрешённых id.", "points": ["список — перебор, O(n)", "set — по хешу, O(1)", "построить set — O(n)", "окупается при многих проверках"]}]);
+explain($("exXs5"), [{"q": "Расскажи решение Two Sum так, как рассказывал бы интервьюеру.", "model": "Решение в лоб — перебрать все пары двумя циклами, это O(n²). Тратим время на поиск пары, поэтому ускорим поиск словарём. Иду по массиву один раз; для каждого x считаю need = target − x. Если need уже в словаре seen — возвращаю его индекс и текущий. Если нет — кладу x в seen. Сначала проверяю, потом кладу, чтобы не сложить число с самим собой. Время O(n), память O(n).", "points": ["в лоб O(n²)", "need = target − x", "словарь «число → индекс»", "сначала проверка, потом запись", "O(n) время и O(n) память"]}]);
+predict($("drC"), [
+  {code: "print(list(zip(\"abc\", [1, 2])))", a: "[('a', 1), ('b', 2)]", why: "zip обрезал по короткому."},
+  {code: "for i, x in enumerate(\"ml\", start=1):\n    print(i, x)", a: ["1 m 2 l", "1 m\n2 l"], why: "Номера с единицы. Вводи в одну строку через пробел."},
+  {code: "from collections import Counter\nprint(Counter(\"mississippi\").most_common(1))", a: "[('i', 4)]", why: "i и s встречаются по 4 раза; при равенстве most_common отдаёт того, кто встретился раньше — i."},
+  {code: "print(dict(zip([\"AAA\", \"BBB\"], [268, 240])))", a: "{'AAA': 268, 'BBB': 240}", why: "Словарь из двух списков."},
+  {code: "train = {1, 2, 3}\ntest = {3, 4}\nprint(train & test, train - test)", a: "{3} {1, 2}", why: "Пересечение и разность. Общий студент 3 — утечка!"},
+  {code: "d = {}\nd[(\"AAA\", 2013)] = 1\nprint(len(d))", a: "1", why: "Кортеж можно делать ключом."}
+]);
+findBug($("drB"), [
+  {task: "Подсчёт итогов падает с KeyError на первой же строке.", code: "counts = {}\nfor r in rows:\n    counts[r[\"final_result\"]] += 1\nprint(counts)", bug: 2, fix: "counts = Counter(r[\"final_result\"] for r in rows)", why: "У обычного словаря нового ключа ещё нет. Counter или defaultdict(int) — или counts.get(k, 0) + 1."},
+  {task: "Two Sum для nums = [5], target = 10 вернул [0, 0]. Где ошибка?", code: "def two_sum(nums, target):\n    seen = {}\n    for i, x in enumerate(nums):\n        seen[x] = i\n        if target - x in seen:\n            return [seen[target - x], i]", bug: 3, fix: "сначала проверка need in seen, потом seen[x] = i", why: "Число нашло в словаре само себя."},
+  {task: "Фильтр по миллиону строк работает полчаса.", code: "allowed = load_ids()          # список из 50 000 id\nkept = []\nfor r in rows:                 # 1 000 000 строк\n    if r[\"id\"] in allowed:\n        kept.append(r)", bug: 0, fix: "allowed = set(load_ids())", why: "in по списку — перебор. Со множеством — O(1)."}
+]);
+parsons($("drP"), [
+  {task: "Собери Two Sum. Одна строка лишняя.",
+   lines: ["def two_sum(nums, target):", "    seen = {}", "    for i, x in enumerate(nums):", "        need = target - x", "        if need in seen:", "            return [seen[need], i]", "        seen[x] = i"],
+   extra: ["    for j in range(len(nums)):"], why: "Один проход, без вложенного цикла."},
+  {task: "Сгруппируй студентов по региону: регион → список id.",
+   lines: ["from collections import defaultdict", "groups = defaultdict(list)", "for r in rows:", "    groups[r[\"region\"]].append(r[\"id_student\"])"],
+   extra: ["groups = {}"], why: "defaultdict(list) сам создаёт пустой список для нового региона."}
 ]);
 
 initLesson({topics: [["python.coll.2", "Распаковка, zip, enumerate"], ["python.coll.4", "collections"], ["algo.ds.1", "Хеш-таблица"], ["algo.cx.2", "Сложность list, dict, set"], ["algo.pat.0", "Хеширование: Two Sum"]]});

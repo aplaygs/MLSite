@@ -41,7 +41,7 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e02-2.html">← Урок 2 · Вопросы с do/does</a><span class="mid">урок 3 из 5</span><a href="/lessons/e02-4.html">Урок 4 · Читаем и пишем →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · Work and study · урок 3 из 5 · 3 темы + разминка · ~70 минут</div>
+  <div class="eyebrow">Неделя 2 · Work and study · урок 3 из 5 · 3 темы + разминка · ~80 минут</div>
   <h1>Просьбы, анкета, be или do</h1>
   <p>То, что нужно в первый же день в другой стране или на стажировке: попросить кофе, пароль от Wi-Fi или помощь — вежливо, а не «Give me». Заполнить анкету так, чтобы дату не перепутали и фамилию прочитали. И главное повторение недели: <b>be</b> или <b>do</b> — до автоматизма, на скорость.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
@@ -252,7 +252,9 @@
     <div class="lab-h"><span class="eyebrow">Диалог · первый день на стажировке</span><span class="btns"><button class="btn" type="button" id="offPlay">▶ Весь диалог</button><button class="btn" type="button" id="offHide" aria-pressed="false">Скрыть реплики B</button></span></div>
     <div class="dlg" id="off"></div>
   </div>
-  <div class="prac">
+    <div class="ex" id="exRule"><div class="ex-h"><span class="eyebrow">Объясни правило другу · по-русски</span><p>Лучший способ запомнить правило — объяснить его тому, кто не знает. Напиши или скажи вслух своими словами, с примером, потом сравни с эталоном.</p></div></div>
+  <div class="ex" id="exTell"><div class="ex-h"><span class="eyebrow">Перескажи · по-английски</span><p>Пиши по-английски простыми фразами. Ошибся — не страшно: сравни с эталоном и скажи ещё раз вслух уже правильно.</p></div></div>
+<div class="prac">
     <div class="task"><span class="tg work">Говорить · 5 минут</span>
       <h3>Знакомство с коллегой</h3>
       <p>Вслух: представься, скажи, чем занимаешься и что учишь (be и present simple). Задай коллеге четыре вопроса: два с be (<i>Are you…? Where are you from?</i>) и два с do (<i>Do you…? What do you do?</i>). Попроси одну вещь вежливо.</p>
@@ -389,6 +391,7 @@
 
 <script src="/assets/lesson.js"></script>
 <script src="/assets/en.js"></script>
+<script src="/assets/drill.js"></script>
 <script src="/assets/quizlet.js"></script>
 <script>
 /* ---------- диалоги: озвучка ролей, скрыть реплики B ---------- */
@@ -635,6 +638,10 @@ exGap($("exMe1"),[
   {s:"В аэропорту Еревана спрашиваешь цену такси. — ___",opts:["How much is it to the city centre?","How many is the taxi?","What costs taxi?"],a:"How much is it to the city centre?",why:"цена — how much"},
   {s:"Коллега: «Do you go to the gym?» Да, три раза в неделю. — ___",opts:["Yes, I do. Three times a week.","Yes, I go.","Yes, I am."],a:"Yes, I do. Three times a week."}
 ]);
+
+/* ---------- объясни и перескажи ---------- */
+explain($("exRule"), [{"q": "Объясни другу, как вежливо попросить что-то по-английски и почему «Give me» — плохо.", "model": "Вещь просят так: Can I have a coffee, please? Ещё вежливее — Could I have…? или I'd like…, please. Попросить сделать — Can you / Could you help me? Повелительное «Give me» и «I want» в просьбе звучат грубо. Русское «пожалуйста» — три фразы: please (прошу), Here you are (на, возьми), You're welcome (не за что).", "points": ["Can / Could I have …, please?", "I'd like …", "Can / Could you …? — попросить сделать", "Give me / I want — грубо", "три «пожалуйста»"]}, {"q": "Объясни три правила анкеты на английском.", "model": "Месяц пишут словом, чтобы не перепутать: 13 October 2026 — в Британии 05/06 это 5 июня, в Америке 6 мая. Номер дома — перед улицей: 5 Lenin Street. Nationality — прилагательное с большой буквы: Russian, не Russia. Occupation — без a: student. Имена, месяцы, дни и национальности — с большой буквы.", "points": ["месяц словом, ловушка 05/06", "дом перед улицей", "Russian, не Russia", "occupation без a", "заглавные буквы"]}]);
+explain($("exTell"), [{"q": "Retell the café dialogue: what does B order, what is not available, how much is it?", "model": "B orders a large cappuccino. He asks for a croissant too, but they don't have croissants today, so he takes a chocolate muffin. He takes it away. It's six pounds twenty.", "points": ["large cappuccino", "no croissants → chocolate muffin", "take away", "six pounds twenty", "глаголы с -s про he"]}, {"q": "You're on your first day at an internship. Introduce yourself and ask for two things politely.", "model": "Hi, I'm Vlad. I'm the new intern. I'm a student, and I study machine learning. Could I have the Wi-Fi password, please? And could you help me with the project, please?", "points": ["I'm the new intern", "be + do правильно", "Could I have …, please?", "Could you help me …?"]}], {lang: "en"});
 
 takeAway($("take"),{lesson:"2.3",words:[
   {en:"Can I have a coffee, please?",ru:"Можно мне кофе?"},
