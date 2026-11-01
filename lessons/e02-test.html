@@ -10,7 +10,7 @@
 
 <script src="/assets/nav.js"></script>
 <div class="wrap">
-<nav class="topnav" id="topnav" hidden aria-label="Навигация"><a href="/lessons/e02-3.html">← Урок 2.3 · Просьбы, анкета, be или do</a><span class="mid">тест недели 2</span><a href="/en#w-2">Неделя 2 в плане →</a></nav>
+<nav class="topnav" id="topnav" hidden aria-label="Навигация"><a href="/lessons/e02-5.html">← Урок 2.5 · Повторение и разговор</a><span class="mid">тест недели 2</span><a href="/en#w-2">Неделя 2 в плане →</a></nav>
 <main class="qz" id="qz" aria-live="polite"></main>
 </div>
 
@@ -18,15 +18,17 @@
 <script src="/assets/quiz.js"></script>
 <script>
 initQuiz({
-  week: 2, minutes: 25, section: "en",
+  week: 2, minutes: 30, section: "en",
   title: "Тест недели 2 · Work and study",
-  intro: "24 вопроса: present simple в утверждении, отрицании и вопросах, -s у he / she / it, короткие ответы, работа и учёба, in / on / at, звук -s, просьбы, анкета и даты, be против do. И четыре вопроса повторения недели 1. Есть задания на слух — включи звук.",
+  intro: "33 вопроса по пяти урокам: present simple в утверждении, отрицании и вопросах, -s у he / she / it, короткие ответы, работа и учёба, in / on / at, звук -s, просьбы, анкета и даты, be против do, чтение, письмо и разговор. И шесть вопросов повторения недели 1 — ровно по тем ошибкам, что были в прошлом тесте. Есть задания на слух — включи звук.",
   howto: "Отвечай по памяти, не открывая уроки. Где надо впечатать — пиши как в обычном тексте: регистр, ’ и точка в конце не важны. В заданиях с 🔊 фраза прозвучит сама, кнопкой её можно повторить. После каждого ответа — разбор и ссылка в урок. Клавиши: <code>1</code>–<code>4</code> — выбрать вариант, <code>Enter</code> — проверить и дальше.",
   lessons: [
     {n: 1, file: "e02-1.html", title: "Present simple: что я делаю всегда", cover: "+ и −, -s у he/she/it, don't/doesn't, профессии и связки с work"},
     {n: 2, file: "e02-2.html", title: "Вопросы с do/does, учёба и звук -s", cover: "Do/Does…? короткие ответы, вопросы со словом, учёба, in/on/at, /s/ /z/ /ɪz/"},
     {n: 3, file: "e02-3.html", title: "Просьбы, анкета, be или do", cover: "Can I have…? анкета и даты, be против do"},
-    {n: 4, file: "e01-1.html", label: "Повторение недели 1", title: "People", cover: "a/an, his/her, вопросы с be и where"}
+    {n: 4, file: "e02-4.html", title: "Читаем и пишем: работа и учёба", cover: "чтение, слушание, письмо о себе, and / but / also"},
+    {n: 5, file: "e02-5.html", title: "Повторение и разговор", cover: "present simple целиком, ответ + деталь + вопрос"},
+    {n: 6, file: "e01-1.html", label: "Повторение недели 1", title: "Ошибки теста недели 1", cover: "be и глагол, people are, a/an по звуку, a very kind person, not very, почта на слух"}
   ],
   questions: [
     /* ---------- урок 2.1 ---------- */
@@ -92,19 +94,48 @@ initQuiz({
     {lesson: 3, topic: "en.02.3.3", ref: "#t3", refTitle: "be или do", type: "text",
      q: "Переведи: «Ты устал?»", ans: ["Are you tired?", "Are you tired"],
      explain: "«Устал» — состояние, глагола-действия нет: <b>Are you tired?</b> А не <i>Do you tired?</i>"},
-    /* ---------- повторение недели 1 ---------- */
-    {lesson: 4, file: "e01-1.html", topic: "en.01.1.2", ref: "#t2", refTitle: "a / an", type: "one",
-     q: "She's ___ engineer.", opts: ["an", "a", "the", "—"], ans: 0,
-     explain: "engineer начинается с гласного звука: <b>an engineer</b>. Профессия — всегда с a/an."},
-    {lesson: 4, file: "e01-1.html", topic: "en.01.1.2", ref: "#t2", refTitle: "my, his, her", type: "one",
-     q: "Anna lives with ___ husband.", opts: ["her", "his", "she", "their"], ans: 0,
-     explain: "Владелец — Анна: <b>her</b> husband."},
-    {lesson: 4, file: "e01-2.html", topic: "en.01.2.1", ref: "#t1", refTitle: "Вопросы с be", type: "text",
-     q: "Сделай вопрос: <i>She is from Spain.</i> → ?", ans: ["Is she from Spain?", "Is she from Spain"],
-     explain: "Глагола нет — be встаёт вперёд: <b>Is she from Spain?</b>"},
-    {lesson: 4, file: "e01-2.html", topic: "en.01.2.2", ref: "#t2", refTitle: "Вопросительные слова", type: "one",
-     q: "Как спросить «Откуда ты?»", opts: ["Where are you from?", "Where you are from?", "From where are you?", "Where do you from?"], ans: 0,
-     explain: "<b>Where are you from?</b> — слово + be + подлежащее, предлог в конце. Глагола нет — значит не do."}
+    /* ---------- урок 2.4 ---------- */
+    {lesson: 4, topic: "en.02.4.1", ref: "#t1", refTitle: "Чтение", type: "one",
+     q: "Прочитай: <i>Anna is a teacher. She works part-time, so she has a lot of free time. On her days off she paints.</i> Что верно?", opts: ["Anna doesn't work full-time.", "Anna doesn't have free time.", "Anna works every day.", "Anna is a painter."], ans: 0,
+     explain: "<b>part-time</b> — неполный день, значит не full-time. Свободного времени у неё много, а рисует она в выходные — это хобби, не работа."},
+    {lesson: 4, topic: "en.02.4.1", ref: "#t1", refTitle: "Слушание", type: "text", say: "She has a part-time job in a café.",
+     q: "🔊 Запиши фразу.", ans: ["She has a part-time job in a café", "She has a part-time job in a cafe", "She has a part time job in a cafe", "She has a part time job in a café"],
+     explain: "<i>She <b>has</b> a part-time job in a café.</i> У she — has, не have."},
+    {lesson: 4, topic: "en.02.4.2", ref: "#t2", refTitle: "also", type: "one",
+     q: "Где правильно стоит also?", opts: ["I also work here.", "Also I work here.", "I work also here.", "I'm work also here."], ans: 0,
+     explain: "also — перед смысловым глаголом: <b>I also work here.</b> С be — после него: <i>I'm also a student.</i>"},
+    {lesson: 4, topic: "en.02.4.2", ref: "#t2", refTitle: "Начало письма", type: "one",
+     q: "Как начать письмо новой группе?", opts: ["Hi everyone,", "Hello, dear friends!", "Dear everyone!", "Hi all people!"], ans: 0,
+     explain: "<b>Hi everyone,</b> — с запятой. «Dear friends!» — калька с русского."},
+    /* ---------- урок 2.5 ---------- */
+    {lesson: 5, topic: "en.02.5.2", ref: "#t2", refTitle: "Разговор", type: "one",
+     q: "— I'm a student. Что ответить, чтобы разговор продолжился?", opts: ["Really? What do you study?", "Yes, I am.", "Do you student?", "What you study?"], ans: 0,
+     explain: "Интерес + вопрос: <b>Really? What do you study?</b> В вопросе со словом нужен do."},
+    {lesson: 5, topic: "en.02.5.1", ref: "#t1", refTitle: "Вопрос с does", type: "text",
+     q: "Сделай вопрос: <i>He works from home.</i> → ?", ans: ["Does he work from home?", "Does he work from home"],
+     explain: "<b>Does</b> he work…? -s переходит с глагола на does."},
+    {lesson: 5, topic: "en.02.5.1", ref: "#t1", refTitle: "Короткие ответы", type: "text",
+     q: "Ответь коротко «да»: <i>Does your sister like her job?</i>", ans: ["Yes, she does", "Yes she does"],
+     explain: "Спросили с does — отвечают does: <b>Yes, she does.</b>"},
+    /* ---------- повторение недели 1: ошибки прошлого теста ---------- */
+    {lesson: 6, file: "e02-1.html", topic: "en.01.1.1", ref: "#warm", refTitle: "be и глагол", type: "many",
+     q: "Какие предложения <b>правильные</b>?", opts: ["I agree with you.", "I'm agree with you.", "He works in a bank.", "He is work in a bank."], ans: [0, 2],
+     explain: "agree и work — глаголы, be с ними не ставят: <b>I agree. He works in a bank.</b>"},
+    {lesson: 6, file: "e02-1.html", topic: "en.01.1.1", ref: "#warm", refTitle: "people are", type: "text",
+     q: "Переведи: «Люди здесь очень дружелюбные».", ans: ["People here are very friendly", "People are very friendly here", "The people here are very friendly"],
+     explain: "people — уже множественное число: <b>People here are very friendly.</b>"},
+    {lesson: 6, file: "e02-2.html", topic: "en.01.1.2", ref: "#warm", refTitle: "a / an по звуку", type: "many",
+     q: "Где нужен <b>an</b>?", opts: ["___ IT company", "___ university", "___ hour", "___ one-year course"], ans: [0, 2],
+     explain: "По звуку: <b>an IT company</b> («ай-ти»), <b>an hour</b> (h немая). <i>a university</i> и <i>a one-year course</i> начинаются с согласного звука."},
+    {lesson: 6, file: "e02-3.html", topic: "en.01.2.3", ref: "#warm", refTitle: "a very kind person", type: "one",
+     q: "Как сказать «Он очень хороший учитель»?", opts: ["He's a very good teacher.", "He's a teacher very good.", "He's very a good teacher.", "He's a very good."], ans: 0,
+     explain: "Порядок: <b>a + very + прилагательное + существительное</b>."},
+    {lesson: 6, file: "e02-3.html", topic: "en.01.2.3", ref: "#warm", refTitle: "not very", type: "one",
+     q: "Коллега почти не помогает. Как сказать мягко?", opts: ["He isn't very helpful.", "He's a bit helpful.", "He's very not helpful.", "He isn't a bit helpful."], ans: 0,
+     explain: "Мягко о плохом — <b>not very</b>. a bit — только с плохими словами: <i>a bit lazy</i>."},
+    {lesson: 6, file: "e02-3.html", topic: "en.01.3.1", ref: "#warm", refTitle: "Почта на слух", type: "text", say: "m dot green at gmail dot com",
+     q: "🔊 Запиши почту.", ans: ["m.green@gmail.com"],
+     explain: "<b>dot</b> — точка, <b>at</b> — @: <i>m.green@gmail.com</i>."}
   ]
 });
 </script>

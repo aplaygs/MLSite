@@ -1,0 +1,471 @@
+<title>Урок 2.5 · Повторение и разговор</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/en.css">
+<style>
+/* Только для этого урока: тренажёр интервью — вопрос голосом, 20 секунд на ответ, образец. */
+.iv{display:grid;gap:14px;text-align:center}
+.iv-q{font:600 clamp(20px,4.2vw,28px)/1.3 var(--f-display);background:var(--bg);border-radius:14px;padding:22px 14px;min-height:84px;display:flex;align-items:center;justify-content:center}
+.iv-bar{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.iv-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s linear}
+.iv-meta{display:flex;justify-content:center;gap:16px;font:500 13px var(--f-mono);color:var(--muted)}
+.iv-a{text-align:left;background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:15.5px}
+.iv-a[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.iv-bar i{transition:none}}
+</style>
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e02-4.html">← Урок 4 · Читаем и пишем</a><span class="mid">урок 5 из 5</span><a href="/lessons/e02-test.html">Тест недели 2 →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · Work and study · урок 5 из 5 · 2 темы + работа над ошибками · ~75 минут</div>
+  <h1>Повторение и разговор</h1>
+  <p>Последний урок недели — нового почти нет. Сначала финальная работа над ошибками теста недели 1. Потом вся неделя в одном месте: present simple, be или do, вопросы и короткие ответы — много упражнений, на слух и на письмо. И главное — разговор: как отвечать не одним словом и задавать встречные вопросы. В конце — тренажёр интервью: вопрос звучит, у тебя 20 секунд на ответ вслух.</p>
+  <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#warm">Ошибки недели 1</a><a href="#t1">Повторение недели</a><a href="#t2">Разговор</a><a href="#practice">Практика</a><a href="#take">В Quizlet</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<!-- ============ разминка ============ -->
+<section class="topic" id="warm">
+  <div class="eyebrow">Работа над ошибками · тест недели 1 · ~10 минут</div>
+  <h2>Финал: все шесть ошибок теста недели 1</h2>
+  <p class="tldr">За неделю ты разобрал каждую ошибку теста недели 1 в разминках уроков 2.1–2.3. Здесь они все вместе и вперемешку. Цель — без ошибок: тогда в тесте недели 2 вопросы повторения пройдут легко.</p>
+  <div class="callout mem"><b class="h">Шесть правил в одном месте</b>
+    <ul>
+      <li><b>1.</b> be и глагол-действие вместе не ставят: <span class="say">I agree.</span> <span class="say">He works in a bank.</span></li>
+      <li><b>2.</b> people, parents, children — много: <span class="say">People are friendly.</span> <span class="say">Where are your parents?</span></li>
+      <li><b>3.</b> a или an — по звуку: <span class="say">an hour</span>, <span class="say">an IT company</span>, <span class="say">a university</span>.</li>
+      <li><b>4.</b> <span class="say">a very kind person</span>; без существительного — без a: <span class="say">She's kind.</span></li>
+      <li><b>5.</b> Мягко о плохом — <span class="say">not very friendly</span>; a bit — только с плохим: <span class="say">a bit lazy</span>.</li>
+      <li><b>6.</b> Почта на слух: dot — точка, at — @, underscore — _.</li>
+    </ul>
+  </div>
+  <div class="ex" id="exW1"><div class="ex-h"><span class="eyebrow">Ошибки недели 1 · выбери</span><p>Вперемешку все шесть правил.</p></div></div>
+  <div class="ex" id="exW2"><div class="ex-h"><span class="eyebrow">Ошибки недели 1 · на слух и перевод</span><p>Где 🔊 — послушай и запиши. Остальное — переведи.</p></div></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 2 · Повторение</div>
+  <h2>Повторение юнита 2: present simple в речи</h2>
+  <p class="tldr">Вся грамматика недели — в одной таблице. Помощник <b>do / does</b> нужен в вопросе и отрицании, <b>-s</b> одна на предложение: либо у глагола (<span class="say">She works.</span>), либо у does (<span class="say">She doesn't work. Does she work?</span>). Нет глагола-действия — работает <b>be</b>.</p>
+  <div class="tbl"><table class="forms">
+    <thead><tr><th></th><th>I / you / we / they</th><th>he / she / it</th></tr></thead>
+    <tbody>
+      <tr><td>+</td><td><span class="say">I work from home.</span></td><td><span class="say">She <span class="k">works</span> from home.</span></td></tr>
+      <tr><td>−</td><td><span class="say">I <span class="k">don't</span> work at weekends.</span></td><td><span class="say">She <span class="k">doesn't</span> work at weekends.</span></td></tr>
+      <tr><td>?</td><td><span class="say"><span class="k">Do</span> you work?</span> <span class="say">Where do you work?</span></td><td><span class="say"><span class="k">Does</span> she work?</span> <span class="say">Where does she work?</span></td></tr>
+      <tr><td>кратко</td><td><span class="say">Yes, I do.</span> <span class="say">No, I don't.</span></td><td><span class="say">Yes, she does.</span> <span class="say">No, she doesn't.</span></td></tr>
+    </tbody></table></div>
+  <div class="callout ru"><b class="h">Пять главных ошибок недели 2</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">He work in a bank.</span><span class="yes"><span class="say">He works in a bank.</span></span></div>
+      <div class="pair"><span class="no">She doesn't works.</span><span class="yes"><span class="say">She doesn't work.</span></span><span class="n">-s одна: уже в doesn't.</span></div>
+      <div class="pair"><span class="no">Where you live?</span><span class="yes"><span class="say">Where do you live?</span></span><span class="n">В вопросе нужен помощник.</span></div>
+      <div class="pair"><span class="no">Are you work?</span><span class="yes"><span class="say">Do you work?</span></span></div>
+      <div class="pair"><span class="no">Do you like it? — Yes, I like.</span><span class="yes"><span class="say">Yes, I do.</span></span><span class="n">Спросили с do — отвечают do.</span></div>
+    </div>
+  </div>
+
+  <div class="ex" id="ex1a"><div class="ex-h"><span class="eyebrow">Упражнение 1 · переделай</span><p>Сделай то, что в скобках: (−) — отрицание, (?) — вопрос, (he) — про него. Enter — проверить и дальше.</p></div></div>
+  <div class="ex" id="ex1b"><div class="ex-h"><span class="eyebrow">Упражнение 2 · кто это? на слух</span><p>Нажми 🔊: человек описывает свою работу. Выбери профессию — слова из урока 2.1.</p></div></div>
+  <div class="ex" id="ex1c"><div class="ex-h"><span class="eyebrow">Упражнение 3 · найди ошибку</span><p>Нажми на неправильное слово. В одном предложении ошибки нет.</p></div></div>
+  <div class="ex" id="ex1d"><div class="ex-h"><span class="eyebrow">Упражнение 4 · собери фразу</span><p>Переведи. Есть лишние плитки.</p></div></div>
+  <div class="ex" id="ex1e"><div class="ex-h"><span class="eyebrow">Упражнение 5 · большой микс недель 1–2</span><p>Впиши одно слово. be, do, a / an, -s — всё вперемешку.</p></div></div>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Переведи быстро: «Он не работает», «Он не дома», «Где она учится?», «Откуда она?»</summary>
+      <div class="a"><p><span class="say">He doesn't work.</span> <span class="say">He isn't at home.</span> <span class="say">Where does she study?</span> <span class="say">Where is she from?</span></p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Ответь коротко: «Does your friend like football?» — да; «Are you tired?» — нет.</summary>
+      <div class="a"><p><span class="say">Yes, he does.</span> (или she does) · <span class="say">No, I'm not.</span></p></div></details>
+  </div>
+  <div class="topic-check" data-for="en.02.5.1">
+    <label class="tp"><input type="checkbox" data-id="en.02.5.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>повторение юнита 2</b></span></label>
+    <span class="note" data-d="en.02.5.1">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 2 · Речь</div>
+  <h2>Разговор: интервью о работе и учёбе</h2>
+  <p class="tldr">Ответ одним словом обрывает разговор. Правило <b>«ответ + деталь + вопрос»</b>: <span class="say">Do you work? — No, I don't. I'm a full-time student. What about you?</span> Так говорят на митапах, собеседованиях и с новыми коллегами.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Зачем</th><th>Фразы</th></tr></thead>
+    <tbody>
+      <tr><td>Вернуть вопрос</td><td><span class="say">What about you?</span> · <span class="say">And you?</span></td></tr>
+      <tr><td>Показать интерес</td><td><span class="say">Really?</span> · <span class="say">That sounds interesting!</span> · <span class="say">Cool!</span></td></tr>
+      <tr><td>Спросить подробнее</td><td><span class="say">What do you do there?</span> · <span class="say">Do you like it?</span></td></tr>
+      <tr><td>Согласиться</td><td><span class="say">Me too.</span> — только на утверждение: <span class="say">I love films. — Me too!</span></td></tr>
+      <tr><td>Не расслышал</td><td><span class="say">Sorry, can you say that again?</span> · <span class="say">Sorry, what do you mean?</span></td></tr>
+      <tr><td>Подумать</td><td><span class="say">Hmm, let me think…</span> · <span class="say">Well…</span></td></tr>
+    </tbody></table></div>
+  <div class="callout ru"><b class="h">Ошибки русскоговорящих</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">— Do you work? — No.</span><span class="yes"><span class="say">No, I don't. I'm a student. What about you?</span></span><span class="n">Голое «No» звучит как «отстань». Короткий ответ + деталь.</span></div>
+      <div class="pair"><span class="no">— Do you like Python? — Yes, I like.</span><span class="yes"><span class="say">Yes, I do. I use it every day.</span></span></div>
+      <div class="pair"><span class="no">And what about you work?</span><span class="yes"><span class="say">What about you?</span> / <span class="say">What do you do?</span></span><span class="n">What about you — готовая фраза, после неё ничего не добавляют.</span></div>
+    </div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Диалог · на митапе</span><span class="btns"><button class="btn" type="button" id="meetPlay">▶ Весь диалог</button><button class="btn" type="button" id="meetHide" aria-pressed="false">Скрыть реплики B</button></span></div>
+    <div class="dlg" id="meet"></div>
+  </div>
+
+  <div class="ex" id="ex2a"><div class="ex-h"><span class="eyebrow">Упражнение 6 · поддержи разговор</span><p>Выбери ответ, после которого разговор продолжится.</p></div></div>
+  <div class="ex" id="ex2b"><div class="ex-h"><span class="eyebrow">Упражнение 7 · встречный вопрос</span><p>Переведи вопрос, который задашь собеседнику. Есть лишние плитки.</p></div></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Тренажёр · интервью</span><span class="muted mono" id="ivState"></span></div>
+    <div class="iv">
+      <div class="iv-q" id="ivQ">12 вопросов о работе и учёбе. Вопрос прозвучит — отвечай вслух по правилу «ответ + деталь + вопрос». На ответ — 20 секунд.</div>
+      <div class="iv-bar" aria-hidden="true"><i id="ivBar"></i></div>
+      <div class="iv-meta"><span id="ivN"></span><span id="ivT"></span></div>
+      <div class="iv-a" id="ivA" hidden></div>
+      <div class="btns" style="justify-content:center"><button class="btn" type="button" id="ivGo">Начать</button><button class="btn" type="button" id="ivRe" disabled>🔊 Ещё раз</button><button class="btn" type="button" id="ivShow" disabled>Образец</button></div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Свой ответ лучше записать на диктофон и переслушать. В образцах «…» — подставь своё; если ответ про тебя другой, говори как есть.</p>
+  </div>
+
+  <div class="topic-check" data-for="en.02.5.2">
+    <label class="tp"><input type="checkbox" data-id="en.02.5.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>разговор о работе и учёбе</b></span></label>
+    <span class="note" data-d="en.02.5.2">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · ~25 минут</div>
+  <h2>Практика</h2>
+  <p class="tldr">Говорить много — главное в этом уроке. Отмечай «Сделал» — план дня это видит.</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Говорить · 5 минут</span>
+      <h3>Роль B на митапе</h3>
+      <p>Включи диалог «на митапе», нажми «Скрыть реплики B» и говори за Влада сам. Два раза: первый — подглядывая, второй — нет.</p>
+      <p class="ok">Готово, когда прошёл диалог без подсказок.</p>
+    </div>
+    <div class="task"><span class="tg int">Говорить · 7 минут</span>
+      <h3>Голосовое о себе на 2 минуты</h3>
+      <p>Запиши на диктофон рассказ о своей неделе: кто ты, что учишь, во сколько встаёшь, что делаешь вечером и на выходных, что нравится и что нет. Переслушай и найди хотя бы одну ошибку be / do или -s.</p>
+      <details><summary>Опорный план</summary><div class="a">
+        <p><span class="say">I'm a student. I study machine learning and English. On weekdays I get up at … I study … In the evening I … At the weekend I … I really like … but I don't like …</span></p></div></details>
+    </div>
+    <div class="task"><span class="tg rev">Писать · 8 минут</span>
+      <h3>10 вопросов новому коллеге</h3>
+      <p>Напиши 10 вопросов: 4 с do / does (<i>Do you…?</i>), 3 с be (<i>Are you…? Where are you from?</i>), 3 с вопросительным словом и do (<i>What time do you…?</i>). Потом задай их вслух.</p>
+      <details><summary>Образец</summary><div class="a">
+        <p><span class="say">Do you work from home? Do you like your job? Do you speak Spanish? Does your team have meetings every day? Are you from Moscow? Are you a developer? Where are you from? What time do you start work? Where do you live? What do you do at the weekend?</span></p></div></details>
+    </div>
+    <div class="task"><span class="tg lc">Говорить · 5 минут</span>
+      <h3>Расскажи о знакомом</h3>
+      <p>Шесть предложений о друге или родственнике: кто он, где работает или учится, во сколько начинает, что не любит, что делает в свободное время. Каждый глагол — с -s или doesn't.</p>
+      <details><summary>Образец</summary><div class="a">
+        <p><span class="say">My friend Ilya is a developer. He works for a big company. He starts work at ten. He doesn't like meetings. He plays football at the weekend. He also studies English, like me.</span></p></div></details>
+    </div>
+  </div>
+  <div class="callout mem"><b class="h">Дальше</b><p>В субботу — <a href="/lessons/e02-test.html">тест недели 2</a>: все пять уроков недели и повторение недели 1 — как раз шесть ошибок из разминок. В воскресенье — отдых.</p></div>
+</section>
+
+<!-- ============ take ============ -->
+<section class="topic" id="take">
+  <div class="eyebrow">После урока</div>
+  <h2>В Quizlet</h2>
+  <p class="tldr">Фразы для разговора и правила урока — в Quizlet. Новое уже отмечено — сними лишнее, нажми «Скопировать для Quizlet» и вставь в набор недели через «Импорт».</p>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в плане</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда сделал упражнения темы без ошибок или с одной. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Present simple:</b> <span class="say">She works.</span> · <span class="say">She doesn't work.</span> · <span class="say">Does she work?</span> — -s одна на предложение.</li>
+      <li><b>Вопрос со словом:</b> слово + do / does + кто + глагол: <span class="say">Where does she work?</span></li>
+      <li><b>Короткий ответ</b> — тем же помощником: <span class="say">Yes, I do.</span> <span class="say">No, she doesn't.</span> <span class="say">Yes, I am.</span></li>
+      <li><b>be или do:</b> нет глагола-действия — be; есть — do. Вместе — никогда.</li>
+      <li><b>Разговор:</b> ответ + деталь + вопрос. <span class="say">What about you?</span> <span class="say">Really? That sounds interesting!</span></li>
+      <li><b>Me too</b> — только на утверждение. Не расслышал — <span class="say">Sorry, can you say that again?</span></li>
+      <li><b>Ошибки недели 1:</b> I agree · People are · an hour, an IT company, a university · a very kind person · not very friendly · dot / at.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+    <p class="muted" style="font-size:13.5px">Конспект этого урока уже лежит в Obsidian: <code>65_Английский/Уроки</code>.</p>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b>
+    <p>Закрой урок. Пройди тренажёр интервью ещё раз — без образцов. Потом на бумаге: таблица present simple (+, −, ?, кратко) для I и для she, и шесть правил недели 1 своими словами. Где запнулся — туда и возвращаешься, а в субботу — тест.</p>
+  </div>
+  <p><a class="btn" href="/lessons/e02-test.html" style="text-decoration:none">Дальше: тест недели 2 →</a></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+# 🇬🇧 Урок 2.5 · Повторение и разговор
+
+## Работа над ошибками теста недели 1
+1. be и глагол-действие вместе не ставят: *I agree. He works in a bank.*
+2. people, parents, children — много: *People are friendly. Where are your parents?*
+3. a / an — по звуку: *an hour, an IT company, a university.*
+4. *a very kind person*; без существительного — без a: *She's kind.*
+5. Мягко о плохом — *not very friendly*; a bit — только с плохим: *a bit lazy.*
+6. Почта на слух: dot — точка, at — @, underscore — _.
+
+## Present simple — вся неделя
+| | I / you / we / they | he / she / it |
+| :--- | :--- | :--- |
+| + | I work from home. | She works from home. |
+| − | I don't work at weekends. | She doesn't work at weekends. |
+| ? | Do you work? Where do you work? | Does she work? Where does she work? |
+| кратко | Yes, I do. / No, I don't. | Yes, she does. / No, she doesn't. |
+
+> [!warning] Ошибки недели 2
+> - ~~He work~~ → *He works*
+> - ~~She doesn't works~~ → *She doesn't work*
+> - ~~Where you live?~~ → *Where do you live?*
+> - ~~Are you work?~~ → *Do you work?*
+> - ~~Yes, I like~~ → *Yes, I do.*
+
+## Разговор: ответ + деталь + вопрос
+*Do you work? — No, I don't. I'm a full-time student. What about you?*
+
+- Вернуть вопрос: *What about you? And you?*
+- Интерес: *Really? That sounds interesting! Cool!*
+- Подробнее: *What do you do there? Do you like it?*
+- Согласиться: *Me too.* — только на утверждение.
+- Не расслышал: *Sorry, can you say that again? Sorry, what do you mean?*
+- Подумать: *Hmm, let me think… Well…*
+
+## Проверь себя
+> [!question]- «Он не работает», «Он не дома», «Где она учится?», «Откуда она?»
+> *He doesn't work. He isn't at home. Where does she study? Where is she from?*
+
+> [!question]- Ответь по правилу: «Do you work?»
+> *No, I don't. I'm a student. I study machine learning. What about you?*
+
+> [!question]- Исправь: «Where your brother works?», «Is your mum work?»
+> *Where does your brother work? Does your mum work?*
+</script>
+
+<script src="/assets/lesson.js"></script>
+<script src="/assets/en.js"></script>
+<script src="/assets/quizlet.js"></script>
+<script>
+/* ---------- диалог: озвучка ролей, скрыть реплики B ---------- */
+function dialog(id,D){
+  const box=$(id), play=$(id+"Play"), hide=$(id+"Hide");
+  box.innerHTML=D.map(([w,en,ru],i)=>`<div class="dl ${w==="B"?"b":""}" data-i="${i}"><span class="who">${w}</span><span class="tx"><span class="say" data-say="${enEsc(en)}">${en}</span><span class="ru">${ru}</span></span></div>`).join("");
+  hide.onclick=()=>{const on=hide.getAttribute("aria-pressed")!=="true";hide.setAttribute("aria-pressed",on);
+    box.querySelectorAll(".dl.b .say").forEach(s=>{s.style.filter=on?"blur(7px)":"";s.title=on?"Скажи сам, потом нажми — откроется":""})};
+  box.addEventListener("click",e=>{const s=e.target.closest(".dl.b .say");if(s)s.style.filter=""});
+  let playing=false;
+  const stop=()=>{playing=false;play.textContent="▶ Весь диалог";box.querySelectorAll(".tx").forEach(t=>t.style.outline="")};
+  play.onclick=()=>{
+    if(!("speechSynthesis" in window))return;
+    if(playing){speechSynthesis.cancel();stop();return}
+    playing=true;play.textContent="■ Стоп";speechSynthesis.cancel();
+    D.forEach(([w,en],i)=>{const u=new SpeechSynthesisUtterance(en);if(EN_VOICE)u.voice=EN_VOICE;u.lang="en-GB";u.rate=w==="A"?0.95:0.88;u.pitch=w==="A"?1.1:0.9;
+      u.onstart=()=>box.querySelectorAll(".dl").forEach((d,k)=>d.querySelector(".tx").style.outline=k===i?"2px solid var(--accent)":"");
+      if(i===D.length-1)u.onend=stop;
+      speechSynthesis.speak(u)});
+  };
+}
+dialog("meet",[
+  ["A","Hi! Is this seat free?","Привет! Тут свободно?"],
+  ["B","Yes, it is. I'm Vlad.","Да. Я Влад."],
+  ["A","Nice to meet you, Vlad. I'm Emma. Are you a developer?","Приятно познакомиться. Я Эмма. Ты разработчик?"],
+  ["B","Not yet. I'm a student. I study machine learning. What about you?","Пока нет. Я студент, изучаю машинное обучение. А ты?"],
+  ["A","I'm a data scientist. I work for a start-up.","Я дата-сайентист. Работаю в стартапе."],
+  ["B","Really? That sounds interesting! What do you do there?","Правда? Звучит интересно! А что ты там делаешь?"],
+  ["A","I build models for online shops. Do you work too?","Делаю модели для интернет-магазинов. А ты тоже работаешь?"],
+  ["B","No, I don't. I study full-time. But I want to work as an ML engineer.","Нет. Учусь на полный день. Но хочу работать ML-инженером."],
+  ["A","Great! Do you use Python?","Отлично! Ты пользуешься Python?"],
+  ["B","Yes, I do. I use it every day. And you?","Да, каждый день. А ты?"],
+  ["A","All the time. Is this your first meetup?","Постоянно. Это твой первый митап?"],
+  ["B","Yes, it is. I don't know many people here.","Да. Я тут почти никого не знаю."],
+  ["A","Then come with me. I can introduce you to my colleagues.","Тогда пойдём со мной. Познакомлю тебя с коллегами."],
+  ["B","Thank you! That's very kind.","Спасибо! Очень мило с твоей стороны."]
+]);
+
+/* ---------- тренажёр интервью ---------- */
+(function interview(){
+  const Q=[
+    ["What do you do?","I'm a student. I study machine learning. What about you?"],
+    ["Do you work?","No, I don't. I'm a full-time student. / Yes, I do. I work part-time as a …"],
+    ["What do you study?","I study machine learning and English. I really like it, but it isn't easy."],
+    ["Where do you live?","I live in … with my family / on my own."],
+    ["What time do you get up on weekdays?","I get up at … and I start studying at …"],
+    ["Do you study at the weekend?","Yes, I do. I study on Saturdays, but I don't study on Sundays. Sunday is my day off!"],
+    ["What do you do in your free time?","I go to the gym and I watch films. What about you?"],
+    ["Do you like your course? Why?","Yes, I do. It's very interesting, and I learn a lot every week."],
+    ["Do you speak any other languages?","I speak Russian, and I study English every day."],
+    ["Does anyone in your family work in IT?","Yes, my … works as a … / No, they don't. I'm the first one!"],
+    ["What's your dream job?","I want to work as an ML engineer for a big company."],
+    ["What do you do on Sundays?","On Sundays I relax. I don't study! I see my friends or I go for a walk."]
+  ];
+  const T=20, KEY="en-iv-2-5";
+  let order=[],i=-1,left=0,tick=null;
+  const set=()=>{$("ivN").textContent=i>=0?`${i+1} / ${Q.length}`:"";try{const b=+localStorage.getItem(KEY)||0;$("ivState").textContent=b?`пройдено раз: ${b}`:""}catch(e){}};
+  function ask(){
+    clearInterval(tick);$("ivA").hidden=true;
+    if(++i>=Q.length){$("ivQ").textContent="Готово! 12 ответов. Пройди ещё раз — без образцов и быстрее.";$("ivBar").style.width="0";$("ivT").textContent="";
+      $("ivGo").textContent="Ещё раз";$("ivRe").disabled=$("ivShow").disabled=true;i=-1;
+      try{localStorage.setItem(KEY,(+localStorage.getItem(KEY)||0)+1)}catch(e){}set();return}
+    const [q,a]=Q[order[i]];$("ivQ").textContent=q;$("ivA").innerHTML=`<b>Образец:</b> <span class="say" data-say="${enEsc(a.replace(/…/g,""))}">${enEsc(a)}</span>`;
+    say(q);left=T;$("ivBar").style.width="100%";$("ivT").textContent=`${left} с`;
+    $("ivGo").textContent="Следующий вопрос";$("ivRe").disabled=$("ivShow").disabled=false;set();
+    tick=setInterval(()=>{left--;$("ivBar").style.width=`${Math.max(0,left/T*100)}%`;$("ivT").textContent=left>0?`${left} с`:"время — дальше";if(left<=0)clearInterval(tick)},1000);
+  }
+  $("ivGo").onclick=()=>{if(i<0)order=enShuffle(Q.map((_,k)=>k));ask()};
+  $("ivRe").onclick=()=>{if(i>=0)say(Q[order[i]][0])};
+  $("ivShow").onclick=()=>{$("ivA").hidden=false};
+  set();
+})();
+
+/* ---------- работа над ошибками недели 1 ---------- */
+exGap($("exW1"),[
+  {s:"I ___ with you.",opts:["agree","am agree","'m agree"],a:"agree",why:"agree — глагол, be не нужен"},
+  {s:"My brother ___ in an office.",opts:["works","is work","is works"],a:"works"},
+  {s:"The people in my team ___ very nice.",opts:["are","is"],a:"are",why:"people — много"},
+  {s:"It's ___ hour by train.",opts:["an","a"],a:"an",why:"h не читается"},
+  {s:"She studies at ___ university in Kazan.",opts:["a","an"],a:"a",why:"«ю» — согласный звук [й]"},
+  {s:"He works for ___ IT company.",opts:["an","a"],a:"an",why:"IT — «ай-ти», гласный звук"},
+  {s:"My teacher is ___.",opts:["a very good teacher","a teacher very good","very a good teacher"],a:"a very good teacher"},
+  {s:"Мягко: начальник не очень терпеливый. My boss ___ patient.",opts:["isn't very","is a bit","is very not"],a:"isn't very"},
+  {s:"Друг немного ленивый: My friend is ___.",opts:["a bit lazy","a bit kind","lazy a bit"],a:"a bit lazy"}
+],{keep:true});
+exGap($("exW2"),[
+  {s:"Почта: ___",say:"ilya dot smirnov at gmail dot com",a:["ilya.smirnov@gmail.com"]},
+  {s:"Почта: ___",say:"anna, underscore, k, at, yandex dot ru",a:["anna_k@yandex.ru"]},
+  {s:"«Где твои родители?» — ___",a:["Where are your parents?","Where are your parents"]},
+  {s:"«Я не согласен.» — ___",a:["I don't agree","I do not agree"],why:"agree — глагол: отрицание через don't, а не I'm not"},
+  {s:"«Она очень добрый человек.» — ___",a:["She's a very kind person","She is a very kind person"]},
+  {s:"«Он не очень дружелюбный.» — ___",a:["He isn't very friendly","He is not very friendly","He's not very friendly"]}
+]);
+
+/* ---------- тема 1 ---------- */
+exGap($("ex1a"),[
+  {s:"She works in a bank. (−) → ___",a:["She doesn't work in a bank","She does not work in a bank"]},
+  {s:"She works in a bank. (?) → ___",a:"Does she work in a bank?"},
+  {s:"They live in Kazan. (?) → ___",a:"Do they live in Kazan?"},
+  {s:"He has a car. (−) → ___",a:["He doesn't have a car","He does not have a car"],why:"has → doesn't have"},
+  {s:"Anna is a nurse. (?) → ___",a:"Is Anna a nurse?",why:"глагола нет — вопрос с be"},
+  {s:"We go to the gym on Fridays. (he) → ___",a:"He goes to the gym on Fridays."},
+  {s:"I don't like tea. (she) → ___",a:["She doesn't like tea","She does not like tea"]},
+  {s:"I study at home. (вопрос с where к you) → ___",a:"Where do you study?"}
+]);
+const JOBS=[["nurse","pilot","chef"],["pilot","taxi driver","tour guide"],["chef","receptionist","farmer"],["tour guide","pilot","secretary"],["receptionist","nurse","mechanic"],["taxi driver","police officer","dentist"]];
+exGap($("ex1b"),[
+  {s:"Это ___",say:"I work in a hospital. I look after patients, and I often work at night.",opts:JOBS[0],a:"nurse"},
+  {s:"Это ___",say:"I fly to different countries every week. I work for an airline.",opts:JOBS[1],a:"pilot"},
+  {s:"Это ___",say:"I work in a restaurant kitchen. I cook Italian food every day.",opts:JOBS[2],a:"chef"},
+  {s:"Это ___",say:"I show tourists the city. I speak three languages.",opts:JOBS[3],a:"tour guide"},
+  {s:"Это ___",say:"I answer the phone and meet visitors in a hotel.",opts:JOBS[4],a:"receptionist"},
+  {s:"Это ___",say:"I drive people around the city. I don't have an office — my car is my office.",opts:JOBS[5],a:"taxi driver"}
+],{keep:true});
+exSpot($("ex1c"),[
+  {s:"Does he speaks English?",bad:2,fix:"speak",why:"-s уже в does"},
+  {s:"My sister study at university.",bad:2,fix:"studies",why:"sister — она: studies"},
+  {s:"Where does your brother works?",bad:4,fix:"work?",why:"-s уже в does"},
+  {s:"They doesn't work at weekends.",bad:1,fix:"don't",why:"they — don't"},
+  {s:"Is your mum work in a school?",bad:0,fix:"Does",why:"work — глагол: вопрос через does"},
+  {s:"He haves a part-time job.",bad:1,fix:"has",why:"have у he — has"},
+  {s:"Do you like coffee? Yes, I like.",bad:6,fix:"do.",why:"спросили с do — отвечают do"},
+  {s:"What does your father do?",bad:-1}
+]);
+exBuild($("ex1d"),[
+  {ru:"Чем занимается твоя сестра?",w:"What does your sister do ?",extra:["is","works"]},
+  {ru:"Мой папа не работает по выходным.",w:"My dad doesn't work at weekends .",alt:["My dad does not work at weekends ."],extra:["don't","in"]},
+  {ru:"Ты учишься или работаешь?",w:"Do you study or work ?",extra:["Are","studying"]},
+  {ru:"Она не замужем, и у неё нет детей.",w:"She isn't married and she doesn't have children .",alt:["She is not married and she does not have children ."],extra:["don't","hasn't"]},
+  {ru:"Где работают твои родители?",w:"Where do your parents work ?",extra:["does","works","are"]},
+  {ru:"Он инженер в IT-компании.",w:"He's an engineer in an IT company .",extra:["a","on"]}
+]);
+exGap($("ex1e"),[
+  {s:"___ your parents at home?",a:"Are",full:"Are your parents at home?"},
+  {s:"She ___ like coffee. (не)",a:["doesn't","does not"],full:"She doesn't like coffee."},
+  {s:"He's ___ engineer.",a:"an",full:"He's an engineer."},
+  {s:"What ___ your sister do?",a:"does",full:"What does your sister do?"},
+  {s:"My friends ___ from Spain.",a:"are",full:"My friends are from Spain."},
+  {s:"I study at ___ university.",a:"a",full:"I study at a university."},
+  {s:"___ he work from home?",a:"Does",full:"Does he work from home?"},
+  {s:"It's ___ hour from here.",a:"an",full:"It's an hour from here."},
+  {s:"I ___ tired. Let's go home.",a:["'m","am"],full:"I'm tired. Let's go home.",why:"tired — состояние, be"},
+  {s:"My dad ___ (watch) TV every evening.",a:"watches",full:"My dad watches TV every evening."}
+]);
+
+/* ---------- тема 2 ---------- */
+exGap($("ex2a"),[
+  {s:"— Do you work? — ___",opts:["No, I don't. I'm a student. What about you?","No.","No, I'm not work."],a:"No, I don't. I'm a student. What about you?",why:"ответ + деталь + вопрос"},
+  {s:"— I'm a data scientist. — ___",opts:["Really? What do you do there?","Yes, I do.","OK."],a:"Really? What do you do there?"},
+  {s:"— I love films. — ___",opts:["Me too! What films do you like?","Me too don't.","Yes, I love."],a:"Me too! What films do you like?",why:"Me too — на утверждение, и сразу вопрос"},
+  {s:"— Do you like Python? — ___",opts:["Yes, I do. I use it every day.","Yes, I like.","Yes, I am."],a:"Yes, I do. I use it every day."},
+  {s:"Не расслышал вопрос. — ___",opts:["Sorry, can you say that again?","What?","Repeat."],a:"Sorry, can you say that again?",why:"What? и Repeat. звучат резко"},
+  {s:"— What do you do at the weekend? (нужно подумать) — ___",opts:["Hmm, let me think… I go to the gym.","I think.","Wait me."],a:"Hmm, let me think… I go to the gym."}
+],{keep:true});
+exBuild($("ex2b"),[
+  {ru:"А ты?",w:"What about you ?",extra:["And","do"]},
+  {ru:"Что ты там делаешь?",w:"What do you do there ?",extra:["are","doing"]},
+  {ru:"Тебе нравится твоя работа?",w:"Do you like your job ?",extra:["Are","likes"]},
+  {ru:"Где работает твоя команда?",w:"Where does your team work ?",extra:["do","works"]},
+  {ru:"Это твой первый митап?",w:"Is this your first meetup ?",extra:["Does","Do"]}
+]);
+
+takeAway($("take"),{lesson:"2.5",words:[
+  {en:"What about you?",ru:"А ты? (вернуть вопрос)"},
+  {en:"That sounds interesting!",ru:"Звучит интересно!"},
+  {en:"Really?",ru:"Правда? (интерес)"},
+  {en:"Me too.",ru:"Я тоже (на утверждение)."},
+  {en:"Sorry, can you say that again?",ru:"Простите, можете повторить?"},
+  {en:"Let me think…",ru:"Дай подумать…"},
+  {en:"Is this seat free?",ru:"Здесь свободно?"},
+  {en:"meetup",ipa:"ˈmiːt.ʌp",ru:"митап, встреча по интересам",ex:"Is this your first meetup?"},
+  {en:"start-up",ipa:"ˈstɑːt.ʌp",ru:"стартап",ex:"She works for a start-up."},
+  {en:"full-time student",ru:"студент очной формы, учусь на полный день",ex:"I study full-time."}
+],rules:[
+{
+"id": "en.02.5.r1",
+"q": "Как отвечать, чтобы разговор не оборвался?",
+"a": "Ответ + деталь + встречный вопрос. Голое «No» звучит грубо.",
+"ex": [
+"No, I don't. I'm a student. What about you?"
+],
+"wrong": "— Do you work? — No.",
+"right": "No, I don't. I'm a student. What about you?"
+},
+{
+"id": "en.02.5.r2",
+"q": "Present simple: где -s?",
+"a": "-s одна на предложение: у глагола в утверждении (She works) или у does в вопросе и отрицании (Does she work? She doesn't work).",
+"ex": [
+"She works.",
+"Does she work?",
+"She doesn't work."
+],
+"wrong": "She doesn't works.",
+"right": "She doesn't work."
+},
+{
+"id": "en.02.5.r3",
+"q": "Когда говорят Me too?",
+"a": "Только в ответ на утверждение: I love films. — Me too!"
+}
+]});
+
+initLesson({topics:[["en.02.5.1","Повторение юнита 2: present simple в речи"],["en.02.5.2","Разговор: интервью о работе и учёбе"]]});
+</script>

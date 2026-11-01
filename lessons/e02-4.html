@@ -1,0 +1,523 @@
+<title>Урок 2.4 · Читаем и пишем: работа и учёба</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/en.css">
+<style>
+/* Только для этого урока: тексты для чтения, аудио со скрытым текстом, письмо-образец и проверка своего письма. */
+.rd{display:grid;gap:12px}
+.rd article{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:8px}
+.rd .rh{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.rd .rh b{font:600 18px var(--f-display)}
+.rd .rh span{font:500 12px var(--f-mono);color:var(--muted)}
+.rd p{margin:0;font-size:17px;line-height:1.7}
+.dlg.hid .tx .say{filter:blur(7px)}
+.dlg.hid .tx .ru{visibility:hidden}
+.mail{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:16.5px;line-height:1.7;display:grid;gap:10px}
+.mail p{margin:0}
+.mail .part{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:2px}
+.wr textarea{width:100%;min-height:220px;font:16px/1.6 var(--f-body);padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical;box-sizing:border-box}
+.wr textarea:focus{outline:none;border-color:var(--accent)}
+.wr-out{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14.5px}
+.wr-out li.good{color:var(--accent)} .wr-out li.warn{color:var(--sun-ink)} .wr-out li.bad{color:var(--red)}
+</style>
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e02-3.html">← Урок 3 · Просьбы, анкета, be или do</a><span class="mid">урок 4 из 5</span><a href="/lessons/e02-5.html">Урок 5 · Повторение и разговор →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · Work and study · урок 4 из 5 · 2 темы + разминка · ~75 минут</div>
+  <h1>Читаем и пишем: работа и учёба</h1>
+  <p>Вся грамматика недели — в живых текстах. Три человека рассказывают о своей работе и учёбе, ещё одного — аналитика из Москвы — слушаешь без текста. Потом пишешь своё письмо: «привет, я новенький» для группы или команды. Это урок-практика: правил мало, заданий много.</p>
+  <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее. Кнопка 🔊 у текста читает его целиком.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#warm">Разминка</a><a href="#t1">Читаем и слушаем</a><a href="#t2">Письмо о себе</a><a href="#practice">Практика</a><a href="#take">В Quizlet</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<!-- ============ разминка ============ -->
+<section class="topic" id="warm">
+  <div class="eyebrow">Разминка · диктовка · ~8 минут</div>
+  <h2>На слух: время, почта, слова по буквам</h2>
+  <p class="tldr">В тесте недели 1 самый низкий результат — у урока 1.3: диктовка почты и букв. Поэтому каждый урок этой недели начинается с короткой диктовки. Время говорят цифрами: <span class="say">nine thirty</span> — 9:30, <span class="say">six fifteen</span> — 6:15. Почта: <b>dot</b> — точка, <b>at</b> — @. <b>double</b> — две одинаковые буквы подряд.</p>
+  <div class="ex" id="exW1"><div class="ex-h"><span class="eyebrow">Разминка · диктовка</span><p>Нажми 🔊 и запиши. Время — цифрами (9:30), почту — маленькими буквами. Слушай сколько угодно раз.</p></div></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 2 · Чтение</div>
+  <h2>Чтение и слушание: тексты о работе и учёбе</h2>
+  <p class="tldr">Текст на A2 не надо понимать до последнего слова. Сначала прочитай задание, потом прочитай текст один раз целиком и не останавливайся на незнакомых словах. На второй раз ищи ответы. Незнакомое слово угадывай по соседним.</p>
+  <div class="callout mem"><b class="h">Как читать и слушать</b>
+    <ul>
+      <li><b>1.</b> Прочитай вопросы — так ты знаешь, что искать.</li>
+      <li><b>2.</b> Первый раз — общий смысл: кто это, где работает, нравится ли.</li>
+      <li><b>3.</b> Второй раз — детали: время, дни, места.</li>
+      <li><b>4.</b> Слово не знаешь — смотри вокруг: <i>She works at <u>night</u> … so she sleeps in the day</i> — понятно, что night shift — ночная смена.</li>
+    </ul>
+  </div>
+
+  <div class="rd" id="texts">
+    <article id="kate">
+      <div class="rh"><b>Kate · nurse</b><button class="btn" type="button" data-say="Kate is a nurse. She works in a big hospital in Manchester. She works at night three times a week, so she sleeps in the day. Her shift starts at eight in the evening and finishes at eight in the morning. She doesn't like the night shifts, but she loves her job. My patients are my favourite part of the job, she says. On her days off, she goes swimming and sees her friends.">🔊 Послушать</button></div>
+      <p>Kate is a nurse. She works in a big hospital in Manchester. She works at night three times a week, so she sleeps in the day. Her shift starts at eight in the evening and finishes at eight in the morning. She doesn't like the night shifts, but she loves her job. “My patients are my favourite part of the job,” she says. On her days off, she goes swimming and sees her friends.</p>
+    </article>
+    <article id="tom">
+      <div class="rh"><b>Tom · software developer</b><button class="btn" type="button" data-say="Tom is a software developer. He works for an IT company in London. He works from home four days a week and goes to the office only on Fridays. He starts at nine and has a lot of online meetings with his colleagues. He has lunch in his kitchen. I don't spend two hours on the train, and that's great, he says. But sometimes I don't see people all day. In the evening he goes to the gym.">🔊 Послушать</button></div>
+      <p>Tom is a software developer. He works for an IT company in London. He works from home four days a week and goes to the office only on Fridays. He starts at nine and has a lot of online meetings with his colleagues. He has lunch in his kitchen. “I don't spend two hours on the train, and that's great,” he says. “But sometimes I don't see people all day.” In the evening he goes to the gym.</p>
+    </article>
+    <article id="lina">
+      <div class="rh"><b>Li Na · student</b><button class="btn" type="button" data-say="Li Na is from China. She studies medicine at a university in Edinburgh. Her lectures start at nine, and she has classes every day. She also has a part-time job: she works in a café on Saturdays and Sundays. I don't have much free time, she says. I study in the evenings and revise for exams in the library. She calls her parents in China every Sunday.">🔊 Послушать</button></div>
+      <p>Li Na is from China. She studies medicine at a university in Edinburgh. Her lectures start at nine, and she has classes every day. She also has a part-time job: she works in a café on Saturdays and Sundays. “I don't have much free time,” she says. “I study in the evenings and revise for exams in the library.” She calls her parents in China every Sunday.</p>
+    </article>
+  </div>
+
+  <div class="ex" id="ex1a"><div class="ex-h"><span class="eyebrow">Упражнение 1 · кто это?</span><p>Kate, Tom или Li Na? Можно подглядывать в тексты — это чтение, а не память.</p></div></div>
+  <div class="ex" id="ex1b"><div class="ex-h"><span class="eyebrow">Упражнение 2 · правда или нет</span><p>True — так написано в тексте, False — в тексте по-другому.</p></div></div>
+  <div class="ex" id="ex1c"><div class="ex-h"><span class="eyebrow">Упражнение 3 · угадай слово</span><p>Не смотри в словарь: найди слово в тексте и пойми по соседним словам.</p></div></div>
+  <div class="ex" id="ex1d"><div class="ex-h"><span class="eyebrow">Упражнение 4 · вспомни по тексту</span><p>Впиши глагол в нужной форме. Тексты — сплошной present simple: следи за -s и doesn't.</p></div></div>
+
+  <div class="callout feel"><b class="h">Теперь на слух</b><p>Интервью с Максом. Текст скрыт — сначала послушай целиком один-два раза, ответь на вопросы, и только потом открывай текст и проверяй себя.</p></div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Аудио · интервью с Максом</span><span class="btns"><button class="btn" type="button" id="maxPlay">▶ Слушать</button><button class="btn" type="button" id="maxHide" aria-pressed="true">Показать текст</button></span></div>
+    <div class="dlg hid" id="max"></div>
+  </div>
+  <div class="ex" id="ex1e"><div class="ex-h"><span class="eyebrow">Упражнение 5 · понял ли на слух</span><p>Ответь, не открывая текст. Не уверен — послушай ещё раз.</p></div></div>
+  <div class="ex" id="ex1f"><div class="ex-h"><span class="eyebrow">Упражнение 6 · диктант из интервью</span><p>Нажми 🔊 и запиши фразу целиком. Регистр и точка в конце не важны.</p></div></div>
+
+  <h3>Слова из текстов</h3>
+  <div id="ex1cards"></div>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Расскажи про Kate тремя фразами — не глядя в текст.</summary>
+      <div class="a"><p><span class="say">Kate is a nurse. She works at night in a hospital in Manchester. She doesn't like the night shifts, but she loves her job.</span></p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Чем part-time job отличается от full-time job? Что такое day off?</summary>
+      <div class="a"><p><b>part-time</b> — неполный день, подработка. <b>full-time</b> — полный рабочий день. <b>day off</b> — выходной (свой, не обязательно суббота).</p></div></details>
+  </div>
+  <div class="topic-check" data-for="en.02.4.1">
+    <label class="tp"><input type="checkbox" data-id="en.02.4.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>чтение и слушание о работе и учёбе</b></span></label>
+    <span class="note" data-d="en.02.4.1">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 2 · Письмо</div>
+  <h2>Короткое письмо о себе: работа, учёба, обычный день</h2>
+  <p class="tldr">Пришёл в новую группу, команду, на стажировку — пишешь коротко о себе. Схема из пяти частей: <b>привет → кто я → работа и учёба → свободное время → прощание</b>. 60–100 слов, связки <b>and</b>, <b>but</b>, <b>also</b>. Всё в present simple — ровно то, что ты учил эту неделю.</p>
+
+  <div class="mail" id="model">
+    <p><span class="part">Привет</span><span class="say">Hi everyone,</span></p>
+    <p><span class="part">Кто я</span><span class="say">My name's Sam and I'm the new intern in the marketing team.</span> <span class="say">I'm from Kazan, but I live in Moscow now.</span></p>
+    <p><span class="part">Работа и учёба</span><span class="say">I'm a student. I study economics at university, and I also work here three days a week.</span> <span class="say">I start at ten and finish at four. After work I go to my lectures.</span></p>
+    <p><span class="part">Свободное время</span><span class="say">In my free time I play tennis and I watch a lot of films.</span> <span class="say">I don't play computer games, but I really like board games!</span></p>
+    <p><span class="part">Прощание</span><span class="say">See you at the meeting on Monday!</span><br><span class="say">Best wishes,</span><br>Sam</p>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Часть</th><th>Фразы</th></tr></thead>
+    <tbody>
+      <tr><td>Привет</td><td><span class="say">Hi everyone,</span> · <span class="say">Hi Kate,</span> · официально — <span class="say">Dear Ms Brown,</span> После приветствия — запятая.</td></tr>
+      <tr><td>Кто я</td><td><span class="say">My name's…</span> · <span class="say">I'm the new intern / student / developer.</span> · <span class="say">I'm from…</span></td></tr>
+      <tr><td>Работа, учёба</td><td><span class="say">I study…</span> · <span class="say">I work for / in / as…</span> · <span class="say">I start at… and finish at…</span></td></tr>
+      <tr><td>Свободное время</td><td><span class="say">In my free time I…</span> · <span class="say">At the weekend I…</span></td></tr>
+      <tr><td>Прощание</td><td><span class="say">See you on Monday!</span> · <span class="say">Best wishes,</span> · <span class="say">Thanks,</span> — и имя на новой строке.</td></tr>
+    </tbody></table></div>
+  <div class="prose">
+    <ul>
+      <li><b>and</b> — добавить: <span class="say">I study and I work.</span> <b>but</b> — против: <span class="say">I'm from Kazan, but I live in Moscow.</span></li>
+      <li><b>also</b> — «тоже, ещё и». Стоит <b>перед</b> глаголом, но <b>после</b> be: <span class="say">I also work here.</span> <span class="say">I'm also a student.</span></li>
+      <li><b>really</b> — «очень» с глаголом: <span class="say">I really like board games.</span> very с глаголом не ставят.</li>
+    </ul>
+  </div>
+  <div class="callout ru"><b class="h">Ошибки русскоговорящих</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">Hello, dear friends!</span><span class="yes"><span class="say">Hi everyone,</span></span><span class="n">«Дорогие друзья!» с восклицательным знаком — по-русски. По-английски — Hi everyone и запятая.</span></div>
+      <div class="pair"><span class="no">Also I study English.</span><span class="yes"><span class="say">I also study English.</span></span><span class="n">also — перед глаголом, не в начале.</span></div>
+      <div class="pair"><span class="no">I very like football.</span><span class="yes"><span class="say">I really like football.</span></span><span class="n">или <span class="say">I like football very much.</span></span></div>
+      <div class="pair"><span class="no">i work in a café.</span><span class="yes"><span class="say">I work in a café.</span></span><span class="n">I — всегда с большой, даже в середине предложения.</span></div>
+      <div class="pair"><span class="no">I'm study economics.</span><span class="yes"><span class="say">I study economics.</span></span><span class="n">Ошибка недели 1 снова: есть глагол — без be.</span></div>
+    </div>
+  </div>
+
+  <div class="ex" id="ex2a"><div class="ex-h"><span class="eyebrow">Упражнение 7 · части письма</span><p>Куда в письме идёт фраза?</p></div></div>
+  <div class="ex" id="ex2b"><div class="ex-h"><span class="eyebrow">Упражнение 8 · and, but или also</span><p>Выбери связку.</p></div></div>
+  <div class="ex" id="ex2c"><div class="ex-h"><span class="eyebrow">Упражнение 9 · найди ошибку</span><p>Это кусочки писем студентов. Нажми на неправильное слово. В одном ошибки нет.</p></div></div>
+  <div class="ex" id="ex2d"><div class="ex-h"><span class="eyebrow">Упражнение 10 · собери фразу</span><p>Переведи. Есть лишние плитки.</p></div></div>
+
+  <div class="lab wr" data-local>
+    <div class="lab-h"><span class="eyebrow">Лаборатория · моё письмо</span><span class="muted mono" id="wrState"></span></div>
+    <p class="muted" style="font-size:13.5px">Напиши письмо о себе новой группе или команде: 60–100 слов, пять частей. Проверка подсказывает типичные ошибки — но не всё: смысл и естественность проверь по образцу. Текст остаётся только в этом браузере.</p>
+    <textarea id="wrText" spellcheck="false" placeholder="Hi everyone,&#10;&#10;My name's …"></textarea>
+    <ul class="wr-out" id="wrOut" aria-live="polite"></ul>
+    <div class="btns"><button class="btn" type="button" id="wrSay">🔊 Прочитать вслух</button><button class="btn" type="button" id="wrCopy">Скопировать в Obsidian</button><span class="muted" id="wrMsg" role="status" style="font-size:13.5px"></span></div>
+  </div>
+
+  <div class="topic-check" data-for="en.02.4.2">
+    <label class="tp"><input type="checkbox" data-id="en.02.4.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>письмо о себе</b></span></label>
+    <span class="note" data-d="en.02.4.2">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · ~25 минут</div>
+  <h2>Практика</h2>
+  <p class="tldr">Четыре задания: читать вслух, пересказать услышанное, написать своё и рассказать о другом. Отмечай «Сделал» — план дня это видит.</p>
+  <div class="prac">
+    <div class="task"><span class="tg int">Читать вслух · 5 минут</span>
+      <h3>Тень за диктором</h3>
+      <p>Включи текст про Tom (🔊 у текста). Читай вслух вместе с голосом, отставая на полслова. Потом — сам, без звука. Цель — ровно, без пауз на <i>colleagues</i>, <i>meetings</i>, <i>sometimes</i>.</p>
+      <p class="ok">Готово, когда прочитал текст сам без остановок.</p>
+    </div>
+    <div class="task"><span class="tg work">Писать · 5 минут</span>
+      <h3>Перескажи интервью с Максом</h3>
+      <p>Пять-шесть предложений о Максе от третьего лица: что он делает, где, во сколько начинает, где работает по понедельникам, что учит, что делает в субботу. Следи за -s и doesn't.</p>
+      <details><summary>Образец</summary><div class="a">
+        <p><span class="say">Max is a data analyst. He works for a bank in Moscow. He starts work at ten, so he doesn't get up early. He works from home on Mondays and Tuesdays. He also does an online course in machine learning. On Saturdays he plays football with his friends.</span></p></div></details>
+    </div>
+    <div class="task"><span class="tg rev">Писать · 10 минут</span>
+      <h3>Моё письмо</h3>
+      <p>Напиши письмо в лаборатории выше: 60–100 слов, пять частей, хотя бы по разу and, but и also. Добейся, чтобы проверка не нашла ошибок, потом прочитай вслух и скопируй в Obsidian.</p>
+      <details><summary>Образец</summary><div class="a">
+        <p><span class="say">Hi everyone, My name's Vlad and I'm from Russia. I'm a student and I study machine learning. I also study English every day, and I really like it. In my free time I go to the gym. I don't play computer games, but I watch a lot of films in English. See you at the lecture on Monday! Best wishes, Vlad</span></p></div></details>
+    </div>
+    <div class="task"><span class="tg lc">Говорить · 5 минут</span>
+      <h3>Расскажи о человеке из текста</h3>
+      <p>Выбери Kate, Tom или Li Na и расскажи о нём минуту вслух, не глядя в текст: работа, время, что нравится, что делает в свободное время. Потом — минуту о ком-то из своих знакомых (he / she).</p>
+      <details><summary>Образец</summary><div class="a">
+        <p><span class="say">Li Na is from China, but she studies in Edinburgh. She studies medicine. She has lectures every day. She also works in a café at the weekend, so she doesn't have much free time.</span></p></div></details>
+    </div>
+  </div>
+  <div class="callout mem"><b class="h">Дальше</b><p>Завтра — <a href="/lessons/e02-5.html">урок 2.5 «Повторение и разговор»</a>: вся неделя в речи, интервью и финальная работа над ошибками недели 1. В субботу — тест недели.</p></div>
+</section>
+
+<!-- ============ take ============ -->
+<section class="topic" id="take">
+  <div class="eyebrow">После урока</div>
+  <h2>В Quizlet</h2>
+  <p class="tldr">Слова и правила урока учишь в Quizlet. Новое уже отмечено — сними лишнее, нажми «Скопировать для Quizlet» и вставь в набор недели через «Импорт». Слова и правила — отдельными наборами.</p>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в плане</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда сделал упражнения темы без ошибок или с одной. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>Читать:</b> сначала вопросы, потом текст целиком, потом детали. Незнакомое слово — по соседним.</li>
+      <li><b>Слушать:</b> первый раз — общий смысл, второй — детали. Текст открывать в конце.</li>
+      <li><b>Письмо о себе:</b> привет → кто я → работа и учёба → свободное время → прощание. 60–100 слов.</li>
+      <li><b>Начало и конец:</b> <span class="say">Hi everyone,</span> / <span class="say">Dear Ms Brown,</span> … <span class="say">See you on Monday!</span> <span class="say">Best wishes,</span> + имя.</li>
+      <li><b>and</b> — добавить, <b>but</b> — против, <b>also</b> — перед глаголом, после be: <span class="say">I also work here.</span> <span class="say">I'm also a student.</span></li>
+      <li><b>really</b> с глаголом: <span class="say">I really like it.</span> Не «I very like».</li>
+      <li><b>I</b> — всегда с большой. Есть глагол — без be: <span class="say">I study economics.</span></li>
+      <li><b>Слова:</b> shift, night shift, day off, part-time, full-time, colleague, meeting, patient, customer, lunch break.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+    <p class="muted" style="font-size:13.5px">Конспект этого урока уже лежит в Obsidian: <code>65_Английский/Уроки</code>.</p>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b>
+    <p>Закрой урок. Вслух: расскажи про Kate, Tom и Li Na по две фразы о каждом. Включи интервью с Максом ещё раз — без текста — и запиши пять фактов о нём. На бумаге: письмо о себе по памяти, пять частей. Где запнулся — туда и возвращаешься.</p>
+  </div>
+  <p><a class="btn" href="/lessons/e02-5.html" style="text-decoration:none">Дальше: урок 5 · Повторение и разговор →</a></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+# 🇬🇧 Урок 2.4 · Читаем и пишем: работа и учёба
+
+## Разминка: диктовка
+- Время цифрами: *nine thirty* — 9:30, *six fifteen* — 6:15.
+- Почта: dot — точка, at — @, underscore — _. double — две буквы подряд: *address — A, double D, R, E, double S*.
+
+## Как читать и слушать
+1. Сначала вопросы — знаешь, что искать.
+2. Первый раз — общий смысл, не останавливаясь.
+3. Второй раз — детали: время, дни, места.
+4. Незнакомое слово — по соседним словам.
+
+## Слова из текстов
+| Слово | Значение |
+| :--- | :--- |
+| shift, night shift | смена, ночная смена |
+| day off (days off) | выходной |
+| part-time / full-time job | работа на неполный / полный день |
+| colleague | коллега |
+| meeting | встреча, созвон |
+| patient | пациент |
+| customer | клиент, покупатель |
+| lunch break | обеденный перерыв |
+
+## Письмо о себе
+Привет → кто я → работа и учёба → свободное время → прощание. 60–100 слов.
+
+- Начало: *Hi everyone,* · *Hi Kate,* · официально *Dear Ms Brown,*
+- Кто я: *My name's… I'm the new intern. I'm from…*
+- Работа и учёба: *I study… I work for / in / as… I start at… and finish at…*
+- Свободное время: *In my free time I… At the weekend I…*
+- Конец: *See you on Monday! Best wishes,* — и имя на новой строке.
+
+> [!tip] Связки
+> and — добавить · but — против · also — перед глаголом, после be: *I also work here. I'm also a student.* · really с глаголом: *I really like it.*
+
+> [!warning] Ошибки
+> - ~~Hello, dear friends!~~ → *Hi everyone,*
+> - ~~Also I study English~~ → *I also study English.*
+> - ~~I very like football~~ → *I really like football.*
+> - ~~i work~~ → *I work*
+> - ~~I'm study economics~~ → *I study economics.*
+
+## Проверь себя
+> [!question]- Расскажи про Kate тремя фразами
+> *Kate is a nurse. She works at night in a hospital in Manchester. She doesn't like the night shifts, but she loves her job.*
+
+> [!question]- Где ставят also: «Я тоже работаю здесь», «Я тоже студент»
+> *I also work here. I'm also a student.*
+
+> [!question]- Исправь: «Also i very like my job.»
+> *I also really like my job.*
+</script>
+
+<script src="/assets/lesson.js"></script>
+<script src="/assets/en.js"></script>
+<script src="/assets/quizlet.js"></script>
+<script>
+/* ---------- аудио: интервью, текст скрыт до конца ---------- */
+(function interview(){
+  const D=[
+    ["A","So, Max, what do you do?","Итак, Макс, чем ты занимаешься?"],
+    ["B","I'm a data analyst. I work for a bank in Moscow.","Я аналитик данных. Работаю в банке в Москве."],
+    ["A","Do you like your job?","Тебе нравится твоя работа?"],
+    ["B","Yes, I do. I work with numbers all day, and I love it.","Да. Я весь день работаю с цифрами, и мне это очень нравится."],
+    ["A","What time do you start work?","Во сколько начинаешь работать?"],
+    ["B","I start at ten, so I don't get up early. I finish at seven.","В десять, поэтому рано не встаю. Заканчиваю в семь."],
+    ["A","Do you work from home?","Ты работаешь из дома?"],
+    ["B","On Mondays and Tuesdays, yes. The rest of the week I go to the office.","По понедельникам и вторникам — да. Остальную неделю хожу в офис."],
+    ["A","Do you study too?","А учишься тоже?"],
+    ["B","Yes, I do. I do an online course in machine learning. I study in the evening, after work.","Да. Прохожу онлайн-курс по машинному обучению. Учусь вечером, после работы."],
+    ["A","And what do you do at the weekend?","А что делаешь на выходных?"],
+    ["B","I play football with my friends on Saturdays. On Sundays I don't do anything!","По субботам играю в футбол с друзьями. А по воскресеньям ничего не делаю!"]
+  ];
+  const box=$("max"), play=$("maxPlay"), hide=$("maxHide");
+  box.innerHTML=D.map(([w,en,ru])=>`<div class="dl ${w==="B"?"b":""}"><span class="who">${w}</span><span class="tx"><span class="say" data-say="${enEsc(en)}">${en}</span><span class="ru">${ru}</span></span></div>`).join("");
+  hide.onclick=()=>{const hidden=box.classList.toggle("hid");hide.setAttribute("aria-pressed",hidden);hide.textContent=hidden?"Показать текст":"Скрыть текст"};
+  let playing=false;
+  const stop=()=>{playing=false;play.textContent="▶ Слушать";box.querySelectorAll(".tx").forEach(t=>t.style.outline="")};
+  play.onclick=()=>{
+    if(!("speechSynthesis" in window))return;
+    if(playing){speechSynthesis.cancel();stop();return}
+    playing=true;play.textContent="■ Стоп";speechSynthesis.cancel();
+    D.forEach(([w,en],i)=>{const u=new SpeechSynthesisUtterance(en);if(EN_VOICE)u.voice=EN_VOICE;u.lang="en-GB";u.rate=w==="A"?0.95:0.88;u.pitch=w==="A"?1.1:0.9;
+      u.onstart=()=>box.querySelectorAll(".dl").forEach((d,k)=>d.querySelector(".tx").style.outline=k===i?"2px solid var(--accent)":"");
+      if(i===D.length-1)u.onend=stop;
+      speechSynthesis.speak(u)});
+  };
+})();
+
+/* ---------- лаборатория: моё письмо ---------- */
+(function letter(){
+  const KEY="en-letter-2-4", t=$("wrText");
+  const VERBS="work|study|live|like|go|have|play|watch|start|finish|speak|love|want|need|know|agree|do";
+  function rules(v){
+    const out=[], words=(v.match(/[A-Za-z']+/g)||[]).length;
+    if(!v.trim())return out;
+    out.push(words<60?["warn",`Слов: ${words}. Нужно 60–100 — добавь часть про работу, учёбу или свободное время.`]:words>100?["warn",`Слов: ${words}. Многовато — сократи до 100.`]:["good",`Слов: ${words} ✓`]);
+    const first=v.trim().split("\n")[0];
+    if(/^(hi|hello|dear)\b/i.test(first))out.push(/,\s*$/.test(first)?["good","Приветствие ✓"]:["warn","После приветствия — запятая: Hi everyone,"]);
+    else out.push(["bad","Начни с приветствия: Hi everyone, / Hi Kate, / Dear Ms Brown,"]);
+    if(/dear friends|!\s*$/im.test(first))out.push(["warn","Приветствие по-русски. Проще: Hi everyone,"]);
+    if(/(^|[\s.,!?])i([\s',.!?]|$)/.test(v))out.push(["bad","«i» — с большой буквы: I."]);
+    const be=v.match(new RegExp(`\\b(I'm|I am|he's|she's|he is|she is|we're|they're|we are|they are)\\s+(${VERBS})\\b`,"i"));
+    if(be)out.push(["bad",`«${be[0]}» — есть глагол, be не нужен: ${be[0].split(/\s+/).pop()}.`]);
+    const very=v.match(new RegExp(`\\bvery\\s+(${VERBS})\\b`,"i"));
+    if(very)out.push(["bad",`«${very[0]}» — с глаголом не very, а really: really ${very[1]}.`]);
+    if(/(^|[.!?]\s+)also\b/im.test(v))out.push(["warn","also в начале предложения — переставь перед глаголом: I also…"]);
+    const pl=v.match(/\b(people|parents|children|colleagues|friends)\s+is\b/i);
+    if(pl)out.push(["bad",`«${pl[0]}» — ${pl[1]} много: are.`]);
+    const s3=v.match(new RegExp(`(?<!\\b(?:does|doesn't|can)\\s)\\b(he|she|my (?:brother|sister|mum|dad|friend|boss))\\s+(${VERBS})\\b`,"i"));
+    if(s3)out.push(["bad",`«${s3[0]}» — у he / she глагол с -s.`]);
+    if(/\b(and|but)\b/i.test(v)&&/\balso\b/i.test(v))out.push(["good","Связки and / but / also ✓"]);
+    else out.push(["warn","Добавь связки: and, but и also — хотя бы по разу."]);
+    if(/(best wishes|thanks|see you|bye)/i.test(v.split("\n").slice(-3).join(" ")))out.push(["good","Прощание ✓"]);
+    else out.push(["warn","В конце — прощание: See you on Monday! Best wishes, и имя."]);
+    return out;
+  }
+  function check(){
+    const r=rules(t.value);
+    $("wrOut").innerHTML=r.map(([c,m])=>`<li class="${c}">${enEsc(m)}</li>`).join("");
+    const bad=r.filter(x=>x[0]==="bad").length, warn=r.filter(x=>x[0]==="warn").length;
+    $("wrState").textContent=t.value.trim()?(bad||warn?`ошибок ${bad} · советов ${warn}`:"чисто ✓"):"";
+    try{localStorage.setItem(KEY,t.value)}catch(e){}
+  }
+  t.addEventListener("input",check);
+  try{const d=localStorage.getItem(KEY);if(d){t.value=d;check()}}catch(e){}
+  $("wrSay").onclick=()=>{if(t.value.trim())say(t.value)};
+  $("wrCopy").onclick=()=>{const d=new Date(),md=`### Письмо о себе · ${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}\n\n${t.value.trim()}\n`;
+    try{navigator.clipboard.writeText(md).then(()=>$("wrMsg").textContent="Скопировано — вставь в заметку",()=>prompt("Скопируй:",md))}catch(e){prompt("Скопируй:",md)}};
+})();
+
+/* ---------- разминка ---------- */
+exGap($("exW1"),[
+  {s:"Время: ___",say:"The lecture starts at nine thirty.",a:["9:30","9.30","09:30"]},
+  {s:"Время: ___",say:"I finish work at six fifteen.",a:["6:15","6.15","06:15","18:15"]},
+  {s:"Почта: ___",say:"tom dot baker at outlook dot com",a:["tom.baker@outlook.com"]},
+  {s:"Почта: ___",say:"m, underscore, ivanova, at, mail, dot, ru",a:["m_ivanova@mail.ru"]},
+  {s:"Слово: ___",say:"Address. A, double D, R, E, double S.",a:"address"},
+  {s:"Слово: ___",say:"Colleague. C, O, double L, E, A, G, U, E.",a:"colleague",why:"на конце -ague, читается «колиг»"}
+]);
+
+/* ---------- тема 1: чтение ---------- */
+const WHO=["Kate","Tom","Li Na"];
+exGap($("ex1a"),[
+  {s:"___ works at night.",opts:WHO,a:"Kate"},
+  {s:"___ works from home.",opts:WHO,a:"Tom"},
+  {s:"___ has a job at the weekend.",opts:WHO,a:"Li Na",why:"she works in a café on Saturdays and Sundays"},
+  {s:"___ sleeps in the day.",opts:WHO,a:"Kate"},
+  {s:"___ has a lot of online meetings.",opts:WHO,a:"Tom"},
+  {s:"___ revises in the library.",opts:WHO,a:"Li Na"},
+  {s:"___ goes swimming on days off.",opts:WHO,a:"Kate"},
+  {s:"___ sometimes doesn't see people all day.",opts:WHO,a:"Tom"}
+],{keep:true});
+exGap($("ex1b"),[
+  {s:"Kate's shift is twelve hours long. — ___",opts:["True","False"],a:"True",why:"с восьми вечера до восьми утра — двенадцать часов"},
+  {s:"Kate doesn't like her job. — ___",opts:["True","False"],a:"False",why:"she doesn't like the night shifts, but she loves her job"},
+  {s:"Tom goes to the office on Fridays. — ___",opts:["True","False"],a:"True"},
+  {s:"Tom has lunch in a café. — ___",opts:["True","False"],a:"False",why:"he has lunch in his kitchen"},
+  {s:"Li Na studies at a university in China. — ___",opts:["True","False"],a:"False",why:"она из Китая, а учится в Эдинбурге"},
+  {s:"Li Na calls her parents on Sundays. — ___",opts:["True","False"],a:"True"},
+  {s:"Li Na has a lot of free time. — ___",opts:["True","False"],a:"False",why:"I don't have much free time"}
+],{keep:true});
+exGap($("ex1c"),[
+  {s:"shift (Kate) — это ___",opts:["смена, рабочие часы","подарок","перерыв"],a:"смена, рабочие часы",why:"starts at eight in the evening and finishes at eight in the morning — значит, часы работы"},
+  {s:"days off (Kate) — это ___",opts:["выходные дни","больничные","дни рождения"],a:"выходные дни",why:"в эти дни она плавает и видится с друзьями — не работает"},
+  {s:"part-time job (Li Na) — это ___",opts:["подработка, неполный день","работа мечты","стажировка"],a:"подработка, неполный день",why:"она учится каждый день, а работает только по выходным"},
+  {s:"colleagues (Tom) — это ___",opts:["коллеги","клиенты","соседи"],a:"коллеги",why:"online meetings with his colleagues — встречи по работе"}
+],{keep:true});
+exGap($("ex1d"),[
+  {s:"(start) Kate's shift ___ at eight in the evening.",a:"starts",full:"Kate's shift starts at eight in the evening.",why:"shift — одна вещь, как it"},
+  {s:"(have) Tom ___ lunch in his kitchen.",a:"has",full:"Tom has lunch in his kitchen."},
+  {s:"(call) Li Na ___ her parents every Sunday.",a:"calls",full:"Li Na calls her parents every Sunday."},
+  {s:"(not like) Kate ___ the night shifts.",a:["doesn't like","does not like"],full:"Kate doesn't like the night shifts."},
+  {s:"(study) Li Na ___ medicine.",a:"studies",full:"Li Na studies medicine.",why:"согласная + y → ies"},
+  {s:"(go) In the evening Tom ___ to the gym.",a:"goes",full:"In the evening Tom goes to the gym."},
+  {s:"(not have) “I ___ much free time,” says Li Na.",a:["don't have","do not have"],full:"I don't have much free time.",why:"говорит о себе — I, значит don't"}
+]);
+
+/* ---------- тема 1: слушание ---------- */
+exGap($("ex1e"),[
+  {s:"Max is ___.",opts:["a data analyst","a developer","a teacher"],a:"a data analyst"},
+  {s:"He works for ___.",opts:["a bank","an IT company","a university"],a:"a bank"},
+  {s:"He starts work at ___.",opts:["ten","nine","seven"],a:"ten",why:"в семь он заканчивает"},
+  {s:"He works from home on ___.",opts:["Mondays and Tuesdays","Fridays","every day"],a:"Mondays and Tuesdays"},
+  {s:"He studies ___.",opts:["in the evening","in the morning","at the weekend"],a:"in the evening",why:"after work"},
+  {s:"On Saturdays he ___.",opts:["plays football","studies","works"],a:"plays football"},
+  {s:"Does Max get up early? — ___",opts:["No, he doesn't.","Yes, he does.","No, he isn't."],a:"No, he doesn't.",why:"I start at ten, so I don't get up early"}
+],{keep:true});
+exGap($("ex1f"),[
+  {s:"___",say:"I work with numbers all day.",a:"I work with numbers all day"},
+  {s:"___",say:"I start at ten, so I don't get up early.",a:["I start at ten, so I don't get up early","I start at 10, so I don't get up early"]},
+  {s:"___",say:"I do an online course in machine learning.",a:"I do an online course in machine learning"},
+  {s:"___",say:"On Sundays I don't do anything.",a:"On Sundays I don't do anything"}
+]);
+
+const WORDS=[
+  {en:"shift",ipa:"ʃɪft",ru:"смена (рабочие часы)",ex:"Her shift starts at eight."},
+  {en:"night shift",ipa:"ˈnaɪt ʃɪft",ru:"ночная смена",ex:"She doesn't like the night shifts."},
+  {en:"day off",ipa:"ˌdeɪ ˈɒf",ru:"выходной (свой)",ex:"On my days off I go swimming."},
+  {en:"part-time job",ipa:"ˌpɑːt ˈtaɪm dʒɒb",ru:"подработка, работа на неполный день",ex:"She has a part-time job in a café."},
+  {en:"full-time job",ipa:"ˌfʊl ˈtaɪm dʒɒb",ru:"работа на полный день",ex:"He has a full-time job in a bank."},
+  {en:"colleague",ipa:"ˈkɒl.iːɡ",ru:"коллега",ex:"I have online meetings with my colleagues."},
+  {en:"meeting",ipa:"ˈmiː.tɪŋ",ru:"встреча, созвон",ex:"See you at the meeting on Monday!"},
+  {en:"patient",ipa:"ˈpeɪ.ʃənt",ru:"пациент",ex:"My patients are my favourite part of the job."},
+  {en:"customer",ipa:"ˈkʌs.tə.mər",ru:"клиент, покупатель",ex:"The café has a lot of customers on Saturdays."},
+  {en:"lunch break",ipa:"ˈlʌntʃ breɪk",ru:"обеденный перерыв",ex:"I have a lunch break at one."},
+  {en:"free time",ipa:"ˌfriː ˈtaɪm",ru:"свободное время",ex:"In my free time I play tennis."},
+  {en:"intern",ipa:"ˈɪn.tɜːn",ru:"стажёр",ex:"I'm the new intern in the data team."}
+];
+wordCards($("ex1cards"),WORDS);
+
+/* ---------- тема 2: письмо ---------- */
+exSort($("ex2a"),{auto:false,groups:[{label:"начало"},{label:"середина"},{label:"конец"}],items:[
+  {w:"Hi everyone,",g:0},{w:"Dear Ms Brown,",g:0,why:"официально — Dear и фамилия"},{w:"My name's Sam.",g:1},
+  {w:"I study economics.",g:1},{w:"In my free time I play tennis.",g:1},{w:"See you on Monday!",g:2},
+  {w:"Best wishes,",g:2,why:"после — имя на новой строке"},{w:"Thanks,",g:2},{w:"I'm the new intern.",g:1}
+]});
+exGap($("ex2b"),[
+  {s:"I'm from Kazan, ___ I live in Moscow now.",opts:["but","and","also"],a:"but",why:"противопоставление: родом из Казани, а живу в Москве"},
+  {s:"I study economics ___ I work part-time.",opts:["and","but","also"],a:"and"},
+  {s:"I study English. I ___ study Spanish.",opts:["also","and","but"],a:"also",why:"also — перед глаголом"},
+  {s:"I like football, ___ I don't like tennis.",opts:["but","and","also"],a:"but"},
+  {s:"She's a student. She's ___ a tour guide.",opts:["also","and","but"],a:"also",why:"после be: She's also…"},
+  {s:"He works from home ___ he has a lot of online meetings.",opts:["and","but","also"],a:"and"},
+  {s:"I don't have much free time, ___ I go to the gym every week.",opts:["but","and","also"],a:"but"}
+],{keep:true});
+exSpot($("ex2c"),[
+  {s:"Also I study English.",bad:0,n:2,also:[1],fix:"I also",why:"also — перед глаголом: I also study"},
+  {s:"I very like my job.",bad:1,fix:"really",why:"с глаголом — really, не very"},
+  {s:"I'm study economics at university.",bad:0,fix:"I",why:"есть глагол study — be не нужен"},
+  {s:"My colleagues is very friendly.",bad:2,fix:"are",why:"colleagues — много"},
+  {s:"She work from home on Fridays.",bad:1,fix:"works",why:"she — глагол с -s"},
+  {s:"I am a intern in the data team.",bad:2,fix:"an",why:"intern начинается с гласного звука — an"},
+  {s:"See you at the meeting on Monday!",bad:-1}
+]);
+exBuild($("ex2d"),[
+  {ru:"Я новый стажёр в команде данных.",w:"I'm the new intern in the data team .",extra:["a","on"]},
+  {ru:"Я из Казани, но сейчас живу в Москве.",w:"I'm from Kazan , but I live in Moscow now .",extra:["and","am"]},
+  {ru:"Я тоже учу английский.",w:"I also study English .",extra:["Also","am"]},
+  {ru:"Мне очень нравятся настольные игры.",w:"I really like board games .",extra:["very","likes"]},
+  {ru:"До встречи в понедельник!",w:"See you on Monday !",extra:["in","at"]}
+]);
+
+takeAway($("take"),{lesson:"2.4",words:WORDS,rules:[
+{
+"id": "en.02.4.r1",
+"q": "Как начать и закончить письмо о себе?",
+"a": "Начало: Hi everyone, / Hi Kate, / официально Dear Ms Brown, — с запятой. Конец: See you on Monday! Best wishes, — и имя на новой строке.",
+"ex": [
+"Hi everyone,",
+"Best wishes, Sam"
+],
+"wrong": "Hello, dear friends!",
+"right": "Hi everyone,"
+},
+{
+"id": "en.02.4.r2",
+"q": "Где ставить also?",
+"a": "Перед смысловым глаголом, но после be. Не в начале предложения.",
+"ex": [
+"I also work here.",
+"I'm also a student."
+],
+"wrong": "Also I study English.",
+"right": "I also study English."
+},
+{
+"id": "en.02.4.r3",
+"q": "Как сказать «очень нравится»?",
+"a": "really перед глаголом или very much в конце. very прямо перед глаголом не ставят.",
+"ex": [
+"I really like it.",
+"I like it very much."
+],
+"wrong": "I very like it.",
+"right": "I really like it."
+}
+]});
+
+initLesson({topics:[["en.02.4.1","Чтение и слушание: тексты о работе и учёбе"],["en.02.4.2","Короткое письмо о себе: работа, учёба, обычный день"]]});
+</script>

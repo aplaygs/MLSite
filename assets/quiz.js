@@ -46,7 +46,7 @@ function initQuiz(cfg) {
     const saved = store.get();
     const can = saved && saved.list && Object.keys(saved.res).length && Object.keys(saved.res).length < saved.list.length;
     root.innerHTML = `<div class="qz-hero">
-      <div class="eyebrow">Неделя ${cfg.week} · тест после трёх уроков</div>
+      <div class="eyebrow">Неделя ${cfg.week} · тест после уроков недели</div>
       <h1>${esc(cfg.title)}</h1>
       <p class="muted" style="max-width:66ch">${cfg.intro}</p>
       <div class="qz-meta"><span>${N} ${plural(N, "вопрос", "вопроса", "вопросов")}</span><span>~${cfg.minutes} минут</span><span>без подсказок и без ИИ</span></div>

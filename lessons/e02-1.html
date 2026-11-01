@@ -31,16 +31,34 @@
 <script src="/assets/nav.js"></script>
 <script src="/assets/work.js"></script>
 <div class="wrap">
-<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/en#w-2">← Неделя 2 в плане</a><span class="mid">урок 1 из 3</span><a href="/lessons/e02-2.html">Урок 2 · Вопросы с do/does →</a></nav>
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/en#w-2">← Неделя 2 в плане</a><span class="mid">урок 1 из 5</span><a href="/lessons/e02-2.html">Урок 2 · Вопросы с do/does →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · Work and study · урок 1 из 3 · 2 темы · ~60 минут</div>
+  <div class="eyebrow">Неделя 2 · Work and study · урок 1 из 5 · 2 темы + разминка · ~70 минут</div>
   <h1>Present simple: что я делаю всегда</h1>
   <p>Первое настоящее время с «настоящими» глаголами: <span class="say">I work</span>, <span class="say">she works</span>, <span class="say">he doesn't work</span>. Им рассказывают о работе, учёбе, привычках и фактах — то есть почти обо всём, о чём говорят при знакомстве и на собеседовании. Здесь же главная путаница русскоговорящих: когда <b>be</b> (неделя 1), а когда <b>do</b>. Во второй теме — профессии и как сказать, где и кем ты работаешь.</p>
   <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
   <nav class="toc" aria-label="Темы урока">
-    <a href="#t1">Present simple: + и −</a><a href="#t2">Работа и профессии</a><a href="#practice">Практика</a><a href="#take">В Quizlet</a><a href="#sheet">Шпаргалка</a>
+    <a href="#warm">Разминка</a><a href="#t1">Present simple: + и −</a><a href="#t2">Работа и профессии</a><a href="#practice">Практика</a><a href="#take">В Quizlet</a><a href="#sheet">Шпаргалка</a>
   </nav>
 </header>
+
+<!-- ============ разминка ============ -->
+<section class="topic" id="warm">
+  <div class="eyebrow">Разминка · ошибки теста недели 1 · ~8 минут</div>
+  <h2>be и глагол вместе не ставят; people и parents — are</h2>
+  <p class="tldr">Две ошибки из теста недели 1 ведут прямо в этот урок. <b>Первая:</b> «I'm agree», «He is work» — be там, где уже есть глагол-действие. <b>Вторая:</b> «People is», «Where is your parents?» — <span class="say">people</span>, <span class="say">parents</span>, <span class="say">children</span> — это много людей, с ними <b>are</b>.</p>
+  <div class="callout ru"><b class="h">Ошибки из теста</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">I'm agree with you.</span><span class="yes"><span class="say">I agree with you.</span></span><span class="n">agree — глагол «соглашаться». Русское «я согласен» тянет за собой be, английское — нет.</span></div>
+      <div class="pair"><span class="no">He is work in a bank.</span><span class="yes"><span class="say">He works in a bank.</span></span><span class="n">Есть глагол work — be не нужен. А у he к глаголу добавляется -s — об этом весь урок.</span></div>
+      <div class="pair"><span class="no">People is friendly here.</span><span class="yes"><span class="say">People are friendly here.</span></span><span class="n">people — уже множественное число («люди»), peoples почти не говорят.</span></div>
+      <div class="pair"><span class="no">Where is your parents?</span><span class="yes"><span class="say">Where are your parents?</span></span></div>
+    </div>
+  </div>
+  <div class="callout mem"><b class="h">Как запомнить</b><p>Прежде чем сказать фразу, найди в ней глагол-действие. Нашёл — <b>be</b> не ставишь. Не нашёл — ставишь <b>am / is / are</b>: <span class="say">I'm twenty.</span> <span class="say">I'm cold.</span> <span class="say">I'm from Russia.</span></p></div>
+  <div class="ex" id="exW1"><div class="ex-h"><span class="eyebrow">Разминка 1 · найди ошибку</span><p>Нажми на неправильное слово. В одном предложении ошибки нет.</p></div></div>
+  <div class="ex" id="exW2"><div class="ex-h"><span class="eyebrow">Разминка 2 · выбери</span><p>Сначала реши: есть глагол-действие или нет. И сколько людей.</p></div></div>
+</section>
 
 <!-- ============ 1 ============ -->
 <section class="topic" id="t1">
@@ -265,6 +283,11 @@
 <script type="text/markdown" id="md">
 # 🇬🇧 Урок 2.1 · Present simple: что я делаю всегда
 
+## Разминка: ошибки теста недели 1
+- be и глагол-действие вместе не ставят: ~~I'm agree~~ → *I agree*, ~~He is work~~ → *He works*.
+- Возраст и состояние — через be: *I'm twenty. I'm cold.*
+- people, parents, children — много: ~~People is~~ → *People are*, ~~Where is your parents?~~ → *Where are your parents?*
+
 ## Present simple: утверждение и отрицание
 Для того, что бывает всегда, регулярно или вообще: работа, учёба, привычки, расписание, что нравится, факты. Не «сейчас» — для «сейчас» будет present continuous (неделя 10).
 
@@ -473,6 +496,26 @@ exBuild($("ex2c"),[
   {ru:"Она работает из дома.",w:"She works from home .",extra:["work","at"]},
   {ru:"Он не работает по выходным.",w:"He doesn't work at weekends .",alt:["He does not work at weekends ."],extra:["don't","works"]}
 ]);
+
+/* ---------- разминка: ошибки теста недели 1 ---------- */
+exSpot($("exW1"),[
+  {s:"I'm agree with you.",bad:0,fix:"I",why:"agree — глагол, be не нужен: I agree"},
+  {s:"He is work in a bank.",bad:1,n:2,fix:"works",why:"есть глагол work — без be, и у he глагол с -s: He works"},
+  {s:"People is very friendly here.",bad:1,fix:"are",why:"people — много людей: are"},
+  {s:"Where is your parents?",bad:1,fix:"are",why:"parents — двое: are"},
+  {s:"My children is at school.",bad:2,fix:"are",why:"children — много: are"},
+  {s:"I'm twenty and I'm cold.",bad:-1}
+]);
+exGap($("exW2"),[
+  {s:"I ___ with you.",opts:["agree","am agree","'m agree"],a:"agree",why:"agree — глагол"},
+  {s:"She ___ in a bank.",opts:["works","is work","is works"],a:"works",why:"be и глагол вместе не ставят"},
+  {s:"I ___ twenty.",opts:["'m","have","—"],a:"'m",full:"I'm twenty.",why:"возраст — через be"},
+  {s:"People here ___ very friendly.",opts:["are","is"],a:"are",why:"people — множественное число"},
+  {s:"Where ___ your parents?",opts:["are","is","do"],a:"are",full:"Where are your parents?",why:"глагола нет, parents — много"},
+  {s:"My parents ___ in Kazan.",opts:["live","lives","are live"],a:"live",why:"parents — как they: без -s и без be"},
+  {s:"___ your friends students?",opts:["Are","Is","Do"],a:"Are",why:"глагола нет — be; friends — много"},
+  {s:"I ___ cold. Close the window, please.",opts:["'m","have","do"],a:"'m",full:"I'm cold. Close the window, please.",why:"«мне холодно» — I'm cold"}
+],{keep:true});
 
 takeAway($("take"),{lesson:"2.1",words:WORDS.concat([
   {en:"work from home",ru:"работать из дома, удалённо",ex:"I work from home on Fridays."},
