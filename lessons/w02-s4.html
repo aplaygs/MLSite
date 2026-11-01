@@ -1,0 +1,408 @@
+<title>Урок 2.4 · ML заново: как модель ошибается и как это проверить</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/ml.css">
+<style>
+/* Только для этого урока: константа под MSE и MAE, подгонка кривой разной сложности. */
+.cv{display:grid;gap:10px}
+.cv input[type=range]{width:100%}
+.cv-row{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font:14px var(--f-mono)}
+.cv-row b{font-size:16px}
+.cv svg{width:100%;height:auto;display:block;background:var(--soft);border-radius:12px}
+.cv .ax{stroke:var(--line);stroke-width:1}
+.cv .lb{fill:var(--muted);font:11px var(--f-mono)}
+.cv .tr{fill:var(--accent)} .cv .va{fill:none;stroke:var(--warm);stroke-width:1.6}
+.cv .truth{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:5 5}
+.cv .fit{fill:none;stroke:var(--accent);stroke-width:2.6}
+.cv .ghost{fill:none;stroke:var(--accent);stroke-width:1.4;opacity:.35}
+.cv .mse{fill:none;stroke:var(--accent);stroke-width:2} .cv .mae{fill:none;stroke:var(--warm);stroke-width:2}
+.cv .err-tr{fill:none;stroke:var(--accent);stroke-width:2} .cv .err-va{fill:none;stroke:var(--warm);stroke-width:2}
+.cv .mark{stroke:var(--ink);stroke-width:1.4;stroke-dasharray:3 3}
+.cv .dot{fill:var(--ink)}
+.cv-legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13.5px;color:var(--muted)}
+.cv-legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.cv-verdict{font-size:15px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.split3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.split3{grid-template-columns:1fr}}
+.split3 div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:4px;font-size:15px}
+.split3 b{font:600 12px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+</style>
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s3.html">← Урок 2.3 · Коллекции и словарь</a><span class="mid">урок 4 из 5</span><a href="/lessons/w02-s5.html">Урок 2.5 · Файлы и данные →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · урок 4 из 5 · повторение по тесту недели 1 · ~45 минут + практика 20 минут</div>
+  <h1>ML заново: как модель ошибается и как это проверить</h1>
+  <p>Четыре идеи, на которых держится всё машинное обучение, и все четыре были в тесте недели 1. Как одним числом сказать, насколько модель ошибается. Почему данные делят на три части и что такое «утечка». Что такое переобучение — и почему от него не помогает «сделать модель умнее». Здесь всё объясняется через картинки, которые можно покрутить руками.</p>
+  <nav class="steps" aria-label="Шаги урока">
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>MSE и MAE</a><a href="#s2"><i><span>2</span></i>Три выборки</a><a href="#s3"><i><span>3</span></i>Утечка</a><a href="#s4"><i><span>4</span></i>Переобучение</a><a href="#s5"><i><span>5</span></i>Bias и variance</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+  </nav>
+</header>
+
+<!-- ============ 0 ============ -->
+<section class="step" id="s0">
+  <div class="step-h"><span class="num">0</span><h2>Разминка: урок 2.3</h2><span class="min">2 мин</span></div>
+  <div id="exWarm"></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="step" id="s1">
+  <div class="step-h"><span class="num">1</span><h2>Ошибка модели одним числом: MSE и MAE</h2><span class="min">10 мин</span></div>
+  <p class="why"><b>Зачем:</b> модель учится, уменьшая какое-то число — ошибку. От того, какое число выбрать, зависит, чему она научится.</p>
+  <div class="plain">
+    <p>Для каждого объекта ошибка = <b>прогноз − правда</b>. Ошибки бывают со знаком плюс и минус, поэтому просто сложить их нельзя — они погасят друг друга. Два способа убрать знак:</p>
+    <ul>
+      <li><b>MAE</b> — средний модуль: <code>(|+2| + |−1| + |+3|) / 3 = 6 / 3 = 2</code>. «В среднем ошибаемся на 2».</li>
+      <li><b>MSE</b> — средний квадрат: <code>(4 + 1 + 9) / 3 = 14 / 3 ≈ 4,67</code>. Квадрат <b>сильно наказывает большие промахи</b>: ошибка 3 стоит 9, а ошибка 1 — всего 1.</li>
+      <li><b>RMSE</b> = √MSE ≈ 2,16 — та же MSE, но снова в единицах цели (рублях, баллах).</li>
+    </ul>
+    <p>Самая простая «модель» всем отвечает одно и то же число. Какое число лучшее? Покрути — ответ зависит от того, какую ошибку считаем.</p>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · лучшая константа</span><span class="muted mono">цели: 2, 3, 3, 4, 20</span></div>
+    <div class="cv">
+      <div class="cv-row">Отвечаем всем: <b id="kC"></b><span>MAE = <b id="kMae"></b></span><span>MSE = <b id="kMse"></b></span></div>
+      <input type="range" id="kR" min="0" max="22" step="0.1" value="10" aria-label="Константа">
+      <div class="btns"><button class="btn" type="button" id="kMean">Поставить среднее</button><button class="btn" type="button" id="kMed">Поставить медиану</button></div>
+      <svg id="kSvg" viewBox="0 0 600 220" role="img" aria-label="Графики MAE и MSE в зависимости от константы"></svg>
+      <div class="cv-legend"><span><i style="background:var(--accent)"></i>MSE (поделена на 10, чтобы влезла)</span><span><i style="background:var(--warm)"></i>MAE</span></div>
+      <p class="cv-verdict" id="kWhy"></p>
+    </div>
+  </div>
+  <div id="ex1"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>функция потерь</b> (loss) — ошибка на одном объекте, среднее по выборке — <b>эмпирический риск</b>. MSE — mean squared error, MAE — mean absolute error. Для классификации учат на <b>log-loss</b> — он в неделе 4.</span></div>
+  <p class="remember">MSE: лучшая константа — среднее, большие промахи наказываются сильно. MAE: лучшая константа — медиана, выбросы почти не мешают.</p>
+  <div class="topic-check" data-for="ml.base.2">
+    <label class="tp"><input type="checkbox" data-id="ml.base.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Функция потерь</b></span></label>
+    <span class="note" data-d="ml.base.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="step" id="s2">
+  <div class="step-h"><span class="num">2</span><h2>Три выборки: учебник, пробник и экзамен</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> число в README должно говорить, как модель сработает на <b>новых</b> данных. Если его посчитать неправильно, оно врёт — и на собеседовании это видно сразу.</p>
+  <div class="split3">
+    <div><b>Train — учебник</b>Модель учится на этих данных: подбирает свои веса.</div>
+    <div><b>Validation — пробники</b>По ним <b>ты</b> выбираешь: какая модель, какая глубина, какой порог. Можно смотреть сколько угодно.</div>
+    <div><b>Test — экзамен</b>Один раз в самом конце, чтобы получить честное число для README. Ничего по нему не выбираешь.</div>
+  </div>
+  <div class="plain">
+    <p>Почему нельзя выбирать по тесту? Каждый раз, когда ты сравниваешь варианты по тесту и берёшь лучший, модель чуть-чуть подстраивается под этот тест. Сделал так 20 раз — тест превратился в пробник, а честного экзамена не осталось. Число получится <b>завышенным</b>.</p>
+    <p>Обычно делят 60 / 20 / 20 или 70 / 15 / 15. Данных мало — вместо одной validation делают <b>кросс-валидацию</b>: делят train на 5 частей и по очереди проверяют на каждой.</p>
+  </div>
+  <div id="ex2"></div>
+  <div class="term-chip"><b>Так это называют</b><span>train / validation / test split; подбор настроек модели — <b>подбор гиперпараметров</b>; кросс-валидация — <b>k-fold CV</b>.</span></div>
+  <p class="remember">Выбираешь — по validation. Тест — один раз в конце. Выбирал по тесту — его число в README уже нечестное.</p>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="step" id="s3">
+  <div class="step-h"><span class="num">3</span><h2>Утечка: модель подсмотрела ответ</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> утечка даёт прекрасные цифры на проверке и провал в жизни. Это самая частая ошибка учебных проектов — и любимый вопрос на собеседовании.</p>
+  <div class="plain">
+    <p>Утечка — когда модель при обучении видит то, <b>чего не будет в момент реального прогноза</b>. Вопрос, который всё решает: «Будет ли у меня эта информация в тот момент, когда я делаю прогноз?»</p>
+    <ul>
+      <li><b>Признак из будущего:</b> предсказываем, бросит ли студент курс, а среди признаков — «оплатил пересдачу». Пересдача бывает уже после провала.</li>
+      <li><b>Статистики теста:</b> нормировали (StandardScaler) весь датасет до разбиения — среднее посчитано и по тесту тоже. Правильно: обучить на train, применить к остальным.</li>
+      <li><b>Тот же человек:</b> записи одного студента попали и в train, и в test — модель узнаёт человека, а не закономерность. Делят по студентам.</li>
+      <li><b>Время:</b> учимся на 2024 году, проверяем на 2023-м — модель «знает будущее». Делят по времени.</li>
+    </ul>
+  </div>
+  <div id="ex3"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>data leakage</b>; деление по людям — <b>group split</b> (GroupKFold), по времени — <b>time split</b>. «Сначала split, потом fit» — правило, которое потом автоматизирует Pipeline (неделя 8).</span></div>
+  <p class="remember">Сначала разбиваешь, потом всё обучаешь только на train. Признак проверяешь вопросом: «будет ли он у меня в момент прогноза?»</p>
+  <div class="topic-check" data-for="ml.base.3">
+    <label class="tp"><input type="checkbox" data-id="ml.base.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Train, validation и test; утечка данных</b></span></label>
+    <span class="note" data-d="ml.base.3">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="step" id="s4">
+  <div class="step-h"><span class="num">4</span><h2>Переобучение: зубрила, а не отличник</h2><span class="min">10 мин</span></div>
+  <p class="why"><b>Зачем:</b> «train 0.99, validation 0.71 — что делать?» спрашивают почти на каждом собеседовании. Ответ надо видеть, а не помнить.</p>
+  <div class="plain">
+    <p>Студент, который <b>вызубрил</b> ответы к задачнику, на задачнике получает 100%, а на экзамене с новыми задачами — тройку. Модель так же: слишком сложная модель запоминает обучающие точки <b>вместе с шумом</b> и плохо работает на новых.</p>
+    <p>Ниже — точки, которые лежат вокруг волны, плюс случайный шум. Модель — кривая, её сложность (степень многочлена) ты меняешь ползунком. Зелёные точки — train, по ним кривая учится. Оранжевые кружки — validation, их модель не видит.</p>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · сложность модели</span><span class="muted mono" id="pDeg"></span></div>
+    <div class="cv">
+      <input type="range" id="pR" min="0" max="12" step="1" value="1" aria-label="Сложность модели">
+      <div class="cv-row"><span>ошибка train = <b id="pTr"></b></span><span>ошибка validation = <b id="pVa"></b></span></div>
+      <svg id="pSvg" viewBox="0 0 600 260" role="img" aria-label="Точки и кривая модели"></svg>
+      <div class="cv-legend"><span><i style="background:var(--accent)"></i>train и кривая модели</span><span><i style="background:var(--warm)"></i>validation</span><span><i style="background:var(--muted)"></i>правда без шума</span></div>
+      <svg id="pErr" viewBox="0 0 600 170" role="img" aria-label="Ошибки train и validation по сложности"></svg>
+      <div class="cv-legend"><span><i style="background:var(--accent)"></i>ошибка train</span><span><i style="background:var(--warm)"></i>ошибка validation</span><span>пунктир — твоя сложность</span></div>
+      <p class="cv-verdict" id="pWhy"></p>
+      <div class="btns"><button class="btn" type="button" id="pNew">Другая выборка</button><button class="btn" type="button" id="pMany" aria-pressed="false">Показать 6 выборок сразу</button></div>
+    </div>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>train ≫ validation</code><span>переобучение: упростить модель, регуляризация, больше данных, early stopping</span></div>
+    <div class="cmd"><code>train ≈ validation, обе плохие</code><span>недообучение: модель сложнее, признаки лучше</span></div>
+    <div class="cmd"><code>train ≈ validation, обе хорошие</code><span>то, что нужно</span></div>
+  </div>
+  <div id="ex4"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>переобучение</b> (overfitting) и <b>недообучение</b> (underfitting); «штраф за сложность» — <b>регуляризация</b>; остановка обучения, когда validation перестала улучшаться, — <b>early stopping</b>.</span></div>
+  <p class="remember">Большой разрыв train и validation — переобучение. Усложнять модель — только хуже.</p>
+  <div class="topic-check" data-for="ml.base.4">
+    <label class="tp"><input type="checkbox" data-id="ml.base.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Переобучение</b></span></label>
+    <span class="note" data-d="ml.base.4">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="step" id="s5">
+  <div class="step-h"><span class="num">5</span><h2>Bias и variance: прицел и разброс</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> это язык, которым объясняют переобучение на собеседовании: «у модели высокая variance». И вопрос «объясни trade-off на примере дерева» был в тесте недели 1.</p>
+  <div class="plain">
+    <p>Представь стрельбу по мишени много раз — каждый раз модель учится на новой выборке.</p>
+    <ul>
+      <li><b>Bias</b> (смещение) — прицел сбит: все выстрелы кучно, но мимо центра. Модель <b>слишком простая</b> и систематически промахивается. В лаборатории выше: прямая (сложность 1) на волне.</li>
+      <li><b>Variance</b> (разброс) — прицел верный, но выстрелы разлетаются. Модель <b>слишком сложная</b>: поменялась выборка — сильно поменялась модель. В лаборатории: сложность 10–12 и кнопка «Показать 6 выборок».</li>
+    </ul>
+    <p>Уменьшаешь одно — растёт другое. Задача — найти середину, где ошибка на validation минимальна. Это и есть trade-off.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Модель</th><th>Bias</th><th>Variance</th></tr></thead>
+    <tbody>
+      <tr><td>Мелкое дерево (глубина 1–2)</td><td>высокий</td><td>низкая</td></tr>
+      <tr><td>Очень глубокое дерево</td><td>низкий</td><td>высокая</td></tr>
+      <tr><td>kNN, k = 1 (смотрим одного соседа)</td><td>низкий</td><td>высокая</td></tr>
+      <tr><td>kNN, большое k</td><td>высокий</td><td>низкая</td></tr>
+    </tbody></table></div>
+  <div class="callout mem"><b class="h">Как ответить на собеседовании, 4 фразы</b><p>«Ошибка на новых данных складывается из bias — систематического промаха, variance — того, насколько модель меняется от выборки к выборке, и шума. Мелкое дерево не может описать зависимость — высокий bias, недообучение. Глубокое дерево запоминает шум — высокая variance, переобучение. Глубину выбираю по validation или кросс-валидации; а лес из многих деревьев снижает variance».</p></div>
+  <div id="ex5"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>bias–variance trade-off</b>; ошибка = bias² + variance + неустранимый шум.</span></div>
+  <p class="remember">Простая модель — высокий bias. Сложная — высокая variance. Сложность выбирают по validation.</p>
+  <div class="topic-check" data-for="ml.base.5">
+    <label class="tp"><input type="checkbox" data-id="ml.base.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Bias–variance trade-off</b></span></label>
+    <span class="note" data-d="ml.base.5">отметка в дереве</span>
+  </div>
+  <p class="deep">Хочешь глубже: <a href="/lessons/w01-1.html#t3">функция потерь</a> · <a href="/lessons/w01-1.html#t4">train, validation, test</a> · <a href="/lessons/w01-1.html#t5">переобучение</a> · <a href="/lessons/w01-1.html#t6">bias–variance</a> — справочник.</p>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="step" id="practice">
+  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: глубина дерева в sklearn</h2><span class="min">20 мин</span></div>
+  <p class="why">То же, что в лаборатории, но на настоящих данных и в настоящем коде. Нужен Jupyter или файл .py и <code>pip install scikit-learn matplotlib</code>.</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Код · 15 минут</span>
+      <h3>Найди лучшую глубину по validation</h3>
+      <ol>
+        <li>Возьми встроенный датасет <code>load_diabetes</code> (442 пациента, цель — число, показатель болезни через год).</li>
+        <li>Раздели 60 / 20 / 20 на train, validation, test.</li>
+        <li>Для глубины дерева от 1 до 12 обучи <code>DecisionTreeRegressor</code> на train и посчитай MSE на train и на validation.</li>
+        <li>Нарисуй обе кривые. Выбери глубину по validation. Только потом — один раз посчитай MSE на test.</li>
+      </ol>
+      <p class="ok">Готово, когда видишь, что ошибка train падает до нуля, а validation — сначала падает, потом растёт.</p>
+      <details><summary>Код</summary><div class="a">
+<pre>from sklearn.datasets import load_diabetes
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
+
+X, y = load_diabetes(return_X_y=True)
+X_tr, X_tmp, y_tr, y_tmp = train_test_split(X, y, test_size=0.4, random_state=0)
+X_va, X_te, y_va, y_te = train_test_split(X_tmp, y_tmp, test_size=0.5, random_state=0)
+
+depths, tr, va = range(1, 13), [], []
+for d in depths:
+    m = DecisionTreeRegressor(max_depth=d, random_state=0).fit(X_tr, y_tr)
+    tr.append(mean_squared_error(y_tr, m.predict(X_tr)))
+    va.append(mean_squared_error(y_va, m.predict(X_va)))
+
+plt.plot(depths, tr, label="train"); plt.plot(depths, va, label="validation")
+plt.xlabel("max_depth"); plt.ylabel("MSE"); plt.legend(); plt.show()
+
+best = depths[va.index(min(va))]                 <span class="cm"># выбор — по validation</span>
+final = DecisionTreeRegressor(max_depth=best, random_state=0).fit(X_tr, y_tr)
+print(best, mean_squared_error(y_te, final.predict(X_te)))   <span class="cm"># тест — один раз</span></pre></div></details>
+    </div>
+    <div class="task"><span class="tg lc">Говорить · 5 минут</span>
+      <h3>Объясни вслух без подсказки</h3>
+      <p>Закрой урок и расскажи вслух (или запиши голосовое): что такое переобучение и как его увидеть; почему нельзя выбирать по тесту; что такое утечка — с одним примером; bias–variance на примере глубины дерева из своего графика.</p>
+      <p class="ok">Готово, когда уложился в 2 минуты и ни разу не сказал «ну, это когда модель… короче».</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ итог ============ -->
+<section class="step" id="topics">
+  <div class="step-h"><h2>Итог</h2></div>
+  <div class="sheet">
+    <ol>
+      <li><b>MAE</b> — средний модуль ошибки, лучшая константа — медиана, к выбросам спокойна. <b>MSE</b> — средний квадрат, лучшая константа — среднее, большие промахи наказывает сильно. RMSE = √MSE.</li>
+      <li><b>Train</b> — учимся, <b>validation</b> — выбираем, <b>test</b> — один раз в конце. Выбирал по тесту — число завышено.</li>
+      <li><b>Утечка</b> — признак, которого не будет в момент прогноза: из будущего, статистики теста, тот же человек в train и test. Сначала split, потом fit.</li>
+      <li><b>Переобучение:</b> train ≫ validation. Лечат упрощением, регуляризацией, данными, early stopping — но не усложнением.</li>
+      <li><b>Bias</b> — систематический промах простой модели, <b>variance</b> — разброс сложной от выборки к выборке. kNN с k = 1 и глубокое дерево — высокая variance.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+---
+type: конспект
+tags: [ml, повторение, неделя-2]
+---
+# ML заново: как модель ошибается и как это проверить — урок 2.4
+
+## MSE и MAE
+- Ошибка = прогноз − правда. MAE = среднее |ошибка|, MSE = среднее ошибка², RMSE = √MSE.
+- Пример: ошибки +2, −1, +3 → MAE = 2, MSE = 14 / 3 ≈ 4,67.
+- Лучшая константа: под MSE — среднее, под MAE — медиана. MSE сильно наказывает большие промахи, MAE спокойна к выбросам.
+- Для классификации — log-loss (неделя 4).
+
+## Три выборки
+- Train — учимся, validation — выбираем модель и настройки, test — один раз в конце для честного числа.
+- Выбирал по тесту → тест стал валидацией, число завышено. Мало данных — кросс-валидация (k-fold).
+
+## Утечка
+- Модель видит то, чего не будет в момент прогноза: признак из будущего, статистики теста (scaler на всём датасете), тот же человек в train и test, неправильный порядок во времени.
+- Правило: сначала split, потом fit только на train. Группы — GroupKFold, время — деление по времени.
+
+## Переобучение
+- train ≫ validation — переобучение: проще модель, регуляризация, больше данных, early stopping. Усложнение — хуже.
+- train ≈ validation, обе плохие — недообучение: сложнее модель, лучше признаки.
+
+## Bias–variance
+- Bias — систематический промах (простая модель), variance — разброс от выборки к выборке (сложная модель). Ошибка = bias² + variance + шум.
+- Мелкое дерево — высокий bias; глубокое дерево и kNN с k = 1 — высокая variance. Сложность — по validation; лес снижает variance.
+</script>
+<script src="/assets/lesson.js"></script>
+<script src="/assets/ml.js"></script>
+<script>
+/* ---------- лаборатория 1: лучшая константа под MSE и MAE ---------- */
+(function constant() {
+  const Y = [2, 3, 3, 4, 20], mean = Y.reduce((a, b) => a + b) / Y.length, med = 3;
+  const mae = c => Y.reduce((s, y) => s + Math.abs(c - y), 0) / Y.length, mse = c => Y.reduce((s, y) => s + (c - y) ** 2, 0) / Y.length;
+  const W = 600, H = 220, L = 34, R = 10, T = 10, B = 26, X = c => L + c / 22 * (W - L - R), Yp = v => T + (1 - Math.min(v, 30) / 30) * (H - T - B);
+  function line(fn, k) { let d = ""; for (let c = 0; c <= 22.001; c += 0.2) d += (d ? "L" : "M") + X(c).toFixed(1) + "," + Yp(fn(c) / k).toFixed(1); return d; }
+  function run() {
+    const c = +$("kR").value;
+    $("kC").textContent = c.toFixed(1); $("kMae").textContent = mae(c).toFixed(2); $("kMse").textContent = mse(c).toFixed(2);
+    let g = `<line class="ax" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"/><line class="ax" x1="${L}" y1="${T}" x2="${L}" y2="${H - B}"/>`;
+    for (let c2 = 0; c2 <= 22; c2 += 2) g += `<text class="lb" x="${X(c2)}" y="${H - 8}" text-anchor="middle">${c2}</text>`;
+    g += `<path class="mse" d="${line(mse, 10)}"/><path class="mae" d="${line(mae, 1)}"/>`;
+    g += `<line class="mark" x1="${X(c)}" y1="${T}" x2="${X(c)}" y2="${H - B}"/><circle class="dot" cx="${X(c)}" cy="${Yp(mse(c) / 10)}" r="4"/><circle class="dot" cx="${X(c)}" cy="${Yp(mae(c))}" r="4"/>`;
+    g += `<text class="lb" x="${X(mean)}" y="${T + 10}" text-anchor="middle">среднее ${mean}</text><text class="lb" x="${X(med)}" y="${T + 24}" text-anchor="middle">медиана ${med}</text>`;
+    $("kSvg").innerHTML = g;
+    const near = (a, b) => Math.abs(a - b) < 0.06;
+    $("kWhy").innerHTML = near(c, mean) ? `<b>Минимум MSE.</b> Под MSE лучшая константа — среднее (6,4). Выброс 20 тянет его вверх: квадрат большой ошибки слишком дорог.`
+      : c >= 2.95 && c <= 3.05 ? `<b>Минимум MAE.</b> Под MAE лучшая константа — медиана (3). Выброс 20 на неё почти не влияет.`
+      : `Подвигай ползунок или нажми кнопки: где у оранжевой линии дно, а где у зелёной?`;
+  }
+  $("kR").addEventListener("input", run);
+  $("kMean").onclick = () => { $("kR").value = mean; run(); };
+  $("kMed").onclick = () => { $("kR").value = med; run(); };
+  run();
+})();
+
+/* ---------- лаборатория 2: сложность модели (многочлен по Чебышёву, МНК) ---------- */
+(function poly() {
+  const NT = 14, NV = 40, SIG = 0.28, truth = x => Math.sin(2 * Math.PI * x) * 0.9;
+  let seed = 7, many = false;
+  function sample(s) { const r = rng(s), tr = [], va = [];
+    for (let i = 0; i < NT; i++) { const x = (i + 0.2 + 0.6 * r()) / NT; tr.push([x, truth(x) + SIG * gauss(r)]); }
+    for (let i = 0; i < NV; i++) { const x = r(); va.push([x, truth(x) + SIG * gauss(r)]); }
+    return {tr, va}; }
+  const basis = (x, d) => { const t = 2 * x - 1, b = [1, t]; for (let k = 2; k <= d; k++) b.push(2 * t * b[k - 1] - b[k - 2]); return b.slice(0, d + 1); };
+  function fit(pts, d) {
+    const n = d + 1, A = Array.from({length: n}, () => Array(n + 1).fill(0));
+    pts.forEach(([x, y]) => { const b = basis(x, d); for (let i = 0; i < n; i++) { for (let j = 0; j < n; j++) A[i][j] += b[i] * b[j]; A[i][n] += b[i] * y; } });
+    for (let i = 0; i < n; i++) A[i][i] += 1e-9;
+    for (let c = 0; c < n; c++) { let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r; [A[c], A[p]] = [A[p], A[c]];
+      for (let r = 0; r < n; r++) if (r !== c) { const f = A[r][c] / A[c][c]; for (let k = c; k <= n; k++) A[r][k] -= f * A[c][k]; } }
+    const w = A.map((row, i) => row[n] / row[i]); return x => basis(x, d).reduce((s, b, i) => s + b * w[i], 0);
+  }
+  const mse = (f, pts) => pts.reduce((s, [x, y]) => s + (f(x) - y) ** 2, 0) / pts.length;
+  const W = 600, H = 260, P = 14, X = x => P + x * (W - 2 * P), Y = y => H / 2 - Math.max(-2.1, Math.min(2.1, y)) / 2.2 * (H / 2 - 8);
+  const path = f => { let d = ""; for (let i = 0; i <= 300; i++) { const x = i / 300; d += (d ? "L" : "M") + X(x).toFixed(1) + "," + Y(f(x)).toFixed(1); } return d; };
+  function run() {
+    const d = +$("pR").value, S = sample(seed), f = fit(S.tr, d), et = mse(f, S.tr), ev = mse(f, S.va);
+    $("pDeg").textContent = `сложность ${d}${d === 0 ? " — константа" : d === 1 ? " — прямая" : ""}`;
+    $("pTr").textContent = et.toFixed(3); $("pVa").textContent = ev.toFixed(3);
+    let g = `<path class="truth" d="${path(truth)}"/>`;
+    if (many) for (let k = 1; k <= 6; k++) g += `<path class="ghost" d="${path(fit(sample(seed * 31 + k).tr, d))}"/>`;
+    else g += `<path class="fit" d="${path(f)}"/>`;
+    S.va.forEach(([x, y]) => g += `<circle class="va" cx="${X(x)}" cy="${Y(y)}" r="3.6"/>`);
+    if (!many) S.tr.forEach(([x, y]) => g += `<circle class="tr" cx="${X(x)}" cy="${Y(y)}" r="4.4"/>`);
+    $("pSvg").innerHTML = g;
+    const E = [...Array(13).keys()].map(k => { const fk = fit(S.tr, k); return [mse(fk, S.tr), mse(fk, S.va)]; });
+    const mx = 0.6, EW = 600, EH = 170, l = 34, b = 24, ex = k => l + k / 12 * (EW - l - 12), ey = v => 8 + (1 - Math.min(v, mx) / mx) * (EH - 8 - b);
+    let e = `<line class="ax" x1="${l}" y1="${EH - b}" x2="${EW - 12}" y2="${EH - b}"/><line class="ax" x1="${l}" y1="8" x2="${l}" y2="${EH - b}"/>`;
+    for (let k = 0; k <= 12; k += 2) e += `<text class="lb" x="${ex(k)}" y="${EH - 6}" text-anchor="middle">${k}</text>`;
+    e += `<text class="lb" x="${l - 4}" y="14" text-anchor="end">${mx}</text>`;
+    e += `<path class="err-tr" d="${E.map(([t], k) => (k ? "L" : "M") + ex(k) + "," + ey(t)).join("")}"/><path class="err-va" d="${E.map(([, v], k) => (k ? "L" : "M") + ex(k) + "," + ey(v)).join("")}"/>`;
+    e += `<line class="mark" x1="${ex(d)}" y1="8" x2="${ex(d)}" y2="${EH - b}"/>`;
+    $("pErr").innerHTML = e;
+    const best = E.reduce((bi, [, v], k) => v < E[bi][1] ? k : bi, 0);
+    $("pWhy").innerHTML = (et > 0.2 && ev > 0.2 ? `<b>Недообучение (высокий bias).</b> Обе ошибки большие: кривая слишком простая, чтобы повторить волну.`
+      : ev > 2 * et && d > best ? `<b>Переобучение (высокая variance).</b> На train ошибка почти ноль, на validation — ${ev / Math.max(et, 1e-3) > 50 ? "в десятки и сотни раз" : "в " + (ev / Math.max(et, 1e-3)).toFixed(0) + " раз"} больше: кривая петляет, чтобы пройти через каждую зелёную точку вместе с шумом.`
+      : `<b>Хорошо.</b> Ошибки близки, и обе маленькие.`) + ` Лучшая сложность по validation на этой выборке — <b>${best}</b>.` + (many ? " Сейчас нарисованы модели, обученные на 6 разных выборках: чем сильнее они расходятся, тем выше variance." : "");
+  }
+  $("pR").addEventListener("input", run);
+  $("pNew").onclick = () => { seed = (seed * 7919 + 13) % 100000; run(); };
+  $("pMany").onclick = () => { many = !many; $("pMany").setAttribute("aria-pressed", many); $("pMany").textContent = many ? "Одна выборка" : "Показать 6 выборок сразу"; run(); };
+  run();
+})();
+
+/* ---------- проверки ---------- */
+mlCheck($("exWarm"), [
+  {q: "Сложность Two Sum со словарём?", opts: ["O(n) времени и O(n) памяти", "O(n²) и O(1)"], a: 0, why: "Один проход, словарь до n чисел."},
+  {q: "Почему <code>x in set</code> быстрее, чем <code>x in list</code>?", opts: ["set ищет по хешу сразу в ячейке, list перебирает всё", "set всегда отсортирован"], a: 0, why: "Урок 2.3, шаги 3–4."}
+]);
+mlCheck($("ex1"), [
+  {q: "Модель ошиблась на трёх объектах: на +2, на −1 и на +3. Чему равна MSE?", opts: ["≈ 4,67", "2", "≈ 1,33"], a: 0, why: "(4 + 1 + 9) / 3 = 14 / 3. 2 — это MAE, а 1,33 — просто среднее со знаком. Вопрос из теста недели 1."},
+  {q: "Модель всем отвечает одно и то же число. Какое число минимизирует <b>MAE</b>?", opts: ["Медиана", "Среднее", "Ноль"], a: 0, why: "Проверь в лаборатории: дно оранжевой линии — на медиане. Вопрос из теста недели 1."},
+  {q: "В ценах квартир есть несколько дворцов за миллиарды. Какая ошибка меньше «сходит с ума» от них?", opts: ["MAE", "MSE"], a: 0, why: "MSE возводит огромные промахи в квадрат, и модель тратит все силы на дворцы."},
+  {q: "Зачем считать RMSE, если есть MSE?", opts: ["RMSE в тех же единицах, что и цель — её легче объяснить", "RMSE точнее", "MSE нельзя минимизировать"], a: 0, why: "MSE в «рублях в квадрате». Корень возвращает рубли."}
+]);
+mlSort($("ex2"), {title: "На какой выборке это делают?", groups: [{k: "tr", label: "train"}, {k: "va", label: "validation"}, {k: "te", label: "test"}], items: [
+  {w: "обучить веса модели (fit)", g: "tr"},
+  {w: "выбрать глубину дерева", g: "va", why: "Любой выбор — по validation. Вопрос из теста недели 1 был ровно об этом."},
+  {w: "посчитать число для README", g: "te", why: "Один раз, в самом конце."},
+  {w: "сравнить логистическую регрессию и бустинг", g: "va"},
+  {w: "обучить StandardScaler (fit)", g: "tr", why: "Иначе статистики validation и test утекут в модель — шаг 3."},
+  {w: "подобрать порог классификации", g: "va"}
+]});
+mlSort($("ex3"), {title: "Утечка или нормально?", groups: [{k: "y", label: "утечка"}, {k: "n", label: "нормально"}], items: [
+  {w: "StandardScaler обучен на всём датасете до разбиения", g: "y", why: "Среднее и разброс посчитаны и по тесту тоже."},
+  {w: "признак «оплатил пересдачу» в задаче «сдаст ли экзамен»", g: "y", why: "Пересдача бывает после провала — в момент прогноза этого ещё нет."},
+  {w: "разбиение со stratify при редком классе", g: "n", why: "stratify сохраняет долю классов в каждой выборке — это правильная практика."},
+  {w: "записи одного студента и в train, и в test", g: "y", why: "Модель узнаёт человека. Делят по студентам."},
+  {w: "активность студента за первые 4 недели в задаче «бросит ли курс к концу семестра»", g: "n", why: "Эти данные есть к моменту прогноза — это честный признак."},
+  {w: "обучились на 2024 году, проверяем на 2023-м", g: "y", why: "Модель видела будущее относительно проверки."},
+  {w: "Scaler обучен на train и применён к validation и test", g: "n", why: "Ровно так и нужно."}
+]});
+mlCheck($("ex4"), [
+  {q: "Accuracy на train 0.99, на validation 0.71. Что из этого <b>не поможет</b>?", opts: ["Сделать модель сложнее — добавить глубины", "Регуляризация", "Больше данных"], a: 0, why: "Разрыв — переобучение. Усложнение его только усилит. Вопрос из теста недели 1."},
+  {q: "Train 0.62, validation 0.60, а нужно 0.85. Что это?", opts: ["Недообучение: модель слишком простая", "Переобучение", "Утечка"], a: 0, why: "Обе ошибки плохие и близки — модель не тянет."},
+  {q: "В лаборатории при сложности 12 ошибка train почти 0. Это хорошо?", opts: ["Нет: кривая выучила шум, на validation ошибка большая", "Да: модель идеальна"], a: 0, why: "Ноль на train — признак запоминания, а не понимания."}
+]);
+mlCheck($("ex5"), [
+  {q: "kNN с <code>k = 1</code>: какой у него характер ошибки?", opts: ["Низкий bias, высокая variance — подстраивается под каждую точку", "Высокий bias, низкая variance", "Ошибки нет: модель запоминает данные"], a: 0, why: "Один сосед — модель повторяет каждую точку вместе с шумом. Вопрос из теста недели 1."},
+  {q: "Дерево глубиной 1 на сложных данных — это…", opts: ["высокий bias", "высокая variance"], a: 0, why: "Один вопрос «да / нет» не может описать сложную зависимость — систематический промах."},
+  {q: "Включи «6 выборок» при сложности 1 и при 12. Где кривые расходятся сильнее?", opts: ["При 12 — это и есть высокая variance", "При 1"], a: 0, why: "Сложная модель сильно зависит от конкретной выборки."},
+  {q: "Как выбрать глубину дерева?", opts: ["По минимуму ошибки на validation (или кросс-валидации)", "По минимуму ошибки на train", "По тесту"], a: 0, why: "На train глубже всегда лучше, тест — для финального числа."}
+]);
+
+initLesson({topics: [["ml.base.2", "Функция потерь"], ["ml.base.3", "Train, validation и test; утечка данных"], ["ml.base.4", "Переобучение"], ["ml.base.5", "Bias–variance trade-off"]]});
+setTimeout(mlSteps, 600);
+</script>
+<script src="/assets/asks.js" defer></script>

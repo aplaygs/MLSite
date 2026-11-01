@@ -1,0 +1,333 @@
+<title>Урок 2.5 · Файлы и данные: Python и терминал</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/ml.css">
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s4.html">← Урок 2.4 · ML заново</a><span class="mid">урок 5 из 5</span><a href="/lessons/w02-test.html">Тест недели 2 →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · урок 5 из 5 · ~45 минут + практика 20 минут</div>
+  <h1>Файлы и данные: Python и терминал</h1>
+  <p>Первое, что делаешь с любыми данными, — открываешь файл. Здесь — как это делают аккуратно: пути через pathlib, файлы через with, форматы json и csv, быстрый взгляд на файл прямо из терминала и сортировка по любому полю. В конце — первая компания из списка «куда подаваться»: Яндекс.</p>
+  <nav class="steps" aria-label="Шаги урока">
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>pathlib</a><a href="#s2"><i><span>2</span></i>with</a><a href="#s3"><i><span>3</span></i>json и csv</a><a href="#s4"><i><span>4</span></i>Терминал</a><a href="#s5"><i><span>5</span></i>sorted</a><a href="#s6"><i><span>6</span></i>Яндекс</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+  </nav>
+</header>
+
+<!-- ============ 0 ============ -->
+<section class="step" id="s0">
+  <div class="step-h"><span class="num">0</span><h2>Разминка: урок 2.4</h2><span class="min">2 мин</span></div>
+  <div id="exWarm"></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="step" id="s1">
+  <div class="step-h"><span class="num">1</span><h2>Пути к файлам: pathlib</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> пути строками («data/raw/» + name) ломаются на Windows и на лишнем слеше. pathlib собирает путь правильно на любом компьютере.</p>
+  <div class="plain">
+    <p>Путь — это объект <code>Path</code>. Части пути соединяют знаком <code>/</code>, как папки. У пути есть удобные свойства: имя, расширение, папка.</p>
+  </div>
+<pre>from pathlib import Path
+
+raw = Path("data") / "raw"                 <span class="cm"># data/raw — на Windows сам станет data\raw</span>
+f = raw / "studentInfo.csv"
+f.exists()                                  <span class="cm"># True / False</span>
+f.name, f.stem, f.suffix                    <span class="cm"># 'studentInfo.csv', 'studentInfo', '.csv'</span>
+f.parent                                    <span class="cm"># data/raw</span>
+list(raw.glob("*.csv"))                     <span class="cm"># все csv в папке</span>
+Path("reports").mkdir(parents=True, exist_ok=True)   <span class="cm"># создать, если нет, без ошибки</span>
+text = f.read_text(encoding="utf-8")        <span class="cm"># прочитать файл целиком</span></pre>
+  <div id="ex1"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>pathlib</b> — стандартная библиотека; путь от корня диска — <b>абсолютный</b>, от текущей папки — <b>относительный</b>. Текущая папка программы — <code>Path.cwd()</code>.</span></div>
+  <p class="remember">Пути — через Path и /. Папку для результатов — mkdir(parents=True, exist_ok=True).</p>
+  <div class="topic-check" data-for="python.err.3">
+    <label class="tp"><input type="checkbox" data-id="python.err.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Файлы и pathlib</b></span></label>
+    <span class="note" data-d="python.err.3">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="step" id="s2">
+  <div class="step-h"><span class="num">2</span><h2>with: открыл — закрыл само</h2><span class="min">6 мин</span></div>
+  <p class="why"><b>Зачем:</b> незакрытый файл может не дописаться на диск, а сотни открытых файлов роняют программу. with закрывает файл сам — даже если внутри случилась ошибка.</p>
+<pre>with open("data/raw/studentInfo.csv", encoding="utf-8") as f:
+    header = f.readline()          <span class="cm"># первая строка</span>
+    for line in f:                 <span class="cm"># дальше по одной строке — не грузим весь файл в память</span>
+        ...
+<span class="cm"># здесь файл уже закрыт</span>
+
+with open("reports/log.txt", "a", encoding="utf-8") as f:   <span class="cm"># "w" — перезаписать, "a" — дописать в конец</span>
+    f.write("готово\n")</pre>
+  <div class="plain"><p><b>encoding="utf-8"</b> пиши всегда: без него русские буквы на Windows превращаются в кракозябры. with работает не только с файлами — так же открывают соединение с базой или ставят таймер.</p></div>
+  <div id="ex2"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>контекстный менеджер</b> (context manager) — объект, который умеет «войти» и «выйти» (<code>__enter__</code> и <code>__exit__</code>); <code>with</code> гарантирует выход.</span></div>
+  <p class="remember">Файлы — только через with и с encoding="utf-8". "w" стирает файл, "a" дописывает.</p>
+  <div class="topic-check" data-for="python.err.2">
+    <label class="tp"><input type="checkbox" data-id="python.err.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Контекстные менеджеры и with</b></span></label>
+    <span class="note" data-d="python.err.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="step" id="s3">
+  <div class="step-h"><span class="num">3</span><h2>json и csv</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> csv — таблицы (как OULAD), json — всё остальное: настройки, ответы API, отчёты. Читать и писать оба надо уметь без pandas — он не всегда под рукой.</p>
+<pre>import csv, json
+
+with open("data/raw/studentInfo.csv", encoding="utf-8") as f:
+    rows = list(csv.DictReader(f))       <span class="cm"># каждая строка — словарь {столбец: значение}</span>
+rows[0]["final_result"]                   <span class="cm"># 'Pass'</span>
+rows[0]["studied_credits"]                <span class="cm"># '240' — СТРОКА! для чисел — int(...)</span>
+
+report = {"rows": len(rows), "pass": sum(r["final_result"] == "Pass" for r in rows)}
+with open("reports/summary.json", "w", encoding="utf-8") as f:
+    json.dump(report, f, ensure_ascii=False, indent=2)   <span class="cm"># словарь → текст; ensure_ascii=False — русский читаемо</span>
+
+with open("reports/summary.json", encoding="utf-8") as f:
+    back = json.load(f)                   <span class="cm"># текст → словарь</span></pre>
+  <div class="plain"><p>Запомни пару имён: <b>load / dump</b> — с файлом, <b>loads / dumps</b> (s — string) — со строкой.</p></div>
+  <div id="ex3a"></div>
+  <div id="ex3b"></div>
+  <div class="term-chip"><b>Так это называют</b><span>превратить объект в текст — <b>сериализация</b>; обратно — <b>десериализация</b>. CSV — comma-separated values.</span></div>
+  <p class="remember">csv.DictReader — строки как словари, но все значения — строки. json: load/dump с файлом, loads/dumps со строкой.</p>
+  <div class="topic-check" data-for="python.err.4">
+    <label class="tp"><input type="checkbox" data-id="python.err.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>json и csv</b></span></label>
+    <span class="note" data-d="python.err.4">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="step" id="s4">
+  <div class="step-h"><span class="num">4</span><h2>Взглянуть на файл из терминала</h2><span class="min">10 мин</span></div>
+  <p class="why"><b>Зачем:</b> на сервере нет Jupyter, а файл на 2 ГБ не откроешь в редакторе. Первые строки, число строк и быстрый подсчёт — за секунду прямо в терминале.</p>
+  <div class="cmds">
+    <div class="cmd"><code>head -5 файл</code><span>первые 5 строк (по умолчанию 10)</span></div>
+    <div class="cmd"><code>tail -n 3 файл</code><span>последние 3 строки</span></div>
+    <div class="cmd"><code>wc -l файл</code><span>сколько строк</span></div>
+    <div class="cmd"><code>less файл</code><span>листать большой файл (q — выйти; в тренажёре нет)</span></div>
+    <div class="cmd"><code>команда1 | команда2</code><span><b>пайп</b>: вывод первой — на вход второй</span></div>
+    <div class="cmd"><code>… &gt; файл</code>, <code>… &gt;&gt; файл</code><span>записать вывод в файл / дописать в конец</span></div>
+    <div class="cmd"><code>cut -d, -f5</code><span>взять 5-й столбец, разделитель — запятая</span></div>
+    <div class="cmd"><code>sort | uniq -c</code><span>отсортировать и посчитать одинаковые строки</span></div>
+  </div>
+  <div class="plain"><p>Пайпы — как конвейер: <code>grep Withdrawn файл | wc -l</code> — «отбери строки с Withdrawn, и посчитай, сколько их». Каждая команда делает одно маленькое дело.</p></div>
+  <div id="simData"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>пайп</b> (pipe, |) и <b>перенаправление</b> (redirect, &gt; и &gt;&gt;); у каждой программы есть вход — <b>stdin</b> и выход — <b>stdout</b>.</span></div>
+  <p class="remember">head, tail, wc -l — первый взгляд на данные. | соединяет команды, &gt; пишет в файл.</p>
+  <div class="topic-check multi" data-for="tools.term.1,tools.term.3">
+    <div class="topic-check-h"><span class="eyebrow">Пройдено</span><span class="note"></span></div>
+    <div class="topic-check-list">
+      <label class="tp"><input type="checkbox" data-id="tools.term.1"><span class="bx" aria-hidden="true"></span><span><b>Просмотр файлов</b></span></label>
+      <label class="tp"><input type="checkbox" data-id="tools.term.3"><span class="bx" aria-hidden="true"></span><span><b>Пайпы и перенаправления</b></span></label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="step" id="s5">
+  <div class="step-h"><span class="num">5</span><h2>sorted с key: сортировка по чему угодно</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> «топ-5 студентов по баллам», «файлы от новых к старым», «слова по длине» — везде нужна сортировка не по самому элементу, а по какому-то его свойству.</p>
+  <div class="plain"><p>У <code>sorted</code> есть параметр <code>key</code> — функция, которая для каждого элемента говорит, <b>по чему</b> сравнивать. Короткую функцию на месте пишут через <code>lambda</code>: <code>lambda r: r["score"]</code> — «возьми у строки r её score».</p></div>
+<pre>students = [{"name": "Аня", "score": 91}, {"name": "Иван", "score": 78}, {"name": "Оля", "score": 85}]
+
+sorted(students, key=lambda r: r["score"], reverse=True)   <span class="cm"># по баллам, от больших</span>
+sorted(["pandas", "ml", "numpy"], key=len)                   <span class="cm"># ['ml', 'numpy', 'pandas']</span>
+sorted(students, key=lambda r: (-r["score"], r["name"]))     <span class="cm"># по баллам вниз, при равенстве — по имени</span>
+
+nums = [3, 1, 2]
+nums.sort()            <span class="cm"># сортирует САМ список и возвращает None</span>
+new = sorted(nums)     <span class="cm"># возвращает НОВЫЙ список, старый не трогает</span></pre>
+  <div id="ex5"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>lambda</b> — анонимная (безымянная) функция в одну строку; сортировка Python <b>стабильная</b>: равные элементы сохраняют прежний порядок.</span></div>
+  <p class="remember">sorted(…, key=…, reverse=True) — новый список. list.sort() — на месте и возвращает None.</p>
+  <div class="topic-check" data-for="python.coll.3">
+    <label class="tp"><input type="checkbox" data-id="python.coll.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>sorted с key=, lambda</b></span></label>
+    <span class="note" data-d="python.coll.3">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="step" id="s6">
+  <div class="step-h"><span class="num">6</span><h2>Куда подаваться: Яндекс</h2><span class="min">5 мин</span></div>
+  <p class="why"><b>Зачем:</b> отборы на летние стажировки идут осенью и зимой. Чтобы не опоздать, про каждую компанию надо знать заранее: что за программа и какие этапы.</p>
+  <div class="plain">
+    <ul>
+      <li><b>Стажировка Яндекса</b> — <a href="https://yandex.ru/yaintern/" target="_blank" rel="noopener">yandex.ru/yaintern</a>. Схема прошлых сезонов (по разборам, неофициально): анкета → задания в Яндекс Контесте (алгоритмы) → 1–2 технические секции онлайн. В 2026 году, по данным Техинсайдера, около 3200 стажёров по всем направлениям, а из ML-стажёров 2025 года 56% перешли в штат.</li>
+      <li><b>Подготовка</b> — бесплатные «Тренировки по алгоритмам» от Яндекса. Это ровно то, что ты делаешь на LeetCode.</li>
+      <li><b>ШАД</b> (Школа анализа данных) — <a href="https://shad.yandex.ru/" target="_blank" rel="noopener">shad.yandex.ru</a>. Бесплатная вечерняя программа Яндекса на два года. Поступают через отбор по математике и алгоритмам. Точные сроки и этапы смотри на сайте.</li>
+    </ul>
+  </div>
+  <div class="callout mem"><b class="h">Действие на 3 минуты</b><p>Открой обе страницы и скопируй текст про сроки и этапы в раздел «Сырьё» заметок <i>Яндекс — стажировка</i> и <i>Яндекс — ШАД</i> (папка «Отборы»). Потом скажи агенту «разбери отборы» — сроки встанут в календарь.</p></div>
+  <div id="ex6"></div>
+  <div class="topic-check" data-for="career.apply.0">
+    <label class="tp"><input type="checkbox" data-id="career.apply.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Яндекс: стажировка и ШАД</b></span></label>
+    <span class="note" data-d="career.apply.0">отметка в дереве</span>
+  </div>
+  <p class="deep">Хочешь глубже: <a href="/lessons/w02-2.html">файлы, исключения и логи — длинный урок-справочник</a>.</p>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="step" id="practice">
+  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: первый отчёт по OULAD</h2><span class="min">20 мин</span></div>
+  <p class="why">Продолжение проекта из урока 2.1. Нужен скачанный <code>studentInfo.csv</code> в <code>data/raw</code>.</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Терминал · 5 минут</span>
+      <h3>Первый взгляд на настоящий файл</h3>
+      <p>В папке проекта: сколько строк в <code>studentInfo.csv</code>, какие столбцы (первая строка), сколько студентов бросили курс (Withdrawn) и сколько каждого итога (<code>cut</code>, <code>sort</code>, <code>uniq -c</code>). Итоговый результат — 12-й столбец.</p>
+      <details><summary>Команды</summary><div class="a">
+<pre>wc -l data/raw/studentInfo.csv
+head -1 data/raw/studentInfo.csv
+grep -c Withdrawn data/raw/studentInfo.csv
+cut -d, -f12 data/raw/studentInfo.csv | sort | uniq -c</pre></div></details>
+    </div>
+    <div class="task"><span class="tg rev">Код · 15 минут</span>
+      <h3>Скрипт summary.py</h3>
+      <ol>
+        <li>Файл <code>src/oulad_risk/summary.py</code>: путь к данным — через Path, файл — через with и csv.DictReader.</li>
+        <li>Посчитай итоги курса через Counter (урок 2.3) и топ-5 студентов по <code>studied_credits</code> через sorted с key (не забудь int).</li>
+        <li>Сохрани отчёт в <code>reports/summary.json</code> (папку создай через mkdir). Закоммить: <code>feat: add data summary</code>.</li>
+      </ol>
+      <details><summary>Решение</summary><div class="a">
+<pre>import csv, json
+from collections import Counter
+from pathlib import Path
+
+RAW = Path("data") / "raw" / "studentInfo.csv"
+OUT = Path("reports")
+
+with open(RAW, encoding="utf-8") as f:
+    rows = list(csv.DictReader(f))
+
+results = Counter(r["final_result"] for r in rows)
+top = sorted(rows, key=lambda r: int(r["studied_credits"]), reverse=True)[:5]
+
+OUT.mkdir(parents=True, exist_ok=True)
+report = {"rows": len(rows), "results": dict(results),
+          "top_credits": [r["id_student"] for r in top]}
+with open(OUT / "summary.json", "w", encoding="utf-8") as f:
+    json.dump(report, f, ensure_ascii=False, indent=2)
+print(report)</pre>
+        <p>Папку <code>reports/</code> можно добавить в .gitignore — её всегда можно пересоздать скриптом.</p></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ итог ============ -->
+<section class="step" id="topics">
+  <div class="step-h"><h2>Итог</h2></div>
+  <div class="sheet">
+    <ol>
+      <li><b>pathlib:</b> Path("data") / "raw" / "x.csv"; .exists(), .name, .stem, .suffix, .parent, .glob("*.csv"); mkdir(parents=True, exist_ok=True).</li>
+      <li><b>with open(…, encoding="utf-8") as f</b> — файл закроется сам. "w" — перезаписать, "a" — дописать.</li>
+      <li><b>csv.DictReader</b> — строки как словари, значения — строки. <b>json</b>: load/dump — файл, loads/dumps — строка; ensure_ascii=False.</li>
+      <li><b>Терминал:</b> head -5, tail -n 3, wc -l; | — конвейер, &gt; / &gt;&gt; — в файл; cut -d, -f5 | sort | uniq -c — подсчёт значений.</li>
+      <li><b>sorted(…, key=lambda r: r["score"], reverse=True)</b> — новый список; list.sort() — на месте и None.</li>
+      <li><b>Яндекс:</b> стажировка — анкета, Контест, технические секции; ШАД — бесплатно, 2 года, отбор по математике и алгоритмам.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+  <p><a class="btn" href="/lessons/w02-test.html" style="text-decoration:none">Дальше: тест недели 2 →</a></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+---
+type: конспект
+tags: [python, терминал, данные, неделя-2]
+---
+# Файлы и данные: Python и терминал — урок 2.5
+
+## pathlib
+- Path("data") / "raw" / "studentInfo.csv" — путь на любой системе.
+- .exists(), .name, .stem, .suffix, .parent, .glob("*.csv"), .read_text(encoding="utf-8").
+- Path("reports").mkdir(parents=True, exist_ok=True).
+
+## with
+- with open(path, encoding="utf-8") as f: … — файл закроется сам, даже при ошибке. "w" — перезаписать, "a" — дописать.
+- with — контекстный менеджер (__enter__ / __exit__).
+
+## json и csv
+- csv.DictReader(f) — строки как словари; все значения — строки, числа через int().
+- json.dump(obj, f, ensure_ascii=False, indent=2) / json.load(f); со строками — dumps / loads.
+
+## Терминал
+- head -5 файл · tail -n 3 файл · wc -l файл · less файл.
+- | — вывод одной команды на вход другой: grep Withdrawn файл | wc -l.
+- > — записать в файл, >> — дописать. cut -d, -f5 файл | sort | uniq -c — сколько каждого значения.
+
+## sorted с key
+- sorted(rows, key=lambda r: r["score"], reverse=True) — новый список.
+- key=len; key=lambda r: (-r["score"], r["name"]) — по двум полям.
+- list.sort() — на месте, возвращает None.
+
+## Яндекс
+- Стажировка: yandex.ru/yaintern — анкета → Контест → 1–2 технические секции (схема прошлых сезонов). Подготовка — «Тренировки по алгоритмам».
+- ШАД: shad.yandex.ru — бесплатно, 2 года, отбор по математике и алгоритмам.
+</script>
+<script src="/assets/lesson.js"></script>
+<script src="/assets/ml.js"></script>
+<script>
+/* учебный кусок studentInfo.csv для тренажёра (настоящий файл больше: ~32 тысячи строк и 12 столбцов) */
+TERM_FS.projects["oulad-risk"].data.raw["studentInfo.csv"] = [
+  "code_module,id_student,gender,age_band,final_result",
+  "AAA,11391,M,55+,Pass", "AAA,28400,F,35-55,Pass", "AAA,30268,F,35-55,Withdrawn", "AAA,31604,F,35-55,Pass",
+  "BBB,32885,F,0-35,Pass", "BBB,38053,M,35-55,Distinction", "BBB,45462,M,0-35,Fail", "CCC,45642,F,0-35,Withdrawn",
+  "CCC,52130,F,0-35,Pass", "DDD,53025,M,55+,Fail", "DDD,57506,M,35-55,Withdrawn", "DDD,58873,F,0-35,Pass"].join("\n") + "\n";
+const RAWF = s => (s.fs.projects["oulad-risk"].data || {}).raw || {};
+termSim($("simData"), {start: "~/projects/oulad-risk", prep: ["cd ~/projects/oulad-risk"], tasks: [
+  {t: "Посмотри первые 5 строк файла data/raw/studentInfo.csv", hint: "head -5 data/raw/studentInfo.csv", ok: s => /^head\b/.test(s.cmd) && /studentInfo/.test(s.cmd) && s.out.split("\n").length === 5},
+  {t: "Сколько в файле строк (вместе с заголовком)?", hint: "wc -l data/raw/studentInfo.csv", ok: s => /^wc -l/.test(s.cmd) && /^13\b/.test(s.out.trim())},
+  {t: "Покажи последние 3 строки", hint: "tail -n 3 data/raw/studentInfo.csv", ok: s => /^tail\b/.test(s.cmd) && s.out.split("\n").length === 3},
+  {t: "Пайпом посчитай, сколько студентов бросили курс (Withdrawn)", hint: "grep Withdrawn data/raw/studentInfo.csv | wc -l", ok: s => /\|/.test(s.cmd) && /grep/.test(s.cmd) && s.out.trim() === "3"},
+  {t: "Сохрани всех, кто сдал (Pass), в файл passed.csv", hint: "grep Pass data/raw/studentInfo.csv > passed.csv", ok: s => { const f = s.fs.projects["oulad-risk"]["passed.csv"]; return typeof f === "string" && f.trim().split("\n").length === 6; }},
+  {t: "Посчитай, сколько каждого итога: 5-й столбец → sort → uniq -c", hint: "cut -d, -f5 data/raw/studentInfo.csv | sort | uniq -c", ok: s => /uniq -c/.test(s.cmd) && /6 Pass/.test(s.out)}
+]});
+
+mlCheck($("exWarm"), [
+  {q: "Train 0.99, validation 0.70. Что это?", opts: ["Переобучение", "Недообучение"], a: 0, why: "Большой разрыв — модель выучила шум (урок 2.4)."},
+  {q: "По какой выборке выбирают глубину дерева?", opts: ["validation", "test", "train"], a: 0, why: "Тест — один раз в конце."}
+]);
+mlCheck($("ex1"), [
+  {q: "<code>Path(\"data\") / \"raw\" / \"x.csv\"</code> — что это?", opts: ["Путь data/raw/x.csv, собранный правильно для любой системы", "Деление строк — ошибка", "Строка «data/raw/x.csv»"], a: 0, why: "У Path оператор / соединяет части пути."},
+  {q: "<code>Path(\"data/raw/studentInfo.csv\").stem</code> — это…", opts: ["'studentInfo'", "'studentInfo.csv'", "'.csv'"], a: 0, why: "name — с расширением, stem — без, suffix — само расширение."},
+  {q: "Как создать папку reports, чтобы не упасть, если она уже есть?", opts: ["Path(\"reports\").mkdir(parents=True, exist_ok=True)", "Path(\"reports\").mkdir()", "open(\"reports\")"], a: 0, why: "exist_ok=True — не ругаться, если есть; parents=True — создать и родительские папки."}
+]);
+mlCheck($("ex2"), [
+  {q: "Что гарантирует <code>with open(...) as f</code>?", opts: ["Файл закроется при выходе из блока, даже если внутри ошибка", "Файл откроется быстрее", "Файл нельзя будет изменить"], a: 0, why: "В этом весь смысл with."},
+  {q: "Ты открыл отчёт с режимом <code>\"w\"</code>, а там были старые записи. Что с ними?", opts: ["Стёрты: \"w\" перезаписывает файл", "Новые допишутся в конец", "Будет ошибка"], a: 0, why: "Дописать в конец — режим \"a\"."}
+]);
+mlSort($("ex3a"), {title: "csv или json?", groups: [{k: "c", label: "csv"}, {k: "j", label: "json"}], items: [
+  {w: "таблица студентов: строки и одинаковые столбцы", g: "c"},
+  {w: "настройки обучения: {\"lr\": 0.1, \"layers\": [64, 32]}", g: "j", why: "Вложенные структуры — json."},
+  {w: "ответ сервера по API", g: "j"},
+  {w: "оценки за задания: студент, задание, балл", g: "c"},
+  {w: "итоговый отчёт: число строк и словарь итогов", g: "j"}
+]});
+mlCheck($("ex3b"), [
+  {q: "<code>row = next(csv.DictReader(f))</code>. Чему равно <code>row[\"studied_credits\"] + 10</code>, если там 240?", opts: ["Ошибка TypeError: строку нельзя сложить с числом", "250", "\"24010\""], a: 0, why: "Из csv всё приходит строками. Нужно int(row[\"studied_credits\"]) + 10."},
+  {q: "Чем <code>json.dumps</code> отличается от <code>json.dump</code>?", opts: ["dumps возвращает строку, dump пишет в файл", "dumps быстрее", "Ничем"], a: 0, why: "s на конце — string."},
+  {q: "Зачем <code>ensure_ascii=False</code>?", opts: ["Чтобы русские буквы в файле остались читаемыми, а не \\u0410…", "Чтобы файл был меньше", "Без него json не сохранится"], a: 0, why: "По умолчанию json кодирует всё не-ASCII через \\u."}
+]);
+mlCheck($("ex5"), [
+  {q: "Как получить студентов по убыванию баллов?", opts: ["sorted(students, key=lambda r: r[\"score\"], reverse=True)", "sorted(students, reverse=True)", "students.sort(\"score\")"], a: 0, why: "key говорит, по чему сравнивать; reverse — порядок."},
+  {q: "Что напечатает <code>print([3, 1, 2].sort())</code>?", opts: ["None", "[1, 2, 3]", "Ошибку"], a: 0, why: "sort() меняет список на месте и возвращает None. Новый список даёт sorted()."},
+  {q: "<code>sorted([\"pandas\", \"ml\", \"numpy\"], key=len)</code>", opts: ["['ml', 'numpy', 'pandas']", "['ml', 'pandas', 'numpy']", "['pandas', 'numpy', 'ml']"], a: 0, why: "Сортировка по длине: 2, 5, 6."}
+]);
+mlCheck($("ex6"), [
+  {q: "Какой этап обычно первый после анкеты на стажировку Яндекса?", opts: ["Задания в Яндекс Контесте", "Собеседование с HR", "Тестовое на неделю"], a: 0, why: "По разборам прошлых сезонов — сначала Контест с алгоритмами."},
+  {q: "Чем лучше всего готовиться к Контесту?", opts: ["Решать алгоритмические задачи: LeetCode, «Тренировки по алгоритмам»", "Учить теорию ML наизусть", "Писать большой проект"], a: 0, why: "Контест — это задачи на алгоритмы и код."}
+]);
+
+initLesson({topics: [["python.err.3", "Файлы и pathlib"], ["python.err.2", "Контекстные менеджеры и with"], ["python.err.4", "json и csv"], ["tools.term.1", "Просмотр файлов"], ["tools.term.3", "Пайпы и перенаправления"], ["python.coll.3", "sorted с key=, lambda"], ["career.apply.0", "Яндекс: стажировка и ШАД"]]});
+setTimeout(mlSteps, 600);
+</script>
+<script src="/assets/asks.js" defer></script>

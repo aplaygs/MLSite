@@ -124,9 +124,28 @@ function termSim(el, cfg) {
 
   function run(line) {
     const redirect = line.match(/^(.*?)\s*(>>?)\s*(\S+)$/);
-    const cmdline = redirect ? redirect[1] : line;
+    const stages = (redirect ? redirect[1] : line).split(/\s+\|\s+/);  /* пайп: вывод одной команды — вход следующей */
+    let res = {text: ""}, stdin = null;
+    for (const st of stages) {
+      res = exec1(st, stdin);
+      if (res.err || res.silent) return res;
+      stdin = typeof res.text === "string" ? res.text : res.html ? res.html.replace(/<[^>]+>/g, "") : "";
+    }
+    if (redirect) {
+      const text = stdin || "";
+      const [par, name] = parent(resolve(redirect[3]));
+      if (!isDir(par)) return {err: `zsh: no such file or directory: ${redirect[3]}`};
+      const add = text + (text ? "\n" : "");
+      par[name] = redirect[2] === ">>" && typeof par[name] === "string" ? par[name] + add : add; return {text: ""};
+    }
+    return res;
+  }
+
+  function exec1(cmdline, stdin) {
     const a = cmdline.trim().split(/\s+/).map(x => x.replace(/^["']|["']$/g, "")), c = a[0];
     const err = m => ({err: m});
+    const input = (f, name) => { if (f) { const n = node(resolve(f)); if (typeof n !== "string") return err(`${name}: ${f}: ${n === undefined ? "No such file or directory" : "Is a directory"}`); return n.replace(/\n$/, ""); }
+      return stdin !== null ? stdin : err(`${name}: укажи файл (или передай вывод через |)`); };
     let res;
     switch (c) {
       case "pwd": res = S.cwd; break;
@@ -174,7 +193,22 @@ function termSim(el, cfg) {
         if (isDir(n) && !rec) return err(`rm: ${target}: is a directory. Для папки нужен rm -r`);
         const [par, name] = parent(p); delete par[name]; res = ""; break;
       }
-      case "cat": case "head": { const f = a.slice(1).find(x => !x.startsWith("-")), n = node(resolve(f)); if (typeof n !== "string") return err(`${c}: ${f}: ${n === undefined ? "No such file or directory" : "Is a directory"}`); res = n.replace(/\n$/, ""); break; }
+      case "cat": case "head": case "tail": {
+        const ni = a.indexOf("-n"), k = ni > 0 ? +a[ni + 1] : +((a.find(x => /^-\d+$/.test(x)) || "-10").slice(1));
+        const f = a.slice(1).find((x, i) => !x.startsWith("-") && !(ni > 0 && i === ni));  /* не число после -n */
+        const txt = input(f, c); if (typeof txt !== "string") return txt;
+        const L = txt.split("\n"); res = c === "cat" ? txt : (c === "head" ? L.slice(0, k) : L.slice(-k)).join("\n"); break;
+      }
+      case "wc": { const f = a.slice(1).find(x => !x.startsWith("-")), txt = input(f, "wc"); if (typeof txt !== "string") return txt;
+        const n = txt === "" ? 0 : txt.split("\n").length; res = a.includes("-l") ? (f ? `${n} ${f}` : String(n)) : `${n} ${txt.split(/\s+/).filter(Boolean).length} ${txt.length + 1}${f ? " " + f : ""}`; break; }
+      case "sort": { const f = a.slice(1).find(x => !x.startsWith("-")), txt = input(f, "sort"); if (typeof txt !== "string") return txt;
+        let L = txt.split("\n"); L = a.includes("-n") ? L.sort((x, y) => parseFloat(x) - parseFloat(y)) : L.sort(); if (a.includes("-r")) L.reverse(); res = L.join("\n"); break; }
+      case "uniq": { const f = a.slice(1).find(x => !x.startsWith("-")), txt = input(f, "uniq"); if (typeof txt !== "string") return txt;
+        const g = []; txt.split("\n").forEach(l => { if (g.length && g.at(-1)[0] === l) g.at(-1)[1]++; else g.push([l, 1]); });
+        res = g.map(([l, n]) => a.includes("-c") ? `${String(n).padStart(4)} ${l}` : l).join("\n"); break; }
+      case "cut": { const d = (a.find(x => x.startsWith("-d")) || "-d,").slice(2) || ",", fi = a.indexOf("-f"), fs = (fi > 0 ? a[fi + 1] : (a.find(x => /^-f\d/.test(x)) || "-f1").slice(2)).split(",").map(Number);
+        const f = a.slice(1).find((x, i) => !x.startsWith("-") && a[i] !== "-f"), txt = input(f, "cut"); if (typeof txt !== "string") return txt;
+        res = txt.split("\n").map(l => fs.map(k => l.split(d)[k - 1] ?? "").join(d)).join("\n"); break; }
       case "find": {
         const start = a[1] && !a[1].startsWith("-") ? a[1] : ".", i = a.indexOf("-name"), base = resolve(start), n = node(base);
         if (n === undefined) return err(`find: ${start}: No such file or directory`);
@@ -185,6 +219,8 @@ function termSim(el, cfg) {
       case "grep": {
         const flags = a.slice(1).filter(x => x.startsWith("-")).join(""), args = a.slice(1).filter(x => !x.startsWith("-"));
         const pat = args[0], target = args[1] || (flags.includes("r") ? "." : null);
+        if (pat && !target && stdin !== null) { const hit = l => (flags.includes("i") ? l.toLowerCase().includes(pat.toLowerCase()) : l.includes(pat)) !== flags.includes("v");
+          const L = stdin.split("\n").filter(hit); res = flags.includes("c") ? String(L.length) : L.join("\n"); break; }
         if (!pat || !target) return err("usage: grep -rn что_ищем папка");
         const base = resolve(target), n = node(base), lines = [], ic = flags.includes("i");
         if (n === undefined) return err(`grep: ${target}: No such file or directory`);
@@ -225,16 +261,9 @@ function termSim(el, cfg) {
       case "git": { const g = gitCmd(a, cmdline); if (g.err) return g; res = g.text; break; }
       case "code": res = ""; break;
       case "clear": out.innerHTML = ""; return {silent: true};
-      case "help": res = "Команды тренажёра: pwd, ls [-a], cd, mkdir, touch, cp [-r], mv, rm [-r], cat, echo \"текст\" >> файл, find . -name \"*.csv\", grep -rn текст ., python3 -m venv .venv, source .venv/bin/activate, deactivate, pip install / freeze / list, git (init, status, add, commit, log, branch, switch, merge, remote, push, pull, clone), clear"; break;
+      case "help": res = "Команды тренажёра: pwd, ls [-a], cd, mkdir, touch, cp [-r], mv, rm [-r], cat, head / tail -n 5, wc -l, sort, uniq -c, cut -d, -f 2, пайп |, echo \"текст\" >> файл, find . -name \"*.csv\", grep -rn текст ., python3 -m venv .venv, source .venv/bin/activate, deactivate, pip install / freeze / list, git (init, status, add, commit, log, branch, switch, merge, remote, push, pull, clone), clear"; break;
       case "": return {silent: true};
       default: return err(`zsh: command not found: ${c}`);
-    }
-    if (redirect) {
-      const text = typeof res === "string" ? res : (res && res.html ? res.html.replace(/<[^>]+>/g, "") : "");
-      const [par, name] = parent(resolve(redirect[3]));
-      if (!isDir(par)) return err(`zsh: no such file or directory: ${redirect[3]}`);
-      const add = text + (text ? "\n" : "");
-      par[name] = redirect[2] === ">>" && typeof par[name] === "string" ? par[name] + add : add; return {text: ""};
     }
     return typeof res === "string" ? {text: res} : res;
   }

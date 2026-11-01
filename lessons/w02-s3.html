@@ -1,0 +1,392 @@
+<title>Урок 2.3 · Python заново: коллекции и словарь изнутри</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/ml.css">
+<style>
+/* Только для этого урока: хеш-таблица руками, счётчик проверок list и set, Two Sum по шагам. */
+.ht{display:grid;gap:12px}
+.ht-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ht-row input{font:15px var(--f-mono);padding:7px 10px;border:1.5px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);width:9em}
+.ht-row input:focus{outline:none;border-color:var(--accent)}
+.ht-cells{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+@media (max-width:560px){.ht-cells{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.ht-cell{border:1.5px solid var(--line);border-radius:10px;padding:6px 6px 8px;min-height:62px;display:grid;gap:3px;align-content:start;font:13px var(--f-mono);background:var(--surface);transition:border-color .2s,background-color .2s}
+.ht-cell small{color:var(--muted);font-size:11px}
+.ht-cell.look{border-color:var(--warm);background:color-mix(in srgb,var(--warm) 12%,var(--surface))}
+.ht-cell.hit{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--surface))}
+.ht-log{margin:0;padding-left:18px;display:grid;gap:3px;font-size:14.5px}
+.cnt{display:grid;gap:10px}
+.cnt input[type=range]{width:100%}
+.cnt-bars{display:grid;gap:8px}
+.cnt-bar{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:10px;align-items:center;font:13.5px var(--f-mono)}
+.cnt-bar i{display:block;height:14px;border-radius:7px;background:var(--red);min-width:3px}
+.cnt-bar.fast i{background:var(--accent)}
+.ts{display:grid;gap:12px}
+.ts-arr{display:flex;gap:6px;flex-wrap:wrap}
+.ts-arr span{display:grid;justify-items:center;gap:2px;font:600 17px var(--f-mono)}
+.ts-arr span b{width:42px;height:40px;display:grid;place-items:center;border-radius:9px;background:var(--soft);font-weight:600}
+.ts-arr span small{font:11px var(--f-mono);color:var(--muted)}
+.ts-arr span.cur b{background:var(--warm);color:var(--surface)}
+.ts-arr span.hit b{background:var(--accent);color:var(--surface)}
+.ts-info{font:14px var(--f-mono);display:grid;gap:4px;background:var(--soft);border-radius:10px;padding:10px 12px}
+@media (prefers-reduced-motion:reduce){.ht-cell{transition:none}}
+</style>
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s2.html">← Урок 2.2 · Python заново</a><span class="mid">урок 3 из 5</span><a href="/lessons/w02-s4.html">Урок 2.4 · ML заново →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · урок 3 из 5 · повторение по тесту недели 1 · ~45 минут + практика 25 минут</div>
+  <h1>Python заново: коллекции и словарь изнутри</h1>
+  <p>Вторая половина «Python изнутри» и хеш-таблицы из урока 1.3 — по тесту недели 1 они не закрепились. Пять шагов: удобные приёмы с zip и enumerate, готовые инструменты из collections, как словарь находит ключ за один шаг (ты сам положишь ключи в таблицу), почему <code>in</code> по списку бывает в тысячу раз медленнее, и задача Two Sum, которую спрашивают на каждом втором собеседовании.</p>
+  <nav class="steps" aria-label="Шаги урока">
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>zip и enumerate</a><a href="#s2"><i><span>2</span></i>collections</a><a href="#s3"><i><span>3</span></i>Словарь изнутри</a><a href="#s4"><i><span>4</span></i>list или set</a><a href="#s5"><i><span>5</span></i>Two Sum</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+  </nav>
+</header>
+
+<!-- ============ 0 ============ -->
+<section class="step" id="s0">
+  <div class="step-h"><span class="num">0</span><h2>Разминка: урок 2.2</h2><span class="min">2 мин</span></div>
+  <div id="exWarm"></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="step" id="s1">
+  <div class="step-h"><span class="num">1</span><h2>zip, enumerate и распаковка</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> в коде про данные постоянно надо идти по двум спискам сразу или знать номер строки. Эти три приёма заменяют неудобные <code>for i in range(len(...))</code>.</p>
+  <div class="plain">
+    <p><b>Распаковка</b> — раздать значения по именам одной строкой. <b>enumerate</b> — идти по списку и сразу знать номер. <b>zip</b> — идти по нескольким спискам парами.</p>
+  </div>
+<pre>a, b = 1, 2
+a, b = b, a                          <span class="cm"># обмен без третьей переменной</span>
+first, *rest = [10, 20, 30]          <span class="cm"># first = 10, rest = [20, 30]</span>
+
+names = ["Аня", "Иван", "Оля"]
+for i, name in enumerate(names, start=1):
+    print(i, name)                   <span class="cm"># 1 Аня, 2 Иван, 3 Оля</span>
+
+scores = [91, 78]
+for name, score in zip(names, scores):
+    print(name, score)               <span class="cm"># только 2 пары: zip останавливается на самом коротком!</span>
+list(zip(names, scores, strict=True))  <span class="cm"># ValueError — если длины обязаны совпадать</span></pre>
+  <div id="ex1"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>распаковка</b> (unpacking), <code>*rest</code> — «звёздочка собирает остальное». zip и enumerate возвращают <b>итераторы</b> — поэтому печатают через <code>list(...)</code>.</span></div>
+  <p class="remember">zip молча обрезает по самому короткому. Нужен номер — enumerate, а не range(len()).</p>
+  <div class="topic-check" data-for="python.coll.2">
+    <label class="tp"><input type="checkbox" data-id="python.coll.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Распаковка, zip, enumerate</b></span></label>
+    <span class="note" data-d="python.coll.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="step" id="s2">
+  <div class="step-h"><span class="num">2</span><h2>collections: Counter и defaultdict</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> «посчитать, сколько раз встречается» и «разложить по группам» — две задачи, которые в данных делаешь каждый день. Для них есть готовые инструменты.</p>
+  <div class="cmds">
+    <div class="cmd"><code>Counter(words)</code><span>посчитать, сколько раз каждый элемент: <code>Counter("abca")</code> → <code>{'a': 2, 'b': 1, 'c': 1}</code></span></div>
+    <div class="cmd"><code>.most_common(3)</code><span>три самых частых</span></div>
+    <div class="cmd"><code>defaultdict(list)</code><span>словарь, который для нового ключа сам заводит пустой список</span></div>
+    <div class="cmd"><code>deque</code><span>очередь: быстро добавлять и забирать с обоих концов</span></div>
+  </div>
+<pre>from collections import Counter, defaultdict
+
+results = ["Pass", "Fail", "Pass", "Withdrawn", "Pass"]
+Counter(results).most_common(1)      <span class="cm"># [('Pass', 3)]</span>
+
+groups = defaultdict(list)           <span class="cm"># курс → список имён</span>
+for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
+    groups[course].append(name)      <span class="cm"># с обычным dict тут был бы KeyError на первом же ключе</span>
+<span class="cm"># {'ML': ['Аня', 'Оля'], 'SQL': ['Иван']}</span></pre>
+  <div id="ex2"></div>
+  <p class="remember">Посчитать — Counter. Сгруппировать — defaultdict(list). Очередь — deque.</p>
+  <div class="topic-check" data-for="python.coll.4">
+    <label class="tp"><input type="checkbox" data-id="python.coll.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>collections</b></span></label>
+    <span class="note" data-d="python.coll.4">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="step" id="s3">
+  <div class="step-h"><span class="num">3</span><h2>Как словарь находит ключ за один шаг</h2><span class="min">12 мин</span></div>
+  <p class="why"><b>Зачем:</b> «что происходит, когда пишешь <code>d["Аня"] = 5</code>» — классический вопрос собеседования. И отсюда же правило «ключ должен быть неизменяемым».</p>
+  <div class="plain">
+    <p>Представь гардероб на 8 крючков. Чтобы не искать пальто по всем крючкам, номер крючка <b>вычисляют из самого пальто</b>: по нему считают число, и это число говорит, куда вешать. Потом, чтобы найти, считают то же число — и идут сразу к нужному крючку.</p>
+    <ul>
+      <li>Это число — <b>хеш</b>: <code>hash("Аня")</code>. Из хеша получают номер ячейки (например, остаток от деления на число ячеек).</li>
+      <li>Если ячейка занята <b>другим</b> ключом — это <b>коллизия</b>: Python пробует следующую ячейку по своему правилу и сравнивает ключи через ==.</li>
+      <li>Когда таблица заполняется примерно на две трети, Python делает её больше и раскладывает всё заново.</li>
+    </ul>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · положи ключи в таблицу</span><span class="muted mono" id="htState"></span></div>
+    <div class="ht">
+      <p class="muted" style="font-size:13.5px">Учебный хеш: сумма кодов букв, остаток от деления на 8. У настоящего Python хеш сложнее, но логика та же. Попробуй «ab» и «ba» — у них одинаковый хеш.</p>
+      <div class="ht-row"><input id="htKey" value="Аня" aria-label="Ключ" autocomplete="off" spellcheck="false"><button class="btn" type="button" id="htPut">Положить</button><button class="btn" type="button" id="htGet">Найти</button><button class="btn" type="button" id="htClear">Очистить</button></div>
+      <div class="ht-cells" id="htCells"></div>
+      <ol class="ht-log" id="htLog"></ol>
+    </div>
+  </div>
+  <div id="ex3"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>хеш-таблица</b>; ключом может быть только <b>хешируемый</b> (hashable) — неизменяемый — объект: число, строка, кортеж. Поиск, вставка, удаление — <b>O(1) в среднем</b>.</span></div>
+  <p class="remember">Хеш ключа → номер ячейки → сразу туда. Список ключом быть не может: изменится — изменится хеш.</p>
+  <div class="topic-check" data-for="algo.ds.1">
+    <label class="tp"><input type="checkbox" data-id="algo.ds.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Хеш-таблица</b></span></label>
+    <span class="note" data-d="algo.ds.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="step" id="s4">
+  <div class="step-h"><span class="num">4</span><h2>list или set: почему <code>in</code> бывает медленным</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> одна замена списка на множество ускоряет фильтр данных с часов до секунд. В тесте недели 1 это был вопрос про фильтр миллиона строк.</p>
+  <div class="plain">
+    <p><code>x in список</code> — Python идёт по списку с начала и сравнивает с каждым элементом. Элементов n — до n сравнений. <code>x in множество</code> (или в словаре) — считает хеш и сразу смотрит в нужную ячейку, как в гардеробе.</p>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · сколько сравнений</span></div>
+    <div class="cnt">
+      <label class="muted" style="font-size:14px">Строк в данных: <b id="cntRows"></b> · разрешённых id: <b id="cntN"></b></label>
+      <input type="range" id="cntR" min="1" max="6" step="1" value="4" aria-label="Размер данных">
+      <div class="cnt-bars" id="cntBars"></div>
+      <p class="mem-note muted" id="cntNote" style="font-size:14px"></p>
+    </div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Операция</th><th>list</th><th>set / dict</th></tr></thead>
+    <tbody>
+      <tr><td><code>x in …</code></td><td>O(n) — перебор</td><td>O(1) — по хешу</td></tr>
+      <tr><td>добавить в конец / добавить</td><td>O(1)</td><td>O(1)</td></tr>
+      <tr><td>вставить в начало <code>insert(0, x)</code></td><td>O(n) — сдвинуть всех</td><td>—</td></tr>
+      <tr><td>взять по номеру <code>a[i]</code></td><td>O(1)</td><td>— (у set нет номеров)</td></tr>
+    </tbody></table></div>
+  <div id="ex4"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>Big O</b> — как растёт время с ростом n: O(1) — не растёт, O(n) — растёт как n, O(n²) — как n·n.</span></div>
+  <p class="remember">Много проверок «есть ли» — сначала сделай set: allowed = set(allowed).</p>
+  <div class="topic-check" data-for="algo.cx.2">
+    <label class="tp"><input type="checkbox" data-id="algo.cx.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Сложность list, dict, set</b></span></label>
+    <span class="note" data-d="algo.cx.2">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="step" id="s5">
+  <div class="step-h"><span class="num">5</span><h2>Two Sum: меняем память на скорость</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> задача №1 на LeetCode и частый первый вопрос алгоритмической секции. Сама идея «запоминай увиденное в словаре» решает десятки задач.</p>
+  <div class="plain">
+    <p><b>Задача:</b> в массиве найти два числа, которые в сумме дают target, и вернуть их номера.</p>
+    <p><b>В лоб:</b> перебрать все пары — два вложенных цикла, O(n²). <b>Умно:</b> идём один раз. Для каждого числа x считаем, какое нужно ему в пару: <code>need = target − x</code>. Если need уже встречали — ответ найден. Если нет — запоминаем x в словаре «число → номер».</p>
+  </div>
+<pre>def two_sum(nums, target):
+    seen = {}                        <span class="cm"># число → его номер</span>
+    for i, x in enumerate(nums):
+        need = target - x
+        if need in seen:             <span class="cm"># O(1): проверка в словаре</span>
+            return [seen[need], i]
+        seen[x] = i
+    return None</pre>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · Two Sum по шагам</span><span class="muted mono">nums = [4, 1, 7, 3, 9], target = 10</span></div>
+    <div class="ts" id="ts"></div>
+  </div>
+  <div id="ex5"></div>
+  <div class="term-chip"><b>Так это называют</b><span>приём <b>hash map</b> («хеш-мапа») / «запоминай увиденное»; обмен <b>памяти на время</b>: O(n) времени и O(n) памяти вместо O(n²) и O(1).</span></div>
+  <p class="remember">Two Sum: один проход, need = target − x, словарь «число → номер». O(n) и O(n).</p>
+  <div class="topic-check" data-for="algo.pat.0">
+    <label class="tp"><input type="checkbox" data-id="algo.pat.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Хеширование: Two Sum</b></span></label>
+    <span class="note" data-d="algo.pat.0">отметка в дереве</span>
+  </div>
+  <p class="deep">Хочешь глубже: <a href="/lessons/w01-2.html#p9">распаковка, zip, enumerate</a> · <a href="/lessons/w01-2.html#p10">collections</a> · <a href="/lessons/w01-3.html#h1">хеш-таблица подробно</a> · <a href="/lessons/w01-1.html#t10">сложность list, dict, set</a> — справочник.</p>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="step" id="practice">
+  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: три задачи LeetCode</h2><span class="min">25 мин</span></div>
+  <p class="why">Решай на leetcode.com (вкладка Python3). Сначала 2–3 минуты подумай на бумаге, потом пиши. Не вышло за 10 минут — открой подсказку.</p>
+  <div class="prac">
+    <div class="task"><span class="tg int">LeetCode · 8 минут</span>
+      <h3>1. Two Sum</h3>
+      <p>Ровно то, что в шаге 5. Напиши сам, не подглядывая. <a href="https://leetcode.com/problems/two-sum/" target="_blank" rel="noopener">leetcode.com/problems/two-sum</a></p>
+      <p class="ok">Готово, когда решение принято и ты можешь сказать вслух его сложность.</p>
+    </div>
+    <div class="task"><span class="tg int">LeetCode · 7 минут</span>
+      <h3>217. Contains Duplicate</h3>
+      <p>Есть ли в массиве повторы? <a href="https://leetcode.com/problems/contains-duplicate/" target="_blank" rel="noopener">leetcode.com/problems/contains-duplicate</a></p>
+      <details><summary>Подсказка</summary><div class="a"><p>Иди по массиву и складывай увиденное в set. Встретил то, что уже в set, — повтор. Или короче: <code>len(set(nums)) != len(nums)</code>.</p></div></details>
+    </div>
+    <div class="task"><span class="tg int">LeetCode · 10 минут</span>
+      <h3>242. Valid Anagram</h3>
+      <p>Состоят ли две строки из одних и тех же букв? <a href="https://leetcode.com/problems/valid-anagram/" target="_blank" rel="noopener">leetcode.com/problems/valid-anagram</a></p>
+      <details><summary>Подсказка</summary><div class="a"><p>Шаг 2: <code>Counter(s) == Counter(t)</code>. Сложность — O(n).</p></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ итог ============ -->
+<section class="step" id="topics">
+  <div class="step-h"><h2>Итог</h2></div>
+  <div class="sheet">
+    <ol>
+      <li><b>Распаковка:</b> a, b = b, a · first, *rest = lst. <b>enumerate</b> — номер и значение. <b>zip</b> — пары, обрезает по короткому (strict=True — ошибка при разной длине).</li>
+      <li><b>collections:</b> Counter — посчитать (most_common), defaultdict(list) — сгруппировать, deque — очередь.</li>
+      <li><b>Словарь изнутри:</b> хеш ключа → ячейка; коллизия — следующая ячейка и сравнение ==; заполнилась — таблица растёт. Ключ — только неизменяемый.</li>
+      <li><b>Сложность:</b> in по списку O(n), по set/dict O(1). Много проверок — сначала set.</li>
+      <li><b>Two Sum:</b> один проход, need = target − x, словарь «число → номер». O(n) времени, O(n) памяти.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+---
+type: конспект
+tags: [python, алгоритмы, повторение, неделя-2]
+---
+# Python заново: коллекции и словарь изнутри — урок 2.3
+
+## Распаковка, zip, enumerate
+- a, b = b, a — обмен. first, *rest = [10, 20, 30] → 10 и [20, 30].
+- for i, x in enumerate(lst, start=1) — номер и значение.
+- zip(a, b) — пары; обрезает по самому короткому: list(zip([1, 2, 3], "ab")) = [(1, 'a'), (2, 'b')]. strict=True — ошибка при разной длине.
+
+## collections
+- Counter(lst).most_common(k) — частоты. defaultdict(list) — группировка без KeyError. deque — очередь с двух концов.
+
+## Хеш-таблица
+- d["Аня"] = 5: hash("Аня") → номер ячейки → кладём ключ, хеш и значение. Занято другим ключом — коллизия: следующая ячейка, сравнение ключей через ==. Заполнилась на ~2/3 — таблица растёт.
+- Ключ — только хешируемый (неизменяемый): число, строка, кортеж. Список нельзя.
+- 1, 1.0 и True — один и тот же ключ (равны и хеш одинаковый).
+
+## Сложность
+| Операция | list | set / dict |
+| :--- | :--- | :--- |
+| x in … | O(n) | O(1) |
+| добавить | O(1) | O(1) |
+| insert(0, x) | O(n) | — |
+
+## Two Sum
+- seen = {}; для каждого x: need = target − x; если need in seen → ответ; иначе seen[x] = i.
+- O(n) времени, O(n) памяти. В лоб — O(n²).
+</script>
+<script src="/assets/lesson.js"></script>
+<script src="/assets/ml.js"></script>
+<script>
+/* ---------- хеш-таблица руками: учебный хеш, линейное пробирование ---------- */
+(function hashTable() {
+  const N = 8; let cells = Array(N).fill(null);
+  const h = k => [...k].reduce((s, c) => s + c.codePointAt(0), 0);
+  function draw(look = [], hit = -1) {
+    $("htCells").innerHTML = cells.map((c, i) => `<div class="ht-cell${i === hit ? " hit" : look.includes(i) ? " look" : ""}"><small>ячейка ${i}</small>${c ? `<b>${mlEsc(c.k)}</b><small>хеш ${c.h}</small>` : ""}</div>`).join("");
+    $("htState").textContent = `занято ${cells.filter(Boolean).length} из ${N}`;
+  }
+  function log(lines) { $("htLog").innerHTML = lines.map(l => `<li>${l}</li>`).join(""); }
+  $("htPut").onclick = () => {
+    const k = $("htKey").value.trim(); if (!k) return;
+    const hv = h(k), start = hv % N, path = [], L = [`hash("${mlEsc(k)}") = ${hv} → ${hv} % ${N} = <b>ячейка ${start}</b>`];
+    for (let j = 0; j < N; j++) {
+      const i = (start + j) % N; path.push(i);
+      if (!cells[i]) { cells[i] = {k, h: hv}; L.push(j ? `Свободна ячейка ${i} — кладём туда. Коллизий по пути: ${j}.` : `Ячейка свободна — кладём.`); draw(path, i); return log(L); }
+      if (cells[i].k === k) { L.push(`В ячейке ${i} уже «${mlEsc(k)}» — тот же ключ, просто меняем значение.`); draw(path, i); return log(L); }
+      L.push(`Ячейка ${i} занята ключом «${mlEsc(cells[i].k)}» — <b>коллизия</b>, пробуем ${(i + 1) % N}.`);
+    }
+    L.push("Таблица полна — настоящий Python заранее сделал бы её больше и разложил ключи заново."); draw(path); log(L);
+  };
+  $("htGet").onclick = () => {
+    const k = $("htKey").value.trim(); if (!k) return;
+    const hv = h(k), start = hv % N, path = [], L = [`hash("${mlEsc(k)}") = ${hv} → идём сразу в ячейку ${start}`];
+    for (let j = 0; j < N; j++) {
+      const i = (start + j) % N; path.push(i);
+      if (!cells[i]) { L.push(`Ячейка ${i} пуста — значит, ключа нет. Проверок: ${j + 1}.`); draw(path); return log(L); }
+      if (cells[i].k === k) { L.push(`В ячейке ${i} ключ «${mlEsc(k)}» — нашли за ${j + 1} ${j ? "проверки" : "проверку"}, не перебирая всю таблицу.`); draw(path, i); return log(L); }
+      L.push(`В ячейке ${i} другой ключ («${mlEsc(cells[i].k)}») — смотрим следующую.`);
+    }
+    draw(path); log(L);
+  };
+  $("htClear").onclick = () => { cells = Array(N).fill(null); draw(); log([]); };
+  draw();
+})();
+
+/* ---------- сколько сравнений: list против set ---------- */
+(function counter() {
+  const SIZES = [[1000, 100], [10000, 1000], [100000, 5000], [1000000, 50000], [5000000, 100000], [10000000, 500000]];
+  const f = n => n.toLocaleString("ru-RU");
+  function run() {
+    const [rows, n] = SIZES[$("cntR").value - 1], list = rows * n / 2, set = rows, sec = x => x / 1e8;
+    $("cntRows").textContent = f(rows); $("cntN").textContent = f(n);
+    const mx = Math.log10(list);
+    $("cntBars").innerHTML = `<div class="cnt-bar"><span>in list</span><i style="width:100%"></i><span>${f(Math.round(list))}</span></div>
+      <div class="cnt-bar fast"><span>in set</span><i style="width:${Math.max(1, Math.log10(set) / mx * 100)}%"></i><span>${f(set)}</span></div>`;
+    $("cntNote").textContent = `Примерно сравнений: со списком — в среднем половина списка на каждую строку; с set — одна проверка на строку. При 100 млн простых операций в секунду: список ~${sec(list) < 60 ? sec(list).toFixed(1) + " с" : (sec(list) / 60).toFixed(0) + " мин"}, set ~${sec(set).toFixed(3)} с. Шкала полосок логарифмическая — иначе полоска set была бы не видна.`;
+  }
+  $("cntR").addEventListener("input", run); run();
+})();
+
+/* ---------- Two Sum по шагам ---------- */
+(function twoSum() {
+  const nums = [4, 1, 7, 3, 9], T = 10, box = $("ts"); let st = 0;
+  const steps = []; const seen = {};
+  for (let i = 0; i < nums.length; i++) {
+    const x = nums[i], need = T - x, hit = need in seen;
+    steps.push({i, x, need, seen: {...seen}, hit, ans: hit ? [seen[need], i] : null});
+    if (hit) break; seen[x] = i;
+  }
+  function draw() {
+    const s = steps[st];
+    box.innerHTML = `<div class="ts-arr">${nums.map((v, k) => `<span class="${s.ans && s.ans.includes(k) ? "hit" : k === s.i ? "cur" : ""}"><b>${v}</b><small>${k}</small></span>`).join("")}</div>
+      <div class="ts-info"><span>i = ${s.i}, x = ${s.x}</span><span>need = ${T} − ${s.x} = <b>${s.need}</b></span>
+      <span>seen = {${Object.entries(s.seen).map(([k, v]) => `${k}: ${v}`).join(", ")}}</span>
+      <span>${s.hit ? `${s.need} есть в seen под номером ${s.seen[s.need]} → ответ [${s.ans.join(", ")}]: ${nums[s.ans[0]]} + ${nums[s.ans[1]]} = ${T} ✓` : `${s.need} в seen нет → запоминаем ${s.x}: seen[${s.x}] = ${s.i}`}</span></div>
+      <div class="btns"><button class="btn" type="button" data-go="-1" ${st ? "" : "disabled"}>← Назад</button><button class="btn" type="button" data-go="1" ${st < steps.length - 1 ? "" : "disabled"}>Шаг →</button><span class="muted mono" style="font-size:13px;align-self:center">шаг ${st + 1} из ${steps.length} · проход один, без вложенного цикла</span></div>`;
+  }
+  box.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) { st = Math.max(0, Math.min(steps.length - 1, st + +b.dataset.go)); draw(); } });
+  draw();
+})();
+
+/* ---------- проверки ---------- */
+mlCheck($("exWarm"), [
+  {q: "<code>a = [1]; b = a; b.append(2)</code>. Чему равно a?", opts: ["[1, 2]", "[1]"], a: 0, why: "Один список, два ярлыка (урок 2.2, шаг 1)."},
+  {q: "Как проверить, что значение задано, если оно может быть 0?", opts: ["x is not None", "if x:"], a: 0, why: "0 — ложь, поэтому if x: не годится."}
+]);
+mlCheck($("ex1"), [
+  {q: "Что вернёт <code>list(zip([1, 2, 3], \"ab\"))</code>?", opts: ["[(1, 'a'), (2, 'b')]", "[(1, 'a'), (2, 'b'), (3, None)]", "Ошибку: длины разные"], a: 0, why: "zip молча останавливается на самом коротком. Вопрос из теста недели 1."},
+  {q: "<code>first, *rest = [10, 20, 30]</code>. Что в rest?", opts: ["[20, 30]", "20", "(20, 30)"], a: 0, why: "Звёздочка собирает всё оставшееся в список."},
+  {q: "Что напечатает <code>for i, x in enumerate(\"ab\"): print(i, x)</code>?", opts: ["0 a, потом 1 b", "a 0, потом b 1", "1 a, потом 2 b"], a: 0, why: "Сначала номер, потом значение; по умолчанию с нуля (start=1 — с единицы)."},
+  {q: "Как поменять местами a и b?", opts: ["a, b = b, a", "a = b; b = a", "swap(a, b)"], a: 0, why: "Справа сначала собирается пара (b, a), потом раздаётся по именам. Второй вариант сделает оба равными b."}
+]);
+mlSort($("ex2"), {title: "Какой инструмент взять?", groups: [{k: "c", label: "Counter"}, {k: "d", label: "defaultdict(list)"}, {k: "q", label: "deque"}], items: [
+  {w: "сколько студентов с каждым итогом курса", g: "c", why: "Подсчёт частот."},
+  {w: "курс → список студентов", g: "d", why: "Группировка: новый ключ сам получает пустой список. Вопрос из теста недели 1."},
+  {w: "5 самых частых слов в отзывах", g: "c", why: "Counter(words).most_common(5)."},
+  {w: "регион → список id студентов", g: "d"},
+  {w: "последние 100 событий: новые в конец, старые убираем из начала", g: "q", why: "deque(maxlen=100) — быстро с обоих концов."},
+  {w: "сколько раз каждая буква в строке", g: "c"}
+]});
+mlCheck($("ex3"), [
+  {q: "Что происходит, когда пишешь <code>d[\"Аня\"] = 5</code>?", opts: ["Python считает хеш «Аня», по нему находит ячейку и кладёт туда ключ и значение", "Python добавляет пару в конец списка пар", "Python сортирует ключи и вставляет «Аня» на своё место"], a: 0, why: "Хеш → ячейка → сразу туда. Поэтому поиск не зависит от размера словаря. Вопрос из теста недели 1."},
+  {q: "Почему список нельзя сделать ключом словаря?", opts: ["Он изменяемый: изменится — изменится хеш, и словарь потеряет значение", "Списки слишком большие", "У списков нет =="], a: 0, why: "Ключ ищут по хешу. Вместо списка берут кортеж."},
+  {q: "Что такое коллизия?", opts: ["Два разных ключа попали в одну ячейку", "Один ключ записали два раза", "Словарь переполнился"], a: 0, why: "Тогда Python ищет другую ячейку и сравнивает ключи через ==. Попробуй в лаборатории «ab» и «ba»."},
+  {q: "Что выведет <code>print({1: \"a\", 1.0: \"b\", True: \"c\"})</code>?", opts: ["{1: 'c'}", "{1: 'a', 1.0: 'b', True: 'c'}", "{True: 'c'}"], a: 0, why: "1, 1.0 и True равны и хеш у них одинаковый — это один ключ. Остаётся первый ключ и последнее значение."}
+]);
+mlCheck($("ex4"), [
+  {q: "Фильтр <code>[r for r in rows if r.id in allowed]</code>: строк 1 000 000, разрешённых id 50 000 в <b>списке</b>. Как ускорить?", opts: ["allowed = set(allowed) — проверка станет O(1)", "Заменить comprehension на цикл for", "Отсортировать rows"], a: 0, why: "Со списком — до 50 000 сравнений на каждую строку. С set — одна проверка. Вопрос из теста недели 1."},
+  {q: "Какая операция у списка O(n)?", opts: ["insert(0, x)", "append(x)", "a[5]"], a: 0, why: "Вставка в начало сдвигает все элементы."},
+  {q: "Сложность <code>x in d</code>, где d — словарь?", opts: ["O(1) в среднем", "O(n)", "O(log n)"], a: 0, why: "По хешу — сразу в ячейку."}
+]);
+mlCheck($("ex5"), [
+  {q: "Two Sum со словарём «число → номер». Сложность по времени и памяти?", opts: ["O(n) и O(n)", "O(n²) и O(1)", "O(n) и O(1)"], a: 0, why: "Один проход, каждая проверка O(1); словарь хранит до n чисел. Вопрос из теста недели 1."},
+  {q: "Почему мы сначала проверяем need, а потом кладём x в seen?", opts: ["Чтобы не сложить число само с собой", "Так быстрее", "Порядок не важен"], a: 0, why: "nums = [5], target = 10: если сначала положить 5, то найдём 5 + 5 — одно и то же число дважды."},
+  {q: "Решение в лоб двумя циклами — какая сложность?", opts: ["O(n²)", "O(n)", "O(2n)"], a: 0, why: "Для каждого числа перебираем все остальные."}
+]);
+
+initLesson({topics: [["python.coll.2", "Распаковка, zip, enumerate"], ["python.coll.4", "collections"], ["algo.ds.1", "Хеш-таблица"], ["algo.cx.2", "Сложность list, dict, set"], ["algo.pat.0", "Хеширование: Two Sum"]]});
+setTimeout(mlSteps, 600);
+</script>
+<script src="/assets/asks.js" defer></script>

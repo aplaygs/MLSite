@@ -1,0 +1,401 @@
+<title>Урок 2.2 · Python заново: переменные, типы и сравнения</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/ml.css">
+<style>
+/* Только для этого урока: карта памяти (имена → объекты) по шагам и песочница срезов. */
+.mem{display:grid;gap:12px}
+.mem-tabs{display:flex;flex-wrap:wrap;gap:6px}
+.mem-tabs .btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.mem-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:12px}
+@media (max-width:640px){.mem-grid{grid-template-columns:1fr}}
+.mem-code{font:13.5px/1.7 var(--f-mono);background:var(--soft);border-radius:12px;padding:10px 0;margin:0;overflow-x:auto}
+.mem-code div{padding:0 14px;white-space:pre;border-left:3px solid transparent}
+.mem-code div.on{background:color-mix(in srgb,var(--accent) 14%,transparent);border-left-color:var(--accent)}
+.mem-code div.done{color:var(--muted)}
+.mem-state{display:grid;gap:10px;align-content:start}
+.mem-col{display:grid;gap:6px}
+.mem-col>b{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mem-row{display:flex;gap:8px;align-items:center;font:14px var(--f-mono);flex-wrap:wrap}
+.mem-name{background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:3px 9px}
+.mem-obj{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:5px 10px;display:flex;gap:8px;align-items:baseline;transition:border-color .2s,background-color .2s}
+.mem-obj i{font-style:normal;color:var(--muted);font-size:12px}
+.mem-obj.new{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.mem-out{font:14px var(--f-mono);background:#16191D;color:#D8DEE4;border-radius:10px;padding:8px 12px;min-height:20px}
+.mem-note{font-size:14.5px;color:var(--muted)}
+.slc{display:grid;gap:12px}
+.slc-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;font:14px var(--f-mono)}
+.slc-row input{font:15px var(--f-mono);width:4.2em;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);text-align:center}
+.slc-row input.wide{width:11em;text-align:left}
+.slc-row input:focus{outline:none;border-color:var(--accent)}
+.slc-cells{display:flex;flex-wrap:wrap;gap:4px}
+.slc-cell{display:grid;justify-items:center;gap:2px;min-width:30px}
+.slc-cell b{font:600 18px var(--f-mono);width:30px;height:34px;display:grid;place-items:center;border-radius:8px;background:var(--soft)}
+.slc-cell.on b{background:var(--accent);color:var(--surface)}
+.slc-cell small{font:11px var(--f-mono);color:var(--muted)}
+.slc-res{font:600 16px var(--f-mono)}
+@media (prefers-reduced-motion:reduce){.mem-obj{transition:none}}
+</style>
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s1.html">← Урок 2.1 · Проект как на работе</a><span class="mid">урок 2 из 5</span><a href="/lessons/w02-s3.html">Урок 2.3 · Коллекции и словарь →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · урок 2 из 5 · повторение по тесту недели 1 · ~45 минут + практика 15 минут</div>
+  <h1>Python заново: переменные, типы и сравнения</h1>
+  <p>В тесте недели 1 урок «Python изнутри» не сработал совсем — и дело не в тебе: он был длинный и плотный. Здесь то же самое, но по-другому: пять коротких шагов, и в каждом ты сначала <b>видишь</b>, что происходит в памяти, потом предсказываешь вывод кода. Термины — только в конце шага.</p>
+  <nav class="steps" aria-label="Шаги урока">
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Ярлыки</a><a href="#s2"><i><span>2</span></i>Типы</a><a href="#s3"><i><span>3</span></i>== и is</a><a href="#s4"><i><span>4</span></i>Где живёт имя</a><a href="#s5"><i><span>5</span></i>Срезы</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+  </nav>
+</header>
+
+<!-- ============ 0 ============ -->
+<section class="step" id="s0">
+  <div class="step-h"><span class="num">0</span><h2>Разминка: проект из урока 2.1</h2><span class="min">2 мин</span></div>
+  <div id="exWarm"></div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="step" id="s1">
+  <div class="step-h"><span class="num">1</span><h2>Имя — это ярлык, а не коробка</h2><span class="min">12 мин</span></div>
+  <p class="why"><b>Зачем:</b> половина «странных» багов в Python — из-за того, что два имени смотрят на один и тот же список. Поменял через одно — поменялось и в другом. В тесте недели 1 на этом были два вопроса.</p>
+  <div class="plain">
+    <p>Представь, что объекты — это вещи на полке, а имена переменных — <b>ярлыки на ниточках</b>. Запись <code>b = a</code> не копирует вещь: она вешает второй ярлык на ту же самую вещь.</p>
+    <p>Дальше всё зависит от вещи. <b>Список, словарь, множество</b> можно менять на месте — и это увидят все ярлыки. <b>Число, строку, кортеж</b> поменять нельзя: «изменение» создаёт новый объект, и ярлык перевешивается на него.</p>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · карта памяти по шагам</span></div>
+    <div class="mem" id="mem"></div>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>b = a</code><span>второй ярлык на тот же объект — не копия</span></div>
+    <div class="cmd"><code>b = a.copy()</code><span>новая вещь — копия списка (или <code>list(a)</code>, <code>a[:]</code>)</span></div>
+    <div class="cmd"><code>b.append(3)</code>, <code>b += [3]</code><span>меняют список на месте — видно через все ярлыки</span></div>
+    <div class="cmd"><code>b = b + [3]</code><span>создаёт новый список и перевешивает только b</span></div>
+    <div class="cmd"><code>def f(acc=None)</code><span>список по умолчанию — только так: <code>[]</code> в def создаётся один раз на все вызовы</span></div>
+  </div>
+  <div id="ex1"></div>
+  <div class="term-chip"><b>Так это называют</b><span>имена — <b>ссылки</b> на объекты; список и словарь — <b>изменяемые</b> (mutable), число, строка, кортеж — <b>неизменяемые</b> (immutable). Ловушка с <code>acc=[]</code> — <b>mutable default argument</b>.</span></div>
+  <p class="remember">b = a — тот же объект. Нужна копия — a.copy(). Список по умолчанию — None, а внутри новый [].</p>
+  <div class="topic-check" data-for="python.base.1">
+    <label class="tp"><input type="checkbox" data-id="python.base.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Ярлыки и изменяемость</b></span></label>
+    <span class="note" data-d="python.base.1">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="step" id="s2">
+  <div class="step-h"><span class="num">2</span><h2>Типы: числа, строки и дробные, которые врут</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> в данных постоянно приходят числа строками («5» из CSV), а сравнение дробных через == ломает проверки в ML-коде.</p>
+  <div class="plain">
+    <p>Пять типов, которые встречаются везде: <code>int</code> (целое), <code>float</code> (дробное), <code>str</code> (строка), <code>bool</code> (True / False) и <code>None</code> — «значения нет». Узнать тип — <code>type(x)</code>.</p>
+    <ul>
+      <li><code>7 / 2</code> → <code>3.5</code> — обычное деление всегда даёт float. <code>7 // 2</code> → <code>3</code> — целая часть. <code>7 % 2</code> → <code>1</code> — остаток.</li>
+      <li><code>"5" + "1"</code> → <code>"51"</code> — строки склеиваются. Сначала превратить в число: <code>int("5") + 1</code> → <code>6</code>.</li>
+      <li><b>Дробные хранятся неточно</b>, потому что компьютер считает в двоичной системе: <code>0.1 + 0.2</code> → <code>0.30000000000000004</code>. Поэтому дробные сравнивают <b>с допуском</b>.</li>
+    </ul>
+  </div>
+<pre>0.1 + 0.2 == 0.3               <span class="cm"># False!</span>
+import math
+math.isclose(0.1 + 0.2, 0.3)   <span class="cm"># True — равны с маленьким допуском</span>
+abs((0.1 + 0.2) - 0.3) &lt; 1e-9  <span class="cm"># то же самое руками</span></pre>
+  <div id="ex2"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>числа с плавающей точкой</b> (floating point, стандарт IEEE 754); превращение типов — <b>приведение</b> (casting): <code>int()</code>, <code>float()</code>, <code>str()</code>.</span></div>
+  <p class="remember">Дробные через == не сравнивают — только math.isclose. Из CSV всё приходит строками.</p>
+  <div class="topic-check" data-for="python.base.0">
+    <label class="tp"><input type="checkbox" data-id="python.base.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Типы данных</b></span></label>
+    <span class="note" data-d="python.base.0">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="step" id="s3">
+  <div class="step-h"><span class="num">3</span><h2>== или is, и что Python считает «ложью»</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> проверка <code>if n_missing:</code> молча путает «пропусков ноль» с «значения нет». В данных это классическая ошибка.</p>
+  <div class="plain">
+    <p><code>==</code> спрашивает: <b>одинаковые ли значения</b>? <code>is</code> спрашивает: <b>это одна и та же вещь</b> (один объект)? Два разных списка <code>[1, 2]</code> равны по ==, но is даёт False.</p>
+    <p>На практике <b>is нужен ровно для одного</b>: проверить None — <code>x is None</code>, <code>x is not None</code>. Всё остальное — через ==.</p>
+    <p>Python умеет ставить в <code>if</code> что угодно. Считаются ложью: <code>0</code>, <code>0.0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, <code>None</code>, <code>False</code>. Всё остальное — правда, даже <code>"0"</code> и <code>[0]</code>.</p>
+  </div>
+<pre>n_missing = 0
+if n_missing:                 <span class="cm"># 0 — ложь: сюда не зайдём, хотя число есть</span>
+    ...
+if n_missing is not None:     <span class="cm"># правильно: «значение задано», даже если это 0</span>
+    ...</pre>
+  <div id="ex3a"></div>
+  <div id="ex3b"></div>
+  <div class="term-chip"><b>Так это называют</b><span>== — <b>равенство</b> (equality), is — <b>тождество</b> (identity); то, что Python считает ложью, — <b>falsy</b>, остальное — <b>truthy</b>.</span></div>
+  <p class="remember">None проверяют только через is. «Пустое» и «ноль» — тоже ложь, поэтому if x: — не проверка на None.</p>
+  <div class="topic-check" data-for="python.base.6">
+    <label class="tp"><input type="checkbox" data-id="python.base.6"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>is и ==, истинность</b></span></label>
+    <span class="note" data-d="python.base.6">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="step" id="s4">
+  <div class="step-h"><span class="num">4</span><h2>Где живёт имя: внутри функции и снаружи</h2><span class="min">8 мин</span></div>
+  <p class="why"><b>Зачем:</b> ошибка <code>UnboundLocalError</code> и «почему функция не видит мою переменную» — частые вопросы на первой работе и на собеседовании.</p>
+  <div class="plain">
+    <p>У функции своя комната. Имена, которым внутри функции что-то <b>присваивают</b>, живут только в этой комнате. <b>Прочитать</b> имя снаружи функция может, а вот присвоить ему — уже нет: присваивание сразу делает имя «своим», внутренним.</p>
+    <p>Ищет Python по порядку: сначала в своей функции, потом во внешней функции (если одна внутри другой), потом в файле, потом среди встроенных (<code>len</code>, <code>print</code>).</p>
+  </div>
+<pre>total = 10
+def show():
+    print(total)          <span class="cm"># читать снаружи можно → 10</span>
+
+count = 0
+def add():
+    count = count + 1     <span class="cm"># UnboundLocalError: count внутри — своя, а ей ещё ничего не присвоили</span>
+
+def add(count):           <span class="cm"># правильно: получить через параметр…</span>
+    return count + 1      <span class="cm"># …и вернуть через return</span>
+count = add(count)</pre>
+  <div class="callout trap"><b class="h">Ловушка: функция помнит имя, а не значение</b><p>Функция, созданная в цикле, смотрит на переменную цикла <b>в момент вызова</b>, а не в момент создания. <code>fs = [lambda: i for i in range(3)]</code> — все три функции вернут 2: когда их вызвали, цикл уже закончился и i = 2. Починка: <code>lambda i=i: i</code> — значение сохраняется в параметре.</p></div>
+  <div id="ex4"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>область видимости</b> (scope); порядок поиска — <b>LEGB</b>: Local → Enclosing → Global → Built-in. Функция, которая помнит внешние имена, — <b>замыкание</b> (closure).</span></div>
+  <p class="remember">Данные в функцию — через параметры, наружу — через return. global почти никогда не нужен.</p>
+  <div class="topic-check" data-for="python.base.4">
+    <label class="tp"><input type="checkbox" data-id="python.base.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Область видимости</b></span></label>
+    <span class="note" data-d="python.base.4">отметка в дереве</span>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="step" id="s5">
+  <div class="step-h"><span class="num">5</span><h2>Срезы: кусок строки или списка</h2><span class="min">7 мин</span></div>
+  <p class="why"><b>Зачем:</b> срезы — это «первые 5 строк», «последние 3 недели», «каждый второй элемент». В pandas и NumPy (недели 4–5) они работают так же.</p>
+  <div class="plain">
+    <p>Запись <code>s[start:stop:step]</code>: <b>с start включительно, до stop не включая</b>, с шагом step. Пропущенное — значит «с начала», «до конца», «шаг 1». Отрицательные номера считают с конца: <code>-1</code> — последний.</p>
+    <ul>
+      <li><code>s[:3]</code> — первые три · <code>s[-3:]</code> — последние три · <code>s[::2]</code> — каждый второй · <code>s[::-1]</code> — задом наперёд.</li>
+    </ul>
+  </div>
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · покрути срез</span></div>
+    <div class="slc">
+      <div class="slc-row">s = <input id="slS" class="wide" value="abcdef" aria-label="Строка" autocomplete="off" spellcheck="false"></div>
+      <div class="slc-row">s[<input id="slA" aria-label="start" value="1" autocomplete="off">:<input id="slB" aria-label="stop" value="5" autocomplete="off">:<input id="slC" aria-label="step" value="2" autocomplete="off">] → <span class="slc-res" id="slR"></span></div>
+      <div class="slc-cells" id="slCells"></div>
+      <p class="mem-note" id="slWhy"></p>
+    </div>
+  </div>
+  <div id="ex5"></div>
+  <div class="term-chip"><b>Так это называют</b><span><b>срез</b> (slice); у строк, списков и кортежей одинаковый синтаксис. Срез списка — <b>копия</b>: <code>a[:]</code>.</span></div>
+  <p class="remember">stop не включается: s[1:5] — это 4 элемента, с 1-го по 4-й.</p>
+  <div class="topic-check" data-for="python.base.5">
+    <label class="tp"><input type="checkbox" data-id="python.base.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Строки и срезы</b></span></label>
+    <span class="note" data-d="python.base.5">отметка в дереве</span>
+  </div>
+  <p class="deep">Хочешь глубже: <a href="/lessons/w01-2.html#p1">ярлыки и изменяемость</a> · <a href="/lessons/w01-2.html#p2">is и ==</a> · <a href="/lessons/w01-2.html#p5">область видимости</a> · <a href="/lessons/w01-2.html#p6">строки и f-strings</a> — справочник.</p>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="step" id="practice">
+  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: предскажи и проверь</h2><span class="min">15 мин</span></div>
+  <p class="why">Открой Python: в терминале <code>python3</code> или ячейку в Jupyter. Сначала пиши ответ на бумаге, потом запускай. Где не угадал — вернись в шаг урока.</p>
+  <div class="prac">
+    <div class="task"><span class="tg work">Код · 8 минут</span>
+      <h3>Шесть предсказаний</h3>
+<pre>a = [1, 2]; b = a; b.append(3); print(a)
+x = "ML"; y = x; y = y + "!"; print(x)
+print(7 / 2, 7 // 2, 7 % 2)
+print(0.1 + 0.2 == 0.3)
+print(bool("0"), bool([]), bool(0.0))
+print("python"[1:4], "python"[::-1], "python"[-2:])</pre>
+      <details><summary>Ответы</summary><div class="a">
+        <p><code>[1, 2, 3]</code> · <code>ML</code> · <code>3.5 3 1</code> · <code>False</code> · <code>True False False</code> · <code>yth nohtyp on</code></p></div></details>
+    </div>
+    <div class="task"><span class="tg rev">Код · 7 минут</span>
+      <h3>Две функции без ловушек</h3>
+      <ol>
+        <li><code>safe_mean(values)</code>: среднее списка, а для пустого списка — <code>None</code>. Проверь: <code>safe_mean([])</code>, <code>safe_mean([0, 0])</code> — во втором случае должен быть 0, а не None.</li>
+        <li><code>add_score(score, scores=None)</code>: добавляет оценку в список и возвращает его. Вызови дважды без второго аргумента — списки не должны «слипаться».</li>
+      </ol>
+      <details><summary>Решение</summary><div class="a">
+<pre>def safe_mean(values):
+    if not values:              <span class="cm"># пустой список — ложь</span>
+        return None
+    return sum(values) / len(values)
+
+m = safe_mean([0, 0])
+if m is not None:               <span class="cm"># не «if m:» — иначе 0 потеряется</span>
+    print("среднее", m)
+
+def add_score(score, scores=None):
+    if scores is None:
+        scores = []             <span class="cm"># новый список на каждый вызов</span>
+    scores.append(score)
+    return scores</pre></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ итог ============ -->
+<section class="step" id="topics">
+  <div class="step-h"><h2>Итог</h2></div>
+  <div class="sheet">
+    <ol>
+      <li><b>Ярлыки:</b> b = a — тот же объект. Копия — a.copy(). append и += меняют список на месте, b = b + [3] — новый список.</li>
+      <li><b>Список по умолчанию:</b> def f(acc=None): if acc is None: acc = [].</li>
+      <li><b>Типы:</b> 7 / 2 = 3.5, 7 // 2 = 3, 7 % 2 = 1. "5" + "1" = "51" — из CSV всё строки.</li>
+      <li><b>Дробные:</b> 0.1 + 0.2 != 0.3 — сравнивай math.isclose.</li>
+      <li><b>is</b> — только для None. Ложь: 0, 0.0, "", [], {}, None, False. if x: — не проверка на None.</li>
+      <li><b>Функции:</b> присваивание внутри — своё имя. Данные — через параметры и return. Функция помнит имя, а не значение.</li>
+      <li><b>Срезы:</b> [start:stop:step], stop не включается; [::-1] — задом наперёд.</li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+  </div>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+---
+type: конспект
+tags: [python, повторение, неделя-2]
+---
+# Python заново: переменные, типы и сравнения — урок 2.2
+
+## Ярлыки и изменяемость
+- Имя — ярлык на объекте. b = a — второй ярлык на тот же объект, не копия.
+- Список, словарь, множество меняются на месте (append, +=) — видно через все ярлыки. Число, строка, кортеж — неизменяемые.
+- Копия: a.copy(), list(a), a[:]. b = b + [3] — новый список.
+- Список по умолчанию создаётся один раз при def: def f(acc=None), внутри if acc is None: acc = [].
+
+## Типы
+- int, float, str, bool, None. 7 / 2 = 3.5 · 7 // 2 = 3 · 7 % 2 = 1.
+- "5" + "1" = "51"; int("5") + 1 = 6. Из CSV всё приходит строками.
+- 0.1 + 0.2 = 0.30000000000000004 → сравнивать math.isclose(a, b).
+
+## == и is
+- == — равны ли значения, is — тот же ли объект. is — только для None.
+- Ложь (falsy): 0, 0.0, "", [], {}, None, False. "0" и [0] — правда.
+- if n is not None — «значение задано», даже если 0.
+
+## Область видимости
+- Присвоил внутри функции — имя своё (local). Читать внешнее можно, присваивать — нет (UnboundLocalError).
+- Порядок поиска LEGB: Local → Enclosing → Global → Built-in.
+- Функция помнит имя, а не значение: [lambda: i for i in range(3)] → все вернут 2. Починка: lambda i=i: i.
+
+## Срезы
+- s[start:stop:step], stop не включается, отрицательные — с конца.
+- s[:3], s[-3:], s[::2], s[::-1]. "abcdef"[1:5:2] = "bd".
+</script>
+<script src="/assets/lesson.js"></script>
+<script src="/assets/ml.js"></script>
+<script>
+/* ---------- карта памяти: имена → объекты по шагам ---------- */
+(function memory() {
+  const SC = [
+    {title: "Общий список", code: ["a = [1, 2]", "b = a", "b.append(3)", "print(a)"], steps: [
+      {names: {a: 1}, objs: {1: "list · [1, 2]"}, note: "Создали список и повесили на него ярлык a."},
+      {names: {a: 1, b: 1}, objs: {1: "list · [1, 2]"}, note: "b = a — второй ярлык на тот же список. Копии нет."},
+      {names: {a: 1, b: 1}, objs: {1: "list · [1, 2, 3]"}, ch: 1, note: "append меняет список на месте. Изменение одно — а видно через оба ярлыка."},
+      {names: {a: 1, b: 1}, objs: {1: "list · [1, 2, 3]"}, out: "[1, 2, 3]", note: "Печатаем a — а там уже три элемента."}]},
+    {title: "Число не меняется", code: ["x = 5", "y = x", "y = y + 1", "print(x)"], steps: [
+      {names: {x: 1}, objs: {1: "int · 5"}, note: "Число 5 и ярлык x."},
+      {names: {x: 1, y: 1}, objs: {1: "int · 5"}, note: "y смотрит на то же число."},
+      {names: {x: 1, y: 2}, objs: {1: "int · 5", 2: "int · 6"}, ch: 2, note: "Число поменять нельзя: y + 1 создаёт новое число 6, и ярлык y перевешивается на него."},
+      {names: {x: 1, y: 2}, objs: {1: "int · 5", 2: "int · 6"}, out: "5", note: "x по-прежнему смотрит на 5."}]},
+    {title: "Копия", code: ["a = [1, 2]", "b = a.copy()", "b.append(3)", "print(a)"], steps: [
+      {names: {a: 1}, objs: {1: "list · [1, 2]"}, note: "Список и ярлык a."},
+      {names: {a: 1, b: 2}, objs: {1: "list · [1, 2]", 2: "list · [1, 2]"}, ch: 2, note: "copy() делает второй, отдельный список."},
+      {names: {a: 1, b: 2}, objs: {1: "list · [1, 2]", 2: "list · [1, 2, 3]"}, ch: 2, note: "Меняем копию — оригинал не трогаем."},
+      {names: {a: 1, b: 2}, objs: {1: "list · [1, 2]", 2: "list · [1, 2, 3]"}, out: "[1, 2]", note: "a не изменился."}]},
+    {title: "b = b + [3]", code: ["a = [1, 2]", "b = a", "b = b + [3]", "print(a)"], steps: [
+      {names: {a: 1}, objs: {1: "list · [1, 2]"}, note: "Список и ярлык a."},
+      {names: {a: 1, b: 1}, objs: {1: "list · [1, 2]"}, note: "Второй ярлык на тот же список."},
+      {names: {a: 1, b: 2}, objs: {1: "list · [1, 2]", 2: "list · [1, 2, 3]"}, ch: 2, note: "b + [3] собирает НОВЫЙ список, и b перевешивается на него. Сравни с b += [3] — тот меняет на месте."},
+      {names: {a: 1, b: 2}, objs: {1: "list · [1, 2]", 2: "list · [1, 2, 3]"}, out: "[1, 2]", note: "a смотрит на старый список."}]},
+    {title: "Список по умолчанию", code: ["def add(x, acc=[]):", "    acc.append(x)", "    return acc", "print(add(1))", "print(add(2))"], steps: [
+      {names: {"acc (по умолчанию)": 1}, objs: {1: "list · []"}, note: "Пустой список по умолчанию создаётся ОДИН раз — когда Python читает def."},
+      {names: {"acc (по умолчанию)": 1}, objs: {1: "list · [1]"}, ch: 1, out: "[1]", note: "Первый вызов: положили 1 в этот самый список."},
+      {names: {"acc (по умолчанию)": 1}, objs: {1: "list · [1, 2]"}, ch: 1, out: "[1]\n[1, 2]", note: "Второй вызов берёт ТОТ ЖЕ список — там уже лежит 1. Отсюда правило: acc=None, а внутри новый []."}]}
+  ];
+  const box = $("mem"); let sc = 0, st = 0;
+  function draw() {
+    const S = SC[sc], s = S.steps[st];
+    const line = S.title === "Список по умолчанию" ? (st === 0 ? [0, 1, 2] : [st + 2]) : [st];
+    box.innerHTML = `<div class="mem-tabs">${SC.map((x, k) => `<button class="btn" type="button" data-sc="${k}" aria-pressed="${k === sc}">${k + 1}. ${x.title}</button>`).join("")}</div>
+      <div class="mem-grid"><div class="mem-code">${S.code.map((l, k) => `<div class="${line.includes(k) ? "on" : k < Math.min(...line) ? "done" : ""}">${mlEsc(l)}</div>`).join("")}</div>
+      <div class="mem-state"><div class="mem-col"><b>Имена → объекты</b>${Object.entries(s.names).map(([n, o]) => `<div class="mem-row"><span class="mem-name">${mlEsc(n)}</span>→<span class="mem-obj${s.ch === o ? " new" : ""}"><i>#${o}</i>${mlEsc(s.objs[o])}</span></div>`).join("")}</div>
+      <div class="mem-col"><b>Все объекты в памяти</b><div class="mem-row">${Object.entries(s.objs).map(([k, v]) => `<span class="mem-obj${s.ch === +k ? " new" : ""}"><i>#${k}</i>${mlEsc(v)}</span>`).join("")}</div></div>
+      <div class="mem-col"><b>Вывод</b><div class="mem-out">${mlEsc(s.out || "")}</div></div></div></div>
+      <p class="mem-note">${s.note}</p>
+      <div class="btns"><button class="btn" type="button" data-go="-1" ${st ? "" : "disabled"}>← Назад</button><button class="btn" type="button" data-go="1" ${st < S.steps.length - 1 ? "" : "disabled"}>Шаг →</button><span class="muted mono" style="font-size:13px;align-self:center">шаг ${st + 1} из ${S.steps.length}</span></div>`;
+  }
+  box.addEventListener("click", e => { const t = e.target.closest("[data-sc],[data-go]"); if (!t) return;
+    if (t.dataset.sc !== undefined) { sc = +t.dataset.sc; st = 0; } else st = Math.max(0, Math.min(SC[sc].steps.length - 1, st + +t.dataset.go)); draw(); });
+  draw();
+})();
+
+/* ---------- песочница срезов (как в Python) ---------- */
+(function slicer() {
+  const num = v => v.trim() === "" ? null : /^-?\d+$/.test(v.trim()) ? +v : NaN;
+  function idx(n, a, b, c) {
+    const step = c === null ? 1 : c; if (step === 0 || [a, b, step].some(Number.isNaN)) return null;
+    const out = [];
+    if (step > 0) { let i = a === null ? 0 : a < 0 ? Math.max(0, a + n) : Math.min(a, n); const e = b === null ? n : b < 0 ? Math.max(0, b + n) : Math.min(b, n); for (; i < e; i += step) out.push(i); }
+    else { let i = a === null ? n - 1 : a < 0 ? a + n : Math.min(a, n - 1); const e = b === null ? -1 : b < 0 ? Math.max(-1, b + n) : Math.min(b, n - 1); if (i >= 0) for (; i > e; i += step) out.push(i); }
+    return out;
+  }
+  function run() {
+    const s = $("slS").value, A = num($("slA").value), B = num($("slB").value), C = num($("slC").value), I = idx(s.length, A, B, C);
+    $("slCells").innerHTML = [...s].map((ch, k) => `<span class="slc-cell${I && I.includes(k) ? " on" : ""}"><small>${k}</small><b>${mlEsc(ch === " " ? "·" : ch)}</b><small>${k - s.length}</small></span>`).join("");
+    if (!I) { $("slR").textContent = C === 0 ? "ValueError: шаг не может быть 0" : "только целые числа"; $("slWhy").textContent = ""; return; }
+    $("slR").textContent = "'" + I.map(k => s[k]).join("") + "'";
+    $("slWhy").textContent = I.length ? `Взяли номера ${I.join(", ")}. Сверху — номер с начала, снизу — с конца. stop не включается.` : "Пусто: start уже не раньше stop (при шаге вперёд) — Python не ругается, просто возвращает пустую строку.";
+  }
+  ["slS", "slA", "slB", "slC"].forEach(id => $(id).addEventListener("input", run)); run();
+})();
+
+/* ---------- проверки ---------- */
+mlCheck($("exWarm"), [
+  {q: "Что из этого нельзя класть в git?", opts: ["Файл .env с ключом API", "README.md", ".env.example без значений"], a: 0, why: ".env — секреты, он в .gitignore. В git — только .env.example."},
+  {q: "Какая подпись коммита по правилам урока 2.1?", opts: ["feat: add data loader", "fixed stuff", "Правки"], a: 0, why: "тип: что сделал — по-английски и конкретно."}
+]);
+mlCheck($("ex1"), [
+  {q: "Что выведет код?<pre>a = [1, 2]\nb = a\nb += [3]\nprint(a)</pre>", opts: ["[1, 2, 3]", "[1, 2]", "[3]"], a: 0, why: "b — второй ярлык на тот же список, а += у списка меняет его на месте (как карта 1). Это вопрос из теста недели 1."},
+  {q: "А так?<pre>a = [1, 2]\nb = a\nb = b + [3]\nprint(a)</pre>", opts: ["[1, 2]", "[1, 2, 3]", "Ошибку"], a: 0, why: "b + [3] создаёт новый список, b перевешивается на него (карта 4). a смотрит на старый."},
+  {q: "Что выведет код?<pre>def f(x, acc=[]):\n    acc.append(x)\n    return acc\n\nprint(f(1), f(2))</pre>", opts: ["[1, 2] [1, 2]", "[1] [2]", "[1] [1, 2]"], a: 0, why: "Список по умолчанию один на все вызовы (карта 5). Оба вызова вернули ОДИН и тот же список, а print печатает его уже после обоих добавлений."},
+  {q: "<code>s = \"ml\"; t = s; t = t.upper()</code>. Чему равно s?", opts: ["\"ml\"", "\"ML\""], a: 0, why: "Строки неизменяемые: upper() возвращает новую строку, t перевешивается на неё. s не меняется."}
+]);
+mlCheck($("ex2"), [
+  {q: "Что выведет <code>print(7 / 2, 7 // 2)</code>?", opts: ["3.5 3", "3 3", "3.5 3.5"], a: 0, why: "/ — обычное деление (float), // — целая часть."},
+  {q: "Из CSV пришли строки <code>\"5\"</code> и <code>\"1\"</code>. Чему равно их сложение через +?", opts: ["\"51\"", "6", "Ошибка"], a: 0, why: "Строки склеиваются. Нужна сумма — сначала int()."},
+  {q: "Как правильно проверить, что <code>0.1 + 0.2</code> равно <code>0.3</code>?", opts: ["math.isclose(0.1 + 0.2, 0.3)", "0.1 + 0.2 == 0.3", "0.1 + 0.2 is 0.3"], a: 0, why: "Дробные хранятся неточно (0.30000000000000004). Сравнивают с допуском. Вопрос из теста недели 1."},
+  {q: "<code>type(None)</code> — это…", opts: ["NoneType — отдельный тип «значения нет»", "int, равный нулю", "Пустая строка"], a: 0, why: "None — не ноль и не пустая строка, а отдельное «ничего»."}
+]);
+mlSort($("ex3a"), {title: "Ложь или правда в if?", groups: [{k: "f", label: "ложь"}, {k: "t", label: "правда"}], items: [
+  {w: "0", g: "f"}, {w: "\"0\"", g: "t", why: "Непустая строка — правда, неважно, что в ней."}, {w: "[]", g: "f"}, {w: "[0]", g: "t", why: "Список с одним элементом — не пустой."},
+  {w: "\"\"", g: "f"}, {w: "\" \"", g: "t", why: "Пробел — тоже символ: строка не пустая."}, {w: "None", g: "f"}, {w: "0.0", g: "f"}, {w: "{}", g: "f", why: "Пустой словарь."}, {w: "-1", g: "t", why: "Любое число, кроме нуля, — правда."}
+]});
+mlCheck($("ex3b"), [
+  {q: "<code>n_missing</code> — число пропусков, может быть 0. Какая проверка «значение задано» правильная?", opts: ["if n_missing is not None:", "if n_missing:", "if n_missing == True:"], a: 0, why: "0 — ложь, и if n_missing: решит, что значения нет. Вопрос из теста недели 1."},
+  {q: "<code>a = [1, 2]; b = [1, 2]</code>. Что даст <code>a == b</code> и <code>a is b</code>?", opts: ["True и False", "True и True", "False и False"], a: 0, why: "Значения одинаковые, но это два разных списка."},
+  {q: "Как правильно проверить, что функция вернула None?", opts: ["if result is None:", "if result == 0:", "if not result:"], a: 0, why: "not result сработает и на 0, и на пустую строку — это другое."}
+]);
+mlCheck($("ex4"), [
+  {q: "Что выведет код?<pre>total = 10\ndef show():\n    print(total)\nshow()</pre>", opts: ["10", "Ошибку", "None"], a: 0, why: "Читать внешнее имя функция может."},
+  {q: "Что будет?<pre>count = 0\ndef add():\n    count = count + 1\nadd()</pre>", opts: ["UnboundLocalError", "count станет 1", "Ничего"], a: 0, why: "Присваивание делает count внутренним, а прочитать его до присваивания нельзя."},
+  {q: "Что выведет код?<pre>fs = [lambda: i for i in range(3)]\nprint([f() for f in fs])</pre>", opts: ["[2, 2, 2]", "[0, 1, 2]", "[0, 0, 0]"], a: 0, why: "Функции вызвали после цикла, когда i уже 2, а помнят они имя i, не значение. Вопрос из теста недели 1; починка — lambda i=i: i."}
+]);
+mlCheck($("ex5"), [
+  {q: "Что вернёт <code>\"abcdef\"[1:5:2]</code>?", opts: ["'bd'", "'bdf'", "'ace'"], a: 0, why: "Номера 1 и 3 (b и d); 5 не включается. Проверь в песочнице. Вопрос из теста недели 1."},
+  {q: "Последние три символа строки <code>s</code>:", opts: ["s[-3:]", "s[:3]", "s[3:]"], a: 0, why: "-3 — третий с конца, и до конца."},
+  {q: "<code>\"python\"[::-1]</code>", opts: ["'nohtyp'", "'python'", "'n'"], a: 0, why: "Шаг -1 — идём с конца к началу."},
+  {q: "Сколько элементов в <code>a[2:7]</code>, если в a 10 элементов?", opts: ["5", "6", "7"], a: 0, why: "7 − 2 = 5: номера 2, 3, 4, 5, 6."}
+]);
+
+initLesson({topics: [["python.base.1", "Ярлыки и изменяемость"], ["python.base.0", "Типы данных"], ["python.base.6", "is и ==, истинность"], ["python.base.4", "Область видимости"], ["python.base.5", "Строки и срезы"]]});
+setTimeout(mlSteps, 600);
+</script>
+<script src="/assets/asks.js" defer></script>
