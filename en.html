@@ -153,7 +153,7 @@ section.block>p{color:var(--muted);max-width:72ch}
 .stage.next .tag{border-color:var(--line);color:var(--muted)}
 
 /* Ритм недели */
-.rhythm{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.rhythm{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 @media (max-width:920px){.rhythm{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:540px){.rhythm{grid-template-columns:1fr}}
 .rc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
@@ -186,7 +186,7 @@ section.block>p{color:var(--muted);max-width:72ch}
 .chip.late{border-color:var(--red);color:var(--red);background:rgba(180,72,58,.1)}
 
 .wbody{padding:2px 18px 18px;display:grid;gap:16px}
-.lcs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.lcs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 @media (max-width:760px){.lcs{grid-template-columns:1fr 1fr}}
 .lc{display:grid;gap:3px;align-content:start;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-decoration:none;transition:all .15s}
 a.lc:hover{border-color:var(--accent);transform:translateY(-1px);background:var(--soft)}
@@ -329,13 +329,15 @@ footer{padding-block:48px 0;font-size:12.5px;color:var(--muted);border-top:1px s
   <!-- Раздел: Ритм недели -->
   <section class="block" id="week">
     <div class="eyebrow">Ритм</div>
-    <h2>Неделя: три урока, тест и слова каждый день</h2>
-    <p>Как в ML, но с поправкой на язык: грамматику понимаешь, а слова и формы надо повторять. Поэтому — ежедневные 10–15 минут в Quizlet и повторение прошлых недель внутри каждого теста.</p>
+    <h2>Неделя: пять уроков, тест в субботу, воскресенье — отдых</h2>
+    <p>Как в ML: с понедельника по пятницу — урок в день (~1 час), в субботу — тест, воскресенье свободно. Уроки идут по порядку учебника: A, B, Everyday English, Skills for writing, Review. Слова и формы надо повторять — поэтому 10–15 минут в Quizlet и повторение прошлых недель внутри каждого теста.</p>
     <div class="rhythm">
       <div class="rc"><span class="n">Урок 1 · ~60 мин</span><b>Грамматика A</b><p>Главное правило юнита глубоко: живая шкала времён, конструктор предложений, «найди ошибку», ошибки русскоговорящих. Слова темы с озвучкой.</p></div>
-      <div class="rc"><span class="n">Урок 2 · ~60 мин</span><b>Грамматика B, слова и звук</b><p>Второе правило, слова юнита, произношение: послушай и повтори, ударение, звуки.</p></div>
-      <div class="rc"><span class="n">Урок 3 · ~60 мин</span><b>Живой английский</b><p>Фразы на каждый день, письмо, Wordpower, чтение и аудирование — и повторение грамматики прошлых недель.</p></div>
-      <div class="rc t"><span class="n">Тест · ~25 мин</span><b>Тест недели</b><p>Вставь слово, выбери форму, найди ошибку, переведи. Около 20% вопросов — из прошлых недель.</p></div>
+      <div class="rc"><span class="n">Урок 2 · ~60 мин</span><b>Грамматика B и слова</b><p>Второе правило и слова юнита: конструктор предложений, «найди ошибку», слова с озвучкой.</p></div>
+      <div class="rc"><span class="n">Урок 3 · ~60 мин</span><b>Живой английский: разговор и звук</b><p>Фразы на каждый день, диалоги по ролям, произношение: послушай и повтори, ударение, звуки.</p></div>
+      <div class="rc"><span class="n">Урок 4 · ~60 мин</span><b>Читаем и пишем</b><p>Текст юнита глазами и на слух, вопросы на понимание, своё короткое письмо по образцу.</p></div>
+      <div class="rc"><span class="n">Урок 5 · ~60 мин</span><b>Повторение юнита</b><p>Wordpower и слова, грамматика юнита в речи, ошибки недели — подготовка к тесту.</p></div>
+      <div class="rc t"><span class="n">Суббота · тест · ~25 мин</span><b>Тест недели</b><p>Вставь слово, выбери форму, найди ошибку, переведи. Около 20% вопросов — из прошлых недель.</p></div>
       <div class="rc d"><span class="n">Каждый день · 10–15 мин</span><b>Quizlet</b><p>Слова и правила уроков: в конце урока отмечаешь нужное, копируешь и вставляешь в набор недели через «Импорт».</p></div>
     </div>
   </section>
@@ -374,6 +376,7 @@ const SKILLS=[
   {key:"Слова",label:"Словарь",en:"Vocabulary",color:"var(--teal)"},
   {key:"Произношение",label:"Звуки",en:"Pronunciation",color:"var(--plum)"},
   {key:"Речь",label:"Живая речь",en:"Speaking",color:"var(--warm)"},
+  {key:"Чтение",label:"Чтение",en:"Reading & Listening",color:"var(--sun)"},
   {key:"Письмо",label:"Письмо",en:"Writing",color:"var(--terra)"},
   {key:"Повторение",label:"Повторение",en:"Review",color:"var(--indigo)"}
 ];
@@ -389,11 +392,11 @@ function drawWheel(skillCounts, doneTotal, allTotal){
   const cx=270, cy=270, r0=94, r1=222;
   const pct=allTotal?Math.round((doneTotal/allTotal)*100):0;
 
-  // 6 секторов (по 60 градусов), небольшой зазор в 3 градуса
+  // секторы поровну на круг, небольшой зазор в 3 градуса
   const sectors=SKILLS.map((sk,i)=>{
-    const midAngle=-90 + i*60;
-    const a1=(midAngle - 27)*(Math.PI/180);
-    const a2=(midAngle + 27)*(Math.PI/180);
+    const step=360/SKILLS.length, midAngle=-90 + i*step;
+    const a1=(midAngle - step/2 + 3)*(Math.PI/180);
+    const a2=(midAngle + step/2 - 3)*(Math.PI/180);
 
     const st=skillCounts[sk.key]||{done:0,all:1};
     const ratio=st.all?Math.min(1,st.done/st.all):0;
@@ -487,7 +490,7 @@ function updateHero(){
 
     // Пилюли уроков текущей недели
     const curL=(P.lessons||[]).filter(l=>l.week===cur.n);
-    const pillsHTML=[1,2,3].map(n=>{
+    const pillsHTML=cur.lessons.map(x=>x.n).map(n=>{
       const l=curL.find(x=>x.n===n);
       const lTops=(cur.lessons.find(x=>x.n===n)||{}).topics||[];
       const lDone=lTops.filter(x=>done[x.id]).length;
@@ -495,7 +498,7 @@ function updateHero(){
       return `<a class="lp${lDone===lTops.length&&lTops.length?" done":""}" href="${href}">Урок ${n} · ${lDone}/${lTops.length}</a>`;
     });
     const curTest=(P.tests||{})[String(cur.n)];
-    const tl=curL.find(x=>x.n===4);
+    const tl=curL.find(x=>x.kind==="test");
     pillsHTML.push(`<a class="lp" href="${tl&&tl.ready?`/lessons/${encodeURIComponent(tl.file)}`:`#w-${cur.n}`}">Тест ${curTest?`· ${curTest.best}%`:""}</a>`);
     $("curLessonPills").innerHTML=pillsHTML.join("");
   }
@@ -525,20 +528,20 @@ function weekHTML(w){
   const L=(P.lessons||[]).filter(l=>l.week===w.n);
   const chip=now?'<span class="chip now">сейчас</span>':past?(k===ts.length?'<span class="chip ok">пройдена</span>':`<span class="chip late">хвосты: ${ts.length-k}</span>`):'<span class="chip">впереди</span>';
   const T=(P.tests||{})[String(w.n)];
-  const card=(n,title)=>{
-    const l=L.find(x=>x.n===n);
-    return l&&l.ready?`<a class="lc" href="/lessons/${encodeURIComponent(l.file)}"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc(l.title||title)}</b><span class="m">${n===4&&T?`лучший результат ${T.best}% · попыток ${T.attempts}`:n===4?"пройти →":"открыть →"}</span></a>`
-      :`<div class="lc soon"><span class="k">${n===4?"Тест недели":"Урок "+n}</span><b>${esc((l&&l.title)||title)}</b><span class="m">${l&&l.focus?esc(l.focus):"скоро"}</span></div>`;
+  const card=(n,title,test)=>{
+    const l=test?L.find(x=>x.kind==="test"):L.find(x=>x.n===n&&x.kind!=="test");
+    return l&&l.ready?`<a class="lc" href="/lessons/${encodeURIComponent(l.file)}"><span class="k">${test?"Тест недели":"Урок "+n}</span><b>${esc(l.title||title)}</b><span class="m">${test&&T?`лучший результат ${T.best}% · попыток ${T.attempts}`:test?"пройти →":"открыть →"}</span></a>`
+      :`<div class="lc soon"><span class="k">${test?"Тест недели":"Урок "+n}</span><b>${esc((l&&l.title)||title)}</b><span class="m">${l&&l.focus?esc(l.focus):"скоро"}</span></div>`;
   };
 
   return `<details class="wk${w.kind==="review"?" rev":""}${now?" now":""}" id="w-${w.n}" data-kind="${w.kind||""}" data-hasready="${L.some(l=>l.ready)}" ${now?"open":""}>
     <summary><span class="wnum">${w.n}</span><div><h3>${esc(w.title)} <span class="ru">— ${esc(w.ru)}</span></h3><div class="sub">${w.unit?"Empower A2 · юнит "+w.unit:"повторение"} · ${k} / ${ts.length} ${chip}</div></div><span class="dt">${esc(w.span)}<span class="chev" aria-hidden="true">›</span></span></summary>
     <div class="wbody">
-      <div class="lcs">${w.lessons.map(l=>card(l.n,l.title)).join("")}${card(4,"Тест после трёх уроков")}</div>
+      <div class="lcs">${w.lessons.map(l=>card(l.n,l.title)).join("")}${card(0,"Тест в субботу",true)}</div>
       <div class="cols">${w.lessons.map(l=>`<div class="col"><h4>Урок ${l.n} · ${esc(l.title)}</h4><ul>${l.topics.map(t=>`<li><label class="it"><input type="checkbox" data-id="${t.id}"${done[t.id]?" checked":""}><span class="box" aria-hidden="true"></span><span class="tx"><span class="t">${esc(t.title)}</span><span class="kd" style="--kc:${KIND_COLOR[t.kind]||"var(--muted)"}">${esc(t.kind)}</span>${done[t.id]?`<span class="d">${done[t.id].slice(8)}.${done[t.id].slice(5,7)}</span>`:""}</span></label></li>`).join("")}</ul></div>`).join("")}</div>
       <div class="wfoot">
         <a href="obsidian://open?vault=${encodeURIComponent(P.vault)}&file=${encodeURIComponent(w.file.replace(/\.md$/,""))}">открыть неделю в Obsidian ↗</a>
-        <span class="muted" style="font-size:12px">${ts.length} тем · ~4 часа</span>
+        <span class="muted" style="font-size:12px">${ts.length} тем · ~${w.lessons.length} ч + тест</span>
       </div>
     </div></details>`;
 }

@@ -202,7 +202,7 @@ function weekHTML(s){
     return `<li><a href="${l.href}"><span class="m${l.done?" full":p>0?" half":""}" style="--p:${Math.round(p*100)}%"></span><span>${w.n}.${l.n} · ${esc(l.title)}</span><span class="k">${l.topics[0]}/${l.topics[1]}</span></a></li>`}).join("");
   const notes=[];
   if(s.tails.count)notes.push(`<div class="note"><span>⚠</span><span><b>Хвосты: ${s.tails.count}</b> — ${esc(s.tails.titles.slice(0,3).join(", "))}${s.tails.count>3?"…":""}</span></div>`);
-  if(s.test){const t=s.test;notes.push(`<div class="note"><span>✎</span><span>${t.best!=null?`<b>Тест недели: лучший ${t.best}%</b>`:t.open?`<b>Тест недели можно проходить</b>`:"Тест недели — после трёх уроков"}</span></div>`)}
+  if(s.test){const t=s.test;notes.push(`<div class="note"><span>✎</span><span>${t.best!=null?`<b>Тест недели: лучший ${t.best}%</b>`:t.open?`<b>Тест недели можно проходить</b>`:"Тест недели — после уроков недели"}</span></div>`)}
   return `<article class="wk ${c.cls}"><div class="wk-h"><span class="chip"><i>${c.short}</i>${esc(s.title)} · неделя ${w.n}</span><span class="span">${esc(w.span)}</span></div>
     <div class="big"><b>${w.done}<span style="font-size:22px;color:var(--muted)"> / ${w.total}</span></b><span>пройдено тем недели</span></div>
     <div class="bar"><i style="width:${pct}%"></i></div>${ls?`<ul class="ls">${ls}</ul>`:""}${notes.join("")}<a class="more" href="${s.home}">Открыть план раздела →</a></article>`;
@@ -216,9 +216,10 @@ function render(){
   $("toToday").hidden=p.view==="today"; document.title=`${dayTitle(p)} · учебная платформа`;
   ring(p.done,n);
   $("planH").textContent=p.view==="today"?"План на день":p.view==="future"?"Запланировано":"Что было запланировано";
-  if(p.view==="today")$("summary").innerHTML=p.start?`<b>${n-p.done} ${plural(n-p.done,["шаг","шага","шагов"])}</b> на сегодня · примерно <b>${dur(p.minutes_left).replace("~","")}</b>. Сделал шаг — нажми на его номер, он закроется.`
+  if(p.view==="today"&&p.rest&&!n)$("summary").innerHTML="<b>Воскресенье — день отдыха.</b> Хочется позаниматься — можно повторить слова в Quizlet.";
+  else if(p.view==="today")$("summary").innerHTML=p.start?`<b>${n-p.done} ${plural(n-p.done,["шаг","шага","шагов"])}</b> на сегодня · примерно <b>${dur(p.minutes_left).replace("~","")}</b>. Сделал шаг — нажми на его номер, он закроется.`
     :"<b>План на сегодня выполнен.</b> Можно взять урок вперёд или позаниматься в Quizlet.";
-  else if(p.view==="future")$("summary").innerHTML=n?`<b>${n} ${plural(n,["шаг","шага","шагов"])}</b> · примерно <b>${dur(p.minutes_left).replace("~","")}</b>. Quizlet — каждый день, его тут нет.`:"На этот день план по дням не составлен.";
+  else if(p.view==="future")$("summary").innerHTML=n?`<b>${n} ${plural(n,["шаг","шага","шагов"])}</b> · примерно <b>${dur(p.minutes_left).replace("~","")}</b>. Quizlet — каждый день, его тут нет.`:p.rest?"<b>Воскресенье — день отдыха.</b>":"На этот день план по дням не составлен.";
   else $("summary").innerHTML=n?`Сделано <b>${p.done} из ${n}</b>. Несделанное переехало на следующий день.`:"На этот день плана не было.";
   $("left").textContent=p.view==="past"?"":p.minutes_left?`осталось ${dur(p.minutes_left)}`:n?"всё сделано":"";
   /* неделя по дням */
@@ -234,8 +235,9 @@ function render(){
   $("start").innerHTML=p.view!=="today"?"":st?`<a class="start ${sc.cls}" href="${st.href}" style="--c:var(--${st.section==="deck"?"deck":st.section})">
       <div><div class="lab"><i></i>Начать · ${esc(st.label||"повторение")} · ${dur(st.minutes)}</div><h2>${esc(st.title)}</h2><div class="sub">${esc(st.sub)}</div></div>
       <span class="go">${I.arrow}</span></a>`
+    :p.rest&&!n?`<div class="start free"><div><div class="lab">Воскресенье</div><h2>Сегодня отдых 🌿</h2><div class="sub">Уроки — с понедельника по пятницу, тесты — в субботу. Несделанное за неделю будет в понедельник.</div></div></div>`
     :`<div class="start free"><div><div class="lab">Свободно</div><h2>На сегодня всё сделано</h2><div class="sub">Отличный день. Загляни в план недели или повтори колоды ещё раз.</div></div></div>`;
-  $("steps").innerHTML=p.steps.map((x,k)=>stepHTML(x,k+1)).join("")||`<li class="empty">${p.view==="today"?"Пока нечего делать: добавь слова из уроков или открой план.":"Шагов нет."}</li>`;
+  $("steps").innerHTML=p.steps.map((x,k)=>stepHTML(x,k+1)).join("")||`<li class="empty">${p.rest?"Отдыхай — новая неделя начнётся в понедельник.":p.view==="today"?"Пока нечего делать: добавь слова из уроков или открой план.":"Шагов нет."}</li>`;
   $("weeks").innerHTML=p.sections.map(weekHTML).join("");
 }
 async function load(day){
