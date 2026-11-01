@@ -242,6 +242,9 @@
   <div class="eyebrow">Практика · слушай и отвечай</div>
   <h2>Практика</h2>
   <p class="tldr">Опрос про учёбу: вопрос прозвучит, ты отвечаешь вслух — коротким ответом и ещё одной фразой. Потом сверяешься с образцом. Такие вопросы задают при знакомстве и на собеседовании на стажировку.</p>
+  <div class="ex" id="exMe1"><div class="ex-h"><span class="eyebrow">Про тебя · собери вопрос</span><p>Вопросы, которые тебе зададут на стажировке или на митапе, — и твои ответы. Переведи, потом скажи вслух.</p></div></div>
+  <div class="ex" id="exMe2"><div class="ex-h"><span class="eyebrow">Про тебя · диктант</span><p>Нажми 🔊 и запиши вопрос целиком. Слушай слитное «do you» и «does he».</p></div></div>
+
   <div class="lab">
     <div class="lab-h"><span class="eyebrow">Учебные привычки · 8 вопросов</span><span class="muted mono" id="ivState">1 / 8</span></div>
     <div class="iv" id="iv"></div>
@@ -465,7 +468,7 @@ exGap($("ex1b"),[
   {s:"Are you a student? (да) — ___",opts:["Yes, I am.","Yes, I do.","Yes, I'm."],a:"Yes, I am.",full:"Are you a student? Yes, I am.",why:"вопрос с be — и ответ с be"},
   {s:"Do you and Anna study together? (да) — ___",opts:["Yes, we do.","Yes, I do.","Yes, they do."],a:"Yes, we do.",full:"Do you and Anna study together? Yes, we do.",why:"ты и Анна — мы"},
   {s:"Does your phone have a good camera? (да) — ___",opts:["Yes, it does.","Yes, it has.","Yes, it is."],a:"Yes, it does.",full:"Does your phone have a good camera? Yes, it does.",why:"вопрос с does — ответ does"}
-],{keep:true});
+]);
 exGap($("ex1c"),[
   {s:"___ you live? — In Moscow.",a:"Where do",full:"Where do you live? — In Moscow."},
   {s:"___ she do? — She's a nurse.",a:"What does",full:"What does she do? — She's a nurse.",why:"«кем работает»: does + do"},
@@ -520,7 +523,7 @@ exGap($("ex2b"),[
   {s:"We ___ exams in January and June.",opts:["take","pass"],a:"take",why:"сдавать (идти на экзамен) — take; pass — сдать успешно"},
   {s:"You ___ the exam if you get 60% or more.",opts:["pass","take"],a:"pass",why:"сдать успешно — pass"},
   {s:"I always ___ mistakes in long words.",opts:["make","do"],a:"make",why:"ошибку — make"}
-],{keep:true});
+]);
 
 /* ---------- тема 3 ---------- */
 exSort($("ex3a"),{groups:[{label:"/s/ works"},{label:"/z/ lives"},{label:"/ɪz/ watches"}],items:[
@@ -561,6 +564,21 @@ exGap($("exW2"),[
   {s:"That's ___ interesting idea.",a:"an",full:"That's an interesting idea.",why:"смотрим на слово сразу после артикля: interesting"},
   {s:"She's ___ honest person.",a:"an",full:"She's an honest person."},
   {s:"He's ___ useful colleague.",a:"a",full:"He's a useful colleague.",why:"useful — «юсфул», звук [й]"}
+]);
+
+/* ---------- про тебя ---------- */
+exBuild($("exMe1"),[
+  {ru:"Что ты изучаешь? — Машинное обучение.",w:"What do you study ? — Machine learning .",extra:["does","are"]},
+  {ru:"Ты работаешь? — Нет. Я студент.",w:"Do you work ? — No , I don't . I'm a student .",extra:["Are","doesn't"]},
+  {ru:"Как часто ты ходишь в зал? — Три раза в неделю.",w:"How often do you go to the gym ? — Three times a week .",extra:["does","goes"]},
+  {ru:"Твой репетитор говорит по-русски?",w:"Does your tutor speak Russian ?",extra:["Do","speaks"]},
+  {ru:"Я занимаюсь английским два раза в неделю.",w:"I study English twice a week .",extra:["studies","two"]}
+]);
+exGap($("exMe2"),[
+  {s:"___",say:"Do you study at the weekend?",a:"Do you study at the weekend?"},
+  {s:"___",say:"What does your brother do?",a:"What does your brother do?"},
+  {s:"___",say:"Where do you have lectures?",a:"Where do you have lectures?"},
+  {s:"___",say:"Does she take exams in January?",a:"Does she take exams in January?"}
 ]);
 
 takeAway($("take"),{lesson:"2.2",words:WORDS,rules:[

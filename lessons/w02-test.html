@@ -16,9 +16,9 @@
 <script src="/assets/quiz.js"></script>
 <script>
 initQuiz({
-  week: 2, minutes: 80,
+  week: 2, minutes: 85,
   title: "Тест недели 2",
-  intro: "54 вопроса по пяти урокам недели — большой тест, до полутора часов. Три урока из пяти — повторение тем, на которых были ошибки в тесте недели 1: здесь те же идеи, но другие вопросы. Есть «что выведет код», расчёты и пять вопросов «объясни своими словами» — их оцениваешь сам по эталону. Цель — 70% и выше.",
+  intro: "59 вопросов по пяти урокам недели — большой тест, до полутора часов. Три урока из пяти — повторение тем, на которых были ошибки в тесте недели 1: здесь те же идеи, но другие вопросы. Есть «что выведет код», расчёты и пять вопросов «объясни своими словами» — их оцениваешь сам по эталону. Цель — 70% и выше.",
   lessons: [
     {n: 1, file: "w02-s1.html", title: "Проект как на работе", cover: "структура, README, .gitignore, .env, версии, коммиты"},
     {n: 2, file: "w02-s2.html", title: "Python заново: переменные, типы и сравнения", cover: "ярлыки и изменяемость, float, is и ==, область видимости, срезы"},
@@ -90,6 +90,16 @@ initQuiz({
     {lesson: 2, topic: "python.base.5", ref: "#s5", refTitle: "Срезы", type: "one",
      q: "Список недель <code>weeks</code>. Как взять каждую вторую неделю, начиная с первой?", opts: ["weeks[::2]", "weeks[2:]", "weeks[:2]", "weeks[1::2]"], ans: 0,
      explain: "Шаг 2 с самого начала. weeks[1::2] — каждая вторая, начиная со второй."},
+
+    {lesson: 2, topic: "python.base.5", ref: "#s5", refTitle: "Методы строк", type: "one",
+     q: "В столбце итогов попадаются <code>\" Pass\"</code>, <code>\"pass\\n\"</code> и <code>\"PASS\"</code>. Как привести всё к одному виду?", opts: ["x.strip().lower()", "x.lower()", "x.replace(\" \", \"\")", "x.split()"], ans: 0,
+     explain: "strip убирает пробелы и переносы по краям, lower — регистр. Каждый метод возвращает новую строку."},
+    {lesson: 2, topic: "python.base.5", ref: "#s5", refTitle: "f-строки", type: "one",
+     q: "<code>recall = 0.6667</code>. Что выведет <code>f\"{recall:.1%}\"</code>?", opts: ["66.7%", "0.7%", "0.6667%", "67%"], ans: 0,
+     explain: "Формат % умножает на 100 и добавляет знак, .1 — один знак после точки."},
+    {lesson: 2, topic: "python.base.4", ref: "#s4", refTitle: "global и nonlocal", type: "one",
+     q: "Внутренней функции нужно увеличить переменную n из внешней функции. Какое слово нужно?", opts: ["nonlocal n", "global n", "local n", "Ничего — просто n += 1"], ans: 0,
+     explain: "nonlocal — имя из внешней функции, global — из файла. Без слова будет UnboundLocalError."},
 
     /* ---------- урок 2.3 ---------- */
     {lesson: 3, topic: "python.coll.2", ref: "#s1", refTitle: "zip", type: "one",
@@ -199,6 +209,12 @@ initQuiz({
     {lesson: 5, topic: "tools.term.3", ref: "#s4", refTitle: "Перенаправление", type: "one",
      q: "Чем <code>echo ok &gt; log.txt</code> отличается от <code>echo ok &gt;&gt; log.txt</code>?", opts: ["&gt; перезаписывает файл, &gt;&gt; дописывает в конец", "Ничем", "&gt;&gt; перезаписывает, &gt; дописывает", "&gt;&gt; пишет в два файла"], ans: 0,
      explain: "Как режимы \"w\" и \"a\" у open."},
+    {lesson: 5, topic: "tools.term.1", ref: "#s4", refTitle: "tail -f", type: "one",
+     q: "Модель учится час и пишет прогресс в train.log. Как смотреть новые строки по мере появления?", opts: ["tail -f train.log", "cat train.log", "head -f train.log", "wc -l train.log"], ans: 0,
+     explain: "tail -f держит файл открытым и показывает новые строки. Выйти — Ctrl+C."},
+    {lesson: 5, topic: "tools.term.3", ref: "#s4", refTitle: "2>&1", type: "one",
+     q: "Что делает <code>python train.py &gt; log.txt 2&gt;&amp;1</code>?", opts: ["Пишет в log.txt и обычный вывод, и ошибки", "Пишет в log.txt только ошибки", "Запускает скрипт дважды", "Пишет вывод в файлы log.txt и 2"], ans: 0,
+     explain: "&gt; — обычный вывод в файл, 2&gt;&amp;1 — поток ошибок (2) туда же, куда обычный (1)."},
     {lesson: 5, topic: "python.coll.3", ref: "#s5", refTitle: "sorted", type: "one",
      q: "Что выведет код?", code: "words = [\"pandas\", \"ml\", \"sql\"]\nprint(sorted(words, key=len, reverse=True))",
      opts: ["['pandas', 'sql', 'ml']", "['ml', 'sql', 'pandas']", "['sql', 'pandas', 'ml']", "None"], ans: 0,

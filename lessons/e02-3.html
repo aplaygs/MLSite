@@ -246,6 +246,8 @@
   <div class="eyebrow">Практика · ролевая игра</div>
   <h2>Практика</h2>
   <p class="tldr">Сцена: первый день на стажировке. Послушай диалог, потом скрой реплики B и говори их сам. Здесь вся неделя: be и do, вопросы, короткие ответы, просьбы.</p>
+  <div class="ex" id="exMe1"><div class="ex-h"><span class="eyebrow">Про тебя · что сказать</span><p>Твои ситуации: зал, учёба, поездка. Выбери, что сказать.</p></div></div>
+
   <div class="lab">
     <div class="lab-h"><span class="eyebrow">Диалог · первый день на стажировке</span><span class="btns"><button class="btn" type="button" id="offPlay">▶ Весь диалог</button><button class="btn" type="button" id="offHide" aria-pressed="false">Скрыть реплики B</button></span></div>
     <div class="dlg" id="off"></div>
@@ -614,7 +616,7 @@ exGap($("exW2"),[
   {s:"Похвали преподавателя: She's ___.",opts:["a very good teacher","a teacher very good","very a good teacher"],a:"a very good teacher"},
   {s:"Без существительного: My boss is ___.",opts:["very nice","a very nice","a nice"],a:"very nice",why:"нет существительного — нет a"},
   {s:"Город скучноват: Moscow isn't boring, but this town is ___.",opts:["a bit boring","a bit interesting","not very boring"],a:"a bit boring"}
-],{keep:true});
+]);
 exGap($("exW3"),[
   {s:"Почта: ___",say:"anna dot lee at mail dot ru",a:["anna.lee@mail.ru"]},
   {s:"Почта: ___",say:"v dot petrov at gmail dot com",a:["v.petrov@gmail.com"]},
@@ -622,6 +624,16 @@ exGap($("exW3"),[
   {s:"Фамилия: ___",say:"Green. G, R, E, E, N.",a:"Green",exact:1},
   {s:"Имя: ___",say:"Jake. J, A, K, E.",a:"Jake",exact:1,why:"J — «джей», A — «эй», E — «и»"},
   {s:"Фамилия: ___",say:"Riley. R, I, L, E, Y.",a:"Riley",exact:1,why:"R — «а», I — «ай», Y — «уай»"}
+]);
+
+/* ---------- про тебя ---------- */
+exGap($("exMe1"),[
+  {s:"Ты в кафе у зала, хочешь протеиновый коктейль. — ___",opts:["Can I have a protein shake, please?","Give me protein shake.","I want a protein."],a:"Can I have a protein shake, please?"},
+  {s:"Администратор зала спрашивает: «Are you a member?» Да. — ___",opts:["Yes, I am.","Yes, I do.","Yes, I'm."],a:"Yes, I am.",why:"вопрос с be — и ответ с be; I'm в конце не ставят"},
+  {s:"В анкете на стажировку, поле Occupation. — ___",opts:["student","a student","Student of university"],a:"student",why:"в анкете — без артикля"},
+  {s:"Просишь преподавателя повторить задание. — ___",opts:["Could you say that again, please?","Repeat.","What you say?"],a:"Could you say that again, please?"},
+  {s:"В аэропорту Еревана спрашиваешь цену такси. — ___",opts:["How much is it to the city centre?","How many is the taxi?","What costs taxi?"],a:"How much is it to the city centre?",why:"цена — how much"},
+  {s:"Коллега: «Do you go to the gym?» Да, три раза в неделю. — ___",opts:["Yes, I do. Three times a week.","Yes, I go.","Yes, I am."],a:"Yes, I do. Three times a week."}
 ]);
 
 takeAway($("take"),{lesson:"2.3",words:[

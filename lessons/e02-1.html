@@ -216,6 +216,9 @@
   <div class="eyebrow">Практика · говори и пиши</div>
   <h2>Практика</h2>
   <p class="tldr">Present simple оживает, когда рассказываешь о реальной жизни. Говори вслух, следи за -s у he / she.</p>
+  <div class="ex" id="exMe1"><div class="ex-h"><span class="eyebrow">Про тебя · собери фразу</span><p>Это твоя жизнь по-английски: учёба, зал, планы. Переведи — и потом скажи каждую фразу вслух.</p></div></div>
+  <div class="ex" id="exMe2"><div class="ex-h"><span class="eyebrow">Про тебя · диктант</span><p>Нажми 🔊 и запиши фразу целиком. Слушай, есть ли -s в конце глагола. Второй клик сразу — медленнее.</p></div></div>
+
   <div class="prac">
     <div class="task"><span class="tg work">Говорить · 5 минут</span>
       <h3>Мой обычный день</h3>
@@ -515,7 +518,23 @@ exGap($("exW2"),[
   {s:"My parents ___ in Kazan.",opts:["live","lives","are live"],a:"live",why:"parents — как they: без -s и без be"},
   {s:"___ your friends students?",opts:["Are","Is","Do"],a:"Are",why:"глагола нет — be; friends — много"},
   {s:"I ___ cold. Close the window, please.",opts:["'m","have","do"],a:"'m",full:"I'm cold. Close the window, please.",why:"«мне холодно» — I'm cold"}
-],{keep:true});
+]);
+
+/* ---------- про тебя ---------- */
+exBuild($("exMe1"),[
+  {ru:"Я студент третьего курса.",w:"I'm a third-year student .",alt:["I am a third-year student ."],extra:["am","the"]},
+  {ru:"Я изучаю машинное обучение.",w:"I study machine learning .",extra:["studies","am"]},
+  {ru:"Я хожу в зал три раза в неделю.",w:"I go to the gym three times a week .",extra:["goes","in"]},
+  {ru:"Я пока не работаю — я учусь.",w:"I don't work yet . I'm a student .",alt:["I do not work yet . I'm a student ."],extra:["doesn't","not"]},
+  {ru:"Я хочу работать ML-инженером.",w:"I want to work as an ML engineer .",extra:["like","a"]},
+  {ru:"Мой репетитор не работает по воскресеньям.",w:"My tutor doesn't work on Sundays .",alt:["My tutor does not work on Sundays ."],extra:["don't","in"]}
+]);
+exGap($("exMe2"),[
+  {s:"___",say:"He goes to the gym three times a week.",a:"He goes to the gym three times a week"},
+  {s:"___",say:"She studies data science at university.",a:"She studies data science at university"},
+  {s:"___",say:"My friend doesn't like early lectures.",a:["My friend doesn't like early lectures","My friend does not like early lectures"]},
+  {s:"___",say:"They work for a big IT company.",a:"They work for a big IT company"}
+]);
 
 takeAway($("take"),{lesson:"2.1",words:WORDS.concat([
   {en:"work from home",ru:"работать из дома, удалённо",ex:"I work from home on Fridays."},

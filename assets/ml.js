@@ -1,5 +1,5 @@
 /* Короткие уроки ML: быстрые проверки, тренажёр терминала и план шагов. Подключать после lesson.js.
-     mlCheck(el, items)   — вопросы с вариантами, ответ сразу: {q, opts:[…], a: номер верного, why}.
+     mlCheck(el, items)   — вопросы с вариантами, ответ сразу: {q, opts:[…], a: номер верного, why}. Варианты показываются в случайном порядке.
      termSim(el, cfg)     — тренажёр терминала: {start: "~/projects/oulad-risk", prep: ["команда", …], tasks: [{t, hint, ok(state)}]}.
                             Есть git: init, status, add, commit, log, branch, switch, merge, remote, push, pull, clone
                             (cfg.cloneRepo — [{msg, snap}] для clone; служебная «git __colleague {json}» — коллега пушит коммит).
@@ -12,6 +12,7 @@
 function mlSave(id, val) { if (typeof WORK !== "undefined") WORK.put("ex:" + id, val); }
 function mlLoad(id) { return typeof WORK !== "undefined" ? WORK.get("ex:" + id) : null; }
 function mlReady(fn) { if (typeof WORK !== "undefined") WORK.ready(fn); else fn(); }
+const mlShuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const mlEsc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
 
 function mlScore(el, n, t) {
@@ -25,9 +26,10 @@ function mlScore(el, n, t) {
 function mlCheck(el, items) {
   el.classList.add("ex");
   const id = el.id;
+  const order = items.map(it => mlShuffle(it.opts.map((_, k) => k)));  /* варианты в случайном порядке: верный не всегда первый */
   el.innerHTML = `<div class="ex-h"><span class="eyebrow">Проверь себя</span></div>` +
-    items.map((it, i) => `<div class="chk" data-i="${i}"><div class="q">${it.q}</div><div class="opts">${it.opts.map((o, k) =>
-      `<button class="opt" data-k="${k}">${o}</button>`).join("")}</div><p class="fb" hidden></p></div>`).join("") +
+    items.map((it, i) => `<div class="chk" data-i="${i}"><div class="q">${it.q}</div><div class="opts">${order[i].map(k =>
+      `<button class="opt" data-k="${k}">${it.opts[k]}</button>`).join("")}</div><p class="fb" hidden></p></div>`).join("") +
     `<div class="ex-foot"><span class="ex-score">0 / ${items.length}</span><button class="btn" data-reset>Заново</button></div>`;
   let ans = {};
   function show() {

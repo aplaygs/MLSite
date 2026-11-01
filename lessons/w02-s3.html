@@ -77,7 +77,20 @@ list(zip(names, scores, strict=True))  <span class="cm"># ValueError — есл�
   <div id="ex1"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>распаковка</b> (unpacking), <code>*rest</code> — «звёздочка собирает остальное». zip и enumerate возвращают <b>итераторы</b> — поэтому печатают через <code>list(...)</code>.</span></div>
   <p class="remember">zip молча обрезает по самому короткому. Нужен номер — enumerate, а не range(len()).</p>
-  <div class="topic-check" data-for="python.coll.2">
+    <details class="more"><summary>Подробнее: собрать словарь из двух списков, распаковать обратно, items()<small> · 3 минуты</small></summary><div class="a">
+    <pre>codes = ["AAA", "BBB"]; lengths = [268, 240]
+dict(zip(codes, lengths))          <span class="cm"># {'AAA': 268, 'BBB': 240} — частый приём</span>
+
+pairs = [("Аня", 91), ("Иван", 78)]
+names, scores = zip(*pairs)        <span class="cm"># обратно: ('Аня', 'Иван') и (91, 78)</span>
+
+for course, length in lengths_by_code.items():   <span class="cm"># по словарю — сразу ключ и значение</span>
+    print(course, length)
+
+head, *middle, tail = [1, 2, 3, 4, 5]   <span class="cm"># 1, [2, 3, 4], 5</span></pre>
+    <p>Звёздочка при вызове функции делает обратное — раскладывает список на аргументы: <code>max(*[3, 7, 5])</code> — то же, что <code>max(3, 7, 5)</code>. Это те же <code>*args</code> из урока 1.2.</p>
+  </div></details>
+<div class="topic-check" data-for="python.coll.2">
     <label class="tp"><input type="checkbox" data-id="python.coll.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Распаковка, zip, enumerate</b></span></label>
     <span class="note" data-d="python.coll.2">отметка в дереве</span>
   </div>
@@ -104,7 +117,17 @@ for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
 <span class="cm"># {'ML': ['Аня', 'Оля'], 'SQL': ['Иван']}</span></pre>
   <div id="ex2"></div>
   <p class="remember">Посчитать — Counter. Сгруппировать — defaultdict(list). Очередь — deque.</p>
-  <div class="topic-check" data-for="python.coll.4">
+    <details class="more"><summary>Подробнее: ещё про Counter, get, setdefault и deque<small> · 4 минуты</small></summary><div class="a">
+    <ul>
+      <li><code>c = Counter(results)</code>: <code>c["Fail"]</code> — сколько Fail; если такого нет — <b>0, а не ошибка</b>. <code>c.update(новые)</code> — досчитать. <code>c1 + c2</code> — сложить два подсчёта. <code>c.total()</code> — сумма всех.</li>
+      <li><code>defaultdict(int)</code> — счётчик руками: <code>counts[x] += 1</code> без проверки, есть ли ключ.</li>
+      <li>Без collections: <code>d.get(k, 0)</code> — значение или 0, если ключа нет. <code>d.setdefault(k, []).append(v)</code> — то же, что defaultdict, но одной строкой для обычного словаря.</li>
+      <li><code>deque</code>: <code>append</code> / <code>appendleft</code>, <code>pop</code> / <code>popleft</code> — всё за O(1). У списка <code>pop(0)</code> — O(n): сдвигает все элементы. <code>deque(maxlen=100)</code> сам выкидывает старые — «последние 100 событий». Очередь понадобится в обходе графа в ширину (BFS, неделя 9).</li>
+      <li>Обычный словарь с Python 3.7 <b>помнит порядок добавления</b> ключей — OrderedDict почти не нужен.</li>
+    </ul>
+  </div></details>
+  <div class="callout trap"><b class="h">Частые ошибки</b><ul class="oops"><li><span class="no"><code>d[key] += 1  # KeyError на новом ключе</code></span><span class="yes"><code>Counter или defaultdict(int)</code></span></li><li><span class="no"><code>if k in d: d[k].append(v) else: d[k] = [v]</code></span><span class="yes"><code>groups = defaultdict(list); groups[k].append(v)</code></span><span class="n">Четыре строки → одна.</span></li><li><span class="no"><code>queue.pop(0)  # у списка</code></span><span class="yes"><code>queue = deque(); queue.popleft()</code></span><span class="n">pop(0) у списка сдвигает все элементы.</span></li></ul></div>
+<div class="topic-check" data-for="python.coll.4">
     <label class="tp"><input type="checkbox" data-id="python.coll.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>collections</b></span></label>
     <span class="note" data-d="python.coll.4">отметка в дереве</span>
   </div>
@@ -134,7 +157,16 @@ for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
   <div id="ex3"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>хеш-таблица</b>; ключом может быть только <b>хешируемый</b> (hashable) — неизменяемый — объект: число, строка, кортеж. Поиск, вставка, удаление — <b>O(1) в среднем</b>.</span></div>
   <p class="remember">Хеш ключа → номер ячейки → сразу туда. Список ключом быть не может: изменится — изменится хеш.</p>
-  <div class="topic-check" data-for="algo.ds.1">
+    <details class="more"><summary>Подробнее: настоящий хеш, рост таблицы и почему 1 и True — один ключ<small> · 4 минуты</small></summary><div class="a">
+    <ul>
+      <li>У строк хеш <b>меняется от запуска к запуску</b> Python (защита от атак) — <code>hash("Аня")</code> сегодня и завтра разный. Внутри одного запуска — одинаковый, и этого достаточно.</li>
+      <li>Когда таблица заполнена примерно на 2/3, Python создаёт таблицу побольше и переносит все ключи. Это дорого, но бывает редко, поэтому <b>в среднем</b> добавление — O(1). Так же работает append у списка (амортизированная сложность, урок 1.1).</li>
+      <li>Худший случай — O(n): если у многих ключей один хеш, все попадут в коллизии. На практике почти не встречается.</li>
+      <li>Правило для своих объектов: если <code>a == b</code>, то обязан совпадать и <code>hash(a) == hash(b)</code>. Поэтому <code>1</code>, <code>1.0</code> и <code>True</code> — один ключ: они равны и хеш у них одинаковый.</li>
+      <li><b>set</b> устроен так же, как dict, только без значений — поэтому <code>in</code> у него тоже O(1).</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="algo.ds.1">
     <label class="tp"><input type="checkbox" data-id="algo.ds.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Хеш-таблица</b></span></label>
     <span class="note" data-d="algo.ds.1">отметка в дереве</span>
   </div>
@@ -167,7 +199,18 @@ for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
   <div id="ex4"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>Big O</b> — как растёт время с ростом n: O(1) — не растёт, O(n) — растёт как n, O(n²) — как n·n.</span></div>
   <p class="remember">Много проверок «есть ли» — сначала сделай set: allowed = set(allowed).</p>
-  <div class="topic-check" data-for="algo.cx.2">
+    <details class="more"><summary>Подробнее: операции с множествами и цена построения set<small> · 3 минуты</small></summary><div class="a">
+    <pre>train_ids = {1, 2, 3, 4}; test_ids = {3, 4, 5}
+train_ids &amp; test_ids     <span class="cm"># {3, 4} — пересечение: эти студенты в обеих выборках = утечка (урок 2.4)!</span>
+train_ids | test_ids     <span class="cm"># {1, 2, 3, 4, 5} — объединение</span>
+train_ids - test_ids     <span class="cm"># {1, 2} — только в train</span></pre>
+    <ul>
+      <li>Построить set из n элементов — O(n). Если проверка одна, set не нужен. Если проверок много (миллион строк) — строить окупается сразу.</li>
+      <li><code>x in d</code> у словаря проверяет <b>ключи</b>, не значения. <code>x in d.values()</code> — перебор, O(n).</li>
+      <li><code>"ab" in text</code> у строки — поиск подстроки, это перебор по тексту.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="algo.cx.2">
     <label class="tp"><input type="checkbox" data-id="algo.cx.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Сложность list, dict, set</b></span></label>
     <span class="note" data-d="algo.cx.2">отметка в дереве</span>
   </div>
@@ -196,7 +239,18 @@ for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
   <div id="ex5"></div>
   <div class="term-chip"><b>Так это называют</b><span>приём <b>hash map</b> («хеш-мапа») / «запоминай увиденное»; обмен <b>памяти на время</b>: O(n) времени и O(n) памяти вместо O(n²) и O(1).</span></div>
   <p class="remember">Two Sum: один проход, need = target − x, словарь «число → номер». O(n) и O(n).</p>
-  <div class="topic-check" data-for="algo.pat.0">
+    <details class="more"><summary>Подробнее: что ещё спросят про Two Sum<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li><b>Повторы:</b> nums = [3, 3], target = 6. Работает, потому что сначала проверяем, потом кладём: на втором 3 первое уже в seen.</li>
+      <li><b>Нет ответа:</b> функция вернёт None — скажи это вслух интервьюеру, а не молчи.</li>
+      <li><b>Массив отсортирован:</b> можно без словаря — два указателя с краёв, O(1) памяти (неделя 3).</li>
+      <li><b>Продолжение:</b> «а если три числа?» — 3Sum: сортировка + два указателя, O(n²).</li>
+      <li>Как рассказывать решение на собеседовании: 1) решение в лоб и его сложность, 2) «где тратим время — на поиск пары, ускорим словарём», 3) код, 4) прогнать на маленьком примере, 5) сложность по времени и памяти.</li>
+    </ul>
+  </div></details>
+  <div class="callout trap"><b class="h">Частые ошибки</b><ul class="oops"><li><span class="no"><code>for i in range(len(nums)):
+    for j in range(len(nums)):</code></span><span class="yes"><code>один проход + словарь seen</code></span><span class="n">O(n²) → O(n).</span></li><li><span class="no"><code>seen[x] = i; if target - x in seen:</code></span><span class="yes"><code>сначала проверка, потом seen[x] = i</code></span><span class="n">Иначе 5 + 5 = 10 найдётся из одного числа.</span></li><li><span class="no"><code>for i in range(len(a)): x = a[i]</code></span><span class="yes"><code>for i, x in enumerate(a):</code></span></li></ul></div>
+<div class="topic-check" data-for="algo.pat.0">
     <label class="tp"><input type="checkbox" data-id="algo.pat.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Хеширование: Two Sum</b></span></label>
     <span class="note" data-d="algo.pat.0">отметка в дереве</span>
   </div>
@@ -229,6 +283,8 @@ for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
 <!-- ============ итог ============ -->
 <section class="step" id="topics">
   <div class="step-h"><h2>Итог</h2></div>
+    <div class="callout mem"><b class="h">На собеседовании</b><p>Так спрашивают на отборах на стажировку. Сначала ответь вслух сам, потом открой ответ.</p></div>
+  <div class="qs"><details class="q"><summary><span class="t">Собеседование</span>Как устроен словарь в Python? Какая сложность поиска?</summary><div class="a"><p>Это хеш-таблица. Для ключа считается хеш, по нему — номер ячейки, туда кладутся ключ и значение. При коллизии Python ищет другую ячейку и сравнивает ключи через ==. Когда таблица заполняется, она увеличивается. Поиск, вставка и удаление — O(1) в среднем, O(n) в худшем случае. Ключ должен быть хешируемым, то есть неизменяемым.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Почему проверка x in list медленная, а x in set быстрая?</summary><div class="a"><p>Список приходится перебирать с начала — O(n). Множество ищет по хешу сразу в нужной ячейке — O(1) в среднем. Если проверок много, выгодно один раз построить set за O(n).</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Реши Two Sum и назови сложность.</summary><div class="a"><p>Иду по массиву один раз. Для каждого x считаю need = target − x и проверяю, есть ли need в словаре «число → индекс». Есть — возвращаю пару индексов, нет — кладу x в словарь. Время O(n), память O(n). Решение в лоб двумя циклами — O(n²) по времени, O(1) по памяти.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Как посчитать частоты слов?</summary><div class="a"><p>Counter(words).most_common(k) — частоты и k самых частых. Без импорта: словарь и d[w] = d.get(w, 0) + 1.</p></div></details></div>
   <div class="sheet">
     <ol>
       <li><b>Распаковка:</b> a, b = b, a · first, *rest = lst. <b>enumerate</b> — номер и значение. <b>zip</b> — пары, обрезает по короткому (strict=True — ошибка при разной длине).</li>
@@ -240,6 +296,7 @@ for name, course in [("Аня", "ML"), ("Иван", "SQL"), ("Оля", "ML")]:
     <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
     <textarea id="mdArea" rows="8" hidden readonly></textarea>
   </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b><p>Закрой урок. Напиши Two Sum на бумаге за 5 минут и прогони на [3, 2, 4], target = 6. Объясни вслух, что происходит при d["Аня"] = 5 — хеш, ячейка, коллизия, рост таблицы. Назови сложность x in list, x in set, list.pop(0), deque.popleft(). Сверься с уроком.</p></div>
   <ul class="topics" id="topicList"></ul>
   <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
 </section>
@@ -271,6 +328,13 @@ tags: [python, алгоритмы, повторение, неделя-2]
 | x in … | O(n) | O(1) |
 | добавить | O(1) | O(1) |
 | insert(0, x) | O(n) | — |
+
+## Ещё
+- dict(zip(keys, values)) — словарь из двух списков; zip(*pairs) — обратно.
+- Counter: c[k] нет → 0; defaultdict(int) — счётчик; d.get(k, 0), d.setdefault(k, []).append(v).
+- deque: appendleft / popleft за O(1); list.pop(0) — O(n). deque(maxlen=100).
+- Множества: a & b (оба), a | b (хоть один), a - b (только в a). Пересечение id train и test — проверка на утечку.
+- Хеш строк меняется между запусками; таблица растёт при заполнении на ~2/3 → O(1) в среднем, O(n) в худшем.
 
 ## Two Sum
 - seen = {}; для каждого x: need = target − x; если need in seen → ответ; иначе seen[x] = i.

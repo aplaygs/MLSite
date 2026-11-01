@@ -78,7 +78,17 @@
   <div id="ex1"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>функция потерь</b> (loss) — ошибка на одном объекте, среднее по выборке — <b>эмпирический риск</b>. MSE — mean squared error, MAE — mean absolute error. Для классификации учат на <b>log-loss</b> — он в неделе 4.</span></div>
   <p class="remember">MSE: лучшая константа — среднее, большие промахи наказываются сильно. MAE: лучшая константа — медиана, выбросы почти не мешают.</p>
-  <div class="topic-check" data-for="ml.base.2">
+    <details class="more"><summary>Подробнее: функция потерь и метрика — не одно и то же; почему MSE так любят<small> · 4 минуты</small></summary><div class="a">
+    <ul>
+      <li><b>Функция потерь</b> — то, что модель минимизирует при обучении. <b>Метрика</b> — то, чем ты и бизнес оцениваете результат. Часто они разные: логистическая регрессия учится на log-loss, а в README пишут ROC-AUC или recall. Метрику выбирают под задачу, потерю — так, чтобы её было удобно минимизировать.</li>
+      <li><b>Почему MSE популярна:</b> квадрат — гладкая функция, у неё везде есть производная, и градиентный спуск (неделя 3) работает легко. У модуля в нуле «излом».</li>
+      <li><b>RMSE ≥ MAE всегда.</b> Чем больше разница между ними, тем больше в ошибках крупных промахов.</li>
+      <li><b>MAPE</b> — средняя ошибка в процентах (|ошибка| / правда). Понятна бизнесу, но ломается, когда правда близка к нулю.</li>
+      <li><b>Huber</b> — компромисс: на маленьких ошибках как MSE, на больших как MAE. Берут, когда выбросы есть, но учиться хочется гладко.</li>
+      <li>Лучшая константа под MSE — среднее, потому что сумма квадратов отклонений минимальна именно в среднем. Под MAE — медиана: половина точек слева, половина справа, и сдвиг в любую сторону только увеличивает сумму модулей.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="ml.base.2">
     <label class="tp"><input type="checkbox" data-id="ml.base.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Функция потерь</b></span></label>
     <span class="note" data-d="ml.base.2">отметка в дереве</span>
   </div>
@@ -99,7 +109,19 @@
   </div>
   <div id="ex2"></div>
   <div class="term-chip"><b>Так это называют</b><span>train / validation / test split; подбор настроек модели — <b>подбор гиперпараметров</b>; кросс-валидация — <b>k-fold CV</b>.</span></div>
-  <p class="remember">Выбираешь — по validation. Тест — один раз в конце. Выбирал по тесту — его число в README уже нечестное.</p>
+    <details class="more"><summary>Подробнее: кросс-валидация на картинке, stratify и random_state<small> · 4 минуты</small></summary><div class="a">
+    <p><b>5-fold кросс-валидация.</b> Train делят на 5 равных кусков. Пять раз учат модель на четырёх кусках и проверяют на пятом — каждый кусок побывает проверочным. Итог — среднее из пяти чисел (и их разброс):</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Прогон</th><th>Учим на кусках</th><th>Проверяем на куске</th></tr></thead>
+      <tbody><tr><td>1</td><td>2, 3, 4, 5</td><td>1</td></tr><tr><td>2</td><td>1, 3, 4, 5</td><td>2</td></tr><tr><td>…</td><td>…</td><td>…</td></tr><tr><td>5</td><td>1, 2, 3, 4</td><td>5</td></tr></tbody>
+    </table></div>
+    <ul>
+      <li><code>train_test_split(X, y, test_size=0.2, stratify=y, random_state=0)</code>: <b>stratify</b> — в каждой части та же доля классов (важно, когда «бросивших» мало); <b>random_state</b> — то же разбиение при каждом запуске, результат повторяем.</li>
+      <li>Если данные во времени (семестры OULAD!) — не перемешивают: учатся на прошлых семестрах, проверяют на более позднем.</li>
+      <li>Тест после финальной оценки больше не трогают. Захотелось «ещё чуть-чуть подкрутить» — значит, нужна новая отложенная выборка.</li>
+    </ul>
+  </div></details>
+<p class="remember">Выбираешь — по validation. Тест — один раз в конце. Выбирал по тесту — его число в README уже нечестное.</p>
 </section>
 
 <!-- ============ 3 ============ -->
@@ -118,7 +140,17 @@
   <div id="ex3"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>data leakage</b>; деление по людям — <b>group split</b> (GroupKFold), по времени — <b>time split</b>. «Сначала split, потом fit» — правило, которое потом автоматизирует Pipeline (неделя 8).</span></div>
   <p class="remember">Сначала разбиваешь, потом всё обучаешь только на train. Признак проверяешь вопросом: «будет ли он у меня в момент прогноза?»</p>
-  <div class="topic-check" data-for="ml.base.3">
+    <details class="more"><summary>Подробнее: две разновидности утечки и утечки в твоём проекте OULAD<small> · 4 минуты</small></summary><div class="a">
+    <ul>
+      <li><b>Утечка целевой переменной</b> (target leakage) — признак содержит ответ или появляется после события: «дата отчисления», «оценка за итоговый экзамен».</li>
+      <li><b>Загрязнение train тестом</b> (train-test contamination) — обработка видела тест: scaler, заполнение пропусков, отбор признаков на всём датасете; дубликаты в обеих выборках.</li>
+      <li><b>Как заметить:</b> метрика подозрительно высокая с первой попытки; один признак «важнее всех остальных вместе»; на новых данных модель резко хуже.</li>
+      <li><b>В OULAD</b> (твой проект): в таблице <code>studentRegistration</code> есть <code>date_unregistration</code> — дата, когда студент снялся с курса. Для задачи «бросит ли» это и есть ответ. Оценки из <code>studentAssessment</code> и клики из <code>studentVle</code> можно брать <b>только до момента прогноза</b> — например, до 4-й недели курса.</li>
+      <li><b>Как защищаться:</b> сначала split, потом любая обработка; признаки строить «по состоянию на дату прогноза»; Pipeline в sklearn (неделя 8) делает fit только на train автоматически.</li>
+    </ul>
+  </div></details>
+  <div class="callout trap"><b class="h">Частые ошибки</b><ul class="oops"><li><span class="no"><code>scaler.fit(X); X_tr, X_te = split(X)</code></span><span class="yes"><code>X_tr, X_te = split(X); scaler.fit(X_tr)</code></span><span class="n">Сначала разбиение, потом fit.</span></li><li><span class="no"><code>признак date_unregistration</code></span><span class="yes"><code>только признаки, известные к дате прогноза</code></span><span class="n">Иначе модель «знает ответ».</span></li><li><span class="no"><code>выбрал модель по test, записал test в README</code></span><span class="yes"><code>выбор по validation, test — один раз</code></span></li></ul></div>
+<div class="topic-check" data-for="ml.base.3">
     <label class="tp"><input type="checkbox" data-id="ml.base.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Train, validation и test; утечка данных</b></span></label>
     <span class="note" data-d="ml.base.3">отметка в дереве</span>
   </div>
@@ -153,7 +185,16 @@
   <div id="ex4"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>переобучение</b> (overfitting) и <b>недообучение</b> (underfitting); «штраф за сложность» — <b>регуляризация</b>; остановка обучения, когда validation перестала улучшаться, — <b>early stopping</b>.</span></div>
   <p class="remember">Большой разрыв train и validation — переобучение. Усложнять модель — только хуже.</p>
-  <div class="topic-check" data-for="ml.base.4">
+    <details class="more"><summary>Подробнее: кривые обучения и что помогает от чего<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li><b>Кривая обучения</b> — ошибки train и validation в зависимости от <b>размера</b> обучающей выборки. Если линии сходятся на высокой ошибке — данных добавлять бесполезно, модель слишком простая. Если между ними большой зазор, который сужается с ростом данных, — больше данных поможет.</li>
+      <li><b>Больше данных лечит variance</b> (переобучение), но не bias: прямая не станет волной от миллиона точек.</li>
+      <li><b>Регуляризация</b> — штраф за большие веса, модель становится «спокойнее». L1 и L2 — неделя 4.</li>
+      <li><b>Early stopping</b> — у моделей, которые учатся шагами (бустинг, нейросети): останавливаемся, когда ошибка на validation перестала падать.</li>
+      <li>У деревьев переобучение ограничивают глубиной (<code>max_depth</code>) и минимальным числом объектов в листе (<code>min_samples_leaf</code>).</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="ml.base.4">
     <label class="tp"><input type="checkbox" data-id="ml.base.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Переобучение</b></span></label>
     <span class="note" data-d="ml.base.4">отметка в дереве</span>
   </div>
@@ -183,7 +224,15 @@
   <div id="ex5"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>bias–variance trade-off</b>; ошибка = bias² + variance + неустранимый шум.</span></div>
   <p class="remember">Простая модель — высокий bias. Сложная — высокая variance. Сложность выбирают по validation.</p>
-  <div class="topic-check" data-for="ml.base.5">
+    <details class="more"><summary>Подробнее: формула и как ансамбли играют с bias и variance<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li>Для MSE ожидаемая ошибка на новом объекте раскладывается точно: <b>ошибка = bias² + variance + шум</b>. Шум (σ²) — случайность в самих данных, его не убрать никакой моделью.</li>
+      <li><b>Bagging и случайный лес</b> (неделя 7): много глубоких деревьев на разных подвыборках, ответ — среднее. Bias у глубоких деревьев низкий, а усреднение снижает variance.</li>
+      <li><b>Бустинг</b>: много мелких деревьев подряд, каждое исправляет ошибки предыдущих — снижает bias.</li>
+      <li>В kNN сложность задаёт k, в дереве — глубина, в многочлене — степень, в нейросети — число параметров и регуляризация. Везде один и тот же компромисс.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="ml.base.5">
     <label class="tp"><input type="checkbox" data-id="ml.base.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Bias–variance trade-off</b></span></label>
     <span class="note" data-d="ml.base.5">отметка в дереве</span>
   </div>
@@ -239,6 +288,8 @@ print(best, mean_squared_error(y_te, final.predict(X_te)))   <span class="cm"># 
 <!-- ============ итог ============ -->
 <section class="step" id="topics">
   <div class="step-h"><h2>Итог</h2></div>
+    <div class="callout mem"><b class="h">На собеседовании</b><p>Так спрашивают на отборах на стажировку. Сначала ответь вслух сам, потом открой ответ.</p></div>
+  <div class="qs"><details class="q"><summary><span class="t">Собеседование</span>MSE или MAE — когда что?</summary><div class="a"><p>MSE сильно штрафует крупные ошибки и удобна для оптимизации — берут, когда большие промахи особенно плохи. MAE устойчива к выбросам и понятна («ошибаемся в среднем на 2 балла»). Лучшая константа под MSE — среднее, под MAE — медиана. RMSE — корень из MSE, в единицах цели.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Зачем нужны train, validation и test?</summary><div class="a"><p>На train модель учится, на validation я выбираю модель и гиперпараметры, test использую один раз для честной оценки. Если выбирать по test, оценка будет оптимистичной. При малых данных вместо одной validation — кросс-валидация.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Что такое утечка данных? Приведи пример.</summary><div class="a"><p>Это когда при обучении модель видит информацию, которой не будет в момент прогноза. Пример: в задаче оттока студентов признак «дата отчисления», или scaler обучен на всём датасете до разбиения. Признаки — утечки дают отличную метрику на проверке и провал в проде.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Train 0.99, validation 0.70 — что делать?</summary><div class="a"><p>Это переобучение, высокая variance. Упростить модель (меньше глубина), добавить регуляризацию, больше данных, early stopping; проверить, нет ли утечки между выборками. Усложнять модель нельзя.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Объясни bias–variance trade-off.</summary><div class="a"><p>Ошибка раскладывается на bias² — систематический промах слишком простой модели, variance — чувствительность к конкретной выборке у слишком сложной, и неустранимый шум. Усложнение снижает bias и повышает variance; сложность выбирают по validation. Лес снижает variance, бустинг — bias.</p></div></details></div>
   <div class="sheet">
     <ol>
       <li><b>MAE</b> — средний модуль ошибки, лучшая константа — медиана, к выбросам спокойна. <b>MSE</b> — средний квадрат, лучшая константа — среднее, большие промахи наказывает сильно. RMSE = √MSE.</li>
@@ -250,6 +301,7 @@ print(best, mean_squared_error(y_te, final.predict(X_te)))   <span class="cm"># 
     <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
     <textarea id="mdArea" rows="8" hidden readonly></textarea>
   </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b><p>Закрой урок. Посчитай на бумаге MAE и MSE для ошибок +4, −2, 0, +2 (ответ: 2 и 6). Напиши по три примера утечки и того, что ею не является. Нарисуй две кривые ошибок train и validation от сложности и подпиши зоны недообучения и переобучения. Ответь вслух на пять вопросов «На собеседовании» выше.</p></div>
   <ul class="topics" id="topicList"></ul>
   <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
 </section>
@@ -279,6 +331,13 @@ tags: [ml, повторение, неделя-2]
 ## Переобучение
 - train ≫ validation — переобучение: проще модель, регуляризация, больше данных, early stopping. Усложнение — хуже.
 - train ≈ validation, обе плохие — недообучение: сложнее модель, лучше признаки.
+
+## Ещё
+- Потеря — то, что минимизирует модель; метрика — то, чем оцениваем. Могут отличаться.
+- RMSE ≥ MAE; большая разница — есть крупные промахи. Huber — между MSE и MAE.
+- Кросс-валидация: 5 кусков, каждый по разу проверочный, итог — среднее. stratify — доли классов, random_state — повторяемость; данные во времени не перемешивают.
+- Утечка в OULAD: date_unregistration; оценки и клики — только до даты прогноза.
+- Больше данных лечит variance, не bias. Деревья: max_depth, min_samples_leaf.
 
 ## Bias–variance
 - Bias — систематический промах (простая модель), variance — разброс от выборки к выборке (сложная модель). Ошибка = bias² + variance + шум.

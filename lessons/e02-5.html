@@ -348,7 +348,7 @@ exGap($("exW1"),[
   {s:"My teacher is ___.",opts:["a very good teacher","a teacher very good","very a good teacher"],a:"a very good teacher"},
   {s:"Мягко: начальник не очень терпеливый. My boss ___ patient.",opts:["isn't very","is a bit","is very not"],a:"isn't very"},
   {s:"Друг немного ленивый: My friend is ___.",opts:["a bit lazy","a bit kind","lazy a bit"],a:"a bit lazy"}
-],{keep:true});
+]);
 exGap($("exW2"),[
   {s:"Почта: ___",say:"ilya dot smirnov at gmail dot com",a:["ilya.smirnov@gmail.com"]},
   {s:"Почта: ___",say:"anna, underscore, k, at, yandex dot ru",a:["anna_k@yandex.ru"]},
@@ -377,7 +377,7 @@ exGap($("ex1b"),[
   {s:"Это ___",say:"I show tourists the city. I speak three languages.",opts:JOBS[3],a:"tour guide"},
   {s:"Это ___",say:"I answer the phone and meet visitors in a hotel.",opts:JOBS[4],a:"receptionist"},
   {s:"Это ___",say:"I drive people around the city. I don't have an office — my car is my office.",opts:JOBS[5],a:"taxi driver"}
-],{keep:true});
+]);
 exSpot($("ex1c"),[
   {s:"Does he speaks English?",bad:2,fix:"speak",why:"-s уже в does"},
   {s:"My sister study at university.",bad:2,fix:"studies",why:"sister — она: studies"},
@@ -417,7 +417,7 @@ exGap($("ex2a"),[
   {s:"— Do you like Python? — ___",opts:["Yes, I do. I use it every day.","Yes, I like.","Yes, I am."],a:"Yes, I do. I use it every day."},
   {s:"Не расслышал вопрос. — ___",opts:["Sorry, can you say that again?","What?","Repeat."],a:"Sorry, can you say that again?",why:"What? и Repeat. звучат резко"},
   {s:"— What do you do at the weekend? (нужно подумать) — ___",opts:["Hmm, let me think… I go to the gym.","I think.","Wait me."],a:"Hmm, let me think… I go to the gym."}
-],{keep:true});
+]);
 exBuild($("ex2b"),[
   {ru:"А ты?",w:"What about you ?",extra:["And","do"]},
   {ru:"Что ты там делаешь?",w:"What do you do there ?",extra:["are","doing"]},

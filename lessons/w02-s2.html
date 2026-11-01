@@ -46,11 +46,11 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s1.html">← Урок 2.1 · Проект как на работе</a><span class="mid">урок 2 из 5</span><a href="/lessons/w02-s3.html">Урок 2.3 · Коллекции и словарь →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · урок 2 из 5 · повторение по тесту недели 1 · ~45 минут + практика 15 минут</div>
+  <div class="eyebrow">Неделя 2 · урок 2 из 5 · повторение по тесту недели 1 · ~50 минут + практика 15 минут</div>
   <h1>Python заново: переменные, типы и сравнения</h1>
   <p>В тесте недели 1 урок «Python изнутри» не сработал совсем — и дело не в тебе: он был длинный и плотный. Здесь то же самое, но по-другому: пять коротких шагов, и в каждом ты сначала <b>видишь</b>, что происходит в памяти, потом предсказываешь вывод кода. Термины — только в конце шага.</p>
   <nav class="steps" aria-label="Шаги урока">
-    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Ярлыки</a><a href="#s2"><i><span>2</span></i>Типы</a><a href="#s3"><i><span>3</span></i>== и is</a><a href="#s4"><i><span>4</span></i>Где живёт имя</a><a href="#s5"><i><span>5</span></i>Срезы</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
+    <a href="#s0"><i><span>0</span></i>Разминка</a><a href="#s1"><i><span>1</span></i>Ярлыки</a><a href="#s2"><i><span>2</span></i>Типы</a><a href="#s3"><i><span>3</span></i>== и is</a><a href="#s4"><i><span>4</span></i>Где живёт имя</a><a href="#s5"><i><span>5</span></i>Строки</a><a href="#practice"><i><span>✎</span></i>Сделай сам</a>
   </nav>
 </header>
 
@@ -82,7 +82,27 @@
   <div id="ex1"></div>
   <div class="term-chip"><b>Так это называют</b><span>имена — <b>ссылки</b> на объекты; список и словарь — <b>изменяемые</b> (mutable), число, строка, кортеж — <b>неизменяемые</b> (immutable). Ловушка с <code>acc=[]</code> — <b>mutable default argument</b>.</span></div>
   <p class="remember">b = a — тот же объект. Нужна копия — a.copy(). Список по умолчанию — None, а внутри новый [].</p>
-  <div class="topic-check" data-for="python.base.1">
+    <details class="more"><summary>Подробнее: функция получает тот же список, копия бывает «неглубокой»<small> · 4 минуты</small></summary><div class="a">
+    <p><b>В функцию передаётся тот же объект, а не копия.</b> Поэтому функция, которая меняет список на месте, меняет его и у того, кто её вызвал:</p>
+    <pre>def add_bonus(scores):
+    scores.append(100)          <span class="cm"># меняем на месте</span>
+
+my = [70, 80]
+add_bonus(my)
+print(my)                       <span class="cm"># [70, 80, 100] — список изменился снаружи!</span></pre>
+    <p>Правило хорошего тона: функция либо <b>возвращает новый</b> объект, либо явно говорит в названии, что меняет (<code>sort()</code> меняет, <code>sorted()</code> — нет).</p>
+    <p><b>copy() — неглубокая копия.</b> Она копирует только внешний список, а вложенные списки остаются общими:</p>
+    <pre>a = [[1, 2], [3]]
+b = a.copy()
+b[0].append(9)
+print(a)                        <span class="cm"># [[1, 2, 9], [3]] — внутренний список общий</span>
+import copy
+c = copy.deepcopy(a)            <span class="cm"># полная копия на всех уровнях (подробно — неделя 3)</span></pre>
+    <p><b>Проверить, один ли это объект</b>: <code>id(a) == id(b)</code> или <code>a is b</code>. <code>id</code> — «номер» объекта в памяти, как #1 в карте памяти выше.</p>
+    <p><b>Кортеж неизменяемый, но</b> если внутри лежит список, сам список менять можно: <code>t = ([1], 2); t[0].append(5)</code> работает. Поэтому такой кортеж нельзя сделать ключом словаря.</p>
+  </div></details>
+  <div class="callout trap"><b class="h">Частые ошибки</b><ul class="oops"><li><span class="no"><code>b = a  # «скопировал»</code></span><span class="yes"><code>b = a.copy()</code></span><span class="n">b = a — это второй ярлык, а не копия.</span></li><li><span class="no"><code>def f(x, acc=[]):</code></span><span class="yes"><code>def f(x, acc=None):</code></span><span class="n">Список по умолчанию один на все вызовы.</span></li><li><span class="no"><code>def clean(rows): rows.remove(...)</code></span><span class="yes"><code>def clean(rows): return [r for r in rows if ...]</code></span><span class="n">Функция молча портит список вызывающего.</span></li></ul></div>
+<div class="topic-check" data-for="python.base.1">
     <label class="tp"><input type="checkbox" data-id="python.base.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Ярлыки и изменяемость</b></span></label>
     <span class="note" data-d="python.base.1">отметка в дереве</span>
   </div>
@@ -107,7 +127,17 @@ abs((0.1 + 0.2) - 0.3) &lt; 1e-9  <span class="cm"># то же самое рук
   <div id="ex2"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>числа с плавающей точкой</b> (floating point, стандарт IEEE 754); превращение типов — <b>приведение</b> (casting): <code>int()</code>, <code>float()</code>, <code>str()</code>.</span></div>
   <p class="remember">Дробные через == не сравнивают — только math.isclose. Из CSV всё приходит строками.</p>
-  <div class="topic-check" data-for="python.base.0">
+    <details class="more"><summary>Подробнее: округление, int() и bool — тоже число<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li><code>int("3.5")</code> — ошибка ValueError. Сначала <code>float("3.5")</code>, потом <code>int(...)</code>. <code>int(3.9)</code> — 3: дробная часть отбрасывается, не округляется.</li>
+      <li><code>round(2.5)</code> — <b>2</b>, а <code>round(3.5)</code> — <b>4</b>: Python округляет «половинки» к чётному. Для денег и отчётов это бывает неожиданностью. <code>round(x, 2)</code> — до двух знаков.</li>
+      <li><code>int</code> в Python не переполняется: <code>2 ** 100</code> посчитается точно. <code>float</code> держит около 15–16 значащих цифр.</li>
+      <li><code>bool</code> — это почти число: <code>True + True</code> — 2. Отсюда удобный приём: <code>sum(r == "Pass" for r in results)</code> считает, сколько Pass.</li>
+      <li>Проверить тип: <code>isinstance(x, int)</code> (лучше, чем <code>type(x) == int</code>). Подсказать тип в коде: <code>def mean(xs: list[float]) -&gt; float:</code> — это <b>аннотации</b>, Python их не проверяет, но редактор и коллеги понимают код быстрее.</li>
+      <li><code>float("nan")</code> — «не число», так в данных обозначают пропуск. Оно не равно даже самому себе: <code>x != x</code> — True. В pandas (неделя 4) пропуски будут именно такими.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="python.base.0">
     <label class="tp"><input type="checkbox" data-id="python.base.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Типы данных</b></span></label>
     <span class="note" data-d="python.base.0">отметка в дереве</span>
   </div>
@@ -131,7 +161,17 @@ if n_missing is not None:     <span class="cm"># правильно: «знач�
   <div id="ex3b"></div>
   <div class="term-chip"><b>Так это называют</b><span>== — <b>равенство</b> (equality), is — <b>тождество</b> (identity); то, что Python считает ложью, — <b>falsy</b>, остальное — <b>truthy</b>.</span></div>
   <p class="remember">None проверяют только через is. «Пустое» и «ноль» — тоже ложь, поэтому if x: — не проверка на None.</p>
-  <div class="topic-check" data-for="python.base.6">
+    <details class="more"><summary>Подробнее: почему is иногда «работает» с числами, and / or и all / any<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li><code>a = 256; b = 256; a is b</code> — True, а с 1000 может быть False: маленькие числа Python хранит в одном экземпляре для экономии. Это деталь реализации — <b>числа и строки никогда не сравнивают через is</b>.</li>
+      <li>Почему для None именно is: у объекта можно переопределить ==. Например, у массивов NumPy <code>arr == None</code> вернёт массив из True и False, а не один ответ. <code>is</code> переопределить нельзя.</li>
+      <li><code>1 == 1.0</code> — True: числа разных типов сравниваются по значению.</li>
+      <li><code>a or b</code> возвращает первое «правдивое» значение: <code>name = user_name or "гость"</code>. Ловушка та же: если user_name — пустая строка или 0, подставится запасное.</li>
+      <li><code>all(xs)</code> — все правда, <code>any(xs)</code> — хоть одно: <code>any(r["final_result"] == "Fail" for r in rows)</code>.</li>
+    </ul>
+  </div></details>
+  <div class="callout trap"><b class="h">Частые ошибки</b><ul class="oops"><li><span class="no"><code>if x == None:</code></span><span class="yes"><code>if x is None:</code></span></li><li><span class="no"><code>if count:  # count может быть 0</code></span><span class="yes"><code>if count is not None:</code></span><span class="n">0 — ложь.</span></li><li><span class="no"><code>if name is "Аня":</code></span><span class="yes"><code>if name == "Аня":</code></span><span class="n">Строки — только через ==.</span></li></ul></div>
+<div class="topic-check" data-for="python.base.6">
     <label class="tp"><input type="checkbox" data-id="python.base.6"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>is и ==, истинность</b></span></label>
     <span class="note" data-d="python.base.6">отметка в дереве</span>
   </div>
@@ -156,11 +196,26 @@ def add():
 def add(count):           <span class="cm"># правильно: получить через параметр…</span>
     return count + 1      <span class="cm"># …и вернуть через return</span>
 count = add(count)</pre>
+  <div class="plain"><p>Если очень нужно поменять внешнее имя изнутри, есть два слова. <code>global count</code> — «count из файла, не создавай свою». <code>nonlocal count</code> — «count из внешней функции» (когда функция внутри функции). Работают, но делают код запутанным: функция меняет что-то незаметно для читающего. В 9 случаях из 10 правильнее параметр и return.</p></div>
+<pre>count = 0
+def add():
+    global count           <span class="cm"># берём count из файла</span>
+    count += 1
+
+def make_counter():
+    n = 0
+    def step():
+        nonlocal n         <span class="cm"># n из make_counter</span>
+        n += 1
+        return n
+    return step</pre>
   <div class="callout trap"><b class="h">Ловушка: функция помнит имя, а не значение</b><p>Функция, созданная в цикле, смотрит на переменную цикла <b>в момент вызова</b>, а не в момент создания. <code>fs = [lambda: i for i in range(3)]</code> — все три функции вернут 2: когда их вызвали, цикл уже закончился и i = 2. Починка: <code>lambda i=i: i</code> — значение сохраняется в параметре.</p></div>
   <div id="ex4"></div>
+  <div id="ex4b"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>область видимости</b> (scope); порядок поиска — <b>LEGB</b>: Local → Enclosing → Global → Built-in. Функция, которая помнит внешние имена, — <b>замыкание</b> (closure).</span></div>
   <p class="remember">Данные в функцию — через параметры, наружу — через return. global почти никогда не нужен.</p>
-  <div class="topic-check" data-for="python.base.4">
+    <div class="callout trap"><b class="h">Частые ошибки</b><ul class="oops"><li><span class="no"><code>list = [1, 2, 3]</code></span><span class="yes"><code>nums = [1, 2, 3]</code></span><span class="n">Имя list перекрыло встроенную функцию: list("abc") дальше сломается. То же с sum, max, id, type, input.</span></li><li><span class="no"><code>def f(): total += x</code></span><span class="yes"><code>def f(total, x): return total + x</code></span><span class="n">UnboundLocalError — или используй параметр и return.</span></li><li><span class="no"><code>lambda: i  # в цикле</code></span><span class="yes"><code>lambda i=i: i</code></span><span class="n">Иначе все функции увидят последнее i.</span></li></ul></div>
+<div class="topic-check" data-for="python.base.4">
     <label class="tp"><input type="checkbox" data-id="python.base.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Область видимости</b></span></label>
     <span class="note" data-d="python.base.4">отметка в дереве</span>
   </div>
@@ -168,7 +223,7 @@ count = add(count)</pre>
 
 <!-- ============ 5 ============ -->
 <section class="step" id="s5">
-  <div class="step-h"><span class="num">5</span><h2>Срезы: кусок строки или списка</h2><span class="min">7 мин</span></div>
+  <div class="step-h"><span class="num">5</span><h2>Строки: срезы, методы и f-строки</h2><span class="min">11 мин</span></div>
   <p class="why"><b>Зачем:</b> срезы — это «первые 5 строк», «последние 3 недели», «каждый второй элемент». В pandas и NumPy (недели 4–5) они работают так же.</p>
   <div class="plain">
     <p>Запись <code>s[start:stop:step]</code>: <b>с start включительно, до stop не включая</b>, с шагом step. Пропущенное — значит «с начала», «до конца», «шаг 1». Отрицательные номера считают с конца: <code>-1</code> — последний.</p>
@@ -186,10 +241,36 @@ count = add(count)</pre>
     </div>
   </div>
   <div id="ex5"></div>
+  <div class="plain">
+    <p><b>Методы строк</b> — то, чем чистят данные. Строки неизменяемые, поэтому каждый метод <b>возвращает новую</b> строку:</p>
+  </div>
+  <div class="cmds">
+    <div class="cmd"><code>" Pass \n".strip()</code><span><code>"Pass"</code> — убрать пробелы и переносы по краям</span></div>
+    <div class="cmd"><code>"PASS".lower()</code><span><code>"pass"</code>; есть и <code>.upper()</code>, <code>.title()</code></span></div>
+    <div class="cmd"><code>"AAA,2013J,Pass".split(",")</code><span><code>['AAA', '2013J', 'Pass']</code> — разрезать</span></div>
+    <div class="cmd"><code>", ".join(["ML", "SQL"])</code><span><code>"ML, SQL"</code> — склеить список</span></div>
+    <div class="cmd"><code>"10-20%".replace("%", "")</code><span><code>"10-20"</code> — заменить</span></div>
+    <div class="cmd"><code>name.startswith("w0")</code><span>начинается ли с …; есть и <code>endswith(".csv")</code></span></div>
+  </div>
+  <div class="plain"><p><b>f-строки</b> — вставить значения прямо в текст. Буква f перед кавычкой, выражения — в фигурных скобках, после двоеточия — формат:</p></div>
+<pre>acc, n = 0.87342, 32593
+f"accuracy {acc:.3f} на {n:,} студентах"   <span class="cm"># 'accuracy 0.873 на 32,593 студентах'</span>
+f"{acc:.1%}"                                <span class="cm"># '87.3%'</span>
+f"{n=}"                                     <span class="cm"># 'n=32593' — удобно при отладке</span></pre>
+  <div id="ex5b"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>срез</b> (slice); у строк, списков и кортежей одинаковый синтаксис. Срез списка — <b>копия</b>: <code>a[:]</code>.</span></div>
-  <p class="remember">stop не включается: s[1:5] — это 4 элемента, с 1-го по 4-й.</p>
-  <div class="topic-check" data-for="python.base.5">
-    <label class="tp"><input type="checkbox" data-id="python.base.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Строки и срезы</b></span></label>
+  <p class="remember">stop не включается: s[1:5] — это 4 элемента, с 1-го по 4-й. Методы строк возвращают новую строку. Числа в тексте — через f"{x:.2f}".</p>
+    <details class="more"><summary>Подробнее: строки неизменяемые, in, len и форматы чисел<small> · 2 минуты</small></summary><div class="a">
+    <ul>
+      <li><code>s[0] = "P"</code> — ошибка: строку нельзя поменять на месте. Только собрать новую: <code>s = "P" + s[1:]</code>.</li>
+      <li><code>"ML" in "Learning ML"</code> — True: in у строки ищет подстроку. <code>len(s)</code> — длина.</li>
+      <li>Склеивать много строк через + в цикле медленно — собери список и сделай <code>"".join(parts)</code>.</li>
+      <li>Форматы: <code>{x:.2f}</code> — 2 знака после точки, <code>{x:,}</code> — разделитель тысяч, <code>{x:.1%}</code> — проценты, <code>{s:&gt;10}</code> — выровнять вправо на 10 символов.</li>
+      <li>Срез списка — новый список (копия), срез строки — новая строка. Срез никогда не падает с ошибкой «вышли за границу»: <code>"abc"[1:100]</code> — просто <code>"bc"</code>. А вот <code>"abc"[100]</code> — IndexError.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="python.base.5">
+    <label class="tp"><input type="checkbox" data-id="python.base.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Строки, срезы, f-strings</b></span></label>
     <span class="note" data-d="python.base.5">отметка в дереве</span>
   </div>
   <p class="deep">Хочешь глубже: <a href="/lessons/w01-2.html#p1">ярлыки и изменяемость</a> · <a href="/lessons/w01-2.html#p2">is и ==</a> · <a href="/lessons/w01-2.html#p5">область видимости</a> · <a href="/lessons/w01-2.html#p6">строки и f-strings</a> — справочник.</p>
@@ -239,6 +320,8 @@ def add_score(score, scores=None):
 <!-- ============ итог ============ -->
 <section class="step" id="topics">
   <div class="step-h"><h2>Итог</h2></div>
+    <div class="callout mem"><b class="h">На собеседовании</b><p>Так спрашивают на отборах на стажировку. Сначала ответь вслух сам, потом открой ответ.</p></div>
+  <div class="qs"><details class="q"><summary><span class="t">Собеседование</span>Почему def f(x, acc=[]) — плохая идея?</summary><div class="a"><p>Значение по умолчанию вычисляется один раз, когда Python выполняет def. Список создаётся один и общий для всех вызовов, поэтому данные из прошлых вызовов «прилипают». Правильно: acc=None, а внутри if acc is None: acc = [].</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Чем отличаются == и is?</summary><div class="a"><p>== сравнивает значения, is — проверяет, что это один и тот же объект в памяти. is используют только для None (и True/False как синглтонов); числа и строки через is не сравнивают — результат зависит от деталей реализации.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Чем list отличается от tuple?</summary><div class="a"><p>list изменяемый — можно добавлять и менять элементы; tuple неизменяемый. Поэтому tuple можно сделать ключом словаря или элементом set (если внутри тоже неизменяемое), а list нельзя. tuple берут для фиксированных записей, например (код курса, год).</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Что такое поверхностная копия?</summary><div class="a"><p>Копия только внешнего контейнера: a.copy(), list(a), a[:]. Вложенные объекты остаются общими — изменишь вложенный список в копии, он изменится и в оригинале. Полную копию делает copy.deepcopy.</p></div></details></div>
   <div class="sheet">
     <ol>
       <li><b>Ярлыки:</b> b = a — тот же объект. Копия — a.copy(). append и += меняют список на месте, b = b + [3] — новый список.</li>
@@ -247,11 +330,13 @@ def add_score(score, scores=None):
       <li><b>Дробные:</b> 0.1 + 0.2 != 0.3 — сравнивай math.isclose.</li>
       <li><b>is</b> — только для None. Ложь: 0, 0.0, "", [], {}, None, False. if x: — не проверка на None.</li>
       <li><b>Функции:</b> присваивание внутри — своё имя. Данные — через параметры и return. Функция помнит имя, а не значение.</li>
-      <li><b>Срезы:</b> [start:stop:step], stop не включается; [::-1] — задом наперёд.</li>
+      <li><b>Строки:</b> срезы [start:stop:step], stop не включается, [::-1] — задом наперёд; методы strip, lower, split, join, replace возвращают новую строку; f"{x:.2f}", f"{x:,}", f"{x:.1%}".</li>
+      <li><b>global / nonlocal</b> — поменять внешнее имя; почти всегда лучше параметр и return. Не называй переменные list, sum, max, id.</li>
     </ol>
     <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
     <textarea id="mdArea" rows="8" hidden readonly></textarea>
   </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b><p>Закрой урок. Нарисуй на бумаге карту памяти для <code>a = [1]; b = a; c = a.copy(); b.append(2)</code> — что в a, b, c? Перечисли 7 «ложных» значений. Напиши, что выведут <code>"ML engineer"[3:]</code>, <code>"a,b,,c".split(",")</code> и <code>f"{0.5:.0%}"</code>. Проверь в Python.</p></div>
   <ul class="topics" id="topicList"></ul>
   <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
 </section>
@@ -285,9 +370,17 @@ tags: [python, повторение, неделя-2]
 - Порядок поиска LEGB: Local → Enclosing → Global → Built-in.
 - Функция помнит имя, а не значение: [lambda: i for i in range(3)] → все вернут 2. Починка: lambda i=i: i.
 
-## Срезы
-- s[start:stop:step], stop не включается, отрицательные — с конца.
-- s[:3], s[-3:], s[::2], s[::-1]. "abcdef"[1:5:2] = "bd".
+## Строки
+- Срезы: s[start:stop:step], stop не включается, отрицательные — с конца. s[:3], s[-3:], s[::2], s[::-1]. "abcdef"[1:5:2] = "bd".
+- Методы (возвращают новую строку): strip, lower / upper, split(","), ", ".join(lst), replace, startswith / endswith.
+- f-строки: f"{acc:.3f}", f"{n:,}", f"{acc:.1%}", f"{n=}".
+- Строку нельзя менять на месте: s[0] = "P" — ошибка.
+
+## Ещё
+- Функция получает тот же объект: изменение списка внутри видно снаружи.
+- copy() — поверхностная копия; вложенные списки общие; copy.deepcopy — полная.
+- global / nonlocal — менять внешнее имя (лучше параметр и return). Не называй переменные list, sum, max, id.
+- round(2.5) = 2 (к чётному), int(3.9) = 3, int("3.5") — ошибка.
 </script>
 <script src="/assets/lesson.js"></script>
 <script src="/assets/ml.js"></script>
@@ -395,7 +488,18 @@ mlCheck($("ex5"), [
   {q: "Сколько элементов в <code>a[2:7]</code>, если в a 10 элементов?", opts: ["5", "6", "7"], a: 0, why: "7 − 2 = 5: номера 2, 3, 4, 5, 6."}
 ]);
 
-initLesson({topics: [["python.base.1", "Ярлыки и изменяемость"], ["python.base.0", "Типы данных"], ["python.base.6", "is и ==, истинность"], ["python.base.4", "Область видимости"], ["python.base.5", "Строки и срезы"]]});
+mlCheck($("ex5b"), [
+  {q: "Что вернёт <code>\" Withdrawn \\n\".strip().lower()</code>?", opts: ["'withdrawn'", "' withdrawn '", "'Withdrawn'"], a: 0, why: "strip убрал пробелы и перенос, lower сделал маленькие буквы."},
+  {q: "Что вернёт <code>\"AAA,2013J,Pass\".split(\",\")[-1]</code>?", opts: ["'Pass'", "'AAA'", "['Pass']"], a: 0, why: "split даёт список, [-1] — последний элемент."},
+  {q: "Как вывести accuracy 0.87342 как <b>87.3%</b>?", opts: ["f\"{acc:.1%}\"", "f\"{acc:.1f}%\"", "f\"{acc*100}%\""], a: 0, why: "Формат % сам умножает на 100. Второй вариант даст 0.9%."},
+  {q: "<code>s = \"ml\"; s.upper(); print(s)</code> — что выведет?", opts: ["ml", "ML"], a: 0, why: "Строка неизменяемая: upper вернул новую строку, а мы её никуда не сохранили. Надо s = s.upper()."}
+]);
+mlCheck($("ex4b"), [
+  {q: "Что выведет код?<pre>def make_counter():\n    n = 0\n    def step():\n        nonlocal n\n        n += 1\n        return n\n    return step\n\nc = make_counter()\nc(); c()\nprint(c())</pre>", opts: ["3", "1", "Ошибку"], a: 0, why: "nonlocal: step меняет n из make_counter, и функция помнит его между вызовами."},
+  {q: "Почему после <code>list = [1, 2]</code> строка <code>list(\"abc\")</code> падает?", opts: ["Имя list теперь смотрит на список, а не на встроенную функцию", "Нельзя превращать строку в список", "Так всегда"], a: 0, why: "Своё имя перекрыло встроенное (поиск LEGB находит его раньше Built-in)."}
+]);
+
+initLesson({topics: [["python.base.1", "Ярлыки и изменяемость"], ["python.base.0", "Типы данных"], ["python.base.6", "is и ==, истинность"], ["python.base.4", "Область видимости"], ["python.base.5", "Строки, срезы, f-strings"]]});
 setTimeout(mlSteps, 600);
 </script>
 <script src="/assets/asks.js" defer></script>

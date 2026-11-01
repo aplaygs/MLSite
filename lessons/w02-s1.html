@@ -58,7 +58,15 @@
   <div id="exTree"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>структура проекта</b>; папка с кодом и файлом <code>__init__.py</code> внутри — <b>пакет</b> (package), его можно импортировать: <code>from oulad_risk import load</code>.</span></div>
   <p class="remember">data/raw — не трогаем, notebooks — черновики, src — код, models — результаты.</p>
-  <div class="topic-check" data-for="python.eng.0">
+    <details class="more"><summary>Подробнее: имена файлов, пакет и что ещё бывает в проекте<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li><b>Ноутбуки нумеруют</b>: <code>01_eda.ipynb</code>, <code>02_baseline.ipynb</code>, <code>03_features.ipynb</code> — по номеру видно порядок работы. Имена — латиницей, маленькими буквами, через подчёркивание, без пробелов.</li>
+      <li><b>Папка-пакет.</b> <code>src/oulad_risk/</code> с файлом <code>__init__.py</code> внутри — это пакет. Чтобы импортировать его из ноутбука в <code>notebooks/</code>, проект ставят в окружение командой <code>pip install -e .</code> (нужен файл <code>pyproject.toml</code> — сделаем, когда кода станет больше). Пока можно так: в первой ячейке ноутбука <code>import sys; sys.path.append("../src")</code>.</li>
+      <li><b>Ещё папки</b>, которые встретишь в чужих проектах: <code>configs/</code> — настройки обучения (yaml), <code>reports/</code> — графики и таблицы для README, <code>scripts/</code> — запуск из терминала.</li>
+      <li><b>Почему data/raw не трогают:</b> если что-то пошло не так, processed всегда можно пересоздать кодом из raw. Правишь raw руками — теряешь возможность повторить результат.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="python.eng.0">
     <label class="tp"><input type="checkbox" data-id="python.eng.0"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Структура проекта</b></span></label>
     <span class="note" data-d="python.eng.0">отметка в дереве</span>
   </div>
@@ -80,7 +88,29 @@
   </div>
   <div id="exReadme"></div>
   <p class="remember">Первая строка README — задача и результат, а не «учебный проект».</p>
-  <div class="topic-check" data-for="tools.git.9">
+    <details class="more"><summary>Подробнее: README целиком — шаблон для oulad-risk<small> · скопируй и заполняй</small></summary><div class="a">
+    <pre># oulad-risk — кто из студентов бросит онлайн-курс
+
+Предсказываю по активности за первые 4 недели, закончит ли студент курс,
+чтобы преподаватель успел помочь тем, кто в группе риска.
+
+## Результат
+PR-AUC … на тесте против … у бейзлайна «всем — не бросит». (заполнишь в неделе 6)
+
+## Данные
+Open University Learning Analytics Dataset (OULAD): https://analyse.kmi.open.ac.uk/open_dataset
+Скачать и распаковать в data/raw/. В git данные не кладутся.
+
+## Как запустить
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt
+python -m oulad_risk.train
+
+## Что где
+data/raw — исходные данные · notebooks — исследования · src/oulad_risk — код · reports — графики</pre>
+    <p>Хороший README ещё говорит, <b>чего модель не умеет</b> (ограничения) и показывает один график. Это сразу выделяет проект среди учебных.</p>
+  </div></details>
+<div class="topic-check" data-for="tools.git.9">
     <label class="tp"><input type="checkbox" data-id="tools.git.9"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>README как витрина проекта</b></span></label>
     <span class="note" data-d="tools.git.9">отметка в дереве</span>
   </div>
@@ -96,7 +126,16 @@
   </div>
   <div id="simIgnore"></div>
   <div class="callout trap"><b class="h">Ловушка</b><p>.gitignore работает только для файлов, которые ещё не в git. Если data уже закоммитили, сначала убери её из отслеживания: <code>git rm -r --cached data</code>, потом коммит. Поэтому .gitignore делают первым же коммитом.</p></div>
-  <div class="topic-check" data-for="tools.git.5">
+    <details class="more"><summary>Подробнее: как читать правила .gitignore<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li><code># текст</code> — комментарий. <code>*.csv</code> — все csv в любой папке. <code>data/</code> — папка data где угодно. <code>/data/</code> — только в корне проекта.</li>
+      <li><code>!data/.gitkeep</code> — восклицательный знак делает исключение: всю data прячем, а пустой файл-заглушку оставляем, чтобы папка была в репозитории.</li>
+      <li><code>**/__pycache__/</code> — две звёздочки: на любой глубине.</li>
+      <li>На Mac добавь <code>.DS_Store</code> — служебный файл Finder, он появляется в каждой папке.</li>
+      <li>Не понимаешь, почему файл не виден git? <code>git check-ignore -v путь</code> покажет, какое правило его прячет.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="tools.git.5">
     <label class="tp"><input type="checkbox" data-id="tools.git.5"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>.gitignore для данных, моделей и секретов</b></span></label>
     <span class="note" data-d="tools.git.5">отметка в дереве</span>
   </div>
@@ -123,7 +162,15 @@ load_dotenv()                    <span class="cm"># читает .env в пер�
 key = os.environ["KAGGLE_KEY"]   <span class="cm"># нет ключа — сразу понятная ошибка</span></pre>
   <div id="exEnv"></div>
   <p class="remember">Пароль в коде = пароль у всех. Ключ утёк — первым делом отзови его, потом чисти историю.</p>
-  <div class="topic-check" data-for="tools.env.4">
+    <details class="more"><summary>Подробнее: python-dotenv и что делать, если ключ утёк<small> · 2 минуты</small></summary><div class="a">
+    <ul>
+      <li>Библиотека ставится как <code>pip install python-dotenv</code>, а импортируется как <code>dotenv</code> — имена разные, это нормально.</li>
+      <li><code>os.environ["KEY"]</code> — нет ключа → сразу ошибка KeyError (хорошо: сразу видно). <code>os.environ.get("KEY", "")</code> — нет ключа → пустая строка, ошибка вылезет позже и непонятно где.</li>
+      <li>GitHub сам сканирует публичные репозитории на ключи и иногда предупреждает — но боты злоумышленников делают это быстрее.</li>
+      <li>Порядок при утечке: 1) отозвать ключ в сервисе, 2) выпустить новый, 3) убрать файл из истории (<code>git filter-repo</code> — инструмент для этого), 4) добавить .env в .gitignore.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="tools.env.4">
     <label class="tp"><input type="checkbox" data-id="tools.env.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Секреты в .env, а не в коде</b></span></label>
     <span class="note" data-d="tools.env.4">отметка в дереве</span>
   </div>
@@ -143,7 +190,15 @@ key = os.environ["KAGGLE_KEY"]   <span class="cm"># нет ключа — сра
   </div>
   <div id="exVer"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>фиксация версий</b> (pinning); схема «большая.средняя.маленькая» — <b>SemVer</b>, по-английски MAJOR.MINOR.PATCH.</span></div>
-  <div class="topic-check" data-for="tools.env.2">
+    <details class="more"><summary>Подробнее: pip freeze, ~= и проверка «с нуля»<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li><code>pip freeze &gt; requirements.txt</code> записывает <b>все</b> пакеты окружения с точными версиями, включая зависимости зависимостей. Быстро, но список длинный. Многие пишут руками только главные библиотеки с <code>==</code> — тоже нормально.</li>
+      <li><code>pandas~=2.2.3</code> — «совместимая версия»: 2.2.3, 2.2.4 и дальше, но не 2.3. Компромисс между точностью и исправлениями ошибок.</li>
+      <li>Лучшая проверка: новая папка → <code>git clone</code> → новый venv → <code>pip install -r requirements.txt</code> → запуск по README. Запустилось — проект воспроизводим.</li>
+      <li>Версию Python пишут в README («Python 3.12») — у разных версий бывают разные пакеты.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="tools.env.2">
     <label class="tp"><input type="checkbox" data-id="tools.env.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Фиксация версий</b></span></label>
     <span class="note" data-d="tools.env.2">отметка в дереве</span>
   </div>
@@ -170,7 +225,16 @@ key = os.environ["KAGGLE_KEY"]   <span class="cm"># нет ключа — сра
   </div>
   <div class="term-chip"><b>Так это называют</b><span><b>Conventional Commits</b> — эта договорённость; <code>feat(data): …</code> — в скобках можно указать часть проекта.</span></div>
   <p class="remember">Один коммит — одно изменение. Подпись: тип: что сделал.</p>
-  <div class="topic-check" data-for="tools.git.6">
+    <details class="more"><summary>Подробнее: длинное описание, «!» и как поправить последний коммит<small> · 2 минуты</small></summary><div class="a">
+    <ul>
+      <li>Подпись — в повелительном наклонении: <code>add loader</code>, а не <code>added loader</code>. Читается как «этот коммит: add loader».</li>
+      <li>Нужны подробности — пустая строка после подписи и дальше текст: <code>git commit</code> без <code>-m</code> откроет редактор.</li>
+      <li><code>feat!: change data format</code> — восклицательный знак: изменение ломает старое поведение.</li>
+      <li>Опечатался в подписи и ещё не сделал push — <code>git commit --amend -m "fix: правильная подпись"</code>. После push историю лучше не переписывать.</li>
+    </ul>
+  </div></details>
+  <div class="callout trap"><b class="h">Частые ошибки</b><ul class="oops"><li><span class="no"><code>data/ и .venv в репозитории</code></span><span class="yes"><code>.gitignore — первым коммитом</code></span><span class="n">Потом придётся вычищать историю.</span></li><li><span class="no"><code>API_KEY = "a1b2c3" в train.py</code></span><span class="yes"><code>os.environ["API_KEY"] + .env</code></span><span class="n">Пароль в коде — пароль у всех.</span></li><li><span class="no"><code>одна и та же функция в трёх ноутбуках</code></span><span class="yes"><code>функция в src/, ноутбуки её импортируют</code></span></li><li><span class="no"><code>pandas (без версии)</code></span><span class="yes"><code>pandas==2.2.3</code></span><span class="n">Через полгода установится другая версия.</span></li><li><span class="no"><code>git commit -m "правки"</code></span><span class="yes"><code>git commit -m "fix: handle empty csv"</code></span></li></ul></div>
+<div class="topic-check" data-for="tools.git.6">
     <label class="tp"><input type="checkbox" data-id="tools.git.6"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Conventional Commits</b></span></label>
     <span class="note" data-d="tools.git.6">отметка в дереве</span>
   </div>
@@ -205,6 +269,8 @@ git init &amp;&amp; git add .gitignore &amp;&amp; git commit -m "chore: add giti
 <!-- ============ итог ============ -->
 <section class="step" id="topics">
   <div class="step-h"><h2>Итог</h2></div>
+    <div class="callout mem"><b class="h">На собеседовании</b><p>Так спрашивают на отборах на стажировку. Сначала ответь вслух сам, потом открой ответ.</p></div>
+  <div class="qs"><details class="q"><summary><span class="t">Собеседование</span>Как ты организуешь репозиторий ML-проекта?</summary><div class="a"><p>Разделяю данные, исследования и код: data/raw (не трогаю руками) и data/processed, notebooks для экспериментов, src с пакетом для повторно используемого кода, tests и models. В корне README с задачей, результатом и инструкцией запуска, requirements.txt с точными версиями и .gitignore, чтобы данные, окружение и секреты не попали в git.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Как другой человек повторит твой результат?</summary><div class="a"><p>Клонирует репозиторий, создаёт venv и ставит пакеты из requirements.txt с зафиксированными версиями, скачивает данные по ссылке из README и запускает команды из раздела «Как запустить». Случайность фиксирую через random_state, поэтому цифры совпадут.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Ты закоммитил ключ API в публичный репозиторий. Что делаешь?</summary><div class="a"><p>Сначала отзываю ключ и выпускаю новый — старый уже мог быть скопирован. Потом убираю файл из истории git, а ключ переношу в .env, который в .gitignore; в репозиторий кладу .env.example без значений.</p></div></details></div>
   <div class="sheet">
     <ol>
       <li><b>Папки:</b> data/raw (не трогаем), data/processed, notebooks (черновики), src (код), tests, models.</li>
@@ -217,6 +283,7 @@ git init &amp;&amp; git add .gitignore &amp;&amp; git commit -m "chore: add giti
     <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
     <textarea id="mdArea" rows="8" hidden readonly></textarea>
   </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b><p>Закрой урок. На бумаге нарисуй дерево папок oulad-risk, напиши пять строк .gitignore, пять разделов README и три подписи коммитов разных типов. Потом сверь с уроком — где ошибся, туда и возвращайся.</p></div>
   <ul class="topics" id="topicList"></ul>
   <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
 </section>

@@ -46,7 +46,17 @@ text = f.read_text(encoding="utf-8")        <span class="cm"># прочитат�
   <div id="ex1"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>pathlib</b> — стандартная библиотека; путь от корня диска — <b>абсолютный</b>, от текущей папки — <b>относительный</b>. Текущая папка программы — <code>Path.cwd()</code>.</span></div>
   <p class="remember">Пути — через Path и /. Папку для результатов — mkdir(parents=True, exist_ok=True).</p>
-  <div class="topic-check" data-for="python.err.3">
+    <details class="more"><summary>Подробнее: путь от файла скрипта — главная ловушка ноутбуков и скриптов<small> · 3 минуты</small></summary><div class="a">
+    <p>Относительный путь <code>Path("data/raw")</code> считается от папки, <b>из которой запустили</b> программу, а не от файла с кодом. Ноутбук в <code>notebooks/</code> видит данные как <code>../data/raw</code>, скрипт, запущенный из корня, — как <code>data/raw</code>. Отсюда вечное FileNotFoundError.</p>
+    <pre>ROOT = Path(__file__).resolve().parents[2]    <span class="cm"># src/oulad_risk/summary.py → корень проекта</span>
+RAW = ROOT / "data" / "raw"                     <span class="cm"># работает, откуда бы ни запустили</span></pre>
+    <ul>
+      <li><code>__file__</code> — путь к текущему файлу кода (в ноутбуке его нет). <code>.resolve()</code> — сделать путь абсолютным. <code>.parents[0]</code> — папка файла, <code>[1]</code> — на уровень выше и т. д.</li>
+      <li><code>p.with_suffix(".parquet")</code> — то же имя с другим расширением. <code>raw.iterdir()</code> — всё в папке, <code>raw.rglob("*.csv")</code> — во всех подпапках.</li>
+      <li><code>Path.home()</code> — домашняя папка (/Users/vlad).</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="python.err.3">
     <label class="tp"><input type="checkbox" data-id="python.err.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Файлы и pathlib</b></span></label>
     <span class="note" data-d="python.err.3">отметка в дереве</span>
   </div>
@@ -68,7 +78,27 @@ with open("reports/log.txt", "a", encoding="utf-8") as f:   <span class="cm"># "
   <div id="ex2"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>контекстный менеджер</b> (context manager) — объект, который умеет «войти» и «выйти» (<code>__enter__</code> и <code>__exit__</code>); <code>with</code> гарантирует выход.</span></div>
   <p class="remember">Файлы — только через with и с encoding="utf-8". "w" стирает файл, "a" дописывает.</p>
-  <div class="topic-check" data-for="python.err.2">
+    <details class="more"><summary>Подробнее: большие файлы, свой контекстный менеджер, несколько файлов<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li><code>for line in f:</code> читает по одной строке — так можно пройти файл на 10 ГБ, держа в памяти одну строку. <code>f.read()</code> загрузит его целиком.</li>
+      <li>Два файла сразу: <code>with open(a) as src, open(b, "w") as dst:</code>.</li>
+      <li>Битая кодировка (UnicodeDecodeError): узнай, в какой кодировке файл (старые русские — <code>cp1251</code>), или <code>errors="replace"</code>, чтобы не упасть.</li>
+      <li>Свой контекстный менеджер — функция с <code>yield</code> и декоратором. Например, таймер:</li>
+    </ul>
+    <pre>from contextlib import contextmanager
+import time
+
+@contextmanager
+def timer(name):
+    t = time.perf_counter()
+    yield                                   <span class="cm"># здесь выполняется тело with</span>
+    print(f"{name}: {time.perf_counter() - t:.2f} с")
+
+with timer("загрузка"):
+    rows = load_rows()</pre>
+    <p>Декораторы подробно — неделя 5. Пока достаточно понимать: всё до <code>yield</code> — «вход», после — «выход».</p>
+  </div></details>
+<div class="topic-check" data-for="python.err.2">
     <label class="tp"><input type="checkbox" data-id="python.err.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>Контекстные менеджеры и with</b></span></label>
     <span class="note" data-d="python.err.2">отметка в дереве</span>
   </div>
@@ -96,7 +126,19 @@ with open("reports/summary.json", encoding="utf-8") as f:
   <div id="ex3b"></div>
   <div class="term-chip"><b>Так это называют</b><span>превратить объект в текст — <b>сериализация</b>; обратно — <b>десериализация</b>. CSV — comma-separated values.</span></div>
   <p class="remember">csv.DictReader — строки как словари, но все значения — строки. json: load/dump с файлом, loads/dumps со строкой.</p>
-  <div class="topic-check" data-for="python.err.4">
+    <details class="more"><summary>Подробнее: запись csv, точка с запятой из Excel и что json делает с ключами<small> · 3 минуты</small></summary><div class="a">
+    <pre>with open("reports/top.csv", "w", newline="", encoding="utf-8") as f:   <span class="cm"># newline="" — иначе на Windows пустые строки между записями</span>
+    w = csv.DictWriter(f, fieldnames=["id_student", "studied_credits"])
+    w.writeheader()
+    w.writerows(top)</pre>
+    <ul>
+      <li>Русский Excel сохраняет «CSV» через <b>точку с запятой</b>: читать — <code>csv.reader(f, delimiter=";")</code>.</li>
+      <li>csv-модуль правильно понимает кавычки: <code>"Москва, Россия"</code> — одно поле, хоть внутри и запятая. Простой <code>line.split(",")</code> такое ломает.</li>
+      <li>json: ключи словаря всегда становятся <b>строками</b> (<code>{1: "a"}</code> → <code>{"1": "a"}</code>), кортежи — списками, None — null, True — true. NaN в стандарте json нет.</li>
+      <li><b>JSON Lines</b> (.jsonl) — по одному json-объекту на строку. Так пишут логи и большие наборы: можно читать построчно.</li>
+    </ul>
+  </div></details>
+<div class="topic-check" data-for="python.err.4">
     <label class="tp"><input type="checkbox" data-id="python.err.4"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>json и csv</b></span></label>
     <span class="note" data-d="python.err.4">отметка в дереве</span>
   </div>
@@ -113,6 +155,8 @@ with open("reports/summary.json", encoding="utf-8") as f:
     <div class="cmd"><code>less файл</code><span>листать большой файл (q — выйти; в тренажёре нет)</span></div>
     <div class="cmd"><code>команда1 | команда2</code><span><b>пайп</b>: вывод первой — на вход второй</span></div>
     <div class="cmd"><code>… &gt; файл</code>, <code>… &gt;&gt; файл</code><span>записать вывод в файл / дописать в конец</span></div>
+    <div class="cmd"><code>tail -f train.log</code><span>следить за файлом вживую: новые строки появляются сами (Ctrl+C — выйти). Так смотрят лог обучения</span></div>
+    <div class="cmd"><code>… 2&gt; errors.txt</code>, <code>… &gt; out.txt 2&gt;&amp;1</code><span>ошибки идут отдельным потоком: 2&gt; пишет только их, 2&gt;&amp;1 — ошибки туда же, куда обычный вывод</span></div>
     <div class="cmd"><code>cut -d, -f5</code><span>взять 5-й столбец, разделитель — запятая</span></div>
     <div class="cmd"><code>sort | uniq -c</code><span>отсортировать и посчитать одинаковые строки</span></div>
   </div>
@@ -120,7 +164,17 @@ with open("reports/summary.json", encoding="utf-8") as f:
   <div id="simData"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>пайп</b> (pipe, |) и <b>перенаправление</b> (redirect, &gt; и &gt;&gt;); у каждой программы есть вход — <b>stdin</b> и выход — <b>stdout</b>.</span></div>
   <p class="remember">head, tail, wc -l — первый взгляд на данные. | соединяет команды, &gt; пишет в файл.</p>
-  <div class="topic-check multi" data-for="tools.term.1,tools.term.3">
+    <details class="more"><summary>Подробнее: less, ключи grep, sort по столбцу и подвох с кавычками<small> · 3 минуты</small></summary><div class="a">
+    <ul>
+      <li><code>less файл</code>: пробел — страница вниз, <code>/Pass</code> — найти, <code>n</code> — следующее совпадение, <code>q</code> — выйти. В отличие от cat, не вываливает весь файл.</li>
+      <li><code>grep -i</code> — без учёта регистра, <code>-v</code> — строки <b>без</b> совпадения, <code>-c</code> — сразу число вместо строк, <code>-n</code> — с номерами строк.</li>
+      <li><code>sort -t, -k5</code> — сортировать по 5-му столбцу, разделитель — запятая; <code>-n</code> — как числа, <code>-r</code> — по убыванию.</li>
+      <li><code>wc -l</code> считает символы переноса строки: если в конце файла переноса нет, последнюю строку не посчитает.</li>
+      <li><b>Подвох:</b> в настоящем OULAD значения в кавычках (<code>"Pass"</code>), а в некоторых csv внутри полей бывают запятые — тогда <code>cut -d,</code> режет неправильно. Для быстрого взгляда терминал хорош, для точного подсчёта — Python.</li>
+      <li><code>&gt; /dev/null</code> — выбросить вывод («чёрная дыра»), например <code>команда 2&gt; /dev/null</code> — спрятать ошибки.</li>
+    </ul>
+  </div></details>
+<div class="topic-check multi" data-for="tools.term.1,tools.term.3">
     <div class="topic-check-h"><span class="eyebrow">Пройдено</span><span class="note"></span></div>
     <div class="topic-check-list">
       <label class="tp"><input type="checkbox" data-id="tools.term.1"><span class="bx" aria-hidden="true"></span><span><b>Просмотр файлов</b></span></label>
@@ -146,7 +200,16 @@ new = sorted(nums)     <span class="cm"># возвращает НОВЫЙ спи
   <div id="ex5"></div>
   <div class="term-chip"><b>Так это называют</b><span><b>lambda</b> — анонимная (безымянная) функция в одну строку; сортировка Python <b>стабильная</b>: равные элементы сохраняют прежний порядок.</span></div>
   <p class="remember">sorted(…, key=…, reverse=True) — новый список. list.sort() — на месте и возвращает None.</p>
-  <div class="topic-check" data-for="python.coll.3">
+    <details class="more"><summary>Подробнее: itemgetter, min и max с key, сортировка без учёта регистра<small> · 2 минуты</small></summary><div class="a">
+    <ul>
+      <li><code>from operator import itemgetter</code>; <code>sorted(rows, key=itemgetter("score"))</code> — то же, что lambda, чуть быстрее и короче.</li>
+      <li>key есть не только у sorted: <code>max(rows, key=lambda r: r["score"])</code> — лучший студент, <code>min(files, key=len)</code>.</li>
+      <li><code>sorted(names, key=str.lower)</code> — без учёта регистра (иначе «Zoe» окажется раньше «anna»: заглавные идут первыми).</li>
+      <li>Сортировка — O(n log n). Если нужны только 5 лучших из миллиона — <code>heapq.nlargest(5, rows, key=...)</code> быстрее (куча — неделя 8).</li>
+    </ul>
+  </div></details>
+  <div class="callout trap"><b class="h">Частые ошибки</b><ul class="oops"><li><span class="no"><code>"data/raw/" + name</code></span><span class="yes"><code>Path("data") / "raw" / name</code></span></li><li><span class="no"><code>open(path)  # без encoding</code></span><span class="yes"><code>open(path, encoding="utf-8")</code></span><span class="n">Иначе кракозябры на Windows.</span></li><li><span class="no"><code>int_credits = row["studied_credits"] + 10</code></span><span class="yes"><code>int(row["studied_credits"]) + 10</code></span><span class="n">Из csv — строки.</span></li><li><span class="no"><code>lst = lst.sort()</code></span><span class="yes"><code>lst.sort()  или  lst = sorted(lst)</code></span><span class="n">sort() возвращает None — список потерян.</span></li><li><span class="no"><code>open("report.txt", "w")  # хотел дописать</code></span><span class="yes"><code>open("report.txt", "a")</code></span><span class="n">"w" стирает файл.</span></li></ul></div>
+<div class="topic-check" data-for="python.coll.3">
     <label class="tp"><input type="checkbox" data-id="python.coll.3"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>sorted с key=, lambda</b></span></label>
     <span class="note" data-d="python.coll.3">отметка в дереве</span>
   </div>
@@ -221,6 +284,8 @@ print(report)</pre>
 <!-- ============ итог ============ -->
 <section class="step" id="topics">
   <div class="step-h"><h2>Итог</h2></div>
+    <div class="callout mem"><b class="h">На собеседовании</b><p>Так спрашивают на отборах на стажировку. Сначала ответь вслух сам, потом открой ответ.</p></div>
+  <div class="qs"><details class="q"><summary><span class="t">Собеседование</span>Как прочитать файл на 10 ГБ, если памяти 8 ГБ?</summary><div class="a"><p>Не грузить целиком: читать построчно через with open(...) as f: for line in f, или кусками (в pandas — read_csv с chunksize). Обрабатывать и сразу агрегировать, а не держать всё в памяти.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Зачем with при работе с файлами?</summary><div class="a"><p>Это контекстный менеджер: при выходе из блока файл гарантированно закрывается, даже если внутри было исключение. Без этого можно потерять незаписанные данные или упереться в лимит открытых файлов.</p></div></details><details class="q"><summary><span class="t">Собеседование</span>Как быстро посмотреть на большой файл на сервере?</summary><div class="a"><p>head и tail — начало и конец, wc -l — число строк, less — листать, grep — найти строки, tail -f — следить за логом в реальном времени. Через пайп можно посчитать значения: cut | sort | uniq -c.</p></div></details></div>
   <div class="sheet">
     <ol>
       <li><b>pathlib:</b> Path("data") / "raw" / "x.csv"; .exists(), .name, .stem, .suffix, .parent, .glob("*.csv"); mkdir(parents=True, exist_ok=True).</li>
@@ -233,6 +298,7 @@ print(report)</pre>
     <div class="btns"><button class="btn" id="bCopy">Скопировать конспект для Obsidian</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
     <textarea id="mdArea" rows="8" hidden readonly></textarea>
   </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 10 минут</b><p>Закрой урок. Напиши по памяти скрипт: прочитать csv через Path и csv.DictReader, посчитать итоги через Counter, сохранить json. Напиши пять команд терминала: первые 5 строк, число строк, строки с Fail, сколько каждого итога, следить за логом. Проверь на настоящем studentInfo.csv.</p></div>
   <ul class="topics" id="topicList"></ul>
   <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
   <p><a class="btn" href="/lessons/w02-test.html" style="text-decoration:none">Дальше: тест недели 2 →</a></p>
@@ -263,6 +329,13 @@ tags: [python, терминал, данные, неделя-2]
 - head -5 файл · tail -n 3 файл · wc -l файл · less файл.
 - | — вывод одной команды на вход другой: grep Withdrawn файл | wc -l.
 - > — записать в файл, >> — дописать. cut -d, -f5 файл | sort | uniq -c — сколько каждого значения.
+
+## Ещё
+- Путь от файла кода: Path(__file__).resolve().parents[2] / "data" — работает, откуда бы ни запустили.
+- tail -f лог — следить вживую; 2> — только ошибки; > out.txt 2>&1 — всё в один файл; > /dev/null — выбросить.
+- grep -i / -v / -c / -n; sort -t, -k5 -n -r; less: / поиск, q выход.
+- csv.DictWriter + newline=""; русский Excel — delimiter=";". json: ключи → строки, кортежи → списки.
+- Свой контекстный менеджер: @contextmanager и yield.
 
 ## sorted с key
 - sorted(rows, key=lambda r: r["score"], reverse=True) — новый список.
