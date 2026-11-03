@@ -198,8 +198,8 @@ function stepHTML(x,k){
 }
 function weekHTML(s){
   const c=SEC[s.section]||SEC.ml, w=s.week, pct=w.total?Math.round(w.done/w.total*100):0;
-  const ls=(w.lessons||[]).map(l=>{const p=l.topics[1]?l.topics[0]/l.topics[1]:0;
-    return `<li><a href="${l.href}"><span class="m${l.done?" full":p>0?" half":""}" style="--p:${Math.round(p*100)}%"></span><span>${w.n}.${l.n} · ${esc(l.title)}</span><span class="k">${l.topics[0]}/${l.topics[1]}</span></a></li>`}).join("");
+  const ls=(w.lessons||[]).map(l=>{const [tk,tn]=l.tasks||[0,0],k=l.topics[0]+tk,n=l.topics[1]+tn,p=n?k/n:0;  /* практика — пункт урока */
+    return `<li><a href="${l.href}" title="темы ${l.topics[0]} из ${l.topics[1]}${tn?` · практика ${tk} из ${tn}`:""}"><span class="m${l.done?" full":p>0?" half":""}" style="--p:${Math.round(p*100)}%"></span><span>${w.n}.${l.n} · ${esc(l.title)}</span><span class="k">${k}/${n}</span></a></li>`}).join("");
   const notes=[];
   if(s.tails.count)notes.push(`<div class="note"><span>⚠</span><span><b>Хвосты: ${s.tails.count}</b> — ${esc(s.tails.titles.slice(0,3).join(", "))}${s.tails.count>3?"…":""}</span></div>`);
   if(s.test){const t=s.test;notes.push(`<div class="note"><span>✎</span><span>${t.best!=null?`<b>Тест недели: лучший ${t.best}%</b>`:t.open?`<b>Тест недели можно проходить</b>`:"Тест недели — после уроков недели"}</span></div>`)}
