@@ -218,7 +218,7 @@ mlCheck($("exWarm"), [
    opts: ["По ключу считается номер ячейки (хеш) — туда и смотрим, не перебирая всё", "Словарь хранит ключи по алфавиту и ищет делением пополам", "Python держит словари на видеокарте"], a: 0,
    why: "Хеш-функция превращает ключ в номер ячейки. Перебора нет — поэтому в среднем O(1)."},
   {q: "Two Sum: найти два числа с суммой target. Какая идея даёт один проход?",
-   opts: ["Идём по списку и для каждого числа проверяем, видели ли уже target − число (словарь «число → индекс»)", "Перебрать все пары двумя циклами", "Отсортировать и взять два самых больших"], a: 0,
+   opts: ["Отсортировать и взять два самых больших числа", "Запоминать увиденные числа в словаре и искать target − число", "Перебрать все пары двумя вложенными циклами"], a: 1,
    why: "Словарь «что уже видели» превращает внутренний цикл в проверку за O(1). Итого O(n) вместо O(n²)."}
 ]);
 
@@ -238,7 +238,7 @@ termSim($("simFiles"), {start: "~/projects/oulad-risk", tasks: [
   {t: "Удали папку reports — она оказалась не нужна", hint: "rm -r reports", ok: s => !has(s, "projects/oulad-risk/reports") && /^rm\b/.test(s.cmd)}
 ]});
 mlCheck($("exFiles"), [
-  {q: "Ты сделал <code>mv data.csv old.csv</code>. Что произошло?", opts: ["Файл переименован: data.csv больше нет, есть old.csv", "Появилась копия old.csv, data.csv на месте", "Ошибка: mv только для папок"], a: 0,
+  {q: "Ты сделал <code>mv data.csv old.csv</code>. Что произошло?", opts: ["Ошибка: mv только для папок", "Появилась копия old.csv, data.csv на месте", "Файл переименован: data.csv больше нет, есть old.csv"], a: 2,
    why: "mv — перенести. Перенос в ту же папку под другим именем и есть переименование."},
   {q: "<code>rm -r data</code> по ошибке. Как вернуть?", opts: ["Никак: rm удаляет без корзины", "Из корзины Finder", "Командой undo"], a: 0,
    why: "Поэтому перед rm -r — pwd и ls. А данные проекта всегда можно скачать заново, если есть скрипт загрузки."}
@@ -250,9 +250,9 @@ termSim($("simFind"), {start: "~/projects/oulad-risk", tasks: [
   {t: "Найди все .py-файлы в своей папке projects (не только в этом проекте)", hint: 'find ~/projects -name "*.py"', ok: s => /^find\b/.test(s.cmd) && /task1\.py/.test(s.out)}
 ]});
 mlCheck($("exFind"), [
-  {q: "Нужно найти, в каком файле объявлена функция <code>load_students</code>. Что наберёшь?", opts: ["grep -rn load_students .", 'find . -name "load_students"', "ls load_students"], a: 0,
+  {q: "Нужно найти, в каком файле объявлена функция <code>load_students</code>. Что наберёшь?", opts: ['find . -name "load_students"', "ls load_students", "grep -rn load_students ."], a: 2,
    why: "Это текст внутри файла — значит grep. find ищет только по именам файлов."},
-  {q: "Нужно найти все ноутбуки <code>.ipynb</code> в проекте.", opts: ['find . -name "*.ipynb"', "grep -rn ipynb .", "cat *.ipynb"], a: 0,
+  {q: "Нужно найти все ноутбуки <code>.ipynb</code> в проекте.", opts: ["grep -rn ipynb .", 'find . -name "*.ipynb"', "cat *.ipynb"], a: 1,
    why: "Ищем файлы по имени — find. grep нашёл бы строки, где слово ipynb встречается внутри файлов."}
 ]);
 
@@ -264,9 +264,9 @@ termSim($("simVenv"), {start: "~/projects/oulad-risk", tasks: [
   {t: "Посмотри, что теперь стоит", hint: "pip list", ok: s => /^pip3? list/.test(s.cmd) && !!s.venv}
 ]});
 mlCheck($("exVenv"), [
-  {q: "Почему папку <code>.venv</code> не кладут в git?", opts: ["Она тяжёлая и своя на каждом компьютере — коллега создаст свою по списку библиотек", "git не умеет хранить папки с точкой", "Там лежат пароли"], a: 0,
+  {q: "Почему папку <code>.venv</code> не кладут в git?", opts: ["git не умеет хранить папки с точкой в имени в имени", "Она тяжёлая и своя на каждом компьютере", "Там лежат пароли и ключи от сервисов и ключи от сервисов"], a: 1,
    why: "В git кладут рецепт (requirements.txt), а не готовое блюдо. .venv — в .gitignore."},
-  {q: "Ты забыл включить окружение и сделал <code>pip install pandas</code>. Что случилось?", opts: ["pandas встал в общий Python компьютера, а не в проект", "Ничего не поставилось", "pip сам включил окружение"], a: 0,
+  {q: "Ты забыл включить окружение и сделал <code>pip install pandas</code>. Что случилось?", opts: ["pip сам нашёл и включил окружение проекта", "Ничего не поставилось: pip выдал ошибку: pip выдал ошибку", "pandas встал в общий Python компьютера, а не в проект"], a: 2,
    why: "Без activate pip ставит в общий Python. Признак, что окружение включено, — (.venv) в начале строки."}
 ]);
 
@@ -277,9 +277,9 @@ termSim($("simReq"), {start: "~/projects/oulad-risk", prep: ["cd ~/projects/oula
   {t: "Включи окружение и поставь всё по списку", hint: "source .venv/bin/activate", ok: s => !!s.venv && /^pip3? install -r/.test(s.cmd)}
 ]});
 mlCheck($("exReq"), [
-  {q: "В requirements.txt строка <code>pandas</code> без версии. Чем это плохо?", opts: ["Через полгода поставится новая версия, и код может сломаться без твоих изменений", "Ничем, так даже лучше — всегда свежее", "pip не поставит библиотеку без версии"], a: 0,
+  {q: "В requirements.txt строка <code>pandas</code> без версии. Чем это плохо?", opts: ["Потом поставится другая версия — код сломается", "pip откажется ставить библиотеку без версии", "Ничем: так лучше, всегда будет свежая версия"], a: 0,
    why: "pandas==2.2.3 воспроизводит ровно то, что работало у тебя."},
-  {q: "Коллега склонировал проект. Какой порядок команд правильный?", opts: ["python3 -m venv .venv → source .venv/bin/activate → pip install -r requirements.txt", "pip install -r requirements.txt → python3 -m venv .venv", "pip freeze → source .venv/bin/activate"], a: 0,
+  {q: "Коллега склонировал проект. Какой порядок команд правильный?", opts: ["pip install -r requirements.txt → python3 -m venv .venv → source .venv/bin/activate", "python3 -m venv .venv → source .venv/bin/activate → pip install -r requirements.txt", "source .venv/bin/activate → python3 -m venv .venv → pip install -r requirements.txt"], a: 1,
    why: "Сначала рюкзак, потом надеть, потом сложить в него библиотеки по списку."}
 ]);
 
