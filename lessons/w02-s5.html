@@ -12,7 +12,7 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s4.html">← Урок 2.4 · ML заново</a><span class="mid">урок 5 из 5</span><a href="/lessons/w02-test.html">Тест недели 2 →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · урок 5 из 5 · ~60 минут + практика 20 минут</div>
+  <div class="eyebrow">Неделя 2 · урок 5 из 5 · ~60 минут + практика 15 минут</div>
   <h1>Файлы и данные: Python и терминал</h1>
   <p>Первое, что делаешь с любыми данными, — открываешь файл. Здесь — как это делают аккуратно: пути через pathlib, файлы через with, форматы json и csv, быстрый взгляд на файл прямо из терминала и сортировка по любому полю. В конце — первая компания из списка «куда подаваться»: Яндекс.</p>
   <nav class="steps" aria-label="Шаги урока">
@@ -251,38 +251,45 @@ new = sorted(nums)     <span class="cm"># возвращает НОВЫЙ спи
 
 <!-- ============ practice ============ -->
 <section class="step" id="practice">
-  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: первый отчёт по OULAD</h2><span class="min">20 мин</span></div>
-  <p class="why">Продолжение проекта из урока 2.1. Нужен скачанный <code>studentInfo.csv</code> в <code>data/raw</code>.</p>
+  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: первый отчёт по данным</h2><span class="min">15 мин</span></div>
+  <p class="why">Всё из урока в одном скрипте: Path, with, csv, Counter, sorted с key и json. Данные — маленький файл, который скрипт сам создаёт, поэтому ничего скачивать не надо. В неделе 3 этот же скрипт запустишь на настоящем OULAD — поменяется только путь.</p>
   <div class="prac">
-    <div class="task"><span class="tg work">Терминал · 5 минут</span>
-      <h3>Первый взгляд на настоящий файл</h3>
-      <p>В папке проекта: сколько строк в <code>studentInfo.csv</code>, какие столбцы (первая строка), сколько студентов бросили курс (Withdrawn) и сколько каждого итога (<code>cut</code>, <code>sort</code>, <code>uniq -c</code>). Итоговый результат — 12-й столбец.</p>
-      <details><summary>Команды</summary><div class="a">
-<pre>wc -l data/raw/studentInfo.csv
-head -1 data/raw/studentInfo.csv
-grep -c Withdrawn data/raw/studentInfo.csv
-cut -d, -f12 data/raw/studentInfo.csv | sort | uniq -c</pre></div></details>
-    </div>
     <div class="task"><span class="tg rev">Код · 15 минут</span>
       <h3>Скрипт summary.py</h3>
       <ol>
-        <li>Файл <code>src/oulad_risk/summary.py</code>: путь к данным — через Path, файл — через with и csv.DictReader.</li>
-        <li>Посчитай итоги курса через Counter (урок 2.3) и топ-5 студентов по <code>studied_credits</code> через sorted с key (не забудь int).</li>
-        <li>Сохрани отчёт в <code>reports/summary.json</code> (папку создай через mkdir). Закоммить: <code>feat: add data summary</code>.</li>
+        <li>Создай <code>data/students.csv</code> из строки <code>SAMPLE</code> ниже: папку — через <code>mkdir(parents=True, exist_ok=True)</code>, файл — через <code>write_text</code>.</li>
+        <li>Прочитай его через <code>with</code> и <code>csv.DictReader</code>. Посчитай итоги через <code>Counter</code> и топ-3 студентов по <code>studied_credits</code> через <code>sorted</code> с <code>key</code> (не забудь <code>int</code> — в CSV всё строки).</li>
+        <li>Сохрани отчёт в <code>reports/summary.json</code> и выведи его.</li>
       </ol>
+<pre>SAMPLE = """id_student,final_result,studied_credits
+11391,Pass,240
+28400,Pass,60
+30268,Withdrawn,60
+31604,Pass,60
+32885,Fail,60
+38053,Pass,60
+45462,Pass,120
+45642,Distinction,120
+52130,Withdrawn,90
+53025,Fail,30
+"""</pre>
+      <p class="ok">Готово, когда в отчёте <code>{"Pass": 5, "Withdrawn": 2, "Fail": 2, "Distinction": 1}</code>, а первым в топе — 11391 (240 кредитов).</p>
       <details><summary>Решение</summary><div class="a">
 <pre>import csv, json
 from collections import Counter
 from pathlib import Path
 
-RAW = Path("data") / "raw" / "studentInfo.csv"
+DATA = Path("data") / "students.csv"
 OUT = Path("reports")
 
-with open(RAW, encoding="utf-8") as f:
+DATA.parent.mkdir(parents=True, exist_ok=True)
+DATA.write_text(SAMPLE, encoding="utf-8")
+
+with open(DATA, encoding="utf-8") as f:
     rows = list(csv.DictReader(f))
 
 results = Counter(r["final_result"] for r in rows)
-top = sorted(rows, key=lambda r: int(r["studied_credits"]), reverse=True)[:5]
+top = sorted(rows, key=lambda r: int(r["studied_credits"]), reverse=True)[:3]
 
 OUT.mkdir(parents=True, exist_ok=True)
 report = {"rows": len(rows), "results": dict(results),
@@ -290,7 +297,7 @@ report = {"rows": len(rows), "results": dict(results),
 with open(OUT / "summary.json", "w", encoding="utf-8") as f:
     json.dump(report, f, ensure_ascii=False, indent=2)
 print(report)</pre>
-        <p>Папку <code>reports/</code> можно добавить в .gitignore — её всегда можно пересоздать скриптом.</p></div></details>
+        <p>Без <code>int</code> сортировка шла бы по строкам: «90» оказалось бы больше «240», потому что «9» &gt; «2».</p></div></details>
     </div>
   </div>
 </section>

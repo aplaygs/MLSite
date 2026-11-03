@@ -23,7 +23,7 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/plan#w-2">← Неделя 2 в плане</a><span class="mid">урок 1 из 5</span><a href="/lessons/w02-s2.html">Урок 2.2 · Python заново →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · урок 1 из 5 · ~60 минут + практика 20 минут</div>
+  <div class="eyebrow">Неделя 2 · урок 1 из 5 · ~60 минут</div>
   <h1>Проект как на работе</h1>
   <p>На неделе 1 ты научился сохранять работу в git. Теперь — как устроить проект, чтобы тимлид или рекрутер открыл его и за минуту понял: человек умеет работать. Шесть шагов: папки, README, что не класть в git, где хранить пароли, как фиксировать версии и как подписывать коммиты. В конце соберёшь так свой проект по данным OULAD.</p>
   <nav class="steps" aria-label="Шаги урока">
@@ -257,27 +257,8 @@ key = os.environ["KAGGLE_KEY"]   <span class="cm"># нет ключа — сра
 
 <!-- ============ practice ============ -->
 <section class="step" id="practice">
-  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: проект oulad-risk</h2><span class="min">20 мин</span></div>
-  <p class="why">Это начало твоего проекта для резюме: по нему ты будешь рассказывать на собеседовании.</p>
-  <div class="prac">
-    <div class="task"><span class="tg work">Работа · 20 минут</span>
-      <h3>Скелет проекта на GitHub</h3>
-      <ol>
-        <li>Создай папку <code>~/projects/oulad-risk</code> со структурой из шага 1 (пустые папки — с файлом <code>.gitkeep</code>, иначе git их не увидит).</li>
-        <li>Первым коммитом — <code>.gitignore</code> из шага 3.</li>
-        <li>README с разделами: задача, данные, как запустить (результат пока пустой). Данные — <a href="https://analyse.kmi.open.ac.uk/open_dataset" target="_blank" rel="noopener">OULAD</a>, скачай в <code>data/raw</code>.</li>
-        <li><code>.env.example</code> и <code>requirements.txt</code> с версиями через <code>==</code>.</li>
-        <li>3–4 коммита с подписями по шагу 6, потом push на GitHub.</li>
-      </ol>
-      <p class="ok">Готово, когда на GitHub видны README, .gitignore и папка src, а папок data и .venv там нет.</p>
-      <details><summary>Команды для начала</summary><div class="a">
-<pre>mkdir -p ~/projects/oulad-risk/{data/raw,data/processed,notebooks,src/oulad_risk,tests,models}
-cd ~/projects/oulad-risk
-touch src/oulad_risk/__init__.py tests/.gitkeep notebooks/.gitkeep
-printf ".venv/\ndata/\nmodels/\n.env\n__pycache__/\n.ipynb_checkpoints/\n" &gt; .gitignore
-git init &amp;&amp; git add .gitignore &amp;&amp; git commit -m "chore: add gitignore"</pre>
-        <p><code>{data/raw,notebooks}</code> — фигурные скобки создают несколько папок одной командой. <code>printf</code> с <code>\n</code> пишет несколько строк в файл.</p></div></details></div>
-  </div>
+  <div class="step-h"><span class="num">✎</span><h2>Практики в этом уроке нет</h2></div>
+  <p class="why">Тема простая, зубрить её отдельным заданием незачем. Скелет проекта oulad-risk (папки, .gitignore, README, первые коммиты) соберёшь по-настоящему в неделе 3 — это задача проекта А в плане недели. Команды для начала — там же и в шагах 1–6 этого урока.</p>
 </section>
 
 <!-- ============ итог ============ -->

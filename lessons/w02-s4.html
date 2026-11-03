@@ -37,7 +37,7 @@
 <div class="wrap">
 <nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/w02-s3.html">← Урок 2.3 · Коллекции и словарь</a><span class="mid">урок 4 из 5</span><a href="/lessons/w02-s5.html">Урок 2.5 · Файлы и данные →</a></nav>
 <header class="top">
-  <div class="eyebrow">Неделя 2 · урок 4 из 5 · повторение по тесту недели 1 · ~60 минут + практика 20 минут</div>
+  <div class="eyebrow">Неделя 2 · урок 4 из 5 · повторение по тесту недели 1 · ~60 минут + практика 15 минут</div>
   <h1>ML заново: как модель ошибается и как это проверить</h1>
   <p>Четыре идеи, на которых держится всё машинное обучение, и все четыре были в тесте недели 1. Как одним числом сказать, насколько модель ошибается. Почему данные делят на три части и что такое «утечка». Что такое переобучение — и почему от него не помогает «сделать модель умнее». Здесь всё объясняется через картинки, которые можно покрутить руками.</p>
   <nav class="steps" aria-label="Шаги урока">
@@ -255,7 +255,7 @@
 
 <!-- ============ practice ============ -->
 <section class="step" id="practice">
-  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: глубина дерева в sklearn</h2><span class="min">20 мин</span></div>
+  <div class="step-h"><span class="num">✎</span><h2>Сделай сам: глубина дерева в sklearn</h2><span class="min">15 мин</span></div>
   <p class="why">То же, что в лаборатории, но на настоящих данных и в настоящем коде. Нужен Jupyter или файл .py и <code>pip install scikit-learn matplotlib</code>.</p>
   <div class="prac">
     <div class="task"><span class="tg work">Код · 15 минут</span>
@@ -290,11 +290,6 @@ plt.xlabel("max_depth"); plt.ylabel("MSE"); plt.legend(); plt.show()
 best = depths[va.index(min(va))]                 <span class="cm"># выбор — по validation</span>
 final = DecisionTreeRegressor(max_depth=best, random_state=0).fit(X_tr, y_tr)
 print(best, mean_squared_error(y_te, final.predict(X_te)))   <span class="cm"># тест — один раз</span></pre></div></details>
-    </div>
-    <div class="task"><span class="tg lc">Говорить · 5 минут</span>
-      <h3>Объясни вслух без подсказки</h3>
-      <p>Закрой урок и расскажи вслух (или запиши голосовое): что такое переобучение и как его увидеть; почему нельзя выбирать по тесту; что такое утечка — с одним примером; bias–variance на примере глубины дерева из своего графика.</p>
-      <p class="ok">Готово, когда уложился в 2 минуты и ни разу не сказал «ну, это когда модель… короче».</p>
     </div>
   </div>
 </section>

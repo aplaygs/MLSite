@@ -7,7 +7,8 @@
      .lab с полями (input, textarea, select с id) — запоминает их значения, при открытии ставит обратно и
        «шевелит» событиями input/change, чтобы лаборатория перерисовалась; кнопка «↺ сбросить» в шапке.
        Не трогает лаборатории с data-local (у них своё хранение) и галочки тем (input[data-id]).
-     .task (практика) — внизу галочка «Сделал», с датой. */
+     .task (практика) — внизу галочка «Сделал», с датой. Практика — такой же пункт урока, как темы: в списке тем урока
+       (#topicList) появляется строка «Практика · сделано k из n», она же входит в «отмечено k из n» на «Сегодня». */
 const WORK = (() => {
   const m = location.pathname.match(/\/lessons\/([a-z0-9-]+)\.html/), id = m && m[1];
   const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname), LS = "work:" + id;
@@ -74,9 +75,25 @@ const WORK = (() => {
       t.insertAdjacentHTML("beforeend", `<label class="work-done"><input type="checkbox"><span></span></label>`);
       const cb = t.querySelector(".work-done input"), txt = t.querySelector(".work-done span");
       const show = () => { const v = api.get(key); cb.checked = !!v; txt.textContent = v ? `Сделано ${fmt(v)}` : "Сделал"; t.classList.toggle("is-done", !!v); };
-      cb.onchange = () => { put(key, cb.checked ? day() : null); show(); };
+      cb.onchange = () => { put(key, cb.checked ? day() : null); show(); row(); };
       show();
     });
+    row();
+  }
+  /* Строка «Практика» в списке тем урока: отмечается сама, когда у всех заданий стоит «Сделал». */
+  function row() {
+    const list = document.getElementById("topicList"), all = document.querySelectorAll(".task");
+    if (!list || !all.length) return;
+    const k = [...all].filter((t, i) => api.get("task:" + i)).length, n = all.length, ok = k === n;
+    let li = list.querySelector(".tp-prac");
+    if (!li) {
+      li = document.createElement("li"); li.className = "tp-prac";
+      const target = all[0].closest("section") || all[0];
+      li.innerHTML = `<label class="tp"><input type="checkbox" disabled><span class="bx" aria-hidden="true"></span><span><a href="#${target.id || ""}">Практика</a> · <span class="tp-pk"></span></span></label>`;
+      list.append(li);
+    }
+    li.querySelector("input").checked = ok;
+    li.querySelector(".tp-pk").textContent = ok ? `сделано ${k} из ${n}` : `сделано ${k} из ${n} — галочка «Сделал» у каждого задания`;
   }
 
   const st = document.createElement("style");
@@ -84,7 +101,8 @@ const WORK = (() => {
 .work-reset:hover{color:var(--accent);background:var(--accent-soft)}
 .work-done{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none}
 .work-done input{width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
-.task.is-done .work-done{color:var(--accent);font-weight:500}`;
+.task.is-done .work-done{color:var(--accent);font-weight:500}
+.tp-prac .tp{cursor:default} .tp-prac input:disabled+.bx{opacity:1}`;
   document.head.append(st);
   document.addEventListener("DOMContentLoaded", () => api.ready(() => { labs(); tasks(); }));
   return api;

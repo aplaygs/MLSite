@@ -312,7 +312,7 @@ if(PAGE==="tree"&&/^#(w-\d+|plan|brs|obsidian)$/.test(location.hash))location.re
 
   <section class="block" id="plan">
     <div class="eyebrow">План по неделям</div>
-    <h2>Темы до 27 декабря, январь — повторение и собеседования</h2>
+    <h2>Новые темы до 17 января, потом неделя повторения и собеседования с 25 января</h2>
     <p>Каждая тема дерева стоит в одной неделе. Четыре дорожки: код, теория, алгоритмы, проект. Алгоритмы — только частые паттерны и 3–4 задачи LeetCode в неделю, основное время — ML, Python и нейросети. Не успел — тема уходит в хвосты, план не ломается.</p>
     <div class="tl" id="timeline"></div>
     <div class="tl-months" id="tlMonths"></div>
@@ -334,7 +334,7 @@ if(PAGE==="tree"&&/^#(w-\d+|plan|brs|obsidian)$/.test(location.hash))location.re
       <div class="card">
         <h3>А · Ранняя диагностика академического риска</h3>
         <div class="files">
-          <div><span class="tag">недели 2–9</span> Реальные открытые данные OULAD: оценки и активность студентов по дням.</div>
+          <div><span class="tag">недели 3–10</span> Реальные открытые данные OULAD: оценки и активность студентов по дням.</div>
           <div>Предсказать на неделе N курса, что студент провалит курс, чтобы куратор успел вмешаться. Валидация во времени: учимся на прошлых семестрах, проверяем на следующем.</div>
           <div class="note">EDA → бейзлайн (константа, логрегрессия) → CatBoost → PR-AUC и порог под recall → калибровка → SHAP-карточки → FastAPI в Docker → README с ограничениями.</div>
         </div>
@@ -342,7 +342,7 @@ if(PAGE==="tree"&&/^#(w-\d+|plan|brs|obsidian)$/.test(location.hash))location.re
       <div class="card">
         <h3>Б · Помощник по документам вуза (RAG)</h3>
         <div class="files">
-          <div><span class="tag">недели 10–11</span> Открытые документы МИРЭА: положения, правила, учебные планы.</div>
+          <div><span class="tag">недели 11–12</span> Открытые документы МИРЭА: положения, правила, учебные планы.</div>
           <div>Ответы со ссылкой на источник. Главное — оценка качества на своём наборе из 50–100 вопросов: Recall@k и MRR для поиска, проверка ответов.</div>
           <div class="note">Разбор PDF → нарезка → эмбеддинги → поиск FAISS или Qdrant вместе с BM25 → реранкинг → LLM с цитатами.</div>
         </div>
@@ -388,7 +388,7 @@ if(PAGE==="tree"&&/^#(w-\d+|plan|brs|obsidian)$/.test(location.hash))location.re
     </div>
   </section>
 
-  <footer>Составлено 11.10.2026, план по неделям — 12.10.2026. Ключевые темы отобраны по типичным программам стажировок в ML: алгоритмическая секция, ML-теория, SQL и Python.</footer>
+  <footer>Составлено 11.10.2026, план по неделям пересобран 02.11.2026 (после теста недели 1 — сдвиг на неделю). Ключевые темы отобраны по типичным программам стажировок в ML: алгоритмическая секция, ML-теория, SQL и Python.</footer>
 </div>
 
 <script>
@@ -827,7 +827,8 @@ function updatePlan(){
     if(sec)sec.classList.toggle("now",cur&&cur.n===w.n);
     weekLessons(w.n).forEach(l=>{const a=document.getElementById(`ls-${w.n}-${l.n}`),t=document.getElementById(`lp-${w.n}-${l.n}`);if(!a||!t)return;
       if(l.kind==="test"){const r=(PLAN.tests||{})[w.n];t.textContent=r?`лучший ${r.best}% · попыток ${r.attempts}`:"не пройден";a.style.setProperty("--p",(r?r.best:0)+"%");a.classList.toggle("full",!!r&&r.best>=85);return}
-      const k=l.topics.filter(id=>done[id]).length;t.textContent=`${k} / ${l.topics.length}`;a.style.setProperty("--p",(k/l.topics.length*100)+"%");a.classList.toggle("full",k===l.topics.length)});
+      const [tk,tn]=l.tasks||[0,0],k=l.topics.filter(id=>done[id]).length;t.textContent=`${k} / ${l.topics.length}`+(tn?` · практика ${tk} / ${tn}`:"");
+      a.style.setProperty("--p",((k+tk)/(l.topics.length+tn)*100)+"%");a.classList.toggle("full",k===l.topics.length&&tk>=tn)});
   });
   const box=document.getElementById("kWeekBox");
   if(cur){
@@ -837,7 +838,7 @@ function updatePlan(){
     document.getElementById("kWeek").innerHTML=`${k}<small> / ${ids.length}</small>`;
     document.getElementById("kWeekBar").style.width=(ids.length?k/ids.length*100:0)+"%";
     const L=weekLessons(cur.n);
-    document.getElementById("kWeekNav").innerHTML=`<div class="wact"><a class="btn pri" href="#w-${cur.n}" data-gw="${cur.n}">Открыть неделю ${cur.n} →</a>${L.map(l=>{if(l.kind==="test"){const r=(PLAN.tests||{})[cur.n];return `<a class="btn ls tst${r&&r.best>=85?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)}">Тест<em>${r?r.best+"%":"—"}</em></a>`}const k=l.topics.filter(id=>done[id]).length;return l.ready===false?`<span class="btn ls soon" title="${esc(l.title)} — урок готовится">Урок ${l.n}<em>скоро</em></span>`:`<a class="btn ls${k===l.topics.length?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)}">Урок ${l.n}<em>${k}/${l.topics.length}</em></a>`}).join("")}</div>
+    document.getElementById("kWeekNav").innerHTML=`<div class="wact"><a class="btn pri" href="#w-${cur.n}" data-gw="${cur.n}">Открыть неделю ${cur.n} →</a>${L.map(l=>{if(l.kind==="test"){const r=(PLAN.tests||{})[cur.n];return `<a class="btn ls tst${r&&r.best>=85?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)}">Тест<em>${r?r.best+"%":"—"}</em></a>`}const [tk,tn]=l.tasks||[0,0],k=l.topics.filter(id=>done[id]).length+tk,all=l.topics.length+tn;return l.ready===false?`<span class="btn ls soon" title="${esc(l.title)} — урок готовится">Урок ${l.n}<em>скоро</em></span>`:`<a class="btn ls${k===all?" full":""}" href="/lessons/${encodeURIComponent(l.file)}" title="${esc(l.title)} · темы ${k-tk} из ${l.topics.length}${tn?` · практика ${tk} из ${tn}`:""}">Урок ${l.n}<em>${k}/${all}</em></a>`}).join("")}</div>
       <div><div class="mini-cap"><span>все недели</span><span>нажми, чтобы перейти</span></div>
       <div class="mini" style="--n:${PLAN.weeks.length};margin-top:6px">${PLAN.weeks.map(w=>{const ids=weekIds(w.n),kk=ids.filter(id=>done[id]).length,pc=ids.length?kk/ids.length*100:(w.end<t?100:0);
         return `<a href="#w-${w.n}" data-gw="${w.n}" class="${w.n===cur.n?"now":""}${w.end<t?" past":""}" style="--wc:var(${KIND[w.kind][1]})" title="Неделя ${w.n} · ${esc(w.span)} — ${esc(w.focus)}"><i style="height:${pc}%"></i><span>${w.n}</span></a>`}).join("")}</div></div>`;
