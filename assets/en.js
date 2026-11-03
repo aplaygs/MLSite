@@ -78,6 +78,7 @@ function say(text,rate=0.9){
 let enLast={t:"",at:0};
 document.addEventListener("click",e=>{
   const el=e.target.closest("[data-say],.say"); if(!el)return;
+  if(e.detail>1&&!getSelection().isCollapsed)return;  /* двойной клик выделяет слово для перевода — фразу заново не читаем */
   const t=el.dataset.say||el.textContent.trim(), now=Date.now(), slow=enLast.t===t&&now-enLast.at<3000;
   say(t,slow?0.62:0.9); enLast={t:slow?"":t,at:now};
   el.classList.add("playing"); setTimeout(()=>el.classList.remove("playing"),600);
@@ -352,3 +353,59 @@ function takeAway(el,{lesson,words=[],rules=[]}){
 document.addEventListener("DOMContentLoaded",()=>{
   if(!("speechSynthesis" in window))document.querySelectorAll(".audio-note").forEach(n=>{n.hidden=false;n.textContent="Этот браузер не умеет читать вслух — открой урок в Safari или Chrome."});
 });
+
+/* ---------- перевод выделенного ----------
+   Выделил английское слово или фразу в уроке — рядом карточка: перевод, транскрипция, «послушать» и «в словарь».
+   Перевод — /api/en/translate (translate.py): сначала свой словарь и слова уроков, потом онлайн-переводчик.
+   Только на localhost и не в тестах недели (там перевод — подсказка). «В словарь» — та же колода «Слова», что на /words. */
+(function(){
+  if(!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)||/-test\.html$/.test(location.pathname))return;
+  const lesson=(location.pathname.match(/e(\d\d)-([a-z0-9]+)\.html/)||[]), src=lesson[1]?`урок ${+lesson[1]}.${lesson[2]} · выделил`:"выделил в уроке";
+  let box=null, seq=0, lastQ="";
+  const close=()=>{if(box){box.remove();box=null}lastQ=""};
+  function place(rect){
+    const w=Math.min(340,innerWidth-24), left=Math.max(12,Math.min(rect.left+rect.width/2-w/2,innerWidth-w-12));
+    box.style.width=w+"px"; box.style.left=left+"px";
+    const below=rect.bottom+10, h=box.offsetHeight;
+    box.style.top=(below+h>innerHeight-8&&rect.top-h-10>8?rect.top-h-10:below)+"px";
+  }
+  async function show(q,rect){
+    close(); lastQ=q; const my=++seq;
+    box=document.createElement("div"); box.className="wtr"; box.setAttribute("role","dialog");
+    box.innerHTML=`<div class="wtr-h"><b>${enEsc(q)}</b></div><div class="wtr-ru muted">перевожу…</div>`;
+    document.body.append(box); place(rect);
+    let d;
+    try{const r=await fetch("/api/en/translate?q="+encodeURIComponent(q));if(!r.ok)throw 0;d=await r.json()}catch(e){d={ru:"",source:"сервер не отвечает"}}
+    if(my!==seq||!box)return;
+    const short=q.split(/\s+/).length<=4, canAdd=d.ru&&short&&!d.in_deck;
+    const plain=q.replace(/^[\s.,!?;:«»"“”()]+|[\s.,!?;:«»"“”()]+$/g,""), base=d.word&&d.word!==plain.toLowerCase()?d.word:"";  /* works → work */
+    const word=base||plain;
+    box.innerHTML=`<div class="wtr-h"><b>${enEsc(plain)}</b>${base?`<span class="wtr-ipa">→ ${enEsc(base)}</span>`:""}${d.ipa?`<span class="wtr-ipa">/${enEsc(d.ipa)}/</span>`:""}
+        <button type="button" class="wtr-spk" data-say="${enEsc(plain)}" aria-label="Послушать">${EN_SPK_SVG}</button></div>
+      <div class="wtr-ru">${d.ru?enEsc(d.ru):"Перевод не нашёлся."}</div>
+      ${d.alts&&d.alts.length?`<div class="wtr-alt">ещё: ${d.alts.map(enEsc).join(" · ")}</div>`:""}
+      <div class="wtr-f"><span class="wtr-src">${enEsc(d.source==="словарь"?"из твоего словаря":d.source==="MyMemory"?"онлайн-переводчик":/^урок /.test(d.source||"")?d.source.replace(/^урок/,"из урока"):d.source||"")}</span>
+        ${canAdd?`<button type="button" class="btn wtr-add">В словарь</button>`:d.in_deck?`<span class="wtr-src">уже в словаре</span>`:""}</div>`;
+    place(rect);
+    const add=box.querySelector(".wtr-add");
+    if(add)add.onclick=async()=>{add.disabled=true;
+      try{const r=await fetch("/api/decks/words",{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({op:"add",items:[{word,translation:d.ru,ipa:d.ipa||"",source:src}]})});
+        if(!r.ok)throw 0;const j=await r.json();add.replaceWith(Object.assign(document.createElement("span"),{className:"wtr-src ok",textContent:j.added&&j.added.length||j.restored&&j.restored.length?"добавлено в словарь":"уже в словаре"}))}
+      catch(e){add.disabled=false;add.textContent="Не сохранилось — ещё раз"}};
+  }
+  function check(){
+    const sel=getSelection(); if(!sel||sel.isCollapsed||!sel.rangeCount)return;
+    const node=sel.anchorNode&&(sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement);
+    if(!node||node.closest("input,textarea,.wtr,button,select,pre,code"))return;
+    const q=sel.toString().replace(/\s+/g," ").trim();
+    if(!q||q.length>200||!/[A-Za-z]/.test(q)||/[А-Яа-яЁё]/.test(q)||q===lastQ)return;
+    show(q,sel.getRangeAt(0).getBoundingClientRect());
+  }
+  let t=null;
+  document.addEventListener("mouseup",e=>{if(box&&box.contains(e.target))return;setTimeout(check,10)});
+  document.addEventListener("keyup",e=>{if(e.key==="Escape")close();else if(e.shiftKey)setTimeout(check,10)});
+  document.addEventListener("selectionchange",()=>{clearTimeout(t);t=setTimeout(()=>{if(matchMedia("(pointer:coarse)").matches)check()},600)});  // телефон: выделение пальцем
+  document.addEventListener("mousedown",e=>{if(box&&!box.contains(e.target))close()});
+  addEventListener("scroll",()=>{if(box)close()},{passive:true});
+})();

@@ -157,3 +157,19 @@ li.ok .sword,li.bad .sword{pointer-events:none}
 .tk-foot .btn.go{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
 .tk-foot .btn.go:disabled{opacity:.45;cursor:default}
 .tk-msg{font-size:14px;color:var(--muted)}
+
+/* Перевод выделенного (en.js) */
+.wtr{position:fixed;z-index:60;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:12px 14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.14);display:grid;gap:6px;font-size:15px;line-height:1.45;animation:wtrIn .12s ease-out}
+@keyframes wtrIn{from{opacity:0;transform:translateY(-4px)}}
+.wtr-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wtr-h b{font-size:16px}
+.wtr-ipa{font:13px var(--f-mono);color:var(--muted)}
+.wtr-spk{margin-left:auto;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;width:30px;height:28px;display:grid;place-items:center;cursor:pointer}
+.wtr-spk:hover{border-color:var(--accent);color:var(--accent)}
+.wtr-ru{font-weight:500}
+.wtr-alt{font-size:13.5px;color:var(--muted)}
+.wtr-f{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-top:2px}
+.wtr-src{font:500 11px var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.wtr-src.ok{color:var(--accent)}
+.wtr .btn{padding:5px 10px;font-size:13px}
