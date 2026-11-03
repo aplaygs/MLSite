@@ -25,22 +25,36 @@ const enShuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Ma
 
 const EN_SPK_SVG='<svg class="ico-spk" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
 
-/* ---------- голос ---------- */
-let EN_VOICE=null;
+/* ---------- голос ----------
+   Лучший британский голос в Chrome — сетевой Google UK (женский): звучит хорошо, но каждая фраза идёт на сервер Google,
+   поэтому бывала задержка 2–3 с. Что делаем:
+   — прогрев: при первом касании страницы голос тихо произносит пустую фразу, соединение готово заранее;
+   — cancel() только если что-то уже звучит, и новая фраза через 60 мс (иначе Chrome её иногда теряет).
+   Подмены на голос с компьютера нет: два голоса сразу хуже ожидания. */
+let EN_VOICE=null,EN_U=null,EN_WARM=false;
 function enPickVoice(){
   if(!("speechSynthesis" in window))return;
   /* В macOS среди английских голосов есть «шуточные» (Bells, Bad News, Zarvox…) — их пропускаем. */
   const FUN=/Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Junior|Ralph|Fred|Kathy|Princess|Deranged|Hysterical|Pipe|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley/i;
   const v=speechSynthesis.getVoices().filter(x=>/^en[-_]/.test(x.lang)&&!FUN.test(x.name));
-  EN_VOICE=v.find(x=>x.lang==="en-GB"&&/natural|neural|premium|enhanced/i.test(x.name))
-    ||v.find(x=>x.lang==="en-GB"&&/google uk|serena|oliver|stephanie|martha/i.test(x.name))
-    ||v.find(x=>x.lang==="en-GB"&&/daniel|kate|george/i.test(x.name))
-    ||v.find(x=>x.lang==="en-GB")
-    ||v.find(x=>/natural|neural|premium|enhanced/i.test(x.name)&&/^en[-_]/.test(x.lang))
-    ||v.find(x=>/google us|samantha|ava|allison|tom|moira|tessa/i.test(x.name))
-    ||v[0]||null;
+  const best=list=>list.find(x=>/google uk english female/i.test(x.name))  /* тот самый хороший женский голос Chrome */
+    ||list.find(x=>x.lang==="en-GB"&&/natural|neural|premium|enhanced/i.test(x.name))
+    ||list.find(x=>x.lang==="en-GB"&&/google uk|serena|oliver|stephanie|martha/i.test(x.name))
+    ||list.find(x=>x.lang==="en-GB"&&/daniel|kate|george/i.test(x.name))
+    ||list.find(x=>x.lang==="en-GB")
+    ||list.find(x=>/natural|neural|premium|enhanced/i.test(x.name)&&/^en[-_]/.test(x.lang))
+    ||list.find(x=>/google us|samantha|ava|allison|tom|moira|tessa/i.test(x.name))
+    ||list[0]||null;
+  EN_VOICE=best(v);
 }
-if("speechSynthesis" in window){enPickVoice();speechSynthesis.onvoiceschanged=enPickVoice}
+if("speechSynthesis" in window){enPickVoice();speechSynthesis.onvoiceschanged=enPickVoice;
+  /* Прогрев по первому касанию (не по кнопке озвучки — она и так заговорит сама). */
+  document.addEventListener("pointerdown",e=>{
+    if(EN_WARM||e.target.closest("[data-say],.say,.qz-say,.wc-say"))return; EN_WARM=true;
+    if(!EN_VOICE)enPickVoice(); if(!EN_VOICE||EN_VOICE.localService||speechSynthesis.speaking)return;
+    const w=new SpeechSynthesisUtterance(" "); w.voice=EN_VOICE; w.lang=EN_VOICE.lang; w.volume=0; speechSynthesis.speak(w);
+  },{capture:true});
+}
 /* Что голос читать не должен: стрелки (→ читается «right arrow»), «/» между вариантами («slash»), значки ✓ ✗,
    русские подсказки — «(да)», «Тебе говорят…» английский голос коверкает. Остаётся только английский. */
 const enSpeakable=t=>String(t)
@@ -50,10 +64,15 @@ const enSpeakable=t=>String(t)
   .replace(/\s+([,.!?])/g,"$1").replace(/([,.!?])(?:\s*[,.])+/g,"$1").replace(/^[\s,.:;—–-]+/,"").replace(/\s{2,}/g," ").trim();
 function say(text,rate=0.9){
   if(!("speechSynthesis" in window))return false;
-  const u=new SpeechSynthesisUtterance(enSpeakable(text));
+  const t=enSpeakable(text); if(!t)return false;
   if(!EN_VOICE)enPickVoice();
-  if(EN_VOICE)u.voice=EN_VOICE; u.lang=EN_VOICE?EN_VOICE.lang:"en-GB"; u.rate=rate;
-  speechSynthesis.cancel(); speechSynthesis.speak(u); return true;
+  const mk=v=>{const u=new SpeechSynthesisUtterance(t); if(v){u.voice=v;u.lang=v.lang}else u.lang="en-GB"; u.rate=rate; return u};
+  const go=()=>{
+    const u=mk(EN_VOICE); EN_U=u; /* ссылка держит фразу, иначе Chrome может выбросить её до начала */
+    speechSynthesis.resume(); speechSynthesis.speak(u);
+  };
+  if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel(); setTimeout(go,60)} else go();
+  return true;
 }
 /* Клик по фразе с data-say: первый раз — обычная скорость, повторный в течение 3 секунд — медленно. */
 let enLast={t:"",at:0};

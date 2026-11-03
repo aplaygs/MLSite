@@ -21,7 +21,7 @@ initQuiz({
   week: 2, minutes: 30, section: "en",
   title: "Тест недели 2 · Work and study",
   intro: "33 вопроса по пяти урокам: present simple в утверждении, отрицании и вопросах, -s у he / she / it, короткие ответы, работа и учёба, in / on / at, звук -s, просьбы, анкета и даты, be против do, чтение, письмо и разговор. И шесть вопросов повторения недели 1 — ровно по тем ошибкам, что были в прошлом тесте. Есть задания на слух — включи звук.",
-  howto: "Отвечай по памяти, не открывая уроки. Где надо впечатать — пиши как в обычном тексте: регистр, ’ и точка в конце не важны. В заданиях с 🔊 фраза прозвучит сама, кнопкой её можно повторить. После каждого ответа — разбор и ссылка в урок. Клавиши: <code>1</code>–<code>4</code> — выбрать вариант, <code>Enter</code> — проверить и дальше.",
+  howto: "Отвечай по памяти, не открывая уроки. Где надо впечатать — пиши как в обычном тексте: регистр, ’ и точка в конце не важны. В заданиях с кнопкой «Послушать» фраза прозвучит сама, кнопкой её можно повторить. После каждого ответа — разбор и ссылка в урок. Клавиши: <code>1</code>–<code>4</code> — выбрать вариант, <code>Enter</code> — проверить и дальше.",
   lessons: [
     {n: 1, file: "e02-1.html", title: "Present simple: что я делаю всегда", cover: "+ и −, -s у he/she/it, don't/doesn't, профессии и связки с work"},
     {n: 2, file: "e02-2.html", title: "Вопросы с do/does, учёба и звук -s", cover: "Do/Does…? короткие ответы, вопросы со словом, учёба, in/on/at, /s/ /z/ /ɪz/"},
@@ -45,7 +45,7 @@ initQuiz({
      q: "Какие предложения <b>правильные</b>?", opts: ["I'm work from home.", "My parents live in Kazan.", "She watches TV in the evening.", "He don't like coffee."], ans: [1, 2],
      explain: "<i>I work from home</i> — без be. <i>He doesn't like</i> — he требует does. <i>parents</i> — много, без -s; <i>watches</i> — после ch +es."},
     {lesson: 1, topic: "en.02.1.1", ref: "#t1", refTitle: "Звук -s", type: "text", say: "She finishes work at six.",
-     q: "🔊 Послушай и впиши глагол так, как он прозвучал — с окончанием.", ans: ["finishes"],
+     q: "Послушай и впиши глагол так, как он прозвучал — с окончанием.", ans: ["finishes"],
      explain: "<b>finishes</b> — после sh окончание +es, звучит /ɪz/."},
     {lesson: 1, topic: "en.02.1.2", ref: "#t2", refTitle: "Связки с work", type: "one",
      q: "«Он работает разработчиком».", opts: ["He works as developer.", "He works like a developer.", "He works as a developer.", "He is work as developer."], ans: 2,
@@ -67,7 +67,7 @@ initQuiz({
      q: "Do you like coffee? — (да)", opts: ["Yes, I am.", "Yes, I does.", "Yes, I do.", "Yes, I like."], ans: 2,
      explain: "Отвечают тем же помощником: спросили с do — <b>Yes, I do.</b>"},
     {lesson: 2, topic: "en.02.2.1", ref: "#t1", refTitle: "Вопрос со словом", type: "text", say: "Where does she work?",
-     q: "🔊 Послушай вопрос и впиши его.", ans: ["Where does she work?", "Where does she work"],
+     q: "Послушай вопрос и впиши его.", ans: ["Where does she work?", "Where does she work"],
      explain: "<b>Where does she work?</b> — слово + does + кто + глагол без -s."},
     {lesson: 2, topic: "en.02.2.1", ref: "#t1", refTitle: "Вопросы с do/does", type: "many",
      q: "Какие вопросы <b>неправильные</b>?", opts: ["Where do you live?", "What you do?", "When does the lecture start?", "Does she works here?"], ans: [1, 3],
@@ -79,7 +79,7 @@ initQuiz({
      q: "«Сдавать экзамен» (идти на экзамен) — это…", opts: ["make an exam", "take an exam", "pass an exam", "give an exam"], ans: 1,
      explain: "<b>take an exam</b> — сдавать. <i>pass</i> — сдать успешно, <i>fail</i> — провалить."},
     {lesson: 2, topic: "en.02.2.3", ref: "#t3", refTitle: "Звук -s", type: "many", say: "watches, plays, finishes, works",
-     q: "🔊 В каких словах окончание звучит как /ɪz/?", opts: ["works", "finishes", "watches", "plays"], ans: [1, 2],
+     q: "В каких словах окончание звучит как /ɪz/?", opts: ["works", "finishes", "watches", "plays"], ans: [1, 2],
      explain: "После ch и sh — <b>/ɪz/</b>: <i>watches, finishes</i>. <i>plays</i> — /z/, <i>works</i> — /s/."},
     /* ---------- урок 2.3 ---------- */
     {lesson: 3, topic: "en.02.3.1", ref: "#t1", refTitle: "Просьбы", type: "one",
@@ -89,7 +89,7 @@ initQuiz({
      q: "Тебе сказали «Thank you!». Что ответить?", opts: ["You're welcome.", "Nothing.", "Please.", "Here you are."], ans: 0,
      explain: "«Не за что» — <b>You're welcome.</b> <i>Here you are</i> — когда протягиваешь вещь, <i>please</i> — когда просишь."},
     {lesson: 3, topic: "en.02.3.2", ref: "#t2", refTitle: "Даты", type: "text", say: "the thirteenth of October, two thousand and twenty-six",
-     q: "🔊 Запиши дату цифрами по-британски: ДД/ММ/ГГГГ.", ans: ["13/10/2026", "13.10.2026"],
+     q: "Запиши дату цифрами по-британски: ДД/ММ/ГГГГ.", ans: ["13/10/2026", "13.10.2026"],
      explain: "<b>13/10/2026</b> — в Британии сначала число, потом месяц. Читается <i>the thirteenth of October</i>."},
     {lesson: 3, topic: "en.02.3.3", ref: "#t3", refTitle: "be или do", type: "text",
      q: "Переведи: «Ты устал?»", ans: ["Are you tired?", "Are you tired"],
@@ -99,7 +99,7 @@ initQuiz({
      q: "Прочитай: <i>Anna is a teacher. She works part-time, so she has a lot of free time. On her days off she paints.</i> Что верно?", opts: ["Anna doesn't have free time.", "Anna doesn't work full-time.", "Anna is a painter.", "Anna works every day."], ans: 1,
      explain: "<b>part-time</b> — неполный день, значит не full-time. Свободного времени у неё много, а рисует она в выходные — это хобби, не работа."},
     {lesson: 4, topic: "en.02.4.1", ref: "#t1", refTitle: "Слушание", type: "text", say: "She has a part-time job in a café.",
-     q: "🔊 Запиши фразу.", ans: ["She has a part-time job in a café", "She has a part-time job in a cafe", "She has a part time job in a cafe", "She has a part time job in a café"],
+     q: "Запиши фразу.", ans: ["She has a part-time job in a café", "She has a part-time job in a cafe", "She has a part time job in a cafe", "She has a part time job in a café"],
      explain: "<i>She <b>has</b> a part-time job in a café.</i> У she — has, не have."},
     {lesson: 4, topic: "en.02.4.2", ref: "#t2", refTitle: "also", type: "one",
      q: "Где правильно стоит also?", opts: ["I'm work also here.", "I work also here.", "I also work here.", "Also I work here."], ans: 2,
@@ -134,7 +134,7 @@ initQuiz({
      q: "Коллега почти не помогает. Как сказать мягко?", opts: ["He isn't very helpful.", "He's a bit helpful.", "He isn't a bit helpful.", "He's very not helpful."], ans: 0,
      explain: "Мягко о плохом — <b>not very</b>. a bit — только с плохими словами: <i>a bit lazy</i>."},
     {lesson: 6, file: "e02-3.html", topic: "en.01.3.1", ref: "#warm", refTitle: "Почта на слух", type: "text", say: "m dot green at gmail dot com",
-     q: "🔊 Запиши почту.", ans: ["m.green@gmail.com"],
+     q: "Запиши почту.", ans: ["m.green@gmail.com"],
      explain: "<b>dot</b> — точка, <b>at</b> — @: <i>m.green@gmail.com</i>."}
   ]
 });

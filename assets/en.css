@@ -66,7 +66,7 @@ li.bad .gchip.pick{border-color:var(--red);background:color-mix(in srgb,var(--re
 .builds{display:grid;gap:12px}
 .bd{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:10px;background:var(--bg);transition:border-color .2s}
 .bd.ok{border-color:var(--accent)} .bd.bad{border-color:var(--red)}
-.bru{font-size:15px;color:var(--muted)} .bru::before{content:"🇷🇺 ";font-size:13px}
+.bru{font-size:15px;color:var(--muted)} .bru::before{content:"RU";display:inline-block;font:600 10px/1 var(--f-mono);letter-spacing:.08em;padding:3px 6px;margin-right:8px;border-radius:6px;background:var(--surface);border:1px solid var(--line);color:var(--muted);vertical-align:2px}
 .bline{min-height:46px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px;border-radius:10px;background:var(--surface);border:1.5px dashed var(--line)}
 .bd.ok .bline{border-style:solid;border-color:var(--accent);background:var(--accent-soft)}
 .btiles{display:flex;flex-wrap:wrap;gap:6px}

@@ -1,0 +1,497 @@
+<title>Урок 2.6 · Артикль a/an: когда и зачем</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/lesson.css">
+<link rel="stylesheet" href="/assets/en.css">
+<style>
+/* Только для этого урока: три вопроса перед a, быстрый выбор a / an / ничего (как be или do в 2.3). */
+.steps3{display:grid;gap:8px;counter-reset:s}
+.steps3 .st3{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
+.steps3 .st3::before{counter-increment:s;content:counter(s);grid-row:span 2;font:600 13px var(--f-mono);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent)}
+.steps3 .st3 b{font-weight:600}
+.steps3 .st3 span{font-size:14.5px;color:var(--muted)}
+.steps3 .fin{border:1.5px solid var(--accent);border-radius:12px;padding:12px 14px;background:var(--accent-soft);font-weight:500}
+.qc{display:grid;gap:14px;text-align:center}
+.qc-ph{font:600 clamp(22px,4.6vw,32px)/1.25 var(--f-display);background:var(--bg);border-radius:14px;padding:22px 14px;min-height:88px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0 .3em}
+.qc-ph .gap{display:inline-block;min-width:2.2em;border-bottom:3px solid var(--accent);color:var(--accent)}
+.qc-ph.ok{background:var(--accent-soft)} .qc-ph.no{background:color-mix(in srgb,var(--red) 14%,var(--bg))}
+.qc-b{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.qc-b .btn{min-width:88px;font-size:17px}
+.qc-meta{display:flex;justify-content:center;gap:16px;font:500 13px var(--f-mono);color:var(--muted)}
+.qc-miss{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.qc-miss .say{background:var(--bg);border-radius:8px;padding:3px 8px;font-size:14.5px}
+.qc-why{font-size:14.5px;color:var(--muted);min-height:1.4em}
+</style>
+
+<script src="/assets/nav.js"></script>
+<script src="/assets/work.js"></script>
+<div class="wrap">
+<nav class="topnav" id="topnav" hidden aria-label="Навигация по урокам"><a href="/lessons/e02-3.html">← Урок 3 · Просьбы, анкета</a><span class="mid">дополнительный урок</span><a href="/lessons/e02-4.html">Урок 4 · Читаем и пишем →</a></nav>
+<header class="top">
+  <div class="eyebrow">Неделя 2 · Work and study · дополнительный урок · 2 темы · ~60 минут</div>
+  <h1>Артикль a/an: когда и зачем</h1>
+  <p>Отдельный урок по твоей просьбе: <b>зачем вообще нужен «a»</b> и <b>как быстро решить, ставить его или нет</b>. В русском артиклей нет, поэтому кажется, что это лишнее словечко. Для англичанина «I'm student» звучит так же криво, как для нас «я студентом». Сначала разберём смысл, потом правило в три вопроса, а потом — много практики на фразах про тебя.</p>
+  <p class="audio-note">Нажми на английскую фразу — прозвучит. Второй клик сразу — медленнее.</p>
+  <nav class="toc" aria-label="Темы урока">
+    <a href="#t1">Зачем a</a><a href="#t2">a в речи о себе</a><a href="#practice">Практика</a><a href="#take">В Quizlet</a><a href="#sheet">Шпаргалка</a>
+  </nav>
+</header>
+
+<!-- ============ 1 ============ -->
+<section class="topic" id="t1">
+  <div class="eyebrow">Тема 1 из 2 · Грамматика · ~30 минут</div>
+  <h2>Что значит a и когда его ставить</h2>
+  <p class="tldr"><b>a</b> — это бывшее слово <span class="say">one</span>, «один». Оно и сейчас значит <b>«один, какой-то, один из многих»</b>. Главное правило: в английском <b>одна штука, которую можно посчитать, не может стоять «голой»</b>. Перед ней всегда что-то есть: <b>a</b>, <b>my</b>, <b>the</b>, <b>this</b>… Если больше ничего нет — ставишь <b>a</b>.</p>
+
+  <div class="prose">
+    <p><b>Зачем это англичанам.</b> По-русски «я студент», «у меня есть машина», «рядом есть зал» — и так понятно, что речь об одном. В английском это показывает маленькое слово. Сравни:</p>
+    <ul>
+      <li><span class="say">I have a car.</span> — у меня есть машина (одна, какая-то). А просто «I have car» — ошибка, слово как будто оборвано.</li>
+      <li><span class="say">I'm a student.</span> — я студент, <i>один из многих студентов</i>. Поэтому a стоит всегда перед профессией и ролью.</li>
+      <li><span class="say">There's a gym near my house.</span> — рядом с домом есть (какой-то) зал. Ты о нём говоришь впервые.</li>
+    </ul>
+    <p>То есть a — не «лишнее слово», а <b>способ сказать «одна штука, какая-то из многих»</b>. Где по-русски можно вставить «один» или «какой-то» и смысл не сломается — там почти всегда нужен a.</p>
+  </div>
+
+  <h3>Три вопроса перед существительным</h3>
+  <div class="steps3">
+    <div class="st3"><b>Это можно посчитать: один, два, три?</b><span>a book — two books — да. Water, music, money, homework — «две воды» не скажешь — нет, a не ставят.</span></div>
+    <div class="st3"><b>Она одна?</b><span>Если много (students, books, friends) — a не ставят. a = один.</span></div>
+    <div class="st3"><b>Перед словом уже стоит другой «хозяин»?</b><span>my, your, his, her, our, this, that, the — тогда a не нужен. Имя, город, страна, язык, день недели — тоже без a.</span></div>
+    <div class="fin">Можно посчитать + одна + нет хозяина → <span class="say">a</span> (или <span class="say">an</span>, если слово начинается с гласного звука).</div>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Когда ставят a</th><th>Пример</th><th>Перевод</th></tr></thead>
+    <tbody>
+      <tr><td><b>Кто ты:</b> профессия, роль</td><td><span class="say">I'm a student.</span> <span class="say">He works as a developer.</span></td><td>я студент · работает разработчиком</td></tr>
+      <tr><td><b>Что у тебя есть</b></td><td><span class="say">I have a brother.</span> <span class="say">I have a laptop.</span></td><td>у меня есть брат, ноутбук</td></tr>
+      <tr><td><b>Одно из многих, впервые</b></td><td><span class="say">There's a café near my university.</span></td><td>рядом есть (какое-то) кафе</td></tr>
+      <tr><td><b>Описание:</b> a + прилагательное + слово</td><td><span class="say">Moscow is a big city.</span> <span class="say">She's a very kind person.</span></td><td>большой город · очень добрый человек</td></tr>
+      <tr><td><b>«В неделю», «в день»</b></td><td><span class="say">three times a week</span> · <span class="say">twice a week</span> · <span class="say">once a day</span></td><td>три раза в неделю · дважды в неделю · раз в день</td></tr>
+      <tr><td><b>Ровно один</b></td><td><span class="say">an hour</span> · <span class="say">a minute</span> · <span class="say">a hundred</span></td><td>час · минута · сто</td></tr>
+    </tbody></table></div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Когда a не ставят</th><th>Пример</th></tr></thead>
+    <tbody>
+      <tr><td><b>Много</b> (множественное число)</td><td><span class="say">I have two brothers.</span> <span class="say">Students work hard.</span></td></tr>
+      <tr><td><b>Нельзя посчитать</b></td><td><span class="say">I like music.</span> <span class="say">I drink water.</span> <span class="say">I have homework.</span></td></tr>
+      <tr><td><b>Уже есть «хозяин»</b>: my, his, this, the</td><td><span class="say">my phone</span> · <span class="say">this book</span> · не «a my phone»</td></tr>
+      <tr><td><b>Имена, города, страны, языки, дни</b></td><td><span class="say">Vlad</span> · <span class="say">Moscow</span> · <span class="say">Russia</span> · <span class="say">English</span> · <span class="say">on Monday</span></td></tr>
+      <tr><td><b>Прилагательное без слова после</b></td><td><span class="say">She's kind.</span> — но <span class="say">She's a kind person.</span></td></tr>
+      <tr><td><b>Устойчивые фразы</b></td><td><span class="say">at home</span> · <span class="say">at work</span> · <span class="say">at university</span> · <span class="say">have breakfast</span> · <span class="say">play football</span></td></tr>
+    </tbody></table></div>
+
+  <div class="prose">
+    <ul>
+      <li><b>a или an</b> — по <b>звуку</b>, а не по букве (это было в 2.2): <span class="say">an hour</span> (h не читается), <span class="say">a university</span> (звук «ю» = [й]), <span class="say">an ML engineer</span> (ML = «эм-эл»). Смотри на слово сразу после артикля: <span class="say">an English tutor</span>, но <span class="say">a good tutor</span>.</li>
+      <li><b>Кофе в кафе.</b> Coffee, tea, water посчитать нельзя — <span class="say">I like coffee.</span> Но в кафе просят порцию, и тогда a можно: <span class="say">Can I have a coffee, please?</span> = «одну чашку кофе». Это то самое «один».</li>
+      <li><b>В анкете</b> род занятий пишут без a: <i>Occupation: student</i> (это из 2.3). В обычной фразе — с a: <span class="say">I'm a student.</span></li>
+    </ul>
+  </div>
+  <details class="more"><summary>Подробнее: a или the</summary>
+    <div class="prose">
+      <p><b>a</b> — «какой-то, один из многих»: собеседник ещё не знает, о какой вещи речь. <b>the</b> — «тот самый»: уже понятно, какой. Обычно в первый раз говорят a, а потом — the:</p>
+      <ul>
+        <li><span class="say">There's a café near my university. The café is really nice.</span> — сначала «какое-то кафе», потом «это самое кафе».</li>
+        <li><span class="say">I have a tutor. The tutor is very good.</span></li>
+        <li>Единственное в своём роде — сразу the: <span class="say">the sun</span>, <span class="say">the gym</span> (твой обычный зал), <span class="say">the bill</span> (счёт за твой стол).</li>
+      </ul>
+      <p>Сейчас главное — <b>не пропускать a</b>. Это самая частая ошибка у русскоговорящих, и её слышно сразу. В the чаще ошибаются, но собеседник тебя всё равно поймёт. the подробно будет позже, в 4-й неделе — вместе с some и any.</p>
+    </div>
+  </details>
+
+  <div class="callout ru"><b class="h">Ошибки русскоговорящих</b>
+    <div class="pairs">
+      <div class="pair"><span class="no">I'm student.</span><span class="yes"><span class="say">I'm a student.</span></span><span class="n">Профессия и роль — всегда с a.</span></div>
+      <div class="pair"><span class="no">She works as manager.</span><span class="yes"><span class="say">She works as a manager.</span></span><span class="n">После as — тоже a.</span></div>
+      <div class="pair"><span class="no">I have car.</span><span class="yes"><span class="say">I have a car.</span></span><span class="n">Одна штука, которую можно посчитать, не бывает «голой».</span></div>
+      <div class="pair"><span class="no">He's a my friend.</span><span class="yes"><span class="say">He's my friend.</span></span><span class="n">my уже «хозяин» — второй не нужен.</span></div>
+      <div class="pair"><span class="no">I like a music.</span><span class="yes"><span class="say">I like music.</span></span><span class="n">Музыку не посчитать — без a.</span></div>
+      <div class="pair"><span class="no">I have a two brothers.</span><span class="yes"><span class="say">I have two brothers.</span></span><span class="n">a = один. С «два» он не дружит.</span></div>
+      <div class="pair"><span class="no">three times in week</span><span class="yes"><span class="say">three times a week</span></span><span class="n">«В неделю» — a week, без in.</span></div>
+    </div>
+  </div>
+  <div class="callout mem"><b class="h">Как запомнить</b><p>Одна штука без хозяина — с <b>a</b>. Хозяин — это my, his, the, this или имя. Проверка: можно ли подставить «один / какой-то»? «Я (один из) студентов», «у меня есть (одна) машина» — значит, a.</p></div>
+
+  <div class="ex" id="ex1a"><div class="ex-h"><span class="eyebrow">Упражнение 1 · разложи</span><p>a, an или без артикля? Нажимай на группу для каждого слова.</p></div></div>
+  <div class="ex" id="ex1b"><div class="ex-h"><span class="eyebrow">Упражнение 2 · выбери</span><p>Вставь a, an или ничего (—).</p></div></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Лаборатория · быстрый выбор</span><span class="muted mono" id="qcState"></span></div>
+    <div class="qc">
+      <div class="qc-ph" id="qcPh">20 фраз на скорость: a, an или ничего?</div>
+      <div class="qc-why" id="qcWhy" aria-live="polite"></div>
+      <div class="qc-b" id="qcB" role="group" aria-label="Варианты"></div>
+      <div class="qc-meta"><span id="qcScore"></span><span id="qcTime"></span><span id="qcBest"></span></div>
+      <div class="qc-miss" id="qcMiss"></div>
+      <div class="btns" style="justify-content:center"><button class="btn" type="button" id="qcGo">Начать</button></div>
+    </div>
+    <p class="muted" style="font-size:13.5px">Клавиши 1–3 выбирают ответ. После ошибки на секунду видно, почему так. Цель — 20 из 20 меньше чем за 45 секунд.</p>
+  </div>
+
+  <div class="ex" id="ex1c"><div class="ex-h"><span class="eyebrow">Упражнение 3 · найди ошибку</span><p>Нажми на слово с ошибкой: где a не хватает — на слово, перед которым он нужен; где a лишний — на сам a. В двух предложениях ошибки нет.</p></div></div>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Почему «I'm student» — ошибка, а «Occupation: student» в анкете — нет?</summary>
+      <div class="a"><p>В обычной фразе одна штука, которую можно посчитать, не стоит без артикля: <span class="say">I'm a student.</span> Анкета — это не фраза, а подпись к полю, там артикли опускают.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>a или ничего: «I like ___ coffee» и «Can I have ___ coffee, please?»</summary>
+      <div class="a"><p><span class="say">I like coffee.</span> — кофе вообще, не посчитать. <span class="say">Can I have a coffee, please?</span> — одну чашку.</p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Скажи по-английски: «Он мой друг. Он разработчик».</summary>
+      <div class="a"><p><span class="say">He's my friend. He's a developer.</span> С my — без a, с профессией — с a.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="en.02.6.1">
+    <label class="tp"><input type="checkbox" data-id="en.02.6.1"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>артикль a/an: зачем и когда ставить</b></span></label>
+    <span class="note" data-d="en.02.6.1">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="topic" id="t2">
+  <div class="eyebrow">Тема 2 из 2 · Речь · ~20 минут</div>
+  <h2>a в речи о себе</h2>
+  <p class="tldr">Правило понятно — теперь нужен автоматизм. Когда говоришь о себе, a есть почти в каждой фразе: <span class="say">I'm a third-year student.</span> <span class="say">I have an English tutor.</span> <span class="say">I go to the gym three times a week.</span> Здесь все задания — про тебя.</p>
+
+  <div class="ex" id="exMe1"><div class="ex-h"><span class="eyebrow">Про тебя · собери фразу</span><p>Переведи. Есть лишние плитки — среди них лишние a, an и the.</p></div></div>
+  <div class="ex" id="exMe2"><div class="ex-h"><span class="eyebrow">Про тебя · текст</span><p>Рассказ Влада о себе. Вставь a, an или ничего (—). Потом прочитай весь текст вслух.</p></div></div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="eyebrow">Диалог · новичок в зале</span><span class="btns"><button class="btn" type="button" id="gymPlay">▶ Весь диалог</button><button class="btn" type="button" id="gymHide" aria-pressed="false">Скрыть реплики B</button></span></div>
+    <div class="dlg" id="gym"></div>
+  </div>
+  <p class="muted" style="font-size:13.5px">Послушай и найди в репликах все a и an — их одиннадцать. Потом скрой реплики B и говори их сам. Обрати внимание на последние строки: сначала <i>a small club</i>, потом <i>the club</i> — тот самый.</p>
+
+  <div class="qs">
+    <details class="q"><summary><span class="t self">Проверь себя</span>Скажи: «Я хожу в зал три раза в неделю, а с репетитором занимаюсь два раза в неделю».</summary>
+      <div class="a"><p><span class="say">I go to the gym three times a week, and I have lessons with my tutor twice a week.</span></p></div></details>
+    <details class="q"><summary><span class="t self">Проверь себя</span>Скажи: «Я хочу стать ML-инженером». a или an?</summary>
+      <div class="a"><p><span class="say">I want to be an ML engineer.</span> ML читается «эм-эл» — первый звук гласный, поэтому an.</p></div></details>
+  </div>
+  <div class="topic-check" data-for="en.02.6.2">
+    <label class="tp"><input type="checkbox" data-id="en.02.6.2"><span class="bx" aria-hidden="true"></span><span>Пройдено: <b>a/an в речи о себе</b></span></label>
+    <span class="note" data-d="en.02.6.2">отметка в плане</span>
+  </div>
+</section>
+
+<!-- ============ practice ============ -->
+<section class="topic" id="practice">
+  <div class="eyebrow">Практика · ~10 минут</div>
+  <h2>Объясни и расскажи</h2>
+  <p class="tldr">Лучшая проверка — объяснить правило другу и рассказать о себе так, чтобы ни один a не потерялся.</p>
+  <div class="ex" id="exRule"><div class="ex-h"><span class="eyebrow">Объясни правило другу · по-русски</span><p>Напиши или скажи вслух своими словами, с примером, потом сравни с эталоном.</p></div></div>
+  <div class="ex" id="exTell"><div class="ex-h"><span class="eyebrow">Расскажи · по-английски</span><p>Пиши по-английски простыми фразами. Ошибся — не страшно: сравни с эталоном и скажи ещё раз вслух уже правильно.</p></div></div>
+  <div class="prac">
+    <div class="task"><span class="tg work">Говорить · 3 минуты</span>
+      <h3>Что вокруг тебя</h3>
+      <p>Оглядись и назови вслух восемь вещей рядом: <i>I have a laptop. There's a window. There's an umbrella…</i> Две из них — во множественном числе, без a: <i>two pens</i>.</p>
+      <p class="ok">Готово, когда ни разу не сказал «I have laptop».</p>
+    </div>
+    <div class="task"><span class="tg rev">Писать · 7 минут</span>
+      <h3>Переведи и проверь себя</h3>
+      <p>1. Мой брат — инженер. 2. У меня есть репетитор, он очень хороший учитель. 3. Я люблю музыку и спорт. 4. У неё две сестры и собака. 5. Лекция длится час. 6. Я пью кофе два раза в день.</p>
+      <details><summary>Ответы</summary><div class="a">
+        <p>1. <span class="say">My brother is an engineer.</span> 2. <span class="say">I have a tutor. He's a very good teacher.</span> 3. <span class="say">I like music and sport.</span> 4. <span class="say">She has two sisters and a dog.</span> 5. <span class="say">The lecture is an hour long.</span> 6. <span class="say">I drink coffee twice a day.</span></p></div></details>
+    </div>
+  </div>
+  <div class="callout mem"><b class="h">Дальше</b><p>Завтра — <a href="/lessons/e02-4.html">урок 2.4 «Читаем и пишем»</a>. В текстах там много a: <i>a nurse, a big hospital, an IT company</i> — замечай их. В субботу — тест недели.</p></div>
+</section>
+
+<!-- ============ take ============ -->
+<section class="topic" id="take">
+  <div class="eyebrow">После урока</div>
+  <h2>В Quizlet</h2>
+  <p class="tldr">Правила урока учишь в Quizlet. Новое уже отмечено — сними лишнее, нажми «Скопировать для Quizlet» и вставь в набор недели через «Импорт». Что уже перенесено, помечено «в Quizlet»; всё записывается в «Словарь» и «Правила на заучку» в Obsidian.</p>
+</section>
+
+<!-- ============ topics ============ -->
+<section class="topic" id="topics">
+  <div class="eyebrow">Отметки в плане</div>
+  <h2>Темы урока</h2>
+  <p class="prose muted">Ставь галочку, когда сделал упражнения темы без ошибок или с одной. Галочки — те же, что в файле недели в Obsidian и в плане на сайте.</p>
+  <ul class="topics" id="topicList"></ul>
+  <p class="muted" id="topicNote" role="status" style="font-size:13.5px"></p>
+</section>
+
+<!-- ============ end ============ -->
+<section class="end" id="sheet">
+  <div class="eyebrow">Итог урока</div>
+  <h2>Шпаргалка</h2>
+  <div class="sheet">
+    <ol>
+      <li><b>a = «один, какой-то»</b>. Одна штука, которую можно посчитать, не стоит «голой»: <span class="say">I have a car.</span></li>
+      <li><b>Три вопроса:</b> можно посчитать? одна? нет my / the / this / имени? — тогда a.</li>
+      <li><b>Профессия и роль</b> — всегда a: <span class="say">I'm a student.</span> <span class="say">She works as a nurse.</span></li>
+      <li><b>a + прилагательное + слово:</b> <span class="say">a big city</span> · <span class="say">a very kind person</span>. Без слова — без a: <span class="say">She's kind.</span></li>
+      <li><b>Без a:</b> много (<span class="say">two brothers</span>), не посчитать (<span class="say">music, water</span>), с хозяином (<span class="say">my phone</span>), имена, страны, языки, <span class="say">at home, at work</span>.</li>
+      <li><b>«В неделю»:</b> <span class="say">three times a week</span> · <span class="say">twice a week</span> · <span class="say">once a day</span>.</li>
+      <li><b>a или an</b> — по звуку: <span class="say">an hour</span> · <span class="say">an ML engineer</span> · <span class="say">a university</span>.</li>
+      <li><b>a → the:</b> впервые — a, потом — the: <span class="say">I have a tutor. The tutor is great.</span></li>
+    </ol>
+    <div class="btns"><button class="btn" id="bCopy">Скопировать конспект</button><span class="muted" id="copyMsg" role="status" style="font-size:13.5px"></span></div>
+    <textarea id="mdArea" rows="8" hidden readonly></textarea>
+    <p class="muted" style="font-size:13.5px">Конспект этого урока уже лежит в Obsidian: <code>65_Английский/Уроки</code>.</p>
+  </div>
+  <div class="callout"><b class="h" style="color:var(--accent)">Проверка без подсказок, 5 минут</b>
+    <p>Закрой урок. Вслух, за минуту: кто ты, что у тебя есть, чем занимаешься и как часто — минимум шесть a/an. Потом объясни правило в трёх вопросах так, будто рассказываешь другу. Где запнулся — туда и возвращаешься.</p>
+  </div>
+  <p><a class="btn" href="/lessons/e02-4.html" style="text-decoration:none">Дальше: урок 4 · Читаем и пишем →</a></p>
+</section>
+</div>
+
+<script type="text/markdown" id="md">
+# 🇬🇧 Урок 2.6 · Артикль a/an: когда и зачем
+
+## Что значит a
+- a — бывшее слово *one*: «один, какой-то, один из многих».
+- Одна штука, которую можно посчитать, не стоит «голой»: *I have a car*, не «I have car».
+- Проверка: подставь «один / какой-то» — смысл не ломается? Значит, a.
+
+## Три вопроса
+1. Можно посчитать (один, два, три)? Нет — без a: *music, water, homework*.
+2. Одна? Много — без a: *two brothers, students*.
+3. Уже есть хозяин — my, his, this, the, имя, город, язык? Есть — без a: *my phone, Moscow, English*.
+
+Всё так → **a**, перед гласным звуком — **an**.
+
+## Когда ставят a
+- Кто ты, профессия: *I'm a student. He works as a developer.*
+- Что у тебя есть: *I have a brother.*
+- Одно из многих, впервые: *There's a café near my university.*
+- a + прилагательное + слово: *Moscow is a big city. She's a very kind person.*
+- В неделю, в день: *three times a week, twice a week, once a day*.
+- Ровно один: *an hour, a minute*.
+
+## Когда a не ставят
+- Много: *I have two brothers.*
+- Не посчитать: *I like music. I drink water.* Но в кафе порция — *Can I have a coffee, please?*
+- С хозяином: *my phone, this book* — не «a my phone».
+- Имена, города, страны, языки, дни: *Vlad, Moscow, Russia, English, on Monday*.
+- Прилагательное без слова: *She's kind.* — но *She's a kind person.*
+- Устойчивые: *at home, at work, at university, have breakfast, play football*.
+- В анкете: *Occupation: student*.
+
+## a или an — по звуку
+*an hour, an ML engineer, an English tutor* — но *a university, a good tutor*.
+
+## a или the
+Впервые — a, потом — the: *I have a tutor. The tutor is very good.* Главное сейчас — не пропускать a.
+
+## Частые ошибки
+| Ошибка | Правильно |
+| :--- | :--- |
+| I'm student. | I'm a student. |
+| She works as manager. | She works as a manager. |
+| He's a my friend. | He's my friend. |
+| I like a music. | I like music. |
+| I have a two brothers. | I have two brothers. |
+| three times in week | three times a week |
+</script>
+
+<script src="/assets/lesson.js"></script>
+<script src="/assets/en.js"></script>
+<script src="/assets/drill.js"></script>
+<script src="/assets/quizlet.js"></script>
+<script>
+/* ---------- диалог: озвучка ролей, скрыть реплики B ---------- */
+function dialog(id,D){
+  const box=$(id), play=$(id+"Play"), hide=$(id+"Hide");
+  box.innerHTML=D.map(([w,en,ru],i)=>`<div class="dl ${w==="B"?"b":""}" data-i="${i}"><span class="who">${w}</span><span class="tx"><span class="say" data-say="${enEsc(en)}">${en}</span><span class="ru">${ru}</span></span></div>`).join("");
+  hide.onclick=()=>{const on=hide.getAttribute("aria-pressed")!=="true";hide.setAttribute("aria-pressed",on);
+    box.querySelectorAll(".dl.b .say").forEach(s=>{s.style.filter=on?"blur(7px)":"";s.title=on?"Скажи сам, потом нажми — откроется":""})};
+  box.addEventListener("click",e=>{const s=e.target.closest(".dl.b .say");if(s)s.style.filter=""});
+  let playing=false;
+  const stop=()=>{playing=false;play.textContent="▶ Весь диалог";box.querySelectorAll(".tx").forEach(t=>t.style.outline="")};
+  play.onclick=()=>{
+    if(!("speechSynthesis" in window))return;
+    if(playing){speechSynthesis.cancel();stop();return}
+    playing=true;play.textContent="■ Стоп";speechSynthesis.cancel();
+    D.forEach(([w,en],i)=>{const u=new SpeechSynthesisUtterance(en);if(EN_VOICE)u.voice=EN_VOICE;u.lang="en-GB";u.rate=w==="A"?0.95:0.85;u.pitch=w==="A"?1.1:0.9;
+      u.onstart=()=>box.querySelectorAll(".dl").forEach((d,k)=>d.querySelector(".tx").style.outline=k===i?"2px solid var(--accent)":"");
+      if(i===D.length-1)u.onend=stop;
+      speechSynthesis.speak(u)});
+  };
+}
+dialog("gym",[
+  ["A","Hi! Are you new here?","Привет! Ты здесь новенький?"],
+  ["B","Yes, I am. I'm Vlad.","Да. Я Влад."],
+  ["A","Nice to meet you, Vlad. I'm Sam. I'm a coach here.","Приятно познакомиться, Влад. Я Сэм, я здесь тренер."],
+  ["B","Nice to meet you too.","Мне тоже приятно."],
+  ["A","Are you a student?","Ты студент?"],
+  ["B","Yes, I'm a third-year student. I study machine learning.","Да, я студент третьего курса. Изучаю машинное обучение."],
+  ["A","That's an interesting subject! Do you have a job?","Интересный предмет! А работа у тебя есть?"],
+  ["B","Not yet. I want to be an ML engineer.","Пока нет. Хочу стать ML-инженером."],
+  ["A","Cool. How often do you train?","Круто. Как часто тренируешься?"],
+  ["B","Three times a week. I do armwrestling too.","Три раза в неделю. Ещё занимаюсь армрестлингом."],
+  ["A","Armwrestling? That's a great sport. Is there a club near your university?","Армрестлинг? Отличный спорт. Рядом с университетом есть клуб?"],
+  ["B","Yes, there's a small club. The club is really good.","Да, есть небольшой клуб. Клуб очень хороший."],
+  ["A","Great. Have a good workout!","Отлично. Хорошей тренировки!"],
+  ["B","Thanks, you too!","Спасибо, и тебе!"]
+]);
+
+/* ---------- тема 1: быстрый выбор a / an / — ---------- */
+(function quickChoice(){
+  const OPT=["a","an","—"];
+  const Q=[["I'm","student.","a","профессия, роль — a"],["She's","engineer.","an","engineer — гласный звук"],["I like","music.","—","музыку не посчитать"],
+    ["He's","my friend.","—","my — уже хозяин"],["I have","two brothers.","—","много — без a"],["The lecture is","hour long.","an","h не читается: «ауэр»"],
+    ["Moscow is","big city.","a","a + прилагательное + слово"],["I go to the gym three times","week.","a","«в неделю» — a week"],["I study","English.","—","язык — без a"],
+    ["I have","laptop.","a","одна вещь — a"],["She works as","nurse.","a","после as — a"],["I drink","water.","—","воду не посчитать"],
+    ["I want to be","ML engineer.","an","ML — «эм-эл», гласный звук"],["I live in","Moscow.","—","город — без a"],["That's","interesting idea.","an","смотрим на interesting"],
+    ["I study at","university in Moscow.","a","university — звук [й]"],["She's very","kind.","—","прилагательное без слова — без a"],["I have","English tutor.","an","English — гласный звук"],
+    ["We have","homework today.","—","homework не посчитать"],["Can I have","coffee, please?","a","в кафе — одна чашка"]];
+  const KEY="en-article-best";
+  let order=[],i=0,right=0,t0=0,tick=null,miss=[],lock=false,on=false;
+  const best=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){return null}};
+  const showBest=()=>{const b=best();$("qcBest").textContent=b?`лучший: ${b.r}/20 · ${b.s} с`:""};
+  const full=(pre,rest,a)=>`${pre} ${a==="—"?"":a+" "}${rest}`;
+  $("qcB").innerHTML=OPT.map((o,k)=>`<button class="btn" type="button" data-o="${o}" disabled><span class="muted mono" style="font-size:11px;margin-right:6px">${k+1}</span>${o==="—"?"ничего":o}</button>`).join("");
+  function show(){const [pre,rest]=Q[order[i]];$("qcPh").className="qc-ph";$("qcPh").innerHTML=`<span>${pre}</span><span class="gap">&nbsp;</span><span>${rest}</span>`;
+    $("qcWhy").textContent="";$("qcScore").textContent=`${i+1} / ${Q.length}`;$("qcState").textContent=`верно ${right}`;lock=false}
+  function start(){order=enShuffle(Q.map((_,k)=>k));i=0;right=0;miss=[];on=true;t0=Date.now();$("qcMiss").innerHTML="";
+    $("qcB").querySelectorAll(".btn").forEach(b=>b.disabled=false);$("qcGo").textContent="Заново";
+    clearInterval(tick);tick=setInterval(()=>$("qcTime").textContent=`${((Date.now()-t0)/1000).toFixed(0)} с`,250);show()}
+  function finish(){on=false;clearInterval(tick);const s=Math.round((Date.now()-t0)/1000);
+    $("qcB").querySelectorAll(".btn").forEach(b=>b.disabled=true);$("qcTime").textContent=`${s} с`;$("qcWhy").textContent="";
+    const b=best(), better=!b||right>b.r||(right===b.r&&s<b.s);
+    if(better)try{localStorage.setItem(KEY,JSON.stringify({r:right,s}))}catch(e){}
+    $("qcPh").className="qc-ph "+(right===Q.length?"ok":"");
+    $("qcPh").textContent=`${right} из ${Q.length} за ${s} с${better?" — новый рекорд":""}. ${right===Q.length&&s<45?"Автоматизм есть.":right===Q.length?"Без ошибок — теперь быстрее.":"Ошибки ниже — послушай их."}`;
+    $("qcMiss").innerHTML=miss.map(t=>`<span class="say" data-say="${enEsc(t)}">${enEsc(t)}</span>`).join("");
+    $("qcState").textContent=`верно ${right}`;showBest()}
+  function pick(o){if(!on||lock)return;lock=true;const [pre,rest,a,why]=Q[order[i]],ok=o===a,f=full(pre,rest,a);
+    $("qcPh").className="qc-ph "+(ok?"ok":"no");$("qcPh").innerHTML=`<span>${pre}</span>${a==="—"?"":`<b>${a}</b>`}<span>${rest}</span>`;
+    if(ok)right++;else{miss.push(f);$("qcWhy").textContent=why}
+    setTimeout(()=>{i++;if(i<Q.length)show();else finish()},ok?260:1400)}
+  $("qcB").onclick=e=>{const b=e.target.closest(".btn");if(b)pick(b.dataset.o)};
+  $("qcGo").onclick=start;
+  document.addEventListener("keydown",e=>{if(!on||/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=+e.key;if(k>=1&&k<=3){e.preventDefault();pick(OPT[k-1])}});
+  $("qcScore").textContent=`0 / ${Q.length}`;showBest();
+})();
+
+/* ---------- упражнения: тема 1 ---------- */
+exSort($("ex1a"),{groups:[{label:"a"},{label:"an"},{label:"без артикля"}],items:[
+  {w:"student",g:0,why:"одна, можно посчитать"},{w:"engineer",g:1,why:"гласный звук"},{w:"students",g:2,why:"много"},
+  {w:"water",g:2,why:"не посчитать"},{w:"my laptop",g:2,why:"my — уже хозяин"},{w:"hour",g:1,why:"h не читается"},
+  {w:"Moscow",g:2,why:"город"},{w:"big city",g:0,why:"a + прилагательное + слово"},{w:"music",g:2,why:"не посчитать"},
+  {w:"job",g:0},{w:"English",g:2,why:"язык"},{w:"interesting book",g:1,why:"смотрим на interesting"},
+  {w:"friends",g:2,why:"много"},{w:"old friend",g:1,why:"old — гласный звук"},{w:"homework",g:2,why:"не посчитать"},{w:"university",g:0,why:"звук [й]"}
+]});
+exGap($("ex1b"),[
+  {s:"My sister is ___ doctor.",a:"a",opts:["a","an","—"],full:"My sister is a doctor.",why:"профессия"},
+  {s:"I have ___ two cats.",a:"—",opts:["a","an","—"],full:"I have two cats.",why:"много — без a"},
+  {s:"He works as ___ engineer.",a:"an",opts:["a","an","—"],full:"He works as an engineer."},
+  {s:"I don't like ___ coffee.",a:"—",opts:["a","an","—"],full:"I don't like coffee.",why:"кофе вообще — не посчитать"},
+  {s:"Can I have ___ coffee, please?",a:"a",opts:["a","an","—"],full:"Can I have a coffee, please?",why:"одна чашка"},
+  {s:"This is ___ my phone.",a:"—",opts:["a","an","—"],full:"This is my phone.",why:"my — уже хозяин"},
+  {s:"Kazan is ___ beautiful city.",a:"a",opts:["a","an","—"],full:"Kazan is a beautiful city.",why:"a + прилагательное + слово"},
+  {s:"She speaks ___ Spanish.",a:"—",opts:["a","an","—"],full:"She speaks Spanish.",why:"язык"},
+  {s:"I have lessons twice ___ week.",a:"a",opts:["a","an","—"],full:"I have lessons twice a week."},
+  {s:"We have ___ hour for lunch.",a:"an",opts:["a","an","—"],full:"We have an hour for lunch."},
+  {s:"He's ___ friendly.",a:"—",opts:["a","an","—"],full:"He's friendly.",why:"прилагательное без слова после"},
+  {s:"He's ___ friendly guy.",a:"a",opts:["a","an","—"],full:"He's a friendly guy.",why:"а здесь слово есть — guy"}
+]);
+exSpot($("ex1c"),[
+  {s:"I'm student and I study machine learning.",bad:1,fix:"a student",why:"профессия, роль — a student"},
+  {s:"She works as manager in a bank.",bad:3,fix:"a manager",why:"после as — a"},
+  {s:"He's a my best friend.",bad:1,fix:"",why:"my уже хозяин — a лишний"},
+  {s:"I like a music and films.",bad:2,fix:"",why:"музыку не посчитать"},
+  {s:"I go to the gym three times a week.",bad:-1,why:"всё верно: a week — «в неделю»"},
+  {s:"We have a two cats at home.",bad:2,fix:"",why:"a = один, а котов два"},
+  {s:"Moscow is big city.",bad:2,fix:"a big",why:"a + прилагательное + слово"},
+  {s:"My brother is an engineer.",bad:-1,why:"всё верно: an перед гласным звуком"},
+  {s:"I have car and a bike.",bad:2,fix:"a car",why:"одна вещь — a car"},
+  {s:"She's a very kind.",bad:1,fix:"",why:"без слова после прилагательного — без a. Или: She's a very kind person."}
+]);
+
+/* ---------- тема 2: про тебя ---------- */
+exBuild($("exMe1"),[
+  {ru:"Я студент третьего курса.",w:"I'm a third-year student .",extra:["the","an"]},
+  {ru:"Я изучаю машинное обучение.",w:"I study machine learning .",extra:["a","the"]},
+  {ru:"У меня есть репетитор по английскому.",w:"I have an English tutor .",extra:["a","the"]},
+  {ru:"Я занимаюсь с ним два раза в неделю.",w:"I have lessons with him twice a week .",extra:["in","the"]},
+  {ru:"Я хожу в зал три раза в неделю.",w:"I go to the gym three times a week .",extra:["in","an"]},
+  {ru:"Армрестлинг — моё хобби.",w:"Armwrestling is my hobby .",extra:["a","an"]},
+  {ru:"Я хочу стать ML-инженером.",w:"I want to be an ML engineer .",extra:["a","the"]},
+  {ru:"В ноябре у меня поездка в Ереван.",w:"I have a trip to Yerevan in November .",extra:["the","an"]}
+]);
+exGap($("exMe2"),[
+  {s:"My name is Vlad. I'm ___ third-year student.",a:"a",opts:["a","an","—"],full:"My name is Vlad. I'm a third-year student."},
+  {s:"I study ___ machine learning at university.",a:"—",opts:["a","an","—"],full:"I study machine learning at university.",why:"предмет не посчитать"},
+  {s:"I don't have ___ job yet.",a:"a",opts:["a","an","—"],full:"I don't have a job yet.",why:"и в отрицании a остаётся"},
+  {s:"I want to be ___ ML engineer.",a:"an",opts:["a","an","—"],full:"I want to be an ML engineer."},
+  {s:"I have ___ English tutor.",a:"an",opts:["a","an","—"],full:"I have an English tutor."},
+  {s:"She's ___ very good teacher.",a:"a",opts:["a","an","—"],full:"She's a very good teacher.",why:"a + very + прилагательное + слово"},
+  {s:"We have lessons twice ___ week.",a:"a",opts:["a","an","—"],full:"We have lessons twice a week."},
+  {s:"I also go to the gym three times ___ week.",a:"a",opts:["a","an","—"],full:"I also go to the gym three times a week."},
+  {s:"___ armwrestling is my favourite sport.",a:"—",opts:["a","an","—"],full:"Armwrestling is my favourite sport.",why:"вид спорта — без a"},
+  {s:"I have ___ trip to Yerevan in November.",a:"a",opts:["a","an","—"],full:"I have a trip to Yerevan in November."},
+  {s:"Yerevan is ___ old city.",a:"an",opts:["a","an","—"],full:"Yerevan is an old city.",why:"old — гласный звук"}
+]);
+
+/* ---------- объясни и расскажи ---------- */
+explain($("exRule"), [{"q": "Объясни другу, что значит a и зачем он нужен, если в русском его нет.", "model": "a — это бывшее one, «один, какой-то, один из многих». В английском одна штука, которую можно посчитать, не может стоять голой: I have a car, I'm a student. По-русски «один» понятно и так, а в английском это показывает a. Если можно подставить «один» или «какой-то» — нужен a.", "points": ["a = one, «один, какой-то»", "одна штука не стоит голой", "профессия — всегда a", "свой пример"]}, {"q": "Объясни три вопроса, по которым решаешь, ставить a или нет, и приведи пример на каждый «нет».", "model": "1. Можно посчитать? Музыку, воду, домашку — нет, без a: I like music. 2. Одна? Если много — без a: two brothers. 3. Есть ли уже хозяин — my, his, the, this, имя, город, язык? Есть — без a: my phone, Moscow. Если посчитать можно, одна и хозяина нет — a, а перед гласным звуком an.", "points": ["можно посчитать — пример music / water", "одна — пример two brothers", "нет хозяина — пример my phone", "an перед гласным звуком"]}]);
+explain($("exTell"), [{"q": "Tell about yourself in 6 sentences. Use a or an at least 5 times.", "model": "I'm Vlad. I'm a third-year student. I study machine learning. I don't have a job yet, but I want to be an ML engineer. I have an English tutor and we have lessons twice a week. I go to the gym three times a week.", "points": ["a third-year student", "a job / an ML engineer", "an English tutor", "twice a week / three times a week", "без a: machine learning"]}, {"q": "What do you have? Describe your room or your bag in 5 sentences: one thing — a/an, many — no article.", "model": "In my bag I have a laptop and a charger. I have two pens and a notebook. I also have a water bottle and an umbrella. In my room there's a big desk and a comfortable chair. I have a lot of books.", "points": ["a laptop / a notebook — одна вещь", "an umbrella — гласный звук", "two pens / books — без a", "a + прилагательное + слово"]}], {lang: "en"});
+
+takeAway($("take"),{lesson:"2.6",words:[
+  {en:"twice a week",ru:"два раза в неделю",ex:"I have English lessons twice a week."},
+  {en:"three times a week",ru:"три раза в неделю",ex:"I go to the gym three times a week."},
+  {en:"once a day",ru:"раз в день",ex:"I check my email once a day."},
+  {en:"a third-year student",ru:"студент третьего курса",ex:"I'm a third-year student."},
+  {en:"an hour long",ru:"длиной в час",ex:"The lecture is an hour long."}
+],rules:[
+{
+"id": "en.02.6.r1",
+"q": "Что значит a и когда его ставят?",
+"a": "a = «один, какой-то». Одна штука, которую можно посчитать, без хозяина (my, the, this) — всегда с a.",
+"ex": [
+"I have a car.",
+"I'm a student."
+],
+"wrong": "I'm student.",
+"right": "I'm a student."
+},
+{
+"id": "en.02.6.r2",
+"q": "Три вопроса перед a",
+"a": "Можно посчитать? Одна? Нет my / his / the / this / имени? Всё так — a (an перед гласным звуком).",
+"ex": [
+"She works as a nurse.",
+"Moscow is a big city."
+]
+},
+{
+"id": "en.02.6.r3",
+"q": "Когда a не ставят?",
+"a": "Много (two brothers), не посчитать (music, water), есть хозяин (my phone), имена, города, языки, at home / at work.",
+"wrong": "He's a my friend.",
+"right": "He's my friend."
+},
+{
+"id": "en.02.6.r4",
+"q": "Как сказать «три раза в неделю»?",
+"a": "three times a week · twice a week · once a day — через a, без in.",
+"wrong": "three times in week",
+"right": "three times a week"
+},
+{
+"id": "en.02.6.r5",
+"q": "a + прилагательное — где a?",
+"a": "a стоит перед прилагательным, если после него есть слово: a very kind person. Без слова — без a: She's very kind.",
+"wrong": "She's a very kind.",
+"right": "She's very kind."
+},
+{
+"id": "en.02.6.r6",
+"q": "a или the?",
+"a": "Впервые, «какой-то» — a. Уже понятно какой, «тот самый» — the.",
+"ex": [
+"I have a tutor. The tutor is very good."
+]
+}
+]});
+
+initLesson({topics:[["en.02.6.1","Артикль a/an: зачем и когда ставить"],["en.02.6.2","a/an в речи о себе"]]});
+</script>
