@@ -168,7 +168,8 @@ li.ok .sword,li.bad .sword{pointer-events:none}
 .wtr-spk{margin-left:auto;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;width:30px;height:28px;display:grid;place-items:center;cursor:pointer}
 .wtr-spk:hover{border-color:var(--accent);color:var(--accent)}
 .wtr-ru{font-weight:500}
-.wtr-alt{font-size:13.5px;color:var(--muted)}
+.wtr-alt{font-size:13.5px;color:var(--muted)} .wtr-alt i{font-style:normal;font:500 11px var(--f-mono);color:var(--accent);margin-right:4px}
+.wtr-ctx{display:grid;gap:2px;font-size:14px;border-top:1px dashed var(--line);padding-top:6px;margin-top:2px}
 .wtr-f{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-top:2px}
 .wtr-src{font:500 11px var(--f-mono);letter-spacing:.04em;color:var(--muted)}
 .wtr-src.ok{color:var(--accent)}

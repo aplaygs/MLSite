@@ -369,13 +369,20 @@ document.addEventListener("DOMContentLoaded",()=>{
     const below=rect.bottom+10, h=box.offsetHeight;
     box.style.top=(below+h>innerHeight-8&&rect.top-h-10>8?rect.top-h-10:below)+"px";
   }
-  async function show(q,rect){
+  /* Предложение, где стоит выделенное, — для перевода в контексте. */
+  function sentence(sel,q){
+    const n=sel.anchorNode, el=n&&(n.nodeType===1?n:n.parentElement), blk=el&&el.closest("p,li,td,.say,.tx,.gl,.sw,div");
+    const t=(blk?blk.textContent:"").replace(/\s+/g," ").trim(); if(!t||t.length<q.length+3)return "";
+    const parts=t.match(/[^.!?]+[.!?]*/g)||[t], low=q.toLowerCase();
+    return (parts.find(x=>x.toLowerCase().includes(low))||"").trim().slice(0,300);
+  }
+  async function show(q,rect,ctx){
     close(); lastQ=q; const my=++seq;
     box=document.createElement("div"); box.className="wtr"; box.setAttribute("role","dialog");
     box.innerHTML=`<div class="wtr-h"><b>${enEsc(q)}</b></div><div class="wtr-ru muted">перевожу…</div>`;
     document.body.append(box); place(rect);
     let d;
-    try{const r=await fetch("/api/en/translate?q="+encodeURIComponent(q));if(!r.ok)throw 0;d=await r.json()}catch(e){d={ru:"",source:"сервер не отвечает"}}
+    try{const r=await fetch("/api/en/translate?q="+encodeURIComponent(q)+(ctx?"&ctx="+encodeURIComponent(ctx):""));if(!r.ok)throw 0;d=await r.json()}catch(e){d={ru:"",source:"сервер не отвечает"}}
     if(my!==seq||!box)return;
     const short=q.split(/\s+/).length<=4, canAdd=d.ru&&short&&!d.in_deck;
     const plain=q.replace(/^[\s.,!?;:«»"“”()]+|[\s.,!?;:«»"“”()]+$/g,""), base=d.word&&d.word!==plain.toLowerCase()?d.word:"";  /* works → work */
@@ -383,8 +390,9 @@ document.addEventListener("DOMContentLoaded",()=>{
     box.innerHTML=`<div class="wtr-h"><b>${enEsc(plain)}</b>${base?`<span class="wtr-ipa">→ ${enEsc(base)}</span>`:""}${d.ipa?`<span class="wtr-ipa">/${enEsc(d.ipa)}/</span>`:""}
         <button type="button" class="wtr-spk" data-say="${enEsc(plain)}" aria-label="Послушать">${EN_SPK_SVG}</button></div>
       <div class="wtr-ru">${d.ru?enEsc(d.ru):"Перевод не нашёлся."}</div>
-      ${d.alts&&d.alts.length?`<div class="wtr-alt">ещё: ${d.alts.map(enEsc).join(" · ")}</div>`:""}
-      <div class="wtr-f"><span class="wtr-src">${enEsc(d.source==="словарь"?"из твоего словаря":d.source==="MyMemory"?"онлайн-переводчик":/^урок /.test(d.source||"")?d.source.replace(/^урок/,"из урока"):d.source||"")}</span>
+      ${(d.meanings||[]).filter(m=>m.terms.length).slice(0,3).map(m=>`<div class="wtr-alt"><i>${enEsc(m.pos)}</i> ${m.terms.slice(0,4).map(enEsc).join(", ")}</div>`).join("")}
+      ${d.context?`<div class="wtr-ctx"><span class="wtr-src">в этом предложении</span>${enEsc(d.context.ru)}</div>`:""}
+      <div class="wtr-f"><span class="wtr-src">${enEsc(d.source==="словарь"?"из твоего словаря":d.source==="Google"||d.source==="MyMemory"?"онлайн-переводчик":/^урок /.test(d.source||"")?d.source.replace(/^урок/,"из урока"):d.source||"")}</span>
         ${canAdd?`<button type="button" class="btn wtr-add">В словарь</button>`:d.in_deck?`<span class="wtr-src">уже в словаре</span>`:""}</div>`;
     place(rect);
     const add=box.querySelector(".wtr-add");
@@ -400,7 +408,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(!node||node.closest("input,textarea,.wtr,button,select,pre,code"))return;
     const q=sel.toString().replace(/\s+/g," ").trim();
     if(!q||q.length>200||!/[A-Za-z]/.test(q)||/[А-Яа-яЁё]/.test(q)||q===lastQ)return;
-    show(q,sel.getRangeAt(0).getBoundingClientRect());
+    show(q,sel.getRangeAt(0).getBoundingClientRect(),sentence(sel,q));
   }
   let t=null;
   document.addEventListener("mouseup",e=>{if(box&&box.contains(e.target))return;setTimeout(check,10)});
