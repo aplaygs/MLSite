@@ -403,14 +403,11 @@ function dialog(id,D){
   box.addEventListener("click",e=>{const s=e.target.closest(".dl.b .say");if(s)s.style.filter=""});
   let playing=false;
   const stop=()=>{playing=false;play.textContent="▶ Весь диалог";box.querySelectorAll(".tx").forEach(t=>t.style.outline="")};
+  let halt=null;  /* звук — файлами с сервера (enDialog в en.js): без задержки между репликами */
   play.onclick=()=>{
-    if(!("speechSynthesis" in window))return;
-    if(playing){speechSynthesis.cancel();stop();return}
-    playing=true;play.textContent="■ Стоп";speechSynthesis.cancel();
-    D.forEach(([w,en],i)=>{const u=new SpeechSynthesisUtterance(en);if(EN_VOICE)u.voice=EN_VOICE;u.lang="en-GB";u.rate=w==="A"?0.95:0.85;u.pitch=w==="A"?1.1:0.9;
-      u.onstart=()=>box.querySelectorAll(".dl").forEach((d,k)=>d.querySelector(".tx").style.outline=k===i?"2px solid var(--accent)":"");
-      if(i===D.length-1)u.onend=stop;
-      speechSynthesis.speak(u)});
+    if(playing){halt&&halt();return}
+    playing=true;play.textContent="■ Стоп";
+    halt=enDialog(D,{rate:w=>w==="A"?0.95:0.85,onLine:i=>box.querySelectorAll(".dl").forEach((d,k)=>d.querySelector(".tx").style.outline=k===i?"2px solid var(--accent)":""),onEnd:stop});
   };
 }
 dialog("cafe",[

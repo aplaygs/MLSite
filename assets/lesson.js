@@ -67,7 +67,9 @@ function initLesson({topics,md}){
   }
   const day=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
   const fmt=iso=>{const [,m,d]=(iso||"").split("-");return d&&m?`${d}.${m}`:""};
+  let DONE={};
   function apply(d){
+    DONE=d;
     TOPICS.forEach(([id])=>{
       const on=!!d[id];
       document.querySelectorAll(`input[data-id="${id}"]`).forEach(cb=>{cb.checked=on});
@@ -94,7 +96,7 @@ function initLesson({topics,md}){
       w.classList.toggle("lo",sc>0&&sc<=4);w.classList.toggle("mid",sc>=5&&sc<=7);w.classList.toggle("hi",sc>=8);
       w.querySelector(".tr-l").textContent=sc?`понял ${sc}/10`:"понял";
       if(document.activeElement!==ta)ta.value=n.text||"";
-      if(n.text&&ta.hidden&&!w.dataset.closed)ta.hidden=false;
+      if((n.text||DONE[w.dataset.r])&&ta.hidden&&!w.dataset.closed)ta.hidden=false;  /* тема пройдена — поле заметки сразу открыто */
       w.querySelector(".tr-nb").classList.toggle("has",!!n.text);
     });
   }
@@ -136,6 +138,7 @@ function initLesson({topics,md}){
       const r=await fetch(TREE_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(checked?{set:{[id]:day()}}:{unset:[id]})});
       if(!r.ok)throw 0;
       apply((await r.json()).done||{});
+      showNotes();
       if(note)note.textContent="Сохранено — видно и в файле недели в Obsidian";
     }catch(err){
       document.querySelectorAll(`input[data-id="${id}"]`).forEach(c=>{c.checked=!checked});

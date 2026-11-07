@@ -18,6 +18,7 @@ function initQuiz(cfg) {
   const speak = t => { if (typeof say === "function") return say(t); /* en.js подключён — его голос */ try { const u = new SpeechSynthesisUtterance(t), v = speechSynthesis.getVoices();
     u.voice = v.find(x => x.lang === "en-GB") || v.find(x => /Samantha|Karen|Daniel/.test(x.name)) || null; u.lang = "en-GB"; u.rate = 0.92;
     speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} };
+  if (typeof enPrefetch === "function") enPrefetch(Q.filter(q => q.say).map(q => q.say));  /* звук вопросов — заранее */
   const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
   const LET = "ABCDEFGH";
   let S = null;  /* {list: [индексы вопросов], i, res: {qi: {score, pick}}, order: {qi: [перестановка]}, retry} */

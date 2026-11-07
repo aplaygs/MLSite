@@ -359,15 +359,12 @@
     document.querySelectorAll("#dlg .dl.b .say").forEach(s=>{s.style.filter=on?"blur(7px)":"";s.title=on?"Скажи сам, потом нажми — откроется":""})};
   document.getElementById("dlg").addEventListener("click",e=>{const s=e.target.closest(".dl.b .say");if(s)s.style.filter=""});
   let playing=false;
+  let halt=null;  /* звук — файлами с сервера (enDialog в en.js): без задержки между репликами */
+  const fin=()=>{playing=false;$("dlgPlay").textContent="▶ Весь диалог";document.querySelectorAll("#dlg .tx").forEach(t=>t.style.outline="")};
   $("dlgPlay").onclick=()=>{
-    if(!("speechSynthesis" in window))return;
-    if(playing){speechSynthesis.cancel();playing=false;$("dlgPlay").textContent="▶ Весь диалог";return}
+    if(playing){halt&&halt();return}
     playing=true;$("dlgPlay").textContent="■ Стоп";
-    speechSynthesis.cancel();
-    D.forEach(([w,en],i)=>{const u=new SpeechSynthesisUtterance(sayText(en));if(EN_VOICE)u.voice=EN_VOICE;u.lang="en-GB";u.rate=w==="A"?0.95:0.85;u.pitch=w==="A"?1.1:0.9;
-      u.onstart=()=>document.querySelectorAll("#dlg .dl").forEach((d,k)=>d.querySelector(".tx").style.outline=k===i?"2px solid var(--accent)":"");
-      if(i===D.length-1)u.onend=()=>{playing=false;$("dlgPlay").textContent="▶ Весь диалог";document.querySelectorAll("#dlg .tx").forEach(t=>t.style.outline="")};
-      speechSynthesis.speak(u)});
+    halt=enDialog(D.map(([w,en])=>[w,sayText(en)]),{rate:w=>w==="A"?0.95:0.85,onLine:i=>document.querySelectorAll("#dlg .dl").forEach((d,k)=>d.querySelector(".tx").style.outline=k===i?"2px solid var(--accent)":""),onEnd:fin});
   };
 })();
 

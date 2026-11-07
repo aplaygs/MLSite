@@ -1,6 +1,6 @@
 /* Упражнения уроков английского. Подключать после lesson.js: <script src="/assets/en.js"></script>.
    Всё строится из данных — урок только описывает задания:
-     say(text)                      — прочитать фразу голосом браузера (британский, если есть). Любой элемент с data-say
+     say(text)                      — прочитать фразу: на localhost — файлом с сервера (tts.py, сразу), иначе голосом браузера. Любой элемент с data-say
                                       (или класс .say) читается по клику; пустой data-say — читается его текст.
      exGap(el, items, {pick})        — пропуски: {s:"I ___ from Russia.", a:["'m","am"], ru?, why?, opts?}.
                                       opts → выбрать из вариантов, иначе впечатать. ___ — место пропуска.
@@ -30,7 +30,10 @@ const EN_SPK_SVG='<svg class="ico-spk" width="16" height="16" viewBox="0 0 24 24
    поэтому бывала задержка 2–3 с. Что делаем:
    — прогрев: при первом касании страницы голос тихо произносит пустую фразу, соединение готово заранее;
    — cancel() только если что-то уже звучит, и новая фраза через 60 мс (иначе Chrome её иногда теряет).
-   Подмены на голос с компьютера нет: два голоса сразу хуже ожидания. */
+   Подмены на голос с компьютера нет: два голоса сразу хуже ожидания.
+   С 07.11.2026 на компьютере (localhost) звучит не голос браузера, а файл: сервер берёт у Google ту же британскую
+   женскую озвучку mp3 и хранит её (tts.py) — фраза звучит сразу. Фразы урока скачиваются заранее, пока ты читаешь.
+   Сервер не ответил — голос браузера, как раньше (одно или другое, не оба сразу). */
 let EN_VOICE=null,EN_U=null,EN_WARM=false;
 function enPickVoice(){
   if(!("speechSynthesis" in window))return;
@@ -62,11 +65,55 @@ const enSpeakable=t=>String(t)
   .replace(/[А-Яа-яЁё][А-Яа-яЁё\s,.:;!?()-]*/g," ").replace(/[«»"“”]/g,"")
   .replace(/\s*[→←⇄↔↗↘↑↓⟶]\s*/g,", ").replace(/\s+\/\s+/g,". ").replace(/[✓✗✔✘•·]/g," ")
   .replace(/\s+([,.!?])/g,"$1").replace(/([,.!?])(?:\s*[,.])+/g,"$1").replace(/^[\s,.:;—–-]+/,"").replace(/\s{2,}/g," ").trim();
-function say(text,rate=0.9){
-  if(!("speechSynthesis" in window))return false;
+const EN_TTS=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const EN_AUD=new Map();  /* фраза → Promise(адрес звука в памяти | null) */
+let EN_PLAY=null,EN_SEQ=0;
+function enAudio(t){
+  if(!EN_AUD.has(t))EN_AUD.set(t,fetch("/api/en/tts?q="+encodeURIComponent(t)).then(r=>r.ok?r.blob():null)
+    .then(b=>b&&b.size?URL.createObjectURL(b):null).catch(()=>null).then(u=>{if(!u)EN_AUD.delete(t);return u}));
+  return EN_AUD.get(t);
+}
+/* Остановить всё, что звучит (файл и голос браузера). */
+function enHush(){EN_SEQ++;if(EN_PLAY){EN_PLAY.onended=null;EN_PLAY.pause();EN_PLAY=null}if("speechSynthesis" in window&&(speechSynthesis.speaking||speechSynthesis.pending))speechSynthesis.cancel()}
+/* Фразы страницы — заранее на сервер (он скачает их в фоне), чтобы первый клик звучал сразу. */
+function enPrefetch(list){
+  if(!EN_TTS)return;
+  const texts=[...new Set(list.map(enSpeakable).filter(Boolean))];
+  if(texts.length)fetch("/api/en/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({texts})}).catch(()=>{});
+}
+if(EN_TTS){
+  const scan=()=>enPrefetch([...document.querySelectorAll("[data-say],.say")].map(el=>el.dataset.say||el.textContent));
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(scan,400));
+  /* навёл на кнопку — звук уже грузится, к клику готов */
+  document.addEventListener("pointerover",e=>{const el=e.target.closest&&e.target.closest("[data-say],.say");if(el){const t=enSpeakable(el.dataset.say||el.textContent.trim());if(t)enAudio(t)}});
+}
+/* say(text, rate, {onend}) — прочитать фразу; onend — когда договорит (для диалогов по очереди). */
+function say(text,rate=0.9,opt={}){
   const t=enSpeakable(text); if(!t)return false;
+  if(EN_TTS){
+    enHush(); const my=EN_SEQ;
+    enAudio(t).then(url=>{
+      if(my!==EN_SEQ)return;  /* пока грузилось, нажали другое */
+      if(!url)return sayVoice(t,rate,opt);
+      const a=new Audio(url); a.playbackRate=rate/0.9; a.preservesPitch=true; EN_PLAY=a;
+      a.onended=()=>{if(EN_PLAY===a)EN_PLAY=null;if(opt.onend)opt.onend()};
+      a.play().catch(()=>{if(my===EN_SEQ)sayVoice(t,rate,opt)});
+    });
+    return true;
+  }
+  return sayVoice(t,rate,opt);
+}
+/* Диалог по очереди: lines — [[кто, фраза], …]; onLine(i) — подсветить реплику; onEnd() — конец. Возвращает stop(). */
+function enDialog(lines,{onLine=()=>{},onEnd=()=>{},rate=w=>w==="A"?0.95:0.86}={}){
+  let stopped=false;
+  const next=i=>{if(stopped)return;if(i>=lines.length){onEnd();return}onLine(i);say(lines[i][1],rate(lines[i][0]),{onend:()=>setTimeout(()=>next(i+1),250)})};
+  next(0);
+  return ()=>{stopped=true;enHush();onEnd()};
+}
+function sayVoice(t,rate=0.9,opt={}){
+  if(!("speechSynthesis" in window))return false;
   if(!EN_VOICE)enPickVoice();
-  const mk=v=>{const u=new SpeechSynthesisUtterance(t); if(v){u.voice=v;u.lang=v.lang}else u.lang="en-GB"; u.rate=rate; return u};
+  const mk=v=>{const u=new SpeechSynthesisUtterance(t); if(v){u.voice=v;u.lang=v.lang}else u.lang="en-GB"; u.rate=rate; if(opt.onend)u.onend=opt.onend; return u};
   const go=()=>{
     const u=mk(EN_VOICE); EN_U=u; /* ссылка держит фразу, иначе Chrome может выбросить её до начала */
     speechSynthesis.resume(); speechSynthesis.speak(u);
@@ -106,6 +153,7 @@ function enKeep(el,restore){
 
 /* ---------- пропуски ---------- */
 function exGap(el,items,opt={}){
+  enPrefetch(items.flatMap(it=>[it.say,it.full].filter(Boolean)));
   const body=document.createElement("ol"); body.className="gaps"; el.append(body);
   let done={},ans={};
   function draw(){
@@ -254,6 +302,7 @@ function exStress(el,items){
 
 /* ---------- разложить по группам: по одной карточке ---------- */
 function exSort(el,{groups,items,auto=true}){
+  enPrefetch(items.map(it=>it.say||it.w));
   const body=document.createElement("div"); body.className="sorter"; el.append(body);
   let order=[],i=0,right=0,log=[],started=false,picks=[];
   function draw(){order=enShuffle(items.map((_,k)=>k));i=0;right=0;log=[];picks=[];started=false;render();upd(0)}
@@ -281,6 +330,7 @@ function exSort(el,{groups,items,auto=true}){
 
 /* ---------- карточки слов ---------- */
 function wordCards(el,words){
+  enPrefetch(words.flatMap(w=>[w.en,w.ex].filter(Boolean)));
   el.classList.add("wcards-box");
   el.insertAdjacentHTML("beforeend",`<div class="btns wc-mode" role="group" aria-label="Режим карточек">
     <button class="btn" type="button" data-m="all" aria-pressed="true">Всё видно</button><button class="btn" type="button" data-m="en">Вспомни перевод</button><button class="btn" type="button" data-m="ru">Вспомни английское</button></div>

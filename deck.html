@@ -207,7 +207,13 @@ function pickVoice(){
     ||v.find(x=>x.lang==="en-GB")||v.find(x=>/samantha|ava|allison|google us/i.test(x.name))||v[0]||null;
 }
 if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
-function say(t){if(!("speechSynthesis" in window)||!t)return;const u=new SpeechSynthesisUtterance(String(t));if(!VOICE)pickVoice();
+/* Звук слова — файлом с сервера (tts.py): сразу, без задержки голоса браузера; сервер не ответил — голос браузера. */
+const AUD=new Map();let PLAY=null;
+function say(t){if(!t)return;const q=String(t).trim();
+  if(!AUD.has(q))AUD.set(q,fetch("/api/en/tts?q="+encodeURIComponent(q)).then(r=>r.ok?r.blob():null).then(b=>b&&b.size?URL.createObjectURL(b):null).catch(()=>null));
+  if(PLAY)PLAY.pause();
+  AUD.get(q).then(u=>{if(!u){AUD.delete(q);return sayVoice(q)}PLAY=new Audio(u);PLAY.play().catch(()=>sayVoice(q))})}
+function sayVoice(t){if(!("speechSynthesis" in window)||!t)return;const u=new SpeechSynthesisUtterance(String(t));if(!VOICE)pickVoice();
   if(VOICE)u.voice=VOICE;u.lang=VOICE?VOICE.lang:"en-GB";u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b)say(b.dataset.say)});
 
