@@ -172,3 +172,22 @@ body{margin:0} [hidden]{display:none!important}
 .topic-check .tp input:checked~span:last-child{text-decoration:none;color:var(--ink)}
 .topic-check .note{font:500 12px var(--f-mono);color:var(--muted);letter-spacing:.02em}
 .topic-check.is-done .note{color:var(--accent)}
+/* оценка «насколько понял» 1–10 и заметка к теме (lesson.js) */
+.tr{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:2px 6px 8px 33px;font:500 11.5px var(--f-mono);color:var(--muted);--tr:var(--accent)}
+.topic-check .tr{flex-basis:100%;padding:0 8px 2px 34px}
+.tr.lo{--tr:var(--red)} .tr.mid{--tr:var(--warm)} .tr.hi{--tr:var(--teal)}
+.tr-l{min-width:72px;letter-spacing:.02em}
+.tr.lo .tr-l,.tr.mid .tr-l,.tr.hi .tr-l{color:var(--tr)}
+.tr-s{display:inline-flex;gap:3px}
+.tr-s button{width:22px;height:22px;padding:0;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--muted);font:500 11px var(--f-mono);cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.tr-s button:hover{border-color:var(--tr);color:var(--tr)}
+.tr-s button.on{background:color-mix(in srgb,var(--tr) 16%,var(--surface));border-color:color-mix(in srgb,var(--tr) 45%,var(--line));color:var(--tr)}
+.tr-s button.cur{background:var(--tr);border-color:var(--tr);color:var(--surface)}
+.tr-s button:focus-visible,.tr-nb:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.tr-nb{border:0;background:none;padding:2px 4px;border-radius:6px;color:var(--muted);font:inherit;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.tr-nb:hover,.tr-nb.has{color:var(--accent)}
+.tr-t{flex-basis:100%;width:100%;min-height:56px;resize:vertical;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:14px/1.45 var(--f-body)}
+.tr-t:focus{outline:none;border-color:var(--accent)}
+.tr-m{color:var(--accent)}
+@media (max-width:520px){.tr{padding-left:6px}.topic-check .tr{padding-left:8px}.tr-s button{width:24px;height:26px}}
+.topics:has(.tr){grid-template-columns:1fr;gap:2px}

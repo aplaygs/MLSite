@@ -382,7 +382,7 @@ const SKILLS=[
 ];
 const KIND_COLOR=Object.fromEntries(SKILLS.map(s=>[s.key,s.color]));
 
-let P=null, done={}, currentFilter="all";
+let P=null, done={}, currentFilter="all", NOTES={};  /* NOTES — оценка «понял N/10» и заметки тем из уроков */
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
 const tops=w=>w.lessons.flatMap(l=>l.topics);
 
@@ -540,7 +540,7 @@ function weekHTML(w){
     <summary><span class="wnum">${w.n}</span><div><h3>${esc(w.title)} <span class="ru">— ${esc(w.ru)}</span></h3><div class="sub">${w.unit?"Empower A2 · юнит "+w.unit:"повторение"} · ${k} / ${ts.length} ${chip}</div></div><span class="dt">${esc(w.span)}<span class="chev" aria-hidden="true">›</span></span></summary>
     <div class="wbody">
       <div class="lcs">${w.lessons.map(l=>card(l.n,l.title)).join("")}${card(0,"Тест в субботу",true)}</div>
-      <div class="cols">${w.lessons.map(l=>`<div class="col"><h4>Урок ${l.n} · ${esc(l.title)}</h4><ul>${l.topics.map(t=>`<li><label class="it"><input type="checkbox" data-id="${t.id}"${done[t.id]?" checked":""}><span class="box" aria-hidden="true"></span><span class="tx"><span class="t">${esc(t.title)}</span><span class="kd" style="--kc:${KIND_COLOR[t.kind]||"var(--muted)"}">${esc(t.kind)}</span>${done[t.id]?`<span class="d">${done[t.id].slice(8)}.${done[t.id].slice(5,7)}</span>`:""}</span></label></li>`).join("")}</ul></div>`).join("")}</div>
+      <div class="cols">${w.lessons.map(l=>`<div class="col"><h4>Урок ${l.n} · ${esc(l.title)}</h4><ul>${l.topics.map(t=>`<li><label class="it"><input type="checkbox" data-id="${t.id}"${done[t.id]?" checked":""}><span class="box" aria-hidden="true"></span><span class="tx"><span class="t">${esc(t.title)}</span><span class="kd" style="--kc:${KIND_COLOR[t.kind]||"var(--muted)"}">${esc(t.kind)}</span>${done[t.id]||NOTES[t.id]?`<span class="d"${NOTES[t.id]&&NOTES[t.id].text?` title="${esc(NOTES[t.id].text)}"`:""}>${[done[t.id]?`${done[t.id].slice(8)}.${done[t.id].slice(5,7)}`:"",NOTES[t.id]&&NOTES[t.id].score?`понял ${NOTES[t.id].score}/10`:"",NOTES[t.id]&&NOTES[t.id].text?"заметка":""].filter(Boolean).join(" · ")}</span>`:""}</span></label></li>`).join("")}</ul></div>`).join("")}</div>
       <div class="wfoot">
         <a href="obsidian://open?vault=${encodeURIComponent(P.vault)}&file=${encodeURIComponent(w.file.replace(/\.md$/,""))}">открыть неделю в Obsidian ↗</a>
         <span class="muted" style="font-size:12px">${ts.length} тем · ~${hrs(w.lessons.reduce((a,l)=>a+((L.find(x=>x.n===l.n&&x.kind!=="test")||{}).minutes||60),0))} + тест</span>
@@ -603,6 +603,7 @@ async function load(){
   try{
     P=await (await fetch("/api/en/plan")).json();
     done=P.done||{};
+    try{NOTES=(await (await fetch("/api/en/tree")).json()).notes||{}}catch(e){}
     render();
     $("sync").textContent="✓ Отметки сохраняются · Obsidian показывает прогресс";
     (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(jump,80));

@@ -637,8 +637,10 @@ const fmt=iso=>{const [y,m,d]=iso.split("-");return `${d}.${m}`};
 /* ---------- progress ---------- */
 function syncOne(id){
   document.querySelectorAll(`input[data-id="${id}"]`).forEach(cb=>cb.checked=!!done[id]);
-  document.querySelectorAll(`[data-d="${id}"]`).forEach(dd=>dd.textContent=done[id]?fmt(done[id]):"");
+  const n=NOTES[id]||{},sc=n.score?`понял ${n.score}/10`:"";  /* оценка и заметка темы ставятся в уроке */
+  document.querySelectorAll(`[data-d="${id}"]`).forEach(dd=>{dd.textContent=[done[id]?fmt(done[id]):"",sc].filter(Boolean).join(" · ")+(n.text?" · заметка":"");dd.title=n.text||""});
 }
+let NOTES={};
 function syncAll(){ORDER.forEach(syncOne)}
 function updateProgress(){
   const total=ORDER.length, n=ORDER.filter(id=>done[id]).length;
@@ -698,7 +700,8 @@ async function flush(){
 async function load(quiet){
   try{if(PLAN)await refreshPlan();
     const r=await fetch("/api/tree");const d=await r.json();
-    const changed=applyServer(d.done||{}); online=true;
+    NOTES=d.notes||{};
+    const changed=applyServer(d.done||{}); online=true;syncAll();
     if(hasPending()){flush();return}
     setSync((changed&&quiet?"Подтянул свежие отметки · ":"Отметки сохранены, Obsidian показывает их · ")+hhmm())}
   catch(e){online=false;setSync("Нет связи с сервером: запусти «Тренажёр и дерево». Пока отметки не сохраняются.",true)}

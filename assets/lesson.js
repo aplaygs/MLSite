@@ -82,7 +82,51 @@ function initLesson({topics,md}){
       if(h)h.textContent=all?"✓ все темы пройдены":(cnt?`${cnt} из ${ids.length} пройдено`:"");
     });
   }
-  fetch(TREE_API).then(r=>r.json()).then(j=>apply(j.done||{})).catch(()=>{if(note)note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
+  /* оценка «насколько понял» 1–10 и заметка к теме — рядом с каждой галочкой (в карточках тем и в списке в конце урока) */
+  const NOTES={};
+  const rateHTML=id=>`<div class="tr" data-r="${id}"><span class="tr-l">понял</span><span class="tr-s">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button type="button" data-n="${n}" aria-label="Понял на ${n} из 10">${n}</button>`).join("")}</span><button type="button" class="tr-nb">заметка</button><textarea class="tr-t" rows="3" placeholder="Что понял, что неясно, что повторить" hidden></textarea><span class="tr-m" aria-live="polite"></span></div>`;
+  if(box)box.querySelectorAll("li").forEach(li=>{const id=li.querySelector("input[data-id]").dataset.id;li.insertAdjacentHTML("beforeend",rateHTML(id))});
+  document.querySelectorAll(".topic-check label.tp").forEach(lb=>{const cb=lb.querySelector("input[data-id]");if(cb)lb.parentElement.insertAdjacentHTML("beforeend",rateHTML(cb.dataset.id))});
+  function showNotes(){
+    document.querySelectorAll(".tr[data-r]").forEach(w=>{
+      const n=NOTES[w.dataset.r]||{},sc=n.score||0,ta=w.querySelector(".tr-t");
+      w.querySelectorAll(".tr-s button").forEach(b=>{const v=+b.dataset.n;b.classList.toggle("on",v<=sc);b.classList.toggle("cur",v===sc)});
+      w.classList.toggle("lo",sc>0&&sc<=4);w.classList.toggle("mid",sc>=5&&sc<=7);w.classList.toggle("hi",sc>=8);
+      w.querySelector(".tr-l").textContent=sc?`понял ${sc}/10`:"понял";
+      if(document.activeElement!==ta)ta.value=n.text||"";
+      if(n.text&&ta.hidden&&!w.dataset.closed)ta.hidden=false;
+      w.querySelector(".tr-nb").classList.toggle("has",!!n.text);
+    });
+  }
+  async function saveNote(id,patch,w){
+    const m=w&&w.querySelector(".tr-m");
+    try{
+      const r=await fetch(TREE_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({notes_set:{[id]:patch}})});
+      if(!r.ok)throw 0;
+      Object.keys(NOTES).forEach(k=>delete NOTES[k]);Object.assign(NOTES,(await r.json()).notes||{});
+      showNotes();
+      if(m){m.textContent="сохранено";clearTimeout(m._t);m._t=setTimeout(()=>{m.textContent=""},1500)}
+    }catch(err){if(m)m.textContent="не сохранилось: сервер не отвечает"}
+  }
+  document.addEventListener("click",e=>{
+    const w=e.target.closest(".tr[data-r]");if(!w)return;
+    const id=w.dataset.r,b=e.target.closest(".tr-s button");
+    if(b){const v=+b.dataset.n,cur=(NOTES[id]||{}).score;NOTES[id]={...(NOTES[id]||{}),score:cur===v?null:v};showNotes();saveNote(id,{score:cur===v?null:v},w);return}
+    if(e.target.closest(".tr-nb")){const ta=w.querySelector(".tr-t");ta.hidden=!ta.hidden;w.dataset.closed=ta.hidden?"1":"";if(!ta.hidden)ta.focus()}
+  });
+  const timers={};
+  document.addEventListener("input",e=>{
+    const ta=e.target;if(!ta.matches||!ta.matches(".tr-t"))return;
+    const w=ta.closest(".tr"),id=w.dataset.r;
+    document.querySelectorAll(`.tr[data-r="${id}"] .tr-t`).forEach(t=>{if(t!==ta)t.value=ta.value});
+    clearTimeout(timers[id]);timers[id]=setTimeout(()=>saveNote(id,{text:ta.value},w),900);
+  });
+  document.addEventListener("focusout",e=>{
+    const ta=e.target;if(!ta.matches||!ta.matches(".tr-t"))return;
+    const w=ta.closest(".tr"),id=w.dataset.r;
+    if(timers[id]){clearTimeout(timers[id]);timers[id]=0;saveNote(id,{text:ta.value},w)}
+  });
+  fetch(TREE_API).then(r=>r.json()).then(j=>{apply(j.done||{});Object.assign(NOTES,j.notes||{});showNotes()}).catch(()=>{if(note)note.textContent="Сервер не отвечает: запусти «Тренажёр и дерево»."});
   document.addEventListener("change",async e=>{
     const cb=e.target;
     if(!cb||!cb.matches("input[data-id]"))return;
